@@ -16,7 +16,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - **P10 Package**: README (Mermaid architecture, model usage, setup, spec, loop, limitations), DEMO_SCRIPT.md, `scripts/setup.sh`, `scripts/dev.sh`, screenshots + GIF.
 
 ## In progress
-- Fresh-clone check of the README steps.
+- Nothing. Fresh-clone check passed on 2026-10-28: setup.sh (3.5 min), 113/113 tests, server, demo job, dev.sh with Vite proxy.
 
 ## Known issues / limitations
 - Live Meta adapters are implemented from the docs and tested against recorded request shapes with a fake client, but **never called live** (no key on this machine). First live run may surface response-shape surprises; the fallback keeps the UI working and labels it.

@@ -113,3 +113,19 @@ def test_align_removes_extra_gate(example):
     fixed, changes = align_with_spec(code, spec, "ideal")
     assert any("removed qc.x(1)" in c for c in changes)
     assert [c.key for c in extract_calls(fixed)] == [c.key for c in extract_calls(generate_code(spec))]
+
+
+def test_repair_keeps_the_scripts_variable_name(example):
+    spec = parse_spec(example("bell"))
+    code = generate_code(spec).replace("qc", "circuit")
+    broken, _ = inject(code, spec, "missing_cnot")
+    fixed, changes = align_with_spec(broken, spec, "ideal")
+    assert changes and "circuit.cx(0, 1)" in fixed and "qc." not in fixed
+
+
+def test_demo_mode_without_a_plantable_fault_runs_as_written(example):
+    spec = parse_spec(example("superposition"))
+    bus = EventBus()
+    result = run_agent(spec, MockCodeModel(), AgentOptions(noise="ideal", demo_fault="missing_cnot"), bus)
+    assert result.verified and result.fault is None
+    assert any(e.step == "inject" and "no fault planted" in e.message for e in bus.events())

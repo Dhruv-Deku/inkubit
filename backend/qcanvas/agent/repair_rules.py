@@ -48,6 +48,7 @@ def align_with_spec(code: str, spec: CircuitSpec, noise: str) -> tuple[str, list
 
     matcher = SequenceMatcher(a=[c.key for c in calls], b=[c.key for c in ref_calls], autojunk=False)
     indent = re.match(r"\s*", lines[calls[0].lineno - 1]).group(0) if calls else "    "
+    var = calls[0].obj if calls else _circuit_var(code)
     new_block: list[str] = []
     changes: list[str] = []
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
@@ -55,7 +56,7 @@ def align_with_spec(code: str, spec: CircuitSpec, noise: str) -> tuple[str, list
             for c in calls[i1:i2]:
                 new_block.extend(lines[c.lineno - 1:c.end_lineno])
             continue
-        ref_block = [indent + ref_lines[c.lineno - 1].strip() for c in ref_calls[j1:j2]]
+        ref_block = [indent + re.sub(r"^qc\.", f"{var}.", ref_lines[c.lineno - 1].strip()) for c in ref_calls[j1:j2]]
         if tag == "replace":
             for old, new in zip(calls[i1:i2], ref_calls[j1:j2]):
                 changes.append(_describe_replace(old, new))
@@ -83,6 +84,12 @@ def align_with_spec(code: str, spec: CircuitSpec, noise: str) -> tuple[str, list
         if i + 1 not in remove:
             out.append(line)
     return "\n".join(out), changes
+
+
+def _circuit_var(code: str) -> str:
+    """Name of the variable assigned a QuantumCircuit(...), defaulting to ``qc``."""
+    m = re.search(r"^\s*(\w+)\s*=\s*QuantumCircuit\(", code, re.M)
+    return m.group(1) if m else "qc"
 
 
 def rule_based_repair(code: str, spec: CircuitSpec, noise: str, category: str) -> tuple[str, list[str]]:

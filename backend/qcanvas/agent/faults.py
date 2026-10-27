@@ -50,8 +50,8 @@ def _inject_wrong_import(code: str, spec: CircuitSpec) -> str:
 
 
 def _inject_missing_measurement(code: str, spec: CircuitSpec) -> str:
-    lines = [ln for ln in _lines(code) if not re.match(r"\s*qc\.measure\(", ln)]
-    return "\n".join(lines)
+    drop = {n for c in extract_calls(code) if c.name == "measure" for n in range(c.lineno, c.end_lineno + 1)}
+    return "\n".join(ln for i, ln in enumerate(_lines(code), start=1) if i not in drop)
 
 
 def _inject_wrong_qubit(code: str, spec: CircuitSpec) -> str:
@@ -60,7 +60,8 @@ def _inject_wrong_qubit(code: str, spec: CircuitSpec) -> str:
     q = int(call.args[0])
     wrong = (q + 1) % spec.num_qubits
     line = _lines(code)[call.lineno - 1]
-    return _replace_line(code, call.lineno, line.replace(f"qc.{call.name}({q})", f"qc.{call.name}({wrong})", 1))
+    new = re.sub(rf"\.{call.name}\(\s*{q}\s*\)", f".{call.name}({wrong})", line, count=1)
+    return _replace_line(code, call.lineno, new)
 
 
 def _inject_swapped_cx(code: str, spec: CircuitSpec) -> str:
@@ -68,7 +69,8 @@ def _inject_swapped_cx(code: str, spec: CircuitSpec) -> str:
     assert call is not None
     c, t = call.args
     line = _lines(code)[call.lineno - 1]
-    return _replace_line(code, call.lineno, line.replace(f"qc.cx({c}, {t})", f"qc.cx({t}, {c})", 1))
+    new = re.sub(rf"\.cx\(\s*{c}\s*,\s*{t}\s*\)", f".cx({t}, {c})", line, count=1)
+    return _replace_line(code, call.lineno, new)
 
 
 def _inject_missing_cnot(code: str, spec: CircuitSpec) -> str:
@@ -93,7 +95,7 @@ FAULTS: dict[str, Fault] = {f.name: f for f in [
           lambda code, s: "from qiskit_aer import AerSimulator" in code, _inject_wrong_import),
     Fault("missing_measurement", "Missing measurement",
           "drops every measurement, so the run records nothing",
-          lambda code, s: "qc.measure(" in code, _inject_missing_measurement),
+          lambda code, s: _has(code, {"measure"}), _inject_missing_measurement),
     Fault("wrong_qubit_index", "Wrong qubit index",
           "applies the first single-qubit gate to the neighbouring qubit",
           lambda code, s: s.num_qubits > 1 and _has(code, {"h", "x", "y", "z", "s", "t"}), _inject_wrong_qubit),
@@ -127,4 +129,12 @@ def inject(code: str, spec: CircuitSpec, name: str) -> tuple[str, Fault]:
         raise ValueError(f"unknown fault '{name}'; choose auto or one of {', '.join(FAULTS)}")
     if not fault.applies(code, spec):
         raise ValueError(f"fault '{fault.name}' does not apply to this circuit")
-    return fault.inject(code, spec), fault
+    broken = fault.inject(code, spec)
+    if broken == code:
+        if name == "auto":
+            for other in REPAIRABLE_DEMO_ORDER:
+                alt = FAULTS[other]
+                if alt is not fault and alt.applies(code, spec) and (b := alt.inject(code, spec)) != code:
+                    return b, alt
+        raise ValueError(f"fault '{fault.name}' could not be planted in this script")
+    return broken, fault

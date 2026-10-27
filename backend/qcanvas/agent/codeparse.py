@@ -17,6 +17,7 @@ class GateCall:
     args: tuple[float | int | str, ...]
     lineno: int  # 1-based, first line of the statement
     end_lineno: int
+    obj: str = "qc"  # the circuit variable the method is called on
 
     @property
     def key(self) -> tuple[str, tuple[float | int | str, ...]]:
@@ -85,5 +86,6 @@ def extract_calls(code: str, function: str = "build_circuit") -> list[GateCall]:
         func = node.value.func
         if isinstance(func, ast.Attribute) and func.attr in GATE_METHODS:
             args = tuple(_normalise(_eval(a)) for a in node.value.args)
-            calls.append(GateCall(func.attr, args, node.lineno, node.end_lineno or node.lineno))
+            obj = func.value.id if isinstance(func.value, ast.Name) else ast.unparse(func.value)
+            calls.append(GateCall(func.attr, args, node.lineno, node.end_lineno or node.lineno, obj))
     return sorted(calls, key=lambda c: c.lineno)

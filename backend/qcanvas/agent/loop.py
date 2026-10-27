@@ -107,8 +107,13 @@ def run_agent(spec: CircuitSpec, code_model: CodeModel, options: AgentOptions | 
     pause()
 
     fault_info: dict[str, str] | None = None
-    if opts.demo_fault:
-        broken, fault = inject(code, spec, opts.demo_fault)
+    try:
+        planted = inject(code, spec, opts.demo_fault) if opts.demo_fault else None
+    except ValueError as err:
+        planted = None
+        bus.emit("inject", "warn", f"Demo mode: no fault planted ({err}); running the script as written.")
+    if planted:
+        broken, fault = planted
         fault_info = {"name": fault.name, "label": fault.label, "description": fault.description}
         bus.emit("inject", "warn",
                  f"Demo mode: attempt 1 was broken on purpose. Fault: {fault.label} ({fault.description}). "
