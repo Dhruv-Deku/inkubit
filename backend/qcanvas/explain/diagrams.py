@@ -68,7 +68,9 @@ def network_png(spec: NetworkSpec, metrics: dict[str, Any] | None = None) -> byt
         end = n.id in (spec.source, spec.destination)
         ax.scatter([x], [y], s=380, marker=marker[n.type], color=ACCENT if end else INK, zorder=4,
                    edgecolors=BG, linewidths=2)
-        ax.text(x, y - 38, n.label or n.id, color=INK, fontsize=10, ha="center", va="top", zorder=5)
+        above = n.type == "satellite"
+        ax.text(x, y + 38 if above else y - 38, n.label or n.id, color=INK, fontsize=10, ha="center",
+                va="bottom" if above else "top", zorder=5)
     ax.set_aspect("equal", adjustable="datalim")
     ax.margins(0.15)
     ax.axis("off")

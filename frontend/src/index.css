@@ -246,7 +246,7 @@ pre.diff .hunk { color: var(--muted); display: block; }
 table.data { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
 table.data th { color: var(--muted); font-weight: 500; font-size: 12px; text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
 table.data td { padding: 8px; border-bottom: 1px solid var(--line); }
-table.data td.num, table.data th.num { text-align: right; }
+table.data td.num, table.data th.num { text-align: right; white-space: nowrap; }
 table.data tr.weak td { background: rgba(227, 160, 8, 0.07); }
 table.data tr.chosen td { background: rgba(76, 195, 138, 0.07); }
 

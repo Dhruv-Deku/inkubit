@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { ApiError, api, followJob } from './api'
 import { AgentLog } from './components/AgentLog'
 import { CallBadge } from './components/CallBadge'
+import { Histogram } from './components/Histogram'
 import { Logo } from './components/Icons'
 import { OverlayView } from './components/OverlayView'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
 import type {
-  AgentEvent, CircuitResult, Examples, Health, NetworkResult, RunOptions, SketchAnalysis, Spec, SpecIssue,
+  AgentEvent, CircuitResult, Examples, Health, NetworkResult, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
 } from './types'
 import { specTitle } from './util'
 
@@ -25,6 +26,25 @@ interface JobState {
 
 const DEFAULT_OPTIONS: RunOptions = {
   noise: 'realistic', shots: 4096, demo_mode: false, demo_fault: 'auto', explain: true, diagram: true,
+}
+
+/** While a run is live: the newest verified attempt's histogram, so a failure is visible at once. */
+function LivePreview({ events, live }: { events: AgentEvent[]; live: boolean }) {
+  const last = [...events].reverse().find((e) => e.step === 'verify' && e.details.verdict)
+  if (!last) return <div className="panel empty">{live ? 'Results appear here as soon as the first attempt is checked.' : 'No result.'}</div>
+  const v = last.details.verdict as Verdict
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <h2>Attempt {last.attempt}</h2>
+        <span className={`badge ${v.passed ? 'pass' : 'fail'}`}>{v.passed ? 'matches the spec' : 'does not match the spec'}</span>
+        <span className="spacer" />
+        {live && <span className="sub">agent still working…</span>}
+      </div>
+      <Histogram predicted={v.expected} measured={v.measured} ideal={v.ideal} shots={v.metrics.shots} />
+      <div className="sub" style={{ marginTop: 8 }}>{v.reason}</div>
+    </div>
+  )
 }
 
 export default function App() {
@@ -211,7 +231,7 @@ export default function App() {
           </div>
           <div>
             {job.error && <div className="notice error" style={{ marginBottom: 12 }}>{job.error}</div>}
-            {!job.result && <div className="panel empty">{job.live ? 'Results appear here when the run finishes.' : 'No result.'}</div>}
+            {!job.result && <LivePreview events={job.events} live={job.live} />}
             {job.result && 'verified' in job.result && <CircuitResults result={job.result} sketchCalls={sketchCalls} />}
             {job.result && 'before' in job.result && <NetworkResults result={job.result} sketchCalls={sketchCalls} />}
           </div>

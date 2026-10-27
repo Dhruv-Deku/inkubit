@@ -18,6 +18,21 @@ OUT = ROOT / "docs" / "screenshots"
 BASE = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000"
 
 
+def _gif(frames: list[bytes], path: Path, width: int = 1000) -> None:
+    """Assemble PNG screenshots into a compact looping GIF."""
+    import io
+
+    from PIL import Image
+
+    images = []
+    for raw in frames:
+        img = Image.open(io.BytesIO(raw)).convert("RGB")
+        img = img.resize((width, round(img.height * width / img.width)), Image.LANCZOS)
+        images.append(img.quantize(colors=128, method=Image.Quantize.MEDIANCUT))
+    durations = [350] * (len(images) - 1) + [2600]
+    images[0].save(path, save_all=True, append_images=images[1:], duration=durations, loop=0, optimize=True)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
@@ -38,10 +53,21 @@ def main() -> None:
         page.screenshot(path=str(OUT / "2-overlay.png"))
         page.click("label.toggle")
         page.click("button.btn.primary.big")
-        page.wait_for_selector(".ev.diagnose, .ev.fail", timeout=60000)
-        page.wait_for_timeout(2500)
-        page.screenshot(path=str(OUT / "3-live-log.png"))
+        frames: list[bytes] = []
+        logged_fail = False
+        for _ in range(240):  # record the live log until the verdict appears
+            frames.append(page.screenshot())
+            if not logged_fail and page.locator(".ev.fail").count() >= 2:
+                page.wait_for_timeout(1200)
+                page.screenshot(path=str(OUT / "3-live-log.png"))
+                logged_fail = True
+            if page.locator(".verdict-badge").count():
+                break
+            page.wait_for_timeout(350)
         page.wait_for_selector(".verdict-badge", timeout=120000)
+        page.wait_for_timeout(700)
+        frames += [page.screenshot()] * 6
+        _gif(frames, OUT / "agent-repair.gif")
         page.wait_for_timeout(800)
         page.screenshot(path=str(OUT / "4-results.png"))
         page.screenshot(path=str(OUT / "4-results-full.png"), full_page=True)
