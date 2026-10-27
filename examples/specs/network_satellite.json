@@ -1,0 +1,16 @@
+{
+  "kind": "network",
+  "version": "1.0",
+  "nodes": [
+    {"id": "delingha", "type": "ground_station", "label": "Ground station A", "position": {"x": 80, "y": 320}},
+    {"id": "sat", "type": "satellite", "label": "LEO satellite (pair source)", "position": {"x": 400, "y": 80}},
+    {"id": "lijiang", "type": "ground_station", "label": "Ground station B", "position": {"x": 720, "y": 320}}
+  ],
+  "links": [
+    {"from": "delingha", "to": "sat", "medium": "free_space", "length_km": 1100},
+    {"from": "sat", "to": "lijiang", "medium": "free_space", "length_km": 1600}
+  ],
+  "source": "delingha",
+  "destination": "lijiang",
+  "metadata": {"title": "Preset A: satellite link", "notes": "Two ground stations about 1,200 km apart share entanglement from one satellite (dual downlink).", "origin": "manual"}
+}

@@ -1,0 +1,18 @@
+{
+  "kind": "network",
+  "version": "1.0",
+  "nodes": [
+    {"id": "city_a", "type": "ground_station", "label": "City A", "position": {"x": 60, "y": 200}},
+    {"id": "r1", "type": "repeater", "label": "Repeater 1", "memory_t2_ms": 10, "position": {"x": 260, "y": 200}},
+    {"id": "r2", "type": "repeater", "label": "Repeater 2", "memory_t2_ms": 10, "position": {"x": 520, "y": 200}},
+    {"id": "city_b", "type": "ground_station", "label": "City B", "position": {"x": 740, "y": 200}}
+  ],
+  "links": [
+    {"from": "city_a", "to": "r1", "medium": "fiber", "length_km": 80},
+    {"from": "r1", "to": "r2", "medium": "fiber", "length_km": 200},
+    {"from": "r2", "to": "city_b", "medium": "fiber", "length_km": 70}
+  ],
+  "source": "city_a",
+  "destination": "city_b",
+  "metadata": {"title": "Preset B: fiber repeater chain", "notes": "350 km of fiber with two memory repeaters; the middle span is long.", "origin": "manual"}
+}

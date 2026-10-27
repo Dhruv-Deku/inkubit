@@ -1,0 +1,12 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 2,
+  "num_clbits": 2,
+  "operations": [
+    {"gate": "H", "targets": [0]},
+    {"gate": "CX", "controls": [0], "targets": [1]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}],
+  "metadata": {"title": "Bell pair", "notes": "Hadamard then CNOT: the simplest entangled state.", "origin": "manual"}
+}

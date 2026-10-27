@@ -1,0 +1,13 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 2,
+  "num_clbits": 2,
+  "operations": [
+    {"gate": "H", "targets": [0]},
+    {"gate": "CX", "controls": [1], "targets": [1]},
+    {"gate": "RX", "targets": [3]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}],
+  "metadata": {"title": "Broken on purpose", "notes": "Shows the readable validation errors.", "origin": "manual"}
+}

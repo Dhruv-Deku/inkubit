@@ -1,0 +1,13 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "H", "targets": [0]},
+    {"gate": "CX", "controls": [0], "targets": [1]},
+    {"gate": "CX", "controls": [1], "targets": [2]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}, {"qubit": 2, "clbit": 2}],
+  "metadata": {"title": "GHZ-3", "notes": "Three qubits that are all 0 or all 1 together.", "origin": "manual"}
+}

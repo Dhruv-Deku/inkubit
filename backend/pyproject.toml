@@ -1,0 +1,15 @@
+[project]
+name = "qcanvas"
+version = "0.1.0"
+description = "Hand-drawn quantum circuits and networks to verified, running simulations."
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = [
+    "live: makes real (billed) Meta Model API calls; opt in with `pytest -m live`",
+    "slow: runs generated code in a subprocess",
+]
+addopts = "-m 'not live'"
+filterwarnings = ["ignore::DeprecationWarning"]
