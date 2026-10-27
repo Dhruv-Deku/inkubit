@@ -60,12 +60,34 @@ def _link_overlay(spec: dict[str, Any], segments: list[Segment]) -> list[Overlay
             sid = (link.get("source") or {}).get("segment_id")
             if sid:
                 links[sid] = (f"links[{i}]", f"{link.get('length_km')} km {link.get('medium', '')}".strip())
+    boxes = {sid: _source_bbox(spec, key) for sid, (key, _) in links.items()}
     out = []
     for s in segments:
         linked, label = links.get(s.id, (None, s.concept))
+        if linked is None:
+            linked, label = _contained_in(s, boxes, links) or (None, s.concept)
+        if linked is None and spec.get("kind") == "circuit" and any(w in s.concept for w in ("meter", "measure")):
+            linked, label = "measurements", "measure"
         out.append(OverlayBox(segment_id=s.id, concept=s.concept, bbox=s.bbox, confidence=s.confidence,
                               linked_to=linked, label=label))
     return out
+
+
+def _source_bbox(spec: dict[str, Any], key: str) -> tuple[float, ...] | None:
+    group, idx = key.split("[")
+    item = spec.get(group, [])[int(idx.rstrip("]"))]
+    bbox = (item.get("source") or {}).get("bbox")
+    return tuple(bbox) if bbox else None
+
+
+def _contained_in(seg: Segment, boxes: dict[str, tuple[float, ...] | None],
+                  links: dict[str, tuple[str, str]]) -> tuple[str, str] | None:
+    """A part drawn inside another element's box (e.g. a CNOT's control dot) belongs to it."""
+    cx, cy = (seg.bbox[0] + seg.bbox[2]) / 2, (seg.bbox[1] + seg.bbox[3]) / 2
+    for sid, box in boxes.items():
+        if box and box[0] <= cx <= box[2] and box[1] <= cy <= box[3]:
+            return links[sid]
+    return None
 
 
 def analyze_image(raw: bytes, models: Models) -> tuple[SketchAnalysis, bytes]:

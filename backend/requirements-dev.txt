@@ -1,0 +1,3 @@
+-r requirements.txt
+# screenshots / UI checks (uses the system Edge, no browser download)
+playwright==1.58.0

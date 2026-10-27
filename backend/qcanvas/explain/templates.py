@@ -104,6 +104,6 @@ def explain_circuit(spec: CircuitSpec, result: dict[str, Any]) -> str:
             p3 += " The run did not match the spec, so treat these numbers as unverified."
     fault = result.get("fault")
     if fault and result.get("verified"):
-        p3 += (f" The first attempt had a planted bug ({fault['label'].lower()}); the agent caught it only "
+        p3 += (f" The first attempt had a planted bug ({fault['label']}); the agent caught it only "
                "because the counts disagreed with the spec, then fixed the code.")
     return "\n\n".join([p1, p2, p3])
