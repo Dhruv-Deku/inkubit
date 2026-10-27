@@ -46,3 +46,42 @@ for training.
 ## D5. Python 3.13 venv
 System Python is 3.10 (too old for the mission's 3.11+). The `py` launcher has
 3.13, which Qiskit 2.6.1 and qiskit-aer 0.18.2 ship wheels for.
+
+## D6. Generated code runs in a guarded subprocess
+`sim/runner.py` runs scripts with `python -I -X utf8` in a scratch folder under
+`backend/.qcanvas_runs/`, a 60 s timeout, and an environment with every
+`*KEY*`/`*TOKEN*`/`*SECRET*` variable removed (so model-written code can never
+read the Meta key). Before running, `codegen/safety.py` parses the AST and rejects
+imports outside qiskit/qiskit_aer/json/math/numpy and calls such as `open`,
+`eval`, `exec`. This is a guard rail, not a full sandbox; stated in the README.
+
+## D7. Noise presets
+| preset | 1q depol | 2q depol | readout 0->1 / 1->0 | T1 / T2 |
+| --- | --- | --- | --- | --- |
+| ideal | 0 | 0 | 0 / 0 | none |
+| low_noise | 0.05% | 0.5% | 0.5% / 1% | none |
+| realistic | 0.1% | 1.5% | 2% / 4% | 100 us / 80 us (50 ns 1q, 400 ns 2q gates) |
+These are ordinary numbers for current superconducting devices (readout error
+larger for |1> because of T1 decay during readout). Seeds fixed: simulator and
+transpiler seed 1234, 4096 shots.
+
+## D8. Verification method and thresholds
+- The verifier rebuilds the circuit from the spec with its own builder
+  (`verify/expected.py`), never from generated code.
+- Expected distribution is **exact and noise-aware**: density-matrix simulation
+  with the preset's gate noise, then readout error applied exactly per bit.
+  The ideal (statevector) distribution is also reported as "cost of noise".
+- Pass iff TVD(measured, expected) <= max(floor, shot-noise bound) AND Hellinger
+  fidelity >= minimum.
+  - Shot-noise bound: 3/2 * sum_i sqrt(p_i (1-p_i) / N), i.e. three standard
+    deviations of sampling error on every outcome at once. For Bell at 4096
+    shots this is about 0.023, so honest runs essentially never fail.
+  - Floors: ideal 0.02, low_noise 0.03, realistic 0.04; minimum fidelity 0.99 /
+    0.985 / 0.98. Noisier presets spread probability over more outcomes, which
+    adds sampling variance, so their floors are slightly higher. The floors also
+    absorb float/ordering differences between two independent constructions.
+  - Real faults are far outside these limits: a missing or reversed CNOT on Bell
+    gives TVD ~0.46-0.5.
+- Known blind spot, stated honestly: an error that moves the distribution by
+  less than the threshold (for example an angle off by a few degrees) is not
+  caught. Measurement-basis statistics cannot see a pure phase error either.
