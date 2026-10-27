@@ -1,0 +1,173 @@
+{
+  "name": "satellite_sketch",
+  "sha256": "7fbe352478e8aa951d9cecab629600798dffc871ee1d19485b45baf8f795c331",
+  "width": 1400,
+  "height": 900,
+  "kind": "network",
+  "concepts": [
+    "satellite",
+    "antenna dish",
+    "dashed line"
+  ],
+  "segments": [
+    {
+      "id": "s0",
+      "concept": "satellite",
+      "bbox": [
+        465,
+        175,
+        935,
+        265
+      ],
+      "confidence": 0.962
+    },
+    {
+      "id": "s1",
+      "concept": "antenna dish",
+      "bbox": [
+        155,
+        645,
+        305,
+        765
+      ],
+      "confidence": 0.907
+    },
+    {
+      "id": "s2",
+      "concept": "antenna dish",
+      "bbox": [
+        1095,
+        645,
+        1245,
+        765
+      ],
+      "confidence": 0.956
+    },
+    {
+      "id": "s3",
+      "concept": "dashed line",
+      "bbox": [
+        230,
+        270,
+        580,
+        640
+      ],
+      "confidence": 0.81
+    },
+    {
+      "id": "s4",
+      "concept": "dashed line",
+      "bbox": [
+        820,
+        270,
+        1170,
+        640
+      ],
+      "confidence": 0.81
+    }
+  ],
+  "spec": {
+    "kind": "network",
+    "version": "1.0",
+    "nodes": [
+      {
+        "id": "delingha",
+        "type": "ground_station",
+        "label": "Ground station A",
+        "position": {
+          "x": 80,
+          "y": 320
+        },
+        "source": {
+          "bbox": [
+            155,
+            645,
+            305,
+            765
+          ],
+          "confidence": 0.907,
+          "segment_id": "s1"
+        }
+      },
+      {
+        "id": "sat",
+        "type": "satellite",
+        "label": "LEO satellite (pair source)",
+        "position": {
+          "x": 400,
+          "y": 80
+        },
+        "source": {
+          "bbox": [
+            465,
+            175,
+            935,
+            265
+          ],
+          "confidence": 0.962,
+          "segment_id": "s0"
+        }
+      },
+      {
+        "id": "lijiang",
+        "type": "ground_station",
+        "label": "Ground station B",
+        "position": {
+          "x": 720,
+          "y": 320
+        },
+        "source": {
+          "bbox": [
+            1095,
+            645,
+            1245,
+            765
+          ],
+          "confidence": 0.956,
+          "segment_id": "s2"
+        }
+      }
+    ],
+    "links": [
+      {
+        "from": "delingha",
+        "to": "sat",
+        "medium": "free_space",
+        "length_km": 1100,
+        "source": {
+          "bbox": [
+            230,
+            270,
+            580,
+            640
+          ],
+          "confidence": 0.81,
+          "segment_id": "s3"
+        }
+      },
+      {
+        "from": "sat",
+        "to": "lijiang",
+        "medium": "free_space",
+        "length_km": 1600,
+        "source": {
+          "bbox": [
+            820,
+            270,
+            1170,
+            640
+          ],
+          "confidence": 0.81,
+          "segment_id": "s4"
+        }
+      }
+    ],
+    "source": "delingha",
+    "destination": "lijiang",
+    "metadata": {
+      "title": "Satellite entanglement link",
+      "notes": "Read from the bundled sample sketch.",
+      "origin": "image"
+    }
+  }
+}

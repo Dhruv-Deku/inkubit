@@ -1,0 +1,128 @@
+{
+  "name": "bell_sketch",
+  "sha256": "2de97187d4eccaaea1bef8febfbecc964d8126b25841b9ac4e487b4a8d9d0e5e",
+  "width": 1400,
+  "height": 560,
+  "kind": "circuit",
+  "concepts": [
+    "gate box",
+    "dot",
+    "circle",
+    "meter"
+  ],
+  "segments": [
+    {
+      "id": "s0",
+      "concept": "gate box",
+      "bbox": [
+        310,
+        250,
+        410,
+        350
+      ],
+      "confidence": 0.966
+    },
+    {
+      "id": "s1",
+      "concept": "dot",
+      "bbox": [
+        625,
+        285,
+        655,
+        315
+      ],
+      "confidence": 0.928
+    },
+    {
+      "id": "s2",
+      "concept": "circle",
+      "bbox": [
+        599,
+        429,
+        681,
+        511
+      ],
+      "confidence": 0.922
+    },
+    {
+      "id": "s3",
+      "concept": "meter",
+      "bbox": [
+        1010,
+        254,
+        1120,
+        346
+      ],
+      "confidence": 0.924
+    },
+    {
+      "id": "s4",
+      "concept": "meter",
+      "bbox": [
+        1010,
+        424,
+        1120,
+        516
+      ],
+      "confidence": 0.897
+    }
+  ],
+  "spec": {
+    "kind": "circuit",
+    "version": "1.0",
+    "num_qubits": 2,
+    "num_clbits": 2,
+    "operations": [
+      {
+        "gate": "H",
+        "targets": [
+          0
+        ],
+        "source": {
+          "bbox": [
+            310,
+            250,
+            410,
+            350
+          ],
+          "confidence": 0.966,
+          "segment_id": "s0"
+        }
+      },
+      {
+        "gate": "CX",
+        "controls": [
+          0
+        ],
+        "targets": [
+          1
+        ],
+        "source": {
+          "bbox": [
+            599,
+            285,
+            681,
+            511
+          ],
+          "confidence": 0.922,
+          "segment_id": "s2"
+        }
+      }
+    ],
+    "measurements": [
+      {
+        "qubit": 0,
+        "clbit": 0
+      },
+      {
+        "qubit": 1,
+        "clbit": 1
+      }
+    ],
+    "metadata": {
+      "title": "Bell pair",
+      "notes": "Read from the bundled sample sketch.",
+      "origin": "image"
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "name": "ghz_sketch",
+  "sha256": "fdd68a4f67f0d6f0525f2b07bda618a62910f41860e65621cc0e269c9b8e5562",
+  "width": 1400,
+  "height": 730,
+  "kind": "circuit",
+  "concepts": [
+    "gate box",
+    "dot",
+    "circle",
+    "meter"
+  ],
+  "segments": [
+    {
+      "id": "s0",
+      "concept": "gate box",
+      "bbox": [
+        290,
+        220,
+        390,
+        320
+      ],
+      "confidence": 0.938
+    },
+    {
+      "id": "s1",
+      "concept": "dot",
+      "bbox": [
+        565,
+        255,
+        595,
+        285
+      ],
+      "confidence": 0.902
+    },
+    {
+      "id": "s2",
+      "concept": "circle",
+      "bbox": [
+        539,
+        389,
+        621,
+        471
+      ],
+      "confidence": 0.94
+    },
+    {
+      "id": "s3",
+      "concept": "dot",
+      "bbox": [
+        785,
+        415,
+        815,
+        445
+      ],
+      "confidence": 0.952
+    },
+    {
+      "id": "s4",
+      "concept": "circle",
+      "bbox": [
+        759,
+        549,
+        841,
+        631
+      ],
+      "confidence": 0.911
+    },
+    {
+      "id": "s5",
+      "concept": "meter",
+      "bbox": [
+        1010,
+        224,
+        1120,
+        316
+      ],
+      "confidence": 0.93
+    },
+    {
+      "id": "s6",
+      "concept": "meter",
+      "bbox": [
+        1010,
+        384,
+        1120,
+        476
+      ],
+      "confidence": 0.939
+    },
+    {
+      "id": "s7",
+      "concept": "meter",
+      "bbox": [
+        1010,
+        544,
+        1120,
+        636
+      ],
+      "confidence": 0.928
+    }
+  ],
+  "spec": {
+    "kind": "circuit",
+    "version": "1.0",
+    "num_qubits": 3,
+    "num_clbits": 3,
+    "operations": [
+      {
+        "gate": "H",
+        "targets": [
+          0
+        ],
+        "source": {
+          "bbox": [
+            290,
+            220,
+            390,
+            320
+          ],
+          "confidence": 0.938,
+          "segment_id": "s0"
+        }
+      },
+      {
+        "gate": "CX",
+        "controls": [
+          0
+        ],
+        "targets": [
+          1
+        ],
+        "source": {
+          "bbox": [
+            539,
+            255,
+            621,
+            471
+          ],
+          "confidence": 0.902,
+          "segment_id": "s2"
+        }
+      },
+      {
+        "gate": "CX",
+        "controls": [
+          1
+        ],
+        "targets": [
+          2
+        ],
+        "source": {
+          "bbox": [
+            759,
+            415,
+            841,
+            631
+          ],
+          "confidence": 0.911,
+          "segment_id": "s4"
+        }
+      }
+    ],
+    "measurements": [
+      {
+        "qubit": 0,
+        "clbit": 0
+      },
+      {
+        "qubit": 1,
+        "clbit": 1
+      },
+      {
+        "qubit": 2,
+        "clbit": 2
+      }
+    ],
+    "metadata": {
+      "title": "GHZ state",
+      "notes": "Read from the bundled sample sketch.",
+      "origin": "image"
+    }
+  }
+}

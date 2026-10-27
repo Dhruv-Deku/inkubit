@@ -1,0 +1,119 @@
+"""Model-facing draft schemas and their conversion into real specs.
+
+Muse Spark fills a flat projection of ``schema.json`` (no tuples, no optional
+nested objects, every field required) because flat schemas are the most
+reliable for constrained decoding. :func:`draft_to_spec` then attaches image
+boxes from the segments and the result is validated against the real schema.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from qcanvas.spec.models import GateName
+
+_GATES = list(GateName.__args__)  # type: ignore[attr-defined]
+
+
+def _obj(props: dict[str, Any]) -> dict[str, Any]:
+    return {"type": "object", "properties": props, "required": list(props), "additionalProperties": False}
+
+
+_INTS = {"type": "array", "items": {"type": "integer", "minimum": 0}}
+
+CIRCUIT_DRAFT_SCHEMA = _obj({
+    "title": {"type": "string", "description": "Title written on the sketch, or a short name."},
+    "num_qubits": {"type": "integer", "minimum": 1, "maximum": 12},
+    "num_clbits": {"type": "integer", "minimum": 0, "maximum": 12},
+    "operations": {"type": "array", "items": _obj({
+        "gate": {"type": "string", "enum": _GATES},
+        "targets": _INTS,
+        "controls": _INTS,
+        "params": {"type": "array", "items": {"type": "number"}, "description": "Angles in radians."},
+        "segment_id": {"type": "string", "description": "Id of the numbered box this came from, or empty."},
+    })},
+    "measurements": {"type": "array", "items": _obj({
+        "qubit": {"type": "integer", "minimum": 0},
+        "clbit": {"type": "integer", "minimum": 0},
+        "segment_id": {"type": "string"},
+    })},
+    "notes": {"type": "string", "description": "Anything unclear in the drawing, in one or two sentences."},
+})
+
+NETWORK_DRAFT_SCHEMA = _obj({
+    "title": {"type": "string"},
+    "nodes": {"type": "array", "items": _obj({
+        "id": {"type": "string", "description": "Short lower-case id, e.g. station_a."},
+        "type": {"type": "string", "enum": ["ground_station", "satellite", "repeater"]},
+        "label": {"type": "string"},
+        "segment_id": {"type": "string"},
+    })},
+    "links": {"type": "array", "items": _obj({
+        "from": {"type": "string"},
+        "to": {"type": "string"},
+        "medium": {"type": "string", "enum": ["fiber", "free_space"]},
+        "length_km": {"type": "number", "exclusiveMinimum": 0},
+        "segment_id": {"type": "string"},
+    })},
+    "source": {"type": "string"},
+    "destination": {"type": "string"},
+    "notes": {"type": "string"},
+})
+
+CONCEPTS_SCHEMA = _obj({
+    "kind": {"type": "string", "enum": ["circuit", "network"]},
+    "concepts": {"type": "array", "items": {"type": "string"},
+                 "description": "1 to 4 short noun phrases, one concrete drawn thing each."},
+})
+
+
+def draft_schema(kind: str) -> dict[str, Any]:
+    """The draft schema for ``kind``."""
+    return CIRCUIT_DRAFT_SCHEMA if kind == "circuit" else NETWORK_DRAFT_SCHEMA
+
+
+def _source(segment_id: str, segments: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    seg = segments.get((segment_id or "").strip())
+    if not seg:
+        return None
+    return {"bbox": list(seg["bbox"]), "confidence": float(seg.get("confidence", 1.0)), "segment_id": seg["id"]}
+
+
+def draft_to_spec(kind: str, draft: dict[str, Any], segments: list[dict[str, Any]]) -> dict[str, Any]:
+    """Convert a filled draft into a spec dict with image sources attached."""
+    by_id = {s["id"]: s for s in segments}
+    meta = {"title": draft.get("title") or None, "notes": draft.get("notes") or None, "origin": "image"}
+    if kind == "circuit":
+        ops = []
+        for op in draft.get("operations", []):
+            item: dict[str, Any] = {k: op.get(k, []) for k in ("targets", "controls", "params")}
+            item["gate"] = op.get("gate")
+            src = _source(op.get("segment_id", ""), by_id)
+            if src:
+                item["source"] = src
+            ops.append(item)
+        return {
+            "kind": "circuit", "version": "1.0",
+            "num_qubits": draft.get("num_qubits"), "num_clbits": draft.get("num_clbits"),
+            "operations": ops,
+            "measurements": [{"qubit": m.get("qubit"), "clbit": m.get("clbit")} for m in draft.get("measurements", [])],
+            "metadata": meta,
+        }
+    nodes = []
+    for n in draft.get("nodes", []):
+        item = {"id": n.get("id"), "type": n.get("type"), "label": n.get("label") or None}
+        src = _source(n.get("segment_id", ""), by_id)
+        if src:
+            item["source"] = src
+        if item["type"] == "repeater":
+            item["memory_t2_ms"] = 10.0
+        nodes.append(item)
+    links = []
+    for link in draft.get("links", []):
+        item = {k: link.get(k) for k in ("from", "to", "medium", "length_km")}
+        src = _source(link.get("segment_id", ""), by_id)
+        if src:
+            item["source"] = src
+        links.append(item)
+    return {"kind": "network", "version": "1.0", "nodes": nodes, "links": links,
+            "source": draft.get("source"), "destination": draft.get("destination"), "metadata": meta}

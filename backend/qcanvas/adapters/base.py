@@ -127,7 +127,7 @@ class ReasoningModel(ABC):
     """Muse Spark: sketch -> spec draft, and results -> explanation."""
 
     @abstractmethod
-    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult) -> SpecDraft: ...
+    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str) -> SpecDraft: ...
 
     @abstractmethod
     def choose_concepts(self, image: bytes, mime: str) -> tuple[str, list[str], ModelCall]:

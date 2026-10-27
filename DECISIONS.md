@@ -109,3 +109,23 @@ transpiler seed 1234, 4096 shots.
 `QCANVAS_CODE_BACKEND=muse-cli` drives `muse exec` headlessly (flags from the
 docs). The CLI is not installed on this machine, so this path is untested; the
 default backend is the Model API (`muse-spark-1.3`).
+
+## D11. Sketch understanding pipeline
+1. Muse Spark looks at the photo and picks the diagram kind plus 1-4 noun
+   phrases for SAM (the docs recommend exactly this pairing: "let Muse Spark
+   interpret a scene and decide what to segment, then hand the concept to SAM").
+2. SAM 3.1 runs once per phrase (concept prompts, `include_confidence`), boxes
+   parsed from its token grammar. Masks are not decoded: the overlay only needs
+   boxes.
+3. Muse Spark gets the photo, a copy with numbered red boxes (set-of-marks
+   prompting) and the box list, and fills a **flat draft schema** (every field
+   required, no tuples or optional objects), which is the most reliable shape for
+   constrained decoding. `spec/draft.py` converts it to a real spec, attaches the
+   SAM boxes as `source`, and validates. On failure it re-prompts once with the
+   readable validation errors.
+- Uploads are EXIF-rotated and capped at 1600 px on the long side.
+- Offline mode recognises the three bundled sketches by SHA-256 (fixtures drawn
+  by `scripts/make_sketches.py` with exact element boxes). Any other photo gets
+  an honest "needs live mode" message instead of an invented reading.
+- Sample sketches use the Windows "Ink Free" font when present; the font file
+  is not copied into the repo.
