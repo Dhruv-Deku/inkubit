@@ -97,3 +97,12 @@ def test_demo_job_streams_failure_and_repair(example):
 
 def test_missing_job_404():
     assert client.get("/api/jobs/nope").status_code == 404
+
+
+def test_network_job(example):
+    resp = client.post("/api/jobs/spec", json={"spec": example("network_fiber_chain"), "options": {"pace_s": 0}})
+    body = wait_for(resp.json()["job_id"])
+    result = body["result"]
+    assert body["status"] == "done" and result["status"] == "improved"
+    assert result["after"]["end_to_end"]["key_rate_bps"] > 0
+    assert result["explanation"]["text"] and result["diagram"]["image_b64"]

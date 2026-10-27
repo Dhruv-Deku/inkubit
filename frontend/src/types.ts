@@ -226,6 +226,8 @@ export interface NetworkMetrics {
 export interface FixCandidate {
   kind: string
   description: string
+  round: number
+  applied: boolean
   pair_rate_hz: number
   fidelity: number
   key_rate_bps: number
@@ -239,6 +241,7 @@ export interface NetworkResult {
   before: NetworkMetrics
   after: NetworkMetrics | null
   fix: FixCandidate | null
+  fixes: FixCandidate[]
   candidates: FixCandidate[]
   spec_after: NetworkSpec | null
   checks: { name: string; passed: boolean; detail: string }[]

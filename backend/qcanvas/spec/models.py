@@ -129,6 +129,9 @@ class Node(_Strict):
     memory_t2_ms: float | None = Field(
         default=None, gt=0, description="Quantum-memory coherence time (ms) for swapping nodes."
     )
+    aperture_m: float | None = Field(
+        default=None, gt=0, le=10, description="Receiving telescope diameter (m) for ground stations."
+    )
     source: SourceRef | None = None
 
 

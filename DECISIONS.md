@@ -129,3 +129,45 @@ default backend is the Model API (`muse-spark-1.3`).
   an honest "needs live mode" message instead of an invented reading.
 - Sample sketches use the Windows "Ink Free" font when present; the font file
   is not copied into the repo.
+
+## D12. Network model assumptions (P9)
+Analytic and pure Python (`network/physics.py`, `network/model.py`). Every
+number is a stated assumption:
+- Fiber: 0.2 dB/km at 1550 nm, light at 2e5 km/s, detectors 80% efficient,
+  dark-click probability 1e-7 per gate.
+- Free space at 810 nm: diffraction spot from a 0.30 m satellite transmitter
+  (1.22 lambda/D) broadened by 8 urad of turbulence and pointing jitter, compared
+  with a 1.0 m ground telescope (geometric loss); plus 4 dB atmosphere per
+  satellite pass (0.1 dB/km for ground-to-ground), plus 8 dB optics and coupling.
+  Detectors 60%, background + dark 1e-5 per gate. This gives ~66 dB for the
+  1100 + 1600 km dual downlink and ~0.8 pairs/s, in line with Micius (64-82 dB,
+  ~1 pair/s over 1,200 km). Calibrated to that public result, not to tests.
+- Pairs: 1e8 pulses/s, 10% pair probability per pulse, intrinsic Werner
+  fidelity 0.98. Accidental coincidences from dark/background clicks lower the
+  visibility, so long links lose fidelity as well as rate.
+- Segments split at repeaters. A satellite in a segment is the pair source
+  (dual downlink, no memory). Repeater segments herald at L/c with 100
+  multiplexed modes; end-to-end rate = 0.5^swaps / (H_n / slowest segment rate).
+- Memory decoherence: each stored pair waits (T_all - its own wait) and its
+  Werner parameter decays as exp(-t/T2). Swapping multiplies Werner parameters
+  times 0.99 per swap. F = (3w+1)/4, QBER = (1-w)/2.
+- Key: BBM92 asymptotic, sifting 1/2, R = 0.5 R_pairs (1 - 1.16 h(e) - h(e)),
+  clamped at 0.
+- **Limitation:** no entanglement purification or multi-pair terms, so long
+  chains with many swaps accumulate errors (a 6 x 100 km chain reaches 12% QBER
+  and no key). This is documented and tested, not hidden.
+
+## D13. Bottleneck search
+- Bottleneck = memory decoherence if any stored pair waits longer than 0.3 T2,
+  otherwise the highest-loss link.
+- Fixes: midpoint relay (terrestrial links only), move a repeater to balance
+  spans (city positions never move), higher-elevation satellite pass (slant
+  range x0.75, never below 500 km), bigger ground telescope (x1.5, capped at
+  1.8 m, the Lijiang telescope used with Micius), memories x10 T2 (cap 10 s).
+- Each candidate is a new, validated spec, re-simulated from scratch. Score:
+  secret key rate; while there is no key at all, pairs/s x (F - 0.25), so a fix
+  that makes progress (e.g. a relay before the memories are good enough) still
+  counts. Apply the best only if it improves by more than 1%; up to 3 rounds.
+- Sanity checks after the search: fidelity in [0.25, 1], key <= half the pair
+  rate, no key above 11% QBER, and lengthening the weakest link must not raise
+  the rate.

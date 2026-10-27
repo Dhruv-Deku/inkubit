@@ -140,13 +140,14 @@ export function NetworkResults({ result, sketchCalls }: { result: NetworkResult;
       </div>
       {result.candidates.length > 0 && (
         <div className="panel">
-          <div className="panel-head"><h2>Fixes the agent tried</h2><span className="sub">each one re-simulated; the best key rate wins</span></div>
+          <div className="panel-head"><h2>Fixes the agent tried</h2><span className="sub">each one re-simulated; the best one per round is applied</span></div>
           <table className="data">
-            <thead><tr><th>Fix</th><th className="num">Pairs/s</th><th className="num">Fidelity</th><th className="num">Key rate</th></tr></thead>
+            <thead><tr><th>Round</th><th>Fix</th><th className="num">Pairs/s</th><th className="num">Fidelity</th><th className="num">Key rate</th></tr></thead>
             <tbody>
               {result.candidates.map((c, i) => (
-                <tr key={i} className={result.fix && c.description === result.fix.description ? 'chosen' : ''}>
-                  <td>{c.description} {result.fix && c.description === result.fix.description && <span className="badge pass">chosen</span>}</td>
+                <tr key={i} className={c.applied ? 'chosen' : ''}>
+                  <td className="muted">{c.round}</td>
+                  <td>{c.description} {c.applied && <span className="badge pass">applied</span>}</td>
                   <td className="num">{fmtRate(c.pair_rate_hz, '')}</td>
                   <td className="num">{c.fidelity.toFixed(3)}</td>
                   <td className="num">{fmtRate(c.key_rate_bps, 'bit/s')}</td>

@@ -100,7 +100,9 @@ class MockImageModel(ImageModel):
         if isinstance(spec, CircuitSpec):
             png, caption = circuit_png(spec), "Circuit drawn by Qiskit from the verified spec."
         else:
-            png, caption = network_png(spec, result.get("after") or result.get("before")), \
-                "Network drawn from the spec; the weakest link is highlighted."
+            final = NetworkSpec.model_validate(result["spec_after"]) if result.get("spec_after") else spec
+            png = network_png(final, result.get("after") or result.get("before"))
+            caption = ("Final network after the agent's fixes; " if result.get("spec_after") else "Network as drawn; ") \
+                + "the weakest remaining link is highlighted."
         return DiagramResult(image_b64=base64.b64encode(png).decode("ascii"), mime="image/png", caption=caption,
                              call=ModelCall(provider="mock", model="local renderer", role="diagram"))

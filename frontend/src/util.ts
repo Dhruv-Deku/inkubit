@@ -4,9 +4,11 @@ export const pct = (p: number, digits = 1) => `${(p * 100).toFixed(digits)}%`
 
 export function fmtRate(hz: number, unit = 'Hz'): string {
   if (!isFinite(hz) || hz <= 0) return `0 ${unit}`
-  const steps: [number, string][] = [[1e9, 'G'], [1e6, 'M'], [1e3, 'k'], [1, ''], [1e-3, 'm'], [1e-6, 'µ']]
+  if (hz < 1e-3) return `${hz.toExponential(1)} ${unit}`
+  if (hz < 1) return `${Number(hz.toPrecision(2))} ${unit}`
+  const steps: [number, string][] = [[1e9, 'G'], [1e6, 'M'], [1e3, 'k'], [1, '']]
   for (const [f, p] of steps) {
-    if (hz >= f) return `${(hz / f).toPrecision(3).replace(/\.?0+$/, '')} ${p}${unit}`
+    if (hz >= f) return `${Number((hz / f).toPrecision(3))} ${p}${unit}`
   }
   return `${hz.toExponential(2)} ${unit}`
 }

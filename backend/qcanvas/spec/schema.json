@@ -304,6 +304,21 @@
           "description": "Quantum-memory coherence time (ms) for swapping nodes.",
           "title": "Memory T2 Ms"
         },
+        "aperture_m": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 10,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Receiving telescope diameter (m) for ground stations.",
+          "title": "Aperture M"
+        },
         "source": {
           "anyOf": [
             {
