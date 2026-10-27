@@ -111,7 +111,13 @@ export default function App() {
       setStage('run')
       stopRef.current = followJob(
         job_id,
-        (ev) => setJob((j) => (j && j.id === job_id ? { ...j, events: [...j.events, ev] } : j)),
+        (ev) => {
+          setJob((j) => (j && j.id === job_id ? { ...j, events: [...j.events, ev] } : j))
+          if ((ev.step === 'explain' || ev.step === 'diagram') && ev.status === 'running') {
+            // the result is stored before these start: show it while the explanation and diagram finish
+            api.job(job_id).then((s) => setJob((j) => (j && j.id === job_id && s.result ? { ...j, result: s.result } : j))).catch(() => {})
+          }
+        },
         async (status, error) => {
           const summary = await api.job(job_id).catch(() => null)
           setJob((j) => (j && j.id === job_id

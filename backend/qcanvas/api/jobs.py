@@ -83,29 +83,41 @@ def _b64(data: bytes) -> str:
     return base64.b64encode(data).decode("ascii")
 
 
+def _explain(job: Job, models: Models, result: dict[str, Any]) -> dict[str, Any] | None:
+    bus = job.bus
+    bus.emit("explain", "running", "Writing a plain-language explanation of these results…")
+    try:
+        exp = models.reasoning.explain(job.spec, result)
+    except Exception as err:  # noqa: BLE001 - failing soft: the verified result stands on its own
+        bus.emit("explain", "warn", f"Could not write an explanation: {err}")
+        return None
+    tag = " (mock fallback)" if exp.call.provider == "mock-fallback" else ""
+    bus.emit("explain", "ok", f"Explanation ready from {exp.call.model}{tag}.", call=exp.call.model_dump())
+    return exp.model_dump(mode="json")
+
+
+def _diagram(job: Job, models: Models, result: dict[str, Any]) -> dict[str, Any] | None:
+    bus = job.bus
+    bus.emit("diagram", "running", "Drawing a clean diagram of the final design…")
+    try:
+        dia = models.image.diagram(job.spec, result)
+    except Exception as err:  # noqa: BLE001
+        bus.emit("diagram", "warn", f"Could not draw the diagram: {err}")
+        return None
+    tag = " (mock fallback)" if dia.call.provider == "mock-fallback" else ""
+    bus.emit("diagram", "ok", f"Diagram ready from {dia.call.model}{tag}.", call=dia.call.model_dump())
+    return dia.model_dump(mode="json")
+
+
 def _extras(job: Job, models: Models, result: dict[str, Any]) -> dict[str, Any]:
-    """Explanation (Muse Spark) and illustration (Muse Image), each failing soft."""
-    out: dict[str, Any] = {}
-    bus, spec = job.bus, job.spec
-    if job.options.explain:
-        bus.emit("explain", "running", "Writing a plain-language explanation of these results…")
-        try:
-            exp = models.reasoning.explain(spec, result)
-            out["explanation"] = exp.model_dump(mode="json")
-            tag = " (mock fallback)" if exp.call.provider == "mock-fallback" else ""
-            bus.emit("explain", "ok", f"Explanation ready from {exp.call.model}{tag}.", call=exp.call.model_dump())
-        except Exception as err:  # noqa: BLE001
-            bus.emit("explain", "warn", f"Could not write an explanation: {err}")
-    if job.options.diagram:
-        bus.emit("diagram", "running", "Drawing a clean diagram of the final design…")
-        try:
-            dia = models.image.diagram(spec, result)
-            out["diagram"] = dia.model_dump(mode="json")
-            tag = " (mock fallback)" if dia.call.provider == "mock-fallback" else ""
-            bus.emit("diagram", "ok", f"Diagram ready from {dia.call.model}{tag}.", call=dia.call.model_dump())
-        except Exception as err:  # noqa: BLE001
-            bus.emit("diagram", "warn", f"Could not draw the diagram: {err}")
-    return out
+    """Explanation (Muse Spark) and illustration (Muse Image) in parallel, each failing soft."""
+    tasks = {}
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="qcanvas-extra") as pool:
+        if job.options.explain:
+            tasks["explanation"] = pool.submit(_explain, job, models, result)
+        if job.options.diagram:
+            tasks["diagram"] = pool.submit(_diagram, job, models, result)
+    return {k: f.result() for k, f in tasks.items() if f.result() is not None}
 
 
 def _run_job(job: Job, models: Models | None) -> None:
@@ -126,6 +138,7 @@ def _run_job(job: Job, models: Models | None) -> None:
             from qcanvas.network.agent import run_network_agent
 
             payload = run_network_agent(job.spec, job.bus, pace_s=job.options.pace_s or 0.0).model_dump(mode="json")
+        job.result = dict(payload)  # the verified result is available before the extras finish
         payload.update(_extras(job, models, payload))
         job.result = payload
         job.status = "done"
