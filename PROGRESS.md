@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (all tests pass offline; frontend builds)
+## Done (116 tests pass offline; frontend builds; last checked 2026-10-28)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -16,7 +16,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - **P10 Package**: README (Mermaid architecture, model usage, setup, spec, loop, limitations), DEMO_SCRIPT.md, `scripts/setup.sh`, `scripts/dev.sh`, screenshots + GIF.
 
 ## In progress
-- Nothing. Fresh-clone check passed on 2026-10-28: setup.sh (3.5 min), 113/113 tests, server, demo job, dev.sh with Vite proxy.
+- Nothing. Fresh-clone check passed on 2026-10-28 (setup.sh 3.5 min, all tests, server, demo job, dev.sh with Vite proxy). Since then: robust fault injection for model-written code, grid-box overlay fallback, early results, parallel extras (116 tests).
 
 ## Known issues / limitations
 - Live Meta adapters are implemented from the docs and tested against recorded request shapes with a fake client, but **never called live** (no key on this machine). First live run may surface response-shape surprises; the fallback keeps the UI working and labels it.
