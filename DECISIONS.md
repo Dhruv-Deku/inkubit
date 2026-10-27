@@ -171,3 +171,16 @@ number is a stated assumption:
 - Sanity checks after the search: fidelity in [0.25, 1], key <= half the pair
   rate, no key above 11% QBER, and lengthening the weakest link must not raise
   the rate.
+
+## D14. When SAM finds nothing on a real sketch
+SAM 3.1 is trained on photos; pen strokes on paper may give few or no masks for
+some phrases. The draft schema therefore also asks Muse Spark for each element's
+box on its documented 0-1000 grid. If an element has no matching SAM segment, that
+box (scaled to pixels) is used as its source with confidence 0.6 and shown in the
+overlay labelled "seen by muse-spark-1.3", so the overlay is never empty and never
+claims SAM found something it did not. Elements with neither get no location.
+
+## D15. Result timing
+The verified result is stored (and the UI shows it) as soon as the agent
+finishes; the Muse Spark explanation and the Muse Image diagram then run in
+parallel and fill in when ready. Muse Image can take tens of seconds.

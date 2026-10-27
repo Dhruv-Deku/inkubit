@@ -58,6 +58,7 @@ class SpecDraft(BaseModel):
     notes: str = ""
     call: ModelCall
     attempts: int = 1
+    extra_segments: list[Segment] = Field(default_factory=list)  # boxes the reader reported itself
 
 
 class CodeResult(BaseModel):

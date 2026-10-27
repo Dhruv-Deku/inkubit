@@ -163,3 +163,23 @@ def test_meta_without_key_falls_back_honestly(monkeypatch):
     analysis, _ = analyze_image(png("bell_sketch"), models)
     assert all(c.provider == "mock-fallback" for c in analysis.calls)
     assert "META_API_KEY" in (analysis.calls[0].error or "")
+
+
+def test_meta_draft_falls_back_to_grid_boxes_when_sam_finds_nothing():
+    from qcanvas.adapters.base import ModelCall, SegmentationResult
+
+    draft_json = {"title": "Bell", "num_qubits": 2, "num_clbits": 2, "notes": "",
+                  "operations": [{"gate": "H", "targets": [0], "controls": [], "params": [], "segment_id": "",
+                                  "box": [100, 200, 300, 400]},
+                                 {"gate": "CX", "targets": [1], "controls": [0], "params": [], "segment_id": "s9",
+                                  "box": []}],
+                  "measurements": [{"qubit": 0, "clbit": 0, "segment_id": ""}, {"qubit": 1, "clbit": 1, "segment_id": ""}]}
+    client = FakeClient(chats=[json.dumps(draft_json)])
+    empty = SegmentationResult(width=1400, height=560, segments=[], concepts=["box"],
+                               call=ModelCall(provider="meta", model="sam-3.1", role="segment"))
+    draft = MetaReasoningModel(load_settings(), client).draft_spec(png("bell_sketch"), "image/png", empty, "circuit")  # type: ignore[arg-type]
+    assert draft.valid
+    (seg,) = draft.extra_segments
+    assert seg.bbox == pytest.approx((140, 112, 420, 224)) and seg.confidence == 0.6
+    assert draft.spec["operations"][0]["source"]["segment_id"] == seg.id
+    assert "source" not in draft.spec["operations"][1]  # unknown segment id and no box: no invented location

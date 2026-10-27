@@ -37,7 +37,8 @@ DRAFT_SYSTEM = (
     "fiber or free-space links with distances). Numbered boxes from a segmentation model mark the "
     "drawn parts. Produce a spec that matches the drawing exactly. Qubit 0 is the top wire. "
     "Operations are listed left to right. Link every operation or node to the segment it came "
-    "from by putting that segment's id in source.segment_id. Do not add anything that is not drawn, "
+    "from by putting that segment's id in segment_id, and always give its box on a 0-1000 grid of the "
+    "photo (x1, y1, x2, y2; 0,0 is the top-left), even when no segment matches. Do not add anything that is not drawn, "
     "except: if no measurements are drawn, measure every qubit into the classical bit of the same index."
 )
 

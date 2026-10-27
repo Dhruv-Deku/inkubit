@@ -96,10 +96,11 @@ def analyze_image(raw: bytes, models: Models) -> tuple[SketchAnalysis, bytes]:
     kind, concepts, concept_call = models.reasoning.choose_concepts(image, mime)
     segmentation = models.segmentation.segment(image, mime, concepts)
     draft = models.reasoning.draft_spec(image, mime, segmentation, kind)
+    segments = [*segmentation.segments, *draft.extra_segments]
     analysis = SketchAnalysis(
         image_sha256=sha256(image), mime=mime, width=width, height=height, kind=kind, concepts=concepts,
-        segments=segmentation.segments, spec=draft.spec, valid=draft.valid, issues=draft.issues,
-        notes=draft.notes, overlay=_link_overlay(draft.spec, segmentation.segments),
+        segments=segments, spec=draft.spec, valid=draft.valid, issues=draft.issues,
+        notes=draft.notes, overlay=_link_overlay(draft.spec, segments),
         calls=[concept_call, segmentation.call, draft.call],
     )
     return analysis, image

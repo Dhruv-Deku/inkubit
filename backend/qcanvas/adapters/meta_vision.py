@@ -144,7 +144,8 @@ class MetaReasoningModel(ReasoningModel):
         schema = draft_schema(kind)
         data, cached, raw = self._json(messages, schema, f"{kind}_draft", "medium")
         attempts = 1
-        spec = draft_to_spec(kind, data, seg_dicts)
+        size = (segments.width, segments.height)
+        spec = draft_to_spec(kind, data, seg_dicts, size)
         issues: list[str] = []
         try:
             parse_spec(spec)
@@ -158,7 +159,7 @@ class MetaReasoningModel(ReasoningModel):
             ]
             data, cached2, raw = self._json(messages, schema, f"{kind}_draft", "medium")
             cached = cached and cached2
-            spec = draft_to_spec(kind, data, seg_dicts)
+            spec = draft_to_spec(kind, data, seg_dicts, size)
             try:
                 parse_spec(spec)
                 issues = []
@@ -166,8 +167,9 @@ class MetaReasoningModel(ReasoningModel):
                 issues = [str(i) for i in err2.issues]
         call = ModelCall(provider="meta", model=self.model, role="read sketch", cached=cached,
                          latency_s=time.perf_counter() - start)
+        extra = _grid_segments(spec, self.model)
         return SpecDraft(spec=spec, valid=not issues, issues=issues, notes=str(data.get("notes", "")),
-                         call=call, attempts=attempts)
+                         call=call, attempts=attempts, extra_segments=extra)
 
     def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> Explanation:
         start = time.perf_counter()
@@ -182,6 +184,20 @@ class MetaReasoningModel(ReasoningModel):
         if not content.strip():
             raise MetaAPIError("empty explanation")
         return Explanation(text=content.strip(), call=call)
+
+
+def _grid_segments(spec: dict[str, Any], model: str) -> list[Segment]:
+    """Turn boxes the reader reported itself (no SAM match) into labelled overlay segments."""
+    out: list[Segment] = []
+    groups = ("operations",) if spec.get("kind") == "circuit" else ("nodes", "links")
+    for group in groups:
+        for item in spec.get(group, []):
+            src = item.get("source")
+            if src and not src.get("segment_id"):
+                src["segment_id"] = f"m{len(out)}"
+                out.append(Segment(id=src["segment_id"], concept=f"seen by {model}", bbox=tuple(src["bbox"]),
+                                   confidence=src["confidence"]))
+    return out
 
 
 def _rounded(d: dict[str, float] | None) -> dict[str, float]:
