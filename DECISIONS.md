@@ -85,3 +85,27 @@ transpiler seed 1234, 4096 shots.
 - Known blind spot, stated honestly: an error that moves the distribution by
   less than the threshold (for example an angle off by a few degrees) is not
   caught. Measurement-basis statistics cannot see a pure phase error either.
+
+## D9. Agent loop design
+- Steps: plan, generate, (demo) inject, then per attempt run -> verify ->
+  diagnose -> repair; max 4 attempts. Every step is a plain-language event.
+- Statistical diagnosis (`agent/diagnose.py`) reads the verdict: lost
+  correlations ("the entangling gate looks missing or points the wrong way"),
+  wrong marginals ("a gate may act on the wrong qubit"), a single outcome where
+  noise should spread them ("counts look hard-coded").
+- **No-progress stop:** if the repairer returns identical code, the loop stops
+  and reports failure instead of burning attempts on the same script.
+- The offline repairer is rule-based and deliberately limited: import-path
+  fixes and line-level alignment of gate/measure calls with the spec (missing,
+  extra, wrong qubit, reversed CNOT). It has no rule for tampered results
+  (`fake_result`), which is how the "honest failure" path is demonstrated and
+  tested. Muse Spark gets the same evidence and can fix that one too.
+- Demo fault default (`auto`): missing CNOT if the circuit has one, else wrong
+  qubit index, else wrong import.
+- Every attempt keeps its code and a unified diff, so the UI can show exactly
+  what each repair changed.
+
+## D10. Muse Code CLI backend is optional and untested here
+`QCANVAS_CODE_BACKEND=muse-cli` drives `muse exec` headlessly (flags from the
+docs). The CLI is not installed on this machine, so this path is untested; the
+default backend is the Model API (`muse-spark-1.3`).
