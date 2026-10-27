@@ -12,4 +12,4 @@ markers = [
     "slow: runs generated code in a subprocess",
 ]
 addopts = "-m 'not live'"
-filterwarnings = ["ignore::DeprecationWarning"]
+filterwarnings = ["ignore::DeprecationWarning", "ignore:Using `httpx`"]
