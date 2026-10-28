@@ -10,10 +10,10 @@ import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
 import type {
-  AgentEvent, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, NetworkResult, RunOptions, SketchAnalysis,
-  Spec, SpecIssue, Verdict,
+  AgentEvent, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, ModelCall, NetworkResult, RunOptions,
+  SketchAnalysis, Spec, SpecIssue, Verdict,
 } from './types'
-import { specTitle } from './util'
+import { decodeSpec, encodeSpec, specTitle } from './util'
 
 type Stage = 'start' | 'edit' | 'run'
 
@@ -64,6 +64,8 @@ export default function App() {
   const [highlight, setHighlight] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [startError, setStartError] = useState<string | null>(null)
+  const [fromText, setFromText] = useState<{ text: string; notes: string; call: ModelCall } | null>(null)
+  const [shared, setShared] = useState<string | null>(null)
   const [preview, setPreview] = useState<{ ins: CircuitInsights | null; loading: boolean; error: string | null } | null>(null)
 
   useEffect(() => { setPreview(null) }, [spec, options.noise])
@@ -83,7 +85,27 @@ export default function App() {
     Promise.all([api.health(), api.examples()])
       .then(([h, ex]) => { setHealth(h); setExamples(ex) })
       .catch((e: Error) => setBackendError(e.message))
+    // a share link carries the whole spec in the URL hash
+    const m = window.location.hash.match(/^#s=(.+)$/)
+    if (m) {
+      decodeSpec(m[1])
+        .then((s) => { setSketch(null); setFromText(null); setSpec(s); setStage('edit') })
+        .catch(() => setStartError('That share link is damaged: the spec in it could not be read.'))
+        .finally(() => history.replaceState(null, '', window.location.pathname))
+    }
   }, [])
+
+  const shareLink = async () => {
+    if (!spec) return
+    const url = `${window.location.origin}${window.location.pathname}#s=${await encodeSpec(spec)}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setShared('Link copied')
+    } catch {
+      window.prompt('Copy this link', url)
+    }
+    setTimeout(() => setShared(null), 1600)
+  }
 
   useEffect(() => {
     if (!spec) return
@@ -102,6 +124,7 @@ export default function App() {
     setStartError(null)
     try {
       const analysis = await api.analyzeImage(file, name)
+      setFromText(null)
       setSketch({ url: URL.createObjectURL(file), analysis })
       setSpec(analysis.spec)
       setStage('edit')
@@ -114,8 +137,25 @@ export default function App() {
 
   const onSpec = (s: Spec) => {
     setSketch(null)
+    setFromText(null)
     setSpec(s)
     setStage('edit')
+  }
+
+  const onText = async (text: string) => {
+    setBusy(true)
+    setStartError(null)
+    try {
+      const draft = await api.fromText(text)
+      setSketch(null)
+      setFromText({ text, notes: draft.notes, call: draft.call })
+      setSpec(draft.spec)
+      setStage('edit')
+    } catch (e) {
+      setStartError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
   }
 
   const run = async () => {
@@ -178,11 +218,18 @@ export default function App() {
       {backendError && <div className="notice error" style={{ marginBottom: 16 }}>{backendError} Start it with <code>scripts/dev.sh</code>.</div>}
 
       {stage === 'start' && (
-        <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} />
+        <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
+          live={health?.mode === 'meta'} />
       )}
 
       {stage === 'edit' && spec && (
         <div className="stack">
+          {fromText && (
+            <div className="notice row wrap" style={{ gap: 8 }}>
+              <span>Built from your words: <em>“{fromText.text}”</em></span><CallBadge call={fromText.call} />
+              {fromText.notes && <span className="sub">{fromText.notes}</span>}
+            </div>
+          )}
           <div className={sketch ? 'edit-grid' : ''}>
             {sketch && (
               <div className="panel">
@@ -229,6 +276,7 @@ export default function App() {
             {spec.kind === 'network' && <span className="sub">The agent models every link, finds the bottleneck, tries fixes and re-simulates.</span>}
             <span className="grow" />
             {startError && <span className="badge fail">{startError}</span>}
+            <button className="btn big ghost" onClick={shareLink} title="Copy a link that opens this spec">{shared ?? 'Share link'}</button>
             {spec.kind === 'circuit' && (
               <button className="btn big" disabled={!valid || preview?.loading} onClick={stepThrough}
                 title="See the exact state after every gate, the entanglement and the noise budget, without running">

@@ -82,3 +82,33 @@ export function downloadText(name: string, text: string) {
   a.click()
   URL.revokeObjectURL(a.href)
 }
+
+function toB64Url(bytes: Uint8Array): string {
+  let bin = ''
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function fromB64Url(text: string): Uint8Array {
+  const bin = atob(text.replace(/-/g, '+').replace(/_/g, '/'))
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0))
+}
+
+async function pipe(bytes: Uint8Array, stream: CompressionStream | DecompressionStream): Promise<Uint8Array> {
+  const out = new Blob([bytes as BlobPart]).stream().pipeThrough(stream)
+  return new Uint8Array(await new Response(out).arrayBuffer())
+}
+
+/** Spec -> compact URL-safe text for a share link (photo boxes dropped: the receiver has no photo). */
+export async function encodeSpec(spec: Spec): Promise<string> {
+  const lean = JSON.parse(JSON.stringify(spec, (k, v) => (k === 'source' && v && typeof v === 'object' ? undefined : v)))
+  const bytes = new TextEncoder().encode(JSON.stringify(lean))
+  if (typeof CompressionStream !== 'undefined') return `z${toB64Url(await pipe(bytes, new CompressionStream('deflate-raw')))}`
+  return `j${toB64Url(bytes)}`
+}
+
+export async function decodeSpec(text: string): Promise<Spec> {
+  const raw = fromB64Url(text.slice(1))
+  const bytes = text[0] === 'z' ? await pipe(raw, new DecompressionStream('deflate-raw')) : raw
+  return JSON.parse(new TextDecoder().decode(bytes)) as Spec
+}

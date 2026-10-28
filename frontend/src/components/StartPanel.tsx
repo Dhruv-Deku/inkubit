@@ -1,6 +1,10 @@
 import { useRef, useState } from 'react'
 import type { Examples, Spec } from '../types'
+import { CameraCapture } from './CameraCapture'
 import { Upload } from './Icons'
+
+const IDEAS = ['GHZ state on 4 qubits', 'Bernstein-Vazirani with secret 1011', 'QFT on 3 qubits of 5',
+  'h 0; cx 0 1; rz pi/4 1', '300 km of fiber with 2 repeaters']
 
 interface Props {
   examples: Examples | null
@@ -8,10 +12,14 @@ interface Props {
   error: string | null
   onImage: (file: Blob, name: string) => void
   onSpec: (spec: Spec) => void
+  onText: (text: string) => void
+  live: boolean
 }
 
-export function StartPanel({ examples, busy, error, onImage, onSpec }: Props) {
+export function StartPanel({ examples, busy, error, onImage, onSpec, onText, live }: Props) {
   const input = useRef<HTMLInputElement>(null)
+  const [camera, setCamera] = useState(false)
+  const [words, setWords] = useState('')
   const [over, setOver] = useState(false)
   const [paste, setPaste] = useState('')
   const [pasteError, setPasteError] = useState<string | null>(null)
@@ -69,12 +77,30 @@ export function StartPanel({ examples, busy, error, onImage, onSpec }: Props) {
           {busy ? <div className="spin" style={{ width: 26, height: 26 }} /> : <Upload />}
           <strong>{busy ? 'Reading your sketch…' : 'Drop a photo of your sketch'}</strong>
           <span className="sub">or click to choose a file (PNG, JPG, up to 15 MB)</span>
+          <button className="btn small" style={{ marginTop: 10 }} disabled={busy}
+            onClick={(e) => { e.stopPropagation(); setCamera(true) }}>Use the camera</button>
           <input ref={input} type="file" accept="image/*" hidden
             onChange={(e) => { const f = e.target.files?.[0]; if (f) onImage(f, f.name); e.target.value = '' }} />
         </div>
       </div>
 
+      {camera && <CameraCapture onClose={() => setCamera(false)} onShot={(b) => { setCamera(false); onImage(b, 'camera.jpg') }} />}
       {error && <div className="notice error">{error}</div>}
+
+      <div className="panel">
+        <div className="panel-head"><h2>Or describe it in words</h2>
+          <span className="sub">{live ? 'Muse Spark turns any description into a spec' : 'offline: named algorithms, gate lists and simple networks'}</span>
+        </div>
+        <form className="row" style={{ gap: 10, alignItems: 'stretch' }}
+          onSubmit={(e) => { e.preventDefault(); if (words.trim()) onText(words) }}>
+          <input type="text" value={words} onChange={(e) => setWords(e.target.value)} style={{ flex: 1 }}
+            placeholder="e.g. Grover search over 2 qubits, or: h 0; cx 0 1; measure all" aria-label="Describe a circuit or network" />
+          <button className="btn primary" type="submit" disabled={busy || !words.trim()}>{busy ? 'Reading…' : 'Build it'}</button>
+        </form>
+        <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>
+          {IDEAS.map((t) => <button key={t} className="chip-btn" onClick={() => { setWords(t); onText(t) }} disabled={busy}>{t}</button>)}
+        </div>
+      </div>
 
       <div className="panel">
         <div className="panel-head"><h2>Sample sketches</h2><span className="sub">photos of pen drawings, bundled for offline demos</span></div>
@@ -91,13 +117,18 @@ export function StartPanel({ examples, busy, error, onImage, onSpec }: Props) {
       <div className="hero">
         <div className="panel">
           <div className="panel-head"><h2>Start from a spec</h2></div>
-          <div className="spec-list">
-            {examples?.specs.map((s) => (
-              <button key={s.id} className="btn" onClick={() => onSpec(s.spec)} title={s.notes}>
-                {s.title}{!s.valid && <span className="badge warn">invalid on purpose</span>}
-              </button>
-            ))}
-          </div>
+          {[...new Set(examples?.specs.map((s) => s.group) ?? [])].map((g) => (
+            <div key={g} style={{ marginBottom: 12 }}>
+              <div className="label" style={{ marginBottom: 6 }}>{g}</div>
+              <div className="spec-list">
+                {examples?.specs.filter((s) => s.group === g).map((s) => (
+                  <button key={s.id} className="btn" onClick={() => onSpec(s.spec)} title={s.notes}>
+                    {s.title}{!s.valid && <span className="badge warn">invalid on purpose</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
         <div className="panel">
           <div className="panel-head"><h2>Paste JSON</h2><span className="spacer" />

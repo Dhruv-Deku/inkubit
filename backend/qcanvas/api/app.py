@@ -60,6 +60,9 @@ def health() -> dict[str, Any]:
             **s.public()}
 
 
+ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and"}
+
+
 @app.get("/api/examples")
 def examples() -> dict[str, Any]:
     """Example specs and sample sketch images."""
@@ -67,8 +70,13 @@ def examples() -> dict[str, Any]:
     for path in sorted((EXAMPLES_DIR / "specs").glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         meta = data.get("metadata", {})
+        group = ("Networks" if data.get("kind") == "network" else "Algorithms" if path.stem in ALGORITHMS
+                 else "Check the validator" if path.stem == "invalid_circuit" else "Basics")
         specs.append({"id": path.stem, "title": meta.get("title") or path.stem, "kind": data.get("kind"),
-                      "notes": meta.get("notes", ""), "valid": path.stem != "invalid_circuit", "spec": data})
+                      "notes": meta.get("notes", ""), "valid": path.stem != "invalid_circuit", "group": group,
+                      "spec": data})
+    order = ["Basics", "Algorithms", "Networks", "Check the validator"]
+    specs.sort(key=lambda s: (order.index(s["group"]), s["title"]))
     images = []
     for path in sorted((EXAMPLES_DIR / "images").glob("*.json")):
         fx = json.loads(path.read_text(encoding="utf-8"))
@@ -137,6 +145,29 @@ async def job_image(file: UploadFile = File(...)) -> dict[str, Any]:
     except OSError as err:
         raise HTTPException(400, f"could not read the image: {err}") from None
     return analysis.model_dump(mode="json")
+
+
+class TextRequest(BaseModel):
+    text: str
+
+
+@app.post("/api/jobs/text")
+async def job_text(body: TextRequest) -> dict[str, Any]:
+    """Plain-language description -> spec draft (Muse Spark live; an offline parser otherwise)."""
+    from qcanvas.textspec import UnknownTextError
+
+    text = body.text.strip()
+    if not text:
+        raise HTTPException(400, "describe a circuit or a network first")
+    if len(text) > 2000:
+        raise HTTPException(413, "keep the description under 2,000 characters")
+    try:
+        draft = await asyncio.to_thread(get_models().reasoning.spec_from_text, text)
+    except UnknownTextError as err:
+        raise HTTPException(422, str(err)) from None
+    except ModelUnavailable as err:
+        raise HTTPException(502, f"A Meta model call failed and fallback is off: {err}") from None
+    return {"kind": draft.spec.get("kind"), **draft.model_dump(mode="json", exclude={"extra_segments"})}
 
 
 @app.post("/api/jobs/spec")

@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, CircuitInsights, Examples, Health, JobSummary, RunOptions, SketchAnalysis, Spec, SpecIssue,
+  AgentEvent, CircuitInsights, Examples, Health, JobSummary, RunOptions, SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
 export class ApiError extends Error {
@@ -52,6 +52,7 @@ export const api = {
   startJob: (spec: Spec, options: RunOptions) =>
     call<{ job_id: string; kind: string }>('/api/jobs/spec', json({ spec, options })),
   job: (id: string) => call<JobSummary>(`/api/jobs/${id}`),
+  fromText: (text: string) => call<TextDraft>('/api/jobs/text', json({ text })),
   insights: (spec: Spec, noise: string) => call<CircuitInsights>('/api/insights', json({ spec, noise })),
 }
 

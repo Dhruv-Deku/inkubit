@@ -109,6 +109,15 @@ def test_insights_endpoint(example):
     assert client.post("/api/insights", json={"spec": example("invalid_circuit")}).status_code == 422
 
 
+def test_text_to_spec_endpoint():
+    body = client.post("/api/jobs/text", json={"text": "GHZ state on 4 qubits"}).json()
+    assert body["kind"] == "circuit" and body["valid"] and body["spec"]["num_qubits"] == 4
+    assert body["call"]["provider"] == "mock" and "GHZ" in body["notes"]
+    bad = client.post("/api/jobs/text", json={"text": "make me a sandwich"})
+    assert bad.status_code == 422 and "Offline mode understands" in bad.json()["detail"]
+    assert client.post("/api/jobs/text", json={"text": "  "}).status_code == 400
+
+
 def test_missing_job_404():
     assert client.get("/api/jobs/nope").status_code == 404
 

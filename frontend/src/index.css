@@ -284,6 +284,16 @@ table.data tr.chosen td { background: rgba(76, 195, 138, 0.07); }
 .budget-track { height: 10px; background: var(--panel-2); border-radius: 5px; overflow: hidden; }
 .budget-bar { height: 100%; background: var(--primary); border-radius: 0 5px 5px 0; }
 
+/* start: describe, camera */
+.chip-btn { background: var(--panel-2); border: 1px solid var(--line-2); color: var(--text-2); border-radius: 999px;
+  padding: 5px 12px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.chip-btn:hover:not(:disabled) { color: var(--text); background: var(--panel-3); }
+.chip-btn:disabled { opacity: .5; cursor: not-allowed; }
+.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, .62); z-index: 40; display: flex; align-items: center;
+  justify-content: center; padding: 16px; }
+.modal-body { width: min(760px, 100%); }
+.camera { width: 100%; border-radius: var(--radius-sm); background: #000; display: block; max-height: 60vh; }
+
 @media (max-width: 1100px) {
   .two-col, .inspector-grid { grid-template-columns: 1fr; }
   .hero, .edit-grid, .run-grid { grid-template-columns: 1fr; }

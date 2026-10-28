@@ -202,6 +202,15 @@ export interface CircuitResult {
   insights?: CircuitInsights
 }
 
+export interface TextDraft {
+  kind: 'circuit' | 'network'
+  spec: Spec
+  valid: boolean
+  issues: string[]
+  notes: string
+  call: ModelCall
+}
+
 export interface Amplitude { basis: string; probability: number; phase: number }
 export interface StepState {
   step: number
@@ -300,7 +309,7 @@ export interface Health {
 }
 
 export interface Examples {
-  specs: { id: string; title: string; kind: string; notes: string; valid: boolean; spec: Spec }[]
+  specs: { id: string; title: string; kind: string; notes: string; valid: boolean; group: string; spec: Spec }[]
   images: { id: string; title: string; kind: string; url: string }[]
   noise_presets: { name: string; label: string }[]
   faults: { name: string; label: string; description: string }[]

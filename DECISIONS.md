@@ -234,3 +234,14 @@ first upgrades memories and only then adds a round (key 0 -> 0.05 bit/s). We
 assume the segment ends can hold the two pairs a round needs and ignore the
 classical round-trip of the purification itself. The agent proposes it only
 when the error rate, not the pair rate, is what blocks the key.
+
+## D20. Describe it in words, camera, share links
+A third way in: type a description. Live, Muse Spark fills the same flat draft
+schema as for photos (`TEXT_SYSTEM` prompt, validated, one re-prompt). Offline,
+`qcanvas/textspec.py` is a deterministic parser for named algorithms, gate lists
+("h 0; cx 0 1; rz pi/4 1") and simple networks; anything else is a 422 that
+lists what it understands, never a guess. The kind is chosen by keywords
+(satellite, fiber, km, repeater...). The camera button captures a frame in the
+browser (getUserMedia) and sends it through the normal photo path. A share link
+carries the whole spec in the URL hash (deflate-raw + base64url, photo boxes
+dropped), so nothing is stored on a server.

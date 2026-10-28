@@ -137,6 +137,14 @@ class ReasoningModel(ABC):
     @abstractmethod
     def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> Explanation: ...
 
+    def spec_from_text(self, text: str) -> SpecDraft:
+        """A spec from a plain-language description."""
+        raise NotImplementedError
+
+    def answer(self, question: str, context: dict[str, Any]) -> Explanation:
+        """Answer a question about a design and its results, using only the given context."""
+        raise NotImplementedError
+
 
 class CodeModel(ABC):
     """Writes and repairs Qiskit code."""

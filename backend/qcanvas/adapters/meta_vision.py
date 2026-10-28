@@ -32,7 +32,7 @@ from qcanvas.adapters.base import (
 from qcanvas.adapters.config import Settings
 from qcanvas.adapters.imaging import annotate, data_url
 from qcanvas.adapters.meta_client import MetaAPIError, MetaClient
-from qcanvas.adapters.prompts import CONCEPTS_SYSTEM, DRAFT_SYSTEM, EXPLAIN_SYSTEM
+from qcanvas.adapters.prompts import CONCEPTS_SYSTEM, DRAFT_SYSTEM, EXPLAIN_SYSTEM, TEXT_SYSTEM
 from qcanvas.adapters.sam_parse import parse_sam_output
 from qcanvas.sim.noise import get_preset
 from qcanvas.spec.draft import CONCEPTS_SCHEMA, draft_schema, draft_to_spec
@@ -141,10 +141,20 @@ class MetaReasoningModel(ReasoningModel):
                 _image_part(marked, "image/jpeg"),
             ]},
         ]
+        spec, data, cached, attempts, issues = self._draft_validated(
+            messages, kind, seg_dicts, (segments.width, segments.height), "drawing")
+        call = ModelCall(provider="meta", model=self.model, role="read sketch", cached=cached,
+                         latency_s=time.perf_counter() - start)
+        extra = _grid_segments(spec, self.model)
+        return SpecDraft(spec=spec, valid=not issues, issues=issues, notes=str(data.get("notes", "")),
+                         call=call, attempts=attempts, extra_segments=extra)
+
+    def _draft_validated(self, messages: list[dict[str, Any]], kind: str, seg_dicts: list[dict[str, Any]],
+                         size: tuple[int, int] | None, what: str):
+        """Structured draft, validated; one re-prompt with the readable issues if it fails."""
         schema = draft_schema(kind)
         data, cached, raw = self._json(messages, schema, f"{kind}_draft", "medium")
         attempts = 1
-        size = (segments.width, segments.height)
         spec = draft_to_spec(kind, data, seg_dicts, size)
         issues: list[str] = []
         try:
@@ -152,11 +162,10 @@ class MetaReasoningModel(ReasoningModel):
         except SpecError as err:
             issues = [str(i) for i in err.issues]
             attempts = 2
-            messages += [
-                {"role": "assistant", "content": raw},
-                {"role": "user", "content": "That JSON fails validation:\n- " + "\n- ".join(issues)
-                                            + "\nReturn corrected JSON for the same drawing."},
-            ]
+            messages = [*messages,
+                        {"role": "assistant", "content": raw},
+                        {"role": "user", "content": "That JSON fails validation:\n- " + "\n- ".join(issues)
+                                                    + f"\nReturn corrected JSON for the same {what}."}]
             data, cached2, raw = self._json(messages, schema, f"{kind}_draft", "medium")
             cached = cached and cached2
             spec = draft_to_spec(kind, data, seg_dicts, size)
@@ -165,11 +174,24 @@ class MetaReasoningModel(ReasoningModel):
                 issues = []
             except SpecError as err2:
                 issues = [str(i) for i in err2.issues]
-        call = ModelCall(provider="meta", model=self.model, role="read sketch", cached=cached,
+        return spec, data, cached, attempts, issues
+
+    def spec_from_text(self, text: str) -> SpecDraft:
+        from qcanvas.textspec import looks_like_network
+
+        start = time.perf_counter()
+        kind = "network" if looks_like_network(text) else "circuit"
+        messages: list[dict[str, Any]] = [
+            {"role": "system", "content": TEXT_SYSTEM},
+            {"role": "user", "content": f"Kind: quantum {kind}.\nDescription: {text.strip()[:2000]}\n\n"
+                                        "Fill the JSON for this description."},
+        ]
+        spec, data, cached, attempts, issues = self._draft_validated(messages, kind, [], None, "description")
+        spec.setdefault("metadata", {})["origin"] = "text"
+        call = ModelCall(provider="meta", model=self.model, role="read description", cached=cached,
                          latency_s=time.perf_counter() - start)
-        extra = _grid_segments(spec, self.model)
         return SpecDraft(spec=spec, valid=not issues, issues=issues, notes=str(data.get("notes", "")),
-                         call=call, attempts=attempts, extra_segments=extra)
+                         call=call, attempts=attempts)
 
     def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> Explanation:
         start = time.perf_counter()

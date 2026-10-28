@@ -93,6 +93,19 @@ class MockReasoningModel(ReasoningModel):
         return Explanation(text=text, call=ModelCall(provider="mock", model="explanation template", role="explain"))
 
 
+    def spec_from_text(self, text: str) -> SpecDraft:
+        from qcanvas.textspec import parse_description
+
+        spec, how = parse_description(text)
+        call = ModelCall(provider="mock", model="offline text parser", role="read description")
+        try:
+            parse_spec(spec)
+            return SpecDraft(spec=spec, valid=True, call=call, notes=f"Read as {how}.")
+        except SpecError as err:
+            return SpecDraft(spec=spec, valid=False, issues=[str(i) for i in err.issues], call=call,
+                             notes=f"Read as {how}.")
+
+
 class MockImageModel(ImageModel):
     """Exact diagrams drawn locally (Qiskit drawer / matplotlib)."""
 

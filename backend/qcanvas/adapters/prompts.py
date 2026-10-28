@@ -42,6 +42,17 @@ DRAFT_SYSTEM = (
     "except: if no measurements are drawn, measure every qubit into the classical bit of the same index."
 )
 
+TEXT_SYSTEM = (
+    "You turn a plain-language description of a quantum circuit or a quantum network into a spec. "
+    "Qubit 0 is the first qubit. When the description names a known algorithm (Bell pair, GHZ, Grover, "
+    "Bernstein-Vazirani, Deutsch-Jozsa, QFT, phase estimation, teleportation-free protocols such as "
+    "superdense coding), build its standard textbook circuit using only the allowed gates; angles are in "
+    "radians. Measure every qubit into the classical bit of the same index unless the description says "
+    "otherwise, and leave helper (ancilla) qubits unmeasured. For networks, use ground_station, satellite "
+    "and repeater nodes with realistic distances. Leave every segment_id empty and every box empty. Put any "
+    "assumption you had to make in notes."
+)
+
 CONCEPTS_SYSTEM = (
     "You look at a photo of a hand drawing and decide what kind of quantum diagram it is and which "
     "short noun phrases a segmentation model should look for to find each drawn part."
