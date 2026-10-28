@@ -93,6 +93,20 @@ def test_demo_job_streams_failure_and_repair(example):
     assert body["status"] == "done" and result["verified"] and len(result["attempts"]) == 2
     assert "entangle" in result["explanation"]["text"]
     assert result["diagram"]["image_b64"] and result["exact_diagram"]["image_b64"]
+    assert ("insights", "ok") in steps
+    ins = result["insights"]
+    assert len(ins["steps"]) == 3 and ins["entanglement"]["pairs"][0]["ideal"] > 0.99
+    assert ins["budget"]["items"] and ins["mitigation"]["fidelity_corrected"] > ins["mitigation"]["fidelity_raw"]
+
+
+def test_insights_endpoint(example):
+    body = client.post("/api/insights", json={"spec": example("grover2"), "noise": "low_noise"}).json()
+    assert body["steps"][-1]["amplitudes"][0] == {"basis": "11", "probability": pytest.approx(1.0), "phase": pytest.approx(0, abs=1e-6)}
+    assert body["sweep"]["baseline"] == "low_noise" and body["mitigation"] is None
+    assert body["exports"]["qasm3"].startswith("OPENQASM 3.0;")
+    bad = client.post("/api/insights", json={"spec": example("network_satellite")})
+    assert bad.status_code == 422
+    assert client.post("/api/insights", json={"spec": example("invalid_circuit")}).status_code == 422
 
 
 def test_missing_job_404():

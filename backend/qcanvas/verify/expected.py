@@ -12,7 +12,7 @@ from qiskit.quantum_info import DensityMatrix, Statevector
 from qiskit_aer import AerSimulator
 
 from qcanvas.sim.noise import NoisePreset, build_gate_noise_model, get_preset
-from qcanvas.spec.models import CircuitSpec
+from qcanvas.spec.models import CircuitSpec, Operation
 
 Distribution = dict[str, float]
 
@@ -21,28 +21,32 @@ _ROT = {"RX": "rx", "RY": "ry", "RZ": "rz"}
 _EPS = 1e-12
 
 
+def append_operation(qc: QuantumCircuit, op: Operation) -> None:
+    """Append the unitary action of one spec operation (BARRIER and MEASURE add nothing)."""
+    g = op.gate
+    if g in _ONE_Q:
+        for q in op.targets:
+            getattr(qc, _ONE_Q[g])(q)
+    elif g in _ROT:
+        for q in op.targets:
+            getattr(qc, _ROT[g])(op.params[0], q)
+    elif g == "CX":
+        qc.cx(op.controls[0], op.targets[0])
+    elif g == "CZ":
+        qc.cz(op.controls[0], op.targets[0])
+    elif g == "CP":
+        qc.cp(op.params[0], op.controls[0], op.targets[0])
+    elif g == "CCX":
+        qc.ccx(op.controls[0], op.controls[1], op.targets[0])
+    elif g == "SWAP":
+        qc.swap(op.targets[0], op.targets[1])
+
+
 def build_reference_circuit(spec: CircuitSpec) -> QuantumCircuit:
     """The unitary part of the spec (no measurements) as a QuantumCircuit."""
     qc = QuantumCircuit(spec.num_qubits)
     for op in spec.operations:
-        g = op.gate
-        if g in _ONE_Q:
-            for q in op.targets:
-                getattr(qc, _ONE_Q[g])(q)
-        elif g in _ROT:
-            for q in op.targets:
-                getattr(qc, _ROT[g])(op.params[0], q)
-        elif g == "CX":
-            qc.cx(op.controls[0], op.targets[0])
-        elif g == "CZ":
-            qc.cz(op.controls[0], op.targets[0])
-        elif g == "CP":
-            qc.cp(op.params[0], op.controls[0], op.targets[0])
-        elif g == "CCX":
-            qc.ccx(op.controls[0], op.controls[1], op.targets[0])
-        elif g == "SWAP":
-            qc.swap(op.targets[0], op.targets[1])
-        # BARRIER and MEASURE do not change the state before terminal measurement
+        append_operation(qc, op)
     return qc
 
 
@@ -86,19 +90,27 @@ def apply_readout_error(dist: Distribution, spec: CircuitSpec, p01: float, p10: 
     return {k: v for k, v in out.items() if v > _EPS}
 
 
+def noisy_state(spec: CircuitSpec, preset: NoisePreset | str) -> DensityMatrix:
+    """Exact state just before measurement under the preset's gate noise (density matrix)."""
+    preset = get_preset(preset) if isinstance(preset, str) else preset
+    qc = build_reference_circuit(spec)
+    gate_noise = build_gate_noise_model(preset)
+    if gate_noise is None:
+        return DensityMatrix(Statevector.from_instruction(qc))
+    qc.save_density_matrix()
+    sim = AerSimulator(method="density_matrix", noise_model=gate_noise)
+    return DensityMatrix(sim.run(qc, shots=1).result().data()["density_matrix"])
+
+
 def noisy_distribution(spec: CircuitSpec, preset: NoisePreset | str) -> Distribution:
     """Exact outcome probabilities under a noise preset (density-matrix simulation)."""
     preset = get_preset(preset) if isinstance(preset, str) else preset
     if preset.is_ideal:
         return ideal_distribution(spec)
     pairs = spec.measured_pairs()
-    gate_noise = build_gate_noise_model(preset)
-    if gate_noise is None:
+    if build_gate_noise_model(preset) is None:
         dist = ideal_distribution(spec)
     else:
-        qc = build_reference_circuit(spec)
-        qc.save_density_matrix()
-        sim = AerSimulator(method="density_matrix", noise_model=gate_noise)
-        rho = DensityMatrix(sim.run(qc, shots=1).result().data()["density_matrix"])
+        rho = noisy_state(spec, preset)
         dist = _to_clbit_keys(rho.probabilities_dict(qargs=[q for q, _ in pairs]), spec, pairs)
     return apply_readout_error(dist, spec, preset.readout_p01, preset.readout_p10)

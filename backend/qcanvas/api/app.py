@@ -98,6 +98,28 @@ def validate(body: SpecRequest) -> dict[str, Any]:
     return {"valid": True, "issues": [], "spec": spec.model_dump(mode="json", by_alias=True, exclude_none=True)}
 
 
+class InsightsRequest(BaseModel):
+    spec: dict[str, Any]
+    noise: str = "realistic"
+
+
+@app.post("/api/insights")
+def insights(body: InsightsRequest) -> dict[str, Any]:
+    """Exact analyses of a circuit spec without running it (step-through, entanglement, noise budget)."""
+    from qcanvas.insights.circuit import analyze_circuit
+    from qcanvas.spec.models import CircuitSpec
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(status_code=422, detail={"issues": _issues(err)}) from err
+    if not isinstance(spec, CircuitSpec):
+        raise HTTPException(status_code=422, detail="Insights are for circuits; networks have their own analysis.")
+    if body.noise not in PRESETS:
+        raise HTTPException(status_code=422, detail=f"unknown noise preset '{body.noise}'")
+    return analyze_circuit(spec, body.noise).model_dump(mode="json")
+
+
 @app.post("/api/jobs/image")
 async def job_image(file: UploadFile = File(...)) -> dict[str, Any]:
     """Photo -> segments + spec draft + overlay data (does not run anything yet)."""

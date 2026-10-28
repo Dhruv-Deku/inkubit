@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Literal
 
-from qiskit_aer.noise import NoiseModel, ReadoutError, depolarizing_error, thermal_relaxation_error
+from qiskit_aer.noise import NoiseModel, QuantumError, ReadoutError, depolarizing_error, thermal_relaxation_error
 
 NoisePresetName = Literal["ideal", "low_noise", "realistic"]
 
@@ -63,14 +63,10 @@ def get_preset(name: str) -> NoisePreset:
         raise ValueError(f"unknown noise preset '{name}'; choose one of {', '.join(PRESETS)}") from None
 
 
-def build_gate_noise_model(preset: NoisePreset) -> NoiseModel | None:
-    """Gate noise only (depolarizing + thermal relaxation), no readout error.
-
-    The verifier applies readout error separately and exactly.
-    """
+def gate_errors(preset: NoisePreset) -> dict[int, QuantumError] | None:
+    """The error applied after every 1-, 2- and 3-qubit gate, keyed by gate size (None if noiseless)."""
     if preset.p1 == 0 and preset.p2 == 0 and preset.t1_us is None:
         return None
-    noise = NoiseModel()
     one_q = depolarizing_error(preset.p1, 1)
     two_q = depolarizing_error(preset.p2, 2)
     three_q = depolarizing_error(toffoli_error(preset), 3)
@@ -81,9 +77,21 @@ def build_gate_noise_model(preset: NoisePreset) -> NoiseModel | None:
         one_q = one_q.compose(r1)
         two_q = two_q.compose(r2.expand(r2))
         three_q = three_q.compose(r3.expand(r3).expand(r3))
-    noise.add_all_qubit_quantum_error(one_q, ONE_QUBIT_GATES)
-    noise.add_all_qubit_quantum_error(two_q, TWO_QUBIT_GATES)
-    noise.add_all_qubit_quantum_error(three_q, THREE_QUBIT_GATES)
+    return {1: one_q, 2: two_q, 3: three_q}
+
+
+def build_gate_noise_model(preset: NoisePreset) -> NoiseModel | None:
+    """Gate noise only (depolarizing + thermal relaxation), no readout error.
+
+    The verifier applies readout error separately and exactly.
+    """
+    errors = gate_errors(preset)
+    if errors is None:
+        return None
+    noise = NoiseModel()
+    noise.add_all_qubit_quantum_error(errors[1], ONE_QUBIT_GATES)
+    noise.add_all_qubit_quantum_error(errors[2], TWO_QUBIT_GATES)
+    noise.add_all_qubit_quantum_error(errors[3], THREE_QUBIT_GATES)
     return noise
 
 

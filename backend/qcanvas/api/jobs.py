@@ -32,6 +32,7 @@ class RunOptions(BaseModel):
     explain: bool = True
     diagram: bool = True
     pace_s: float | None = Field(default=None, ge=0, le=2)
+    insights: bool = True
 
 
 @dataclass
@@ -109,10 +110,32 @@ def _diagram(job: Job, models: Models, result: dict[str, Any]) -> dict[str, Any]
     return dia.model_dump(mode="json")
 
 
+def _insights(job: Job, result: dict[str, Any]) -> dict[str, Any] | None:
+    """Exact analyses of the circuit (no model calls): steps, entanglement, error budget, sweep, exports."""
+    from qcanvas.insights.circuit import analyze_circuit
+
+    if not isinstance(job.spec, CircuitSpec):
+        return None
+    bus = job.bus
+    bus.emit("insights", "running", "Analysing the state step by step, the entanglement and the noise budget…")
+    try:
+        verdict = result.get("verdict") or {}
+        measured = verdict.get("measured") if result.get("verified") else None
+        ins = analyze_circuit(job.spec, job.options.noise, measured)
+    except Exception as err:  # noqa: BLE001 - failing soft, like the other extras
+        bus.emit("insights", "warn", f"Could not analyse the circuit: {err}")
+        return None
+    parts = [ins.entanglement.summary if ins.entanglement else "", ins.budget.summary if ins.budget else ""]
+    bus.emit("insights", "ok", " ".join(p for p in parts if p) or "Step-by-step states ready.")
+    return ins.model_dump(mode="json")
+
+
 def _extras(job: Job, models: Models, result: dict[str, Any]) -> dict[str, Any]:
-    """Explanation (Muse Spark) and illustration (Muse Image) in parallel, each failing soft."""
+    """Explanation (Muse Spark), illustration (Muse Image) and exact insights in parallel, each failing soft."""
     tasks = {}
-    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="qcanvas-extra") as pool:
+    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="qcanvas-extra") as pool:
+        if isinstance(job.spec, CircuitSpec) and job.options.insights:
+            tasks["insights"] = pool.submit(_insights, job, result)
         if job.options.explain:
             tasks["explanation"] = pool.submit(_explain, job, models, result)
         if job.options.diagram:

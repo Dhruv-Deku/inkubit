@@ -205,3 +205,19 @@ Noise: CP gets the same two-qubit error as CX. A Toffoli is charged six CNOTs'
 worth of depolarizing error, 1 - (1 - p2)^6, plus thermal relaxation for six
 two-qubit gate times, because that is how it compiles on today's hardware. The
 generated script and the verifier build that error identically.
+
+## D18. Circuit insights
+After a circuit runs, Q-Canvas also reports, exactly and from the spec alone:
+the state after every gate (amplitudes with phases relative to the largest
+amplitude, since a global phase is unobservable, and one Bloch vector per
+qubit; a qubit whose vector is shorter than 1 is entangled with the others);
+pairwise concurrence ideal vs noisy, plus each qubit's entanglement entropy
+(so GHZ states, which have no pairwise entanglement, are described correctly);
+an error budget (fidelity lost to each noise source acting alone); a sweep of
+fidelity vs a noise scale factor with the scale needed for a 99% match
+(bisection); readout correction of verified counts by inverting each bit's
+known confusion matrix (clipped and renormalised); OpenQASM 2/3 exports.
+These analyses evolve the density matrix gate by gate with the same error
+channels as the verifier's Aer model, built in closed form (the generic
+three-qubit conversion takes seconds); tests check both agree to 1e-8.
+Above 10 qubits the noisy analyses are skipped with a note.
