@@ -10,8 +10,8 @@ import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
 import type {
-  AgentEvent, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, ModelCall, NetworkResult, RunOptions,
-  SketchAnalysis, Spec, SpecIssue, Verdict,
+  AgentEvent, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, JobSummary, ModelCall, NetworkResult,
+  RecentRun, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
 } from './types'
 import { decodeSpec, encodeSpec, specTitle } from './util'
 
@@ -25,6 +25,12 @@ interface JobState {
   status: string
   error: string | null
   result: CircuitResult | NetworkResult | null
+}
+
+function outcomeOf(s: JobSummary | null): string {
+  if (!s || s.status === 'failed' || !s.result) return 'error'
+  if ('verified' in s.result) return s.result.verified ? 'verified' : 'not verified'
+  return s.result.fix ? 'improved' : 'no better design'
 }
 
 const DEFAULT_OPTIONS: RunOptions = {
@@ -66,6 +72,7 @@ export default function App() {
   const [startError, setStartError] = useState<string | null>(null)
   const [fromText, setFromText] = useState<{ text: string; notes: string; call: ModelCall } | null>(null)
   const [shared, setShared] = useState<string | null>(null)
+  const [recent, setRecent] = useState<RecentRun[]>([])
   const [preview, setPreview] = useState<{ ins: CircuitInsights | null; loading: boolean; error: string | null } | null>(null)
 
   useEffect(() => { setPreview(null) }, [spec, options.noise])
@@ -158,6 +165,44 @@ export default function App() {
     }
   }
 
+  /** Stream a job's log (replayed from the start) into state, and note its outcome in the recent list. */
+  const follow = (jobId: string) => {
+    stopRef.current = followJob(
+      jobId,
+      (ev) => {
+        setJob((j) => (j && j.id === jobId ? { ...j, events: [...j.events, ev] } : j))
+        if ((ev.step === 'explain' || ev.step === 'diagram') && ev.status === 'running') {
+          // the result is stored before these start: show it while the explanation and diagram finish
+          api.job(jobId).then((s) => setJob((j) => (j && j.id === jobId && s.result ? { ...j, result: s.result } : j))).catch(() => {})
+        }
+      },
+      async (status, error) => {
+        const summary = await api.job(jobId).catch(() => null)
+        setJob((j) => (j && j.id === jobId
+          ? { ...j, live: false, status: summary?.status ?? status, error: summary?.error ?? error, result: summary?.result ?? null }
+          : j))
+        setRecent((r) => r.map((x) => (x.id === jobId ? { ...x, outcome: outcomeOf(summary) } : x)))
+      },
+    )
+  }
+
+  const openJob = async (jobId: string) => {
+    stopRef.current?.()
+    try {
+      const s = await api.job(jobId)
+      setSketch(null)
+      setFromText(null)
+      setSpec(s.spec)
+      setJob({ id: jobId, spec: s.spec, events: [], live: s.status === 'running' || s.status === 'queued',
+               status: s.status, error: s.error, result: s.result })
+      setStage('run')
+      follow(jobId)
+    } catch (e) {
+      setRecent((r) => r.filter((x) => x.id !== jobId))
+      setStartError(`That run is no longer available (${(e as Error).message}).`)
+    }
+  }
+
   const run = async () => {
     if (!spec) return
     stopRef.current?.()
@@ -165,22 +210,8 @@ export default function App() {
       const { job_id } = await api.startJob(spec, options)
       setJob({ id: job_id, spec, events: [], live: true, status: 'running', error: null, result: null })
       setStage('run')
-      stopRef.current = followJob(
-        job_id,
-        (ev) => {
-          setJob((j) => (j && j.id === job_id ? { ...j, events: [...j.events, ev] } : j))
-          if ((ev.step === 'explain' || ev.step === 'diagram') && ev.status === 'running') {
-            // the result is stored before these start: show it while the explanation and diagram finish
-            api.job(job_id).then((s) => setJob((j) => (j && j.id === job_id && s.result ? { ...j, result: s.result } : j))).catch(() => {})
-          }
-        },
-        async (status, error) => {
-          const summary = await api.job(job_id).catch(() => null)
-          setJob((j) => (j && j.id === job_id
-            ? { ...j, live: false, status: summary?.status ?? status, error: summary?.error ?? error, result: summary?.result ?? null }
-            : j))
-        },
-      )
+      setRecent((r) => [{ id: job_id, title: specTitle(spec), kind: spec.kind, started: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), outcome: null }, ...r].slice(0, 8))
+      follow(job_id)
     } catch (e) {
       if (e instanceof ApiError && e.issues.length) setIssues(e.issues)
       else setStartError((e as Error).message)
@@ -219,7 +250,7 @@ export default function App() {
 
       {stage === 'start' && (
         <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
-          live={health?.mode === 'meta'} />
+          live={health?.mode === 'meta'} recent={recent} onOpen={openJob} />
       )}
 
       {stage === 'edit' && spec && (

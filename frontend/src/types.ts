@@ -308,6 +308,15 @@ export interface JobSummary {
   status: 'queued' | 'running' | 'done' | 'failed'
   error: string | null
   result: CircuitResult | NetworkResult | null
+  spec: Spec
+}
+
+export interface RecentRun {
+  id: string
+  title: string
+  kind: 'circuit' | 'network'
+  started: string
+  outcome: string | null
 }
 
 export interface Health {

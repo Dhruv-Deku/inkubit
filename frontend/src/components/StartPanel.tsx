@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import type { Examples, Spec } from '../types'
+import type { Examples, RecentRun, Spec } from '../types'
 import { CameraCapture } from './CameraCapture'
 import { Upload } from './Icons'
 
@@ -14,9 +14,11 @@ interface Props {
   onSpec: (spec: Spec) => void
   onText: (text: string) => void
   live: boolean
+  recent: RecentRun[]
+  onOpen: (id: string) => void
 }
 
-export function StartPanel({ examples, busy, error, onImage, onSpec, onText, live }: Props) {
+export function StartPanel({ examples, busy, error, onImage, onSpec, onText, live, recent, onOpen }: Props) {
   const input = useRef<HTMLInputElement>(null)
   const [camera, setCamera] = useState(false)
   const [words, setWords] = useState('')
@@ -86,6 +88,23 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
 
       {camera && <CameraCapture onClose={() => setCamera(false)} onShot={(b) => { setCamera(false); onImage(b, 'camera.jpg') }} />}
       {error && <div className="notice error">{error}</div>}
+
+      {recent.length > 0 && (
+        <div className="panel">
+          <div className="panel-head"><h2>Recent runs</h2><span className="sub">this session; click to reopen the log and results</span></div>
+          <div className="spec-list">
+            {recent.map((r) => (
+              <button key={r.id} className="btn" onClick={() => onOpen(r.id)}>
+                <span>{r.title}</span>
+                <span className={`badge ${r.outcome === 'verified' || r.outcome === 'improved' ? 'pass' : r.outcome ? 'fail' : ''}`}>
+                  {r.outcome ?? 'running'}
+                </span>
+                <span className="sub">{r.started}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="panel">
         <div className="panel-head"><h2>Or describe it in words</h2>
