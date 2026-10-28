@@ -278,18 +278,19 @@ export default function App() {
             <select value={options.language} onChange={(e) => setOptions({ ...options, language: e.target.value })} aria-label="Explanation language">
               {(examples?.languages ?? ['English']).map((l) => <option key={l}>{l}</option>)}
             </select>
-            <span className="grow" />
-            {startError && <span className="badge fail">{startError}</span>}
-            <button className="btn big ghost" onClick={shareLink} title="Copy a link that opens this spec">{shared ?? 'Share link'}</button>
-            {spec.kind === 'circuit' && (
-              <button className="btn big" disabled={!valid || preview?.loading} onClick={stepThrough}
-                title="See the exact state after every gate, the entanglement and the noise budget, without running">
-                {preview?.loading ? 'Analysing…' : 'Step through'}
+            <div className="run-actions">
+              {startError && <span className="badge fail">{startError}</span>}
+              <button className="btn big ghost" onClick={shareLink} title="Copy a link that opens this spec">{shared ?? 'Share link'}</button>
+              {spec.kind === 'circuit' && (
+                <button className="btn big" disabled={!valid || preview?.loading} onClick={stepThrough}
+                  title="See the exact state after every gate, the entanglement and the noise budget, without running">
+                  {preview?.loading ? 'Analysing…' : 'Step through'}
+                </button>
+              )}
+              <button className="btn primary big" disabled={!valid} onClick={run}>
+                {checking ? 'Checking…' : issues.length ? 'Fix the spec to run' : `Run ${specTitle(spec)}`}
               </button>
-            )}
-            <button className="btn primary big" disabled={!valid} onClick={run}>
-              {checking ? 'Checking…' : issues.length ? 'Fix the spec to run' : `Run ${specTitle(spec)}`}
-            </button>
+            </div>
           </div>
           {preview?.error && <div className="notice error">{preview.error}</div>}
           {preview?.ins && spec.kind === 'circuit' && <InsightsSection spec={spec} ins={preview.ins} wide />}

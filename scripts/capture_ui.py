@@ -51,7 +51,7 @@ def main() -> None:
         page.hover(".ops tbody tr >> nth=1")
         page.wait_for_timeout(300)
         page.screenshot(path=str(OUT / "2-overlay.png"))
-        page.click("label.toggle")
+        page.click("header label.toggle")
         page.click("button.btn.primary.big")
         frames: list[bytes] = []
         logged_fail = False
@@ -70,7 +70,39 @@ def main() -> None:
         _gif(frames, OUT / "agent-repair.gif")
         page.wait_for_timeout(800)
         page.screenshot(path=str(OUT / "4-results.png"))
+        page.wait_for_selector(".inspector", timeout=120000)
+        page.wait_for_selector(".panel.explain", timeout=120000)
+        page.wait_for_timeout(600)
         page.screenshot(path=str(OUT / "4-results-full.png"), full_page=True)
+
+        # inside the circuit: step back to the superposition, then the analyses
+        page.locator(".inspector").scroll_into_view_if_needed()
+        page.click("button[aria-label='Previous step']")
+        page.wait_for_timeout(500)
+        panel = lambda title: page.locator(".panel", has=page.locator("h2", has_text=title)).first  # noqa: E731
+        panel("Inside the circuit").screenshot(path=str(OUT / "6-inspector.png"))
+        page.click("button[aria-label='Next step']")
+        page.wait_for_timeout(500)
+        panel("Inside the circuit").screenshot(path=str(OUT / "6-inspector-entangled.png"))
+        panel("How good must the hardware be").screenshot(path=str(OUT / "7-hardware.png"))
+        panel("Error budget").screenshot(path=str(OUT / "7-budget.png"))
+        panel("On real chip layouts").screenshot(path=str(OUT / "7-layouts.png"))
+        page.click(".chip-btn:has-text('Why did the first attempt fail?')")
+        page.wait_for_selector(".qa .a p")
+        page.click(".chip-btn:has-text('How good must the hardware be?')")
+        page.wait_for_function("document.querySelectorAll('.qa .a p').length >= 2")
+        page.wait_for_timeout(300)
+        panel("Ask about this result").screenshot(path=str(OUT / "8-ask.png"))
+
+        # describe it in words
+        page.click("nav.steps button >> nth=0")
+        page.fill("input[aria-label='Describe a circuit or network']", "Bernstein-Vazirani with secret 1011")
+        page.click("button:has-text('Build it')")
+        page.wait_for_selector(".ops")
+        page.click("button:has-text('Step through')")
+        page.wait_for_selector(".inspector")
+        page.wait_for_timeout(600)
+        page.screenshot(path=str(OUT / "9-describe.png"))
 
         # network: preset A from the spec list
         page.click("nav.steps button >> nth=0")
