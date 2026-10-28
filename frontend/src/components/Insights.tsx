@@ -252,6 +252,31 @@ export function SweepChart({ sweep }: { sweep: NoiseSweep }) {
   )
 }
 
+export function LayoutsPanel({ ins }: { ins: CircuitInsights }) {
+  if (!ins.layouts.length) return null
+  return (
+    <div className="panel">
+      <div className="panel-head"><h2>On real chip layouts</h2><span className="sub">compiled to rz, sx, x, cx with Qiskit's router</span></div>
+      <p className="lead">{ins.layout_summary}</p>
+      <table className="data">
+        <thead><tr><th>Wiring</th><th className="num">Depth</th><th className="num">CNOTs</th><th className="num">Extra SWAPs</th><th className="num">Rough success</th></tr></thead>
+        <tbody>
+          {ins.layouts.map((l) => (
+            <tr key={l.layout}>
+              <td><strong>{l.layout}</strong> <span className="sub">{l.description}</span></td>
+              <td className="num">{l.depth}</td>
+              <td className="num">{l.two_qubit_gates}</td>
+              <td className="num">{l.swaps_added}</td>
+              <td className="num">{pct(l.estimated_success, 0)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="sub" style={{ marginTop: 6 }}>Rough success multiplies gate and readout fidelities and ignores decoherence; the verified numbers above are exact.</div>
+    </div>
+  )
+}
+
 export function ReadoutPanel({ m }: { m: Mitigation }) {
   return (
     <div className="panel">
@@ -289,6 +314,7 @@ export function InsightsSection({ spec, ins, wide = false }: { spec: CircuitSpec
         {ins.budget && <ErrorBudgetPanel budget={ins.budget} />}
       </div>
       {ins.sweep && <SweepChart sweep={ins.sweep} />}
+      <LayoutsPanel ins={ins} />
       {ins.mitigation && <ReadoutPanel m={ins.mitigation} />}
       {ins.notes.map((t, k) => <div key={k} className="notice">{t}</div>)}
     </div>

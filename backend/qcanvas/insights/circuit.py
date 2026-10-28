@@ -103,6 +103,15 @@ class Mitigation(BaseModel):
     summary: str
 
 
+class LayoutCost(BaseModel):
+    layout: str
+    description: str
+    depth: int
+    two_qubit_gates: int
+    swaps_added: int
+    estimated_success: float  # rough: product of gate and readout fidelities, decoherence ignored
+
+
 class Exports(BaseModel):
     qasm2: str
     qasm3: str
@@ -114,6 +123,8 @@ class CircuitInsights(BaseModel):
     budget: ErrorBudget | None = None
     sweep: NoiseSweep | None = None
     mitigation: Mitigation | None = None
+    layouts: list[LayoutCost] = Field(default_factory=list)
+    layout_summary: str = ""
     exports: Exports
     notes: list[str] = Field(default_factory=list)
 
@@ -409,6 +420,53 @@ def correct_readout(spec: CircuitSpec, measured: Distribution, preset: NoisePres
                       summary=summary)
 
 
+# ---------------------------------------------------------------- real chip layouts
+
+BASIS = ["rz", "sx", "x", "cx"]  # IBM-style native gates; rz is virtual (error-free)
+FALCON_7Q = [(0, 1), (1, 2), (1, 3), (3, 5), (4, 5), (5, 6)]  # 7-qubit heavy-hex chips (IBM Falcon r5.11H)
+
+
+def chip_layouts(spec: CircuitSpec, preset: NoisePreset) -> tuple[list[LayoutCost], str]:
+    """Compile onto all-to-all, a line and heavy-hex wiring; count routing SWAPs and estimate success."""
+    from qiskit import transpile
+    from qiskit.transpiler import CouplingMap
+
+    n = spec.num_qubits
+    base = preset if not preset.is_ideal else get_preset("realistic")
+    qc = build_reference_circuit(spec)
+    hex_map = CouplingMap(FALCON_7Q) if n <= 7 else CouplingMap.from_heavy_hex(3)
+    hex_map.make_symmetric()
+    layouts = [("all-to-all", "every qubit wired to every other (trapped ions)", None),
+               ("line", f"{n} qubits in a row, each talking only to its neighbours", CouplingMap.from_line(n)),
+               ("heavy-hex", f"IBM heavy-hex chip ({hex_map.size()} qubits)", hex_map)]
+    read_ok = 1 - (base.readout_p01 + base.readout_p10) / 2
+    out: list[LayoutCost] = []
+    for name, desc, cmap in layouts:
+        if n < 2 and cmap is not None:
+            continue
+        compiled = transpile(qc, coupling_map=cmap, basis_gates=BASIS, optimization_level=1, seed_transpiler=1234)
+        ops = compiled.count_ops()
+        cx, one = ops.get("cx", 0), ops.get("sx", 0) + ops.get("x", 0)
+        success = (1 - base.p1) ** one * (1 - base.p2) ** cx * read_ok ** len(spec.measured_pairs())
+        out.append(LayoutCost(layout=name, description=desc, depth=compiled.depth(), two_qubit_gates=cx,
+                              swaps_added=0, estimated_success=round(success, 4)))
+    if out:
+        ref = out[0].two_qubit_gates
+        for lay in out[1:]:
+            lay.swaps_added = max(0, round((lay.two_qubit_gates - ref) / 3))
+    worst = max(out, key=lambda lay: lay.swaps_added, default=None)
+    if not worst or worst.swaps_added == 0:
+        cx = out[0].two_qubit_gates if out else 0
+        summary = ("Every two-qubit gate already sits between neighbouring qubits, so no layout needs extra SWAPs "
+                   f"({cx} CNOT{'s' if cx != 1 else ''} on every chip).")
+    else:
+        summary = (f"Wired all-to-all it needs {out[0].two_qubit_gates} CNOTs. On a {worst.layout} chip, routing adds "
+                   f"{worst.swaps_added} SWAP{'s' if worst.swaps_added != 1 else ''} ({worst.two_qubit_gates} CNOTs) "
+                   f"and the rough success estimate drops from {out[0].estimated_success:.2f} to "
+                   f"{worst.estimated_success:.2f}: the wiring of the chip costs accuracy too.")
+    return out, summary
+
+
 # ---------------------------------------------------------------- exports
 
 def exports(spec: CircuitSpec) -> Exports:
@@ -431,7 +489,10 @@ def analyze_circuit(spec: CircuitSpec, noise: str = "realistic",
     if not noisy_ok:
         notes.append(f"Noise analyses skipped above {MAX_NOISY_QUBITS} qubits (the exact density matrix gets too large).")
     rho = noisy_state(spec, preset) if noisy_ok and not preset.is_ideal else None
+    layouts, layout_summary = chip_layouts(spec, preset)
     return CircuitInsights(
+        layouts=layouts,
+        layout_summary=layout_summary,
         steps=step_states(spec),
         entanglement=entanglement(spec, preset, rho),
         budget=error_budget(spec, preset, ideal) if noisy_ok and not preset.is_ideal else None,

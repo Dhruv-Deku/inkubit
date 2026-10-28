@@ -255,3 +255,12 @@ contain the answer. Offline, answers are assembled from the same facts by topic
 (repair, entanglement, noise budget, hardware, readout, verification,
 bottleneck, key rate); a question outside those topics gets a plain "can't
 answer that offline", never a loosely related paragraph.
+
+## D22. Chip layouts
+Insights also compile the circuit (Qiskit `transpile`, optimization level 1,
+fixed seed) to IBM-style native gates on three wirings: all-to-all (trapped-ion
+style), a line, and heavy-hex (the 7-qubit Falcon map, or the 19-qubit
+distance-3 heavy-hex above 7 qubits). Extra SWAPs = extra CNOTs / 3 against the
+all-to-all compile. The success figure is labelled rough: it multiplies gate and
+readout fidelities of the preset and ignores decoherence; the verified numbers
+remain the exact ones.

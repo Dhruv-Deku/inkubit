@@ -102,6 +102,15 @@ def test_qasm_exports_round_trip(example):
     assert back.num_qubits == 4 and back.count_ops()["measure"] == 3 and back.count_ops()["cp"] == 6
 
 
+def test_chip_layouts_count_routing_swaps(example):
+    ins = analyze_circuit(parse_spec(example("phase_estimation")), "realistic")
+    by = {lay.layout: lay for lay in ins.layouts}
+    assert set(by) == {"all-to-all", "line", "heavy-hex"} and by["all-to-all"].swaps_added == 0
+    assert by["line"].swaps_added > 0 and by["line"].estimated_success < by["all-to-all"].estimated_success
+    bell = analyze_circuit(parse_spec(example("bell")), "realistic")
+    assert all(lay.swaps_added == 0 for lay in bell.layouts) and "no layout needs extra SWAPs" in bell.layout_summary
+
+
 def test_analysis_is_fast_enough_for_every_example(example):
     import time
 

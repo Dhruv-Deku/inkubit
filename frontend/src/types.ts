@@ -228,12 +228,22 @@ export interface ErrorBudget { total_loss: number; items: BudgetItem[]; summary:
 export interface SweepPoint { scale: number; fidelity: number; success: number | null }
 export interface NoiseSweep { baseline: string; points: SweepPoint[]; target: number; scale_for_target: number | null; summary: string }
 export interface Mitigation { corrected: Distribution; fidelity_raw: number; fidelity_corrected: number; summary: string }
+export interface LayoutCost {
+  layout: string
+  description: string
+  depth: number
+  two_qubit_gates: number
+  swaps_added: number
+  estimated_success: number
+}
 export interface CircuitInsights {
   steps: StepState[]
   entanglement: Entanglement | null
   budget: ErrorBudget | null
   sweep: NoiseSweep | null
   mitigation: Mitigation | null
+  layouts: LayoutCost[]
+  layout_summary: string
   exports: { qasm2: string; qasm3: string }
   notes: string[]
 }
