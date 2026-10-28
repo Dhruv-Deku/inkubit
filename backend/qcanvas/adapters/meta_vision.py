@@ -254,6 +254,12 @@ def diagram_prompt(spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> s
             if op.gate in ("CX", "CZ"):
                 steps.append(f"{op.gate} with control on wire q{op.controls[0]} (solid dot) and target on wire "
                              f"q{op.targets[0]} ({'circled plus' if op.gate == 'CX' else 'solid dot'})")
+            elif op.gate == "CCX":
+                steps.append(f"Toffoli with controls on q{op.controls[0]} and q{op.controls[1]} (solid dots) "
+                             f"and target on q{op.targets[0]} (circled plus)")
+            elif op.gate == "CP":
+                steps.append(f"controlled phase P({op.params[0]:.2f} rad) between q{op.controls[0]} and "
+                             f"q{op.targets[0]} (two solid dots joined, labelled P)")
             elif op.gate == "SWAP":
                 steps.append(f"SWAP between q{op.targets[0]} and q{op.targets[1]} (two crosses joined)")
             elif op.gate not in ("BARRIER", "MEASURE"):

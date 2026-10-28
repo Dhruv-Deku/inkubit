@@ -1,0 +1,12 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "H", "targets": [0, 1]},
+    {"gate": "CCX", "targets": [2], "controls": [0, 1]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}, {"qubit": 2, "clbit": 2}],
+  "metadata": {"title": "Quantum AND (Toffoli)", "notes": "q2 = q0 AND q1 for all four inputs at once: 25% each of 000, 001, 010 and 111 (q0 is the rightmost bit).", "origin": "manual"}
+}

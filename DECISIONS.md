@@ -195,3 +195,13 @@ mode (offline recordings say so on the title card); waits for the sandbox or
 for model calls are sped up 4x only with an on-screen "4× speed" tag. Demo mode
 now paces the network log too (0.35 s per step, as for circuits), so a viewer
 can follow it.
+
+## D17. New gates and the algorithm gallery
+Added S†, T†, √X, controlled-phase (CP, one angle) and Toffoli (CCX). They let
+the gallery hold real algorithms: Grover search, Bernstein-Vazirani,
+Deutsch-Jozsa, phase estimation of T (inverse QFT built from CP), superdense
+coding and a Toffoli AND; each has a test that checks the textbook answer.
+Noise: CP gets the same two-qubit error as CX. A Toffoli is charged six CNOTs'
+worth of depolarizing error, 1 - (1 - p2)^6, plus thermal relaxation for six
+two-qubit gate times, because that is how it compiles on today's hardware. The
+generated script and the verifier build that error identically.

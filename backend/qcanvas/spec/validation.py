@@ -87,6 +87,20 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
                            f"(got {len(op.controls)} control, {len(op.targets)} target).")
             if op.params:
                 add(where, f"{g} takes no parameters.")
+        elif g == "CP":
+            if len(op.controls) != 1 or len(op.targets) != 1:
+                add(where, f"CP needs exactly one control and one target "
+                           f"(got {len(op.controls)} control, {len(op.targets)} target).")
+            if len(op.params) != 1:
+                add(where, f"CP needs 1 angle parameter, got {len(op.params)}.")
+        elif g == "CCX":
+            if len(op.controls) != 2 or len(op.targets) != 1:
+                add(where, f"CCX (Toffoli) needs exactly two controls and one target "
+                           f"(got {len(op.controls)} controls, {len(op.targets)} target).")
+            elif op.controls[0] == op.controls[1]:
+                add(where, "the two controls of CCX must be different qubits.")
+            if op.params:
+                add(where, "CCX takes no parameters.")
         elif g == "SWAP":
             if len(op.targets) != 2 or op.controls:
                 add(where, "SWAP needs exactly two target qubits and no controls.")

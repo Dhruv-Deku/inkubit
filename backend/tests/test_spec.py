@@ -50,9 +50,9 @@ def test_gate_aliases_are_normalised():
 def test_unknown_gate_and_kind_messages():
     with pytest.raises(SpecError) as info:
         parse_spec({"kind": "circuit", "num_qubits": 1, "num_clbits": 1,
-                    "operations": [{"gate": "TOFFOLI", "targets": [0]}],
+                    "operations": [{"gate": "FREDKIN", "targets": [0]}],
                     "measurements": [{"qubit": 0, "clbit": 0}]})
-    assert "operations[0].gate" in str(info.value) and "TOFFOLI" in str(info.value)
+    assert "operations[0].gate" in str(info.value) and "FREDKIN" in str(info.value)
     with pytest.raises(SpecError) as info:
         parse_spec({"kind": "banana"})
     assert "'kind' must be" in str(info.value)

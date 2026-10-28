@@ -1,0 +1,22 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 4,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "X", "targets": [3]},
+    {"gate": "H", "targets": [0, 1, 2]},
+    {"gate": "CP", "targets": [3], "controls": [0], "params": [0.7853981633974483]},
+    {"gate": "CP", "targets": [3], "controls": [1], "params": [1.5707963267948966]},
+    {"gate": "CP", "targets": [3], "controls": [2], "params": [3.141592653589793]},
+    {"gate": "SWAP", "targets": [0, 2]},
+    {"gate": "H", "targets": [0]},
+    {"gate": "CP", "targets": [1], "controls": [0], "params": [-1.5707963267948966]},
+    {"gate": "H", "targets": [1]},
+    {"gate": "CP", "targets": [2], "controls": [0], "params": [-0.7853981633974483]},
+    {"gate": "CP", "targets": [2], "controls": [1], "params": [-1.5707963267948966]},
+    {"gate": "H", "targets": [2]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}, {"qubit": 2, "clbit": 2}],
+  "metadata": {"title": "Phase estimation of T", "notes": "Estimates the phase of the T gate (1/8 of a turn) with three counting qubits and an inverse QFT: the counting register reads 001, i.e. 1/8. q3 holds the eigenstate.", "origin": "manual"}
+}

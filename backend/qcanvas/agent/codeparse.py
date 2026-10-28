@@ -6,7 +6,8 @@ import ast
 import math
 from dataclasses import dataclass
 
-GATE_METHODS = frozenset({"h", "x", "y", "z", "s", "t", "rx", "ry", "rz", "cx", "cz", "swap", "measure", "barrier"})
+GATE_METHODS = frozenset({"h", "x", "y", "z", "s", "t", "sdg", "tdg", "sx", "rx", "ry", "rz", "cx", "cz", "cp", "swap", "ccx",
+                          "measure", "barrier"})
 
 
 @dataclass(frozen=True)

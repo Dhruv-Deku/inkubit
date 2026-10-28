@@ -9,7 +9,8 @@ from __future__ import annotations
 import math
 from fractions import Fraction
 
-from qcanvas.sim.noise import ONE_QUBIT_GATES, TWO_QUBIT_GATES, NoisePreset, get_preset
+from qcanvas.sim.noise import (ONE_QUBIT_GATES, THREE_QUBIT_GATES, TOFFOLI_CNOTS, TWO_QUBIT_GATES, NoisePreset,
+                               get_preset, toffoli_error)
 from qcanvas.spec.models import CircuitSpec, Operation
 
 RESULT_MARKER = "QCANVAS_RESULT"
@@ -39,7 +40,7 @@ def operation_lines(i: int, op: Operation) -> list[str]:
     """Qiskit statements for one spec operation, each tagged with its op index."""
     tag = f"  # op {i}: {op.gate}"
     g = op.gate
-    if g in ("H", "X", "Y", "Z", "S", "T"):
+    if g in ("H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX"):
         return [f"    qc.{g.lower()}({q}){tag} on q{q}" for q in op.targets]
     if g in ("RX", "RY", "RZ"):
         angle = format_angle(op.params[0])
@@ -47,6 +48,13 @@ def operation_lines(i: int, op: Operation) -> list[str]:
     if g in ("CX", "CZ"):
         c, t = op.controls[0], op.targets[0]
         return [f"    qc.{g.lower()}({c}, {t}){tag}, control q{c} -> target q{t}"]
+    if g == "CP":
+        c, t = op.controls[0], op.targets[0]
+        angle = format_angle(op.params[0])
+        return [f"    qc.cp({angle}, {c}, {t}){tag}({angle}), control q{c} -> target q{t}"]
+    if g == "CCX":
+        (c0, c1), t = op.controls, op.targets[0]
+        return [f"    qc.ccx({c0}, {c1}, {t}){tag}, controls q{c0}, q{c1} -> target q{t}"]
     if g == "SWAP":
         a, b = op.targets
         return [f"    qc.swap({a}, {b}){tag} q{a} <-> q{b}"]
@@ -58,7 +66,7 @@ def operation_lines(i: int, op: Operation) -> list[str]:
     raise ValueError(f"unsupported gate {g}")
 
 
-def _noise_block(preset: NoisePreset) -> list[str]:
+def _noise_block(preset: NoisePreset, toffoli: bool = False) -> list[str]:
     if preset.is_ideal:
         return [
             "def build_noise_model():",
@@ -72,6 +80,8 @@ def _noise_block(preset: NoisePreset) -> list[str]:
         f"    one_qubit = depolarizing_error({preset.p1}, 1)",
         f"    two_qubit = depolarizing_error({preset.p2}, 2)",
     ]
+    if toffoli:
+        lines.append(f"    three_qubit = depolarizing_error({toffoli_error(preset)!r}, 3)  # {TOFFOLI_CNOTS} CNOTs' worth")
     if preset.t1_us is not None and preset.t2_us is not None:
         lines += [
             f"    # thermal relaxation: T1={preset.t1_us} us, T2={preset.t2_us} us",
@@ -80,9 +90,16 @@ def _noise_block(preset: NoisePreset) -> list[str]:
             "    one_qubit = one_qubit.compose(relax_1q)",
             "    two_qubit = two_qubit.compose(relax_2q.expand(relax_2q))",
         ]
+        if toffoli:
+            lines += [
+                f"    relax_3q = thermal_relaxation_error({preset.t1_us}, {preset.t2_us}, "
+                f"{TOFFOLI_CNOTS * preset.gate_2q_us!r})",
+                "    three_qubit = three_qubit.compose(relax_3q.expand(relax_3q).expand(relax_3q))",
+            ]
     lines += [
         f"    noise.add_all_qubit_quantum_error(one_qubit, {ONE_QUBIT_GATES!r})",
         f"    noise.add_all_qubit_quantum_error(two_qubit, {TWO_QUBIT_GATES!r})",
+        *([f"    noise.add_all_qubit_quantum_error(three_qubit, {THREE_QUBIT_GATES!r})"] if toffoli else []),
         f"    p01, p10 = {preset.readout_p01}, {preset.readout_p10}  # readout flips 0->1 and 1->0",
         "    noise.add_all_qubit_readout_error(ReadoutError([[1 - p01, p01], [p10, 1 - p10]]))",
         "    return noise",
@@ -139,7 +156,7 @@ def generate_code(
         *body,
         "",
         "",
-        *_noise_block(preset),
+        *_noise_block(preset, toffoli=any(op.gate == "CCX" for op in spec.operations)),
         "",
         "",
         "def main() -> None:",

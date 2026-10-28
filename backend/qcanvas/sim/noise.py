@@ -13,8 +13,10 @@ from qiskit_aer.noise import NoiseModel, ReadoutError, depolarizing_error, therm
 
 NoisePresetName = Literal["ideal", "low_noise", "realistic"]
 
-ONE_QUBIT_GATES = ["h", "x", "y", "z", "s", "t", "rx", "ry", "rz"]
-TWO_QUBIT_GATES = ["cx", "cz", "swap"]
+ONE_QUBIT_GATES = ["h", "x", "y", "z", "s", "t", "sdg", "tdg", "sx", "rx", "ry", "rz"]
+TWO_QUBIT_GATES = ["cx", "cz", "cp", "swap"]
+THREE_QUBIT_GATES = ["ccx"]
+TOFFOLI_CNOTS = 6  # a Toffoli compiles to six CNOTs on today's hardware (DECISIONS.md D17)
 
 
 @dataclass(frozen=True)
@@ -71,14 +73,23 @@ def build_gate_noise_model(preset: NoisePreset) -> NoiseModel | None:
     noise = NoiseModel()
     one_q = depolarizing_error(preset.p1, 1)
     two_q = depolarizing_error(preset.p2, 2)
+    three_q = depolarizing_error(toffoli_error(preset), 3)
     if preset.t1_us is not None and preset.t2_us is not None:
         r1 = thermal_relaxation_error(preset.t1_us, preset.t2_us, preset.gate_1q_us)
         r2 = thermal_relaxation_error(preset.t1_us, preset.t2_us, preset.gate_2q_us)
+        r3 = thermal_relaxation_error(preset.t1_us, preset.t2_us, TOFFOLI_CNOTS * preset.gate_2q_us)
         one_q = one_q.compose(r1)
         two_q = two_q.compose(r2.expand(r2))
+        three_q = three_q.compose(r3.expand(r3).expand(r3))
     noise.add_all_qubit_quantum_error(one_q, ONE_QUBIT_GATES)
     noise.add_all_qubit_quantum_error(two_q, TWO_QUBIT_GATES)
+    noise.add_all_qubit_quantum_error(three_q, THREE_QUBIT_GATES)
     return noise
+
+
+def toffoli_error(preset: NoisePreset) -> float:
+    """Depolarizing probability of one Toffoli: six CNOTs' worth of two-qubit error."""
+    return 1 - (1 - preset.p2) ** TOFFOLI_CNOTS
 
 
 def build_noise_model(preset: NoisePreset) -> NoiseModel | None:

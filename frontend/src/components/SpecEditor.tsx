@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { CircuitSpec, Gate, NetLink, NetNode, NetworkSpec, Operation, Spec, SpecIssue } from '../types'
-import { GATES } from '../types'
+import { GATE_LABEL, GATES } from '../types'
 import { angleText, clone, parseAngle, parseIntList, resizeCircuit } from '../util'
 import { CircuitPreview } from './CircuitPreview'
 import { Down, Trash, Up } from './Icons'
@@ -70,8 +70,8 @@ function JsonEditor({ spec, onChange }: { spec: Spec; onChange: (s: Spec) => voi
   )
 }
 
-const needsControl = (g: Gate) => g === 'CX' || g === 'CZ'
-const needsAngle = (g: Gate) => g === 'RX' || g === 'RY' || g === 'RZ'
+const needsControl = (g: Gate) => g === 'CX' || g === 'CZ' || g === 'CP' || g === 'CCX'
+const needsAngle = (g: Gate) => g === 'RX' || g === 'RY' || g === 'RZ' || g === 'CP'
 
 function CircuitForm({ spec, highlight, onPick, onChange }: {
   spec: CircuitSpec; highlight: string | null; onPick: (k: string | null) => void; onChange: (s: Spec) => void
@@ -86,7 +86,12 @@ function CircuitForm({ spec, highlight, onPick, onChange }: {
   const changeGate = (i: number, g: Gate) => {
     const op = spec.operations[i]
     const next: Operation = { ...op, gate: g }
-    if (needsControl(g)) {
+    if (g === 'CCX') {
+      const t = op.targets[0] ?? Math.min(2, spec.num_qubits - 1)
+      const pool = [...(op.controls ?? []), ...Array.from({ length: spec.num_qubits }, (_, q) => q)]
+      next.controls = pool.filter((q, k) => q !== t && pool.indexOf(q) === k).slice(0, 2)
+      next.targets = [t]
+    } else if (needsControl(g)) {
       next.controls = op.controls?.length ? [op.controls[0]] : [op.targets[0] === 0 ? 1 : 0]
       next.targets = [op.targets[0] ?? 1]
     } else next.controls = []
@@ -119,7 +124,7 @@ function CircuitForm({ spec, highlight, onPick, onChange }: {
                 <td className="muted">{i}</td>
                 <td>
                   <select value={op.gate} onChange={(e) => changeGate(i, e.target.value as Gate)}>
-                    {GATES.map((g) => <option key={g}>{g}</option>)}
+                    {GATES.map((g) => <option key={g} value={g}>{GATE_LABEL[g] ?? g}</option>)}
                   </select>
                 </td>
                 <td><IntList value={op.targets} onChange={(v) => setOp(i, { targets: v })} /></td>

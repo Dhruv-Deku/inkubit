@@ -28,6 +28,10 @@ def _op_phrase(op: Operation) -> str:
         return f"a Z gate flips the phase of {qs}, which a measurement alone cannot see"
     if g in ("S", "T"):
         return f"an {g} gate adds a {'quarter' if g == 'S' else 'eighth'}-turn phase to {qs}"
+    if g in ("SDG", "TDG"):
+        return f"an {g[0]}-dagger gate takes a {'quarter' if g == 'SDG' else 'eighth'}-turn phase back off {qs}"
+    if g == "SX":
+        return f"a square-root-of-X gate does half a bit flip on {qs}"
     if g in ("RX", "RY", "RZ"):
         return f"an {g} rotation turns {qs} by {_angle(op.params[0])}"
     if g == "CX":
@@ -35,6 +39,12 @@ def _op_phrase(op: Operation) -> str:
                 f"which ties their results together (entanglement)")
     if g == "CZ":
         return f"a CZ adds a phase when both q{op.controls[0]} and q{op.targets[0]} are 1"
+    if g == "CP":
+        return (f"a controlled-phase adds a {_angle(op.params[0])} phase when both q{op.controls[0]} "
+                f"and q{op.targets[0]} are 1")
+    if g == "CCX":
+        return (f"a Toffoli flips q{op.targets[0]} only when both q{op.controls[0]} and q{op.controls[1]} are 1, "
+                f"the quantum version of an AND gate")
     if g == "SWAP":
         return f"a SWAP exchanges q{op.targets[0]} and q{op.targets[1]}"
     return ""

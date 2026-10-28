@@ -7,8 +7,8 @@ Output contract for the script (the runner depends on it):
 - Standalone Python 3.11+ using only: qiskit, qiskit_aer, json, math, numpy.
 - No file, network, OS or subprocess access; no input().
 - Define build_circuit() that returns the QuantumCircuit, one statement per drawn
-  operation, using `qc.<gate>(...)` calls (h, x, y, z, s, t, rx, ry, rz, cx, cz,
-  swap, measure, barrier).
+  operation, using `qc.<gate>(...)` calls (h, x, y, z, s, t, sdg, tdg, sx, rx, ry,
+  rz, cx, cz, cp, swap, ccx, measure, barrier).
 - Simulate with qiskit_aer.AerSimulator(noise_model=..., seed_simulator=SEED),
   transpile with optimization_level=0 and seed_transpiler=SEED, and the given SHOTS.
 - Build the noise model exactly from the given preset parameters (or None for ideal).

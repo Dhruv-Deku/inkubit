@@ -15,10 +15,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 SPEC_VERSION = "1.0"
 
 GateName = Literal[
-    "H", "X", "Y", "Z", "S", "T", "RX", "RY", "RZ", "CX", "CZ", "SWAP", "MEASURE", "BARRIER"
+    "H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX", "RX", "RY", "RZ",
+    "CX", "CZ", "CP", "SWAP", "CCX", "MEASURE", "BARRIER"
 ]
 
-SINGLE_QUBIT_GATES = frozenset({"H", "X", "Y", "Z", "S", "T", "RX", "RY", "RZ"})
+SINGLE_QUBIT_GATES = frozenset({"H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX", "RX", "RY", "RZ"})
 ROTATION_GATES = frozenset({"RX", "RY", "RZ"})
 CONTROLLED_GATES = frozenset({"CX", "CZ"})
 
@@ -29,6 +30,17 @@ GATE_ALIASES = {
     "CONTROLLED-NOT": "CX",
     "CPHASE": "CZ",
     "CONTROLLED-Z": "CZ",
+    "CONTROLLED-PHASE": "CP",
+    "CU1": "CP",
+    "TOFFOLI": "CCX",
+    "CCNOT": "CCX",
+    "SDAG": "SDG",
+    "S†": "SDG",
+    "TDAG": "TDG",
+    "T†": "TDG",
+    "SQRTX": "SX",
+    "SQRT-X": "SX",
+    "√X": "SX",
     "HADAMARD": "H",
     "NOT": "X",
     "M": "MEASURE",
@@ -64,7 +76,7 @@ class Operation(_Strict):
     gate: GateName
     targets: list[int] = Field(default_factory=list, description="Target qubit indices.")
     controls: list[int] = Field(default_factory=list, description="Control qubit indices.")
-    params: list[float] = Field(default_factory=list, description="Angles in radians (RX/RY/RZ).")
+    params: list[float] = Field(default_factory=list, description="Angles in radians (RX/RY/RZ/CP).")
     clbits: list[int] = Field(default_factory=list, description="Classical bits (MEASURE only).")
     source: SourceRef | None = None
 

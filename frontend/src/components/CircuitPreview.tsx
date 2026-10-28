@@ -4,6 +4,8 @@ import { angleText } from '../util'
 const COL = 64
 const ROW = 46
 const LEFT = 46
+const MULTI = new Set(['CX', 'CZ', 'CP', 'CCX'])
+const SHORT: Record<string, string> = { SDG: 'S†', TDG: 'T†', SX: '√X' }
 
 /** Assign each operation a column, packing gates that touch different qubits. */
 function layout(ops: Operation[], n: number): number[] {
@@ -12,7 +14,7 @@ function layout(ops: Operation[], n: number): number[] {
     const qs = [...op.targets, ...(op.controls ?? [])].filter((q) => q >= 0 && q < n)
     const span = qs.length ? [Math.min(...qs), Math.max(...qs)] : [0, n - 1]
     const range = op.gate === 'BARRIER' && !op.targets.length ? [0, n - 1] : span
-    const lane = op.gate === 'CX' || op.gate === 'CZ' || op.gate === 'SWAP' || op.gate === 'BARRIER'
+    const lane = MULTI.has(op.gate) || op.gate === 'SWAP' || op.gate === 'BARRIER'
       ? Array.from({ length: range[1] - range[0] + 1 }, (_, i) => range[0] + i) : qs
     const col = Math.max(0, ...lane.map((q) => free[q]))
     lane.forEach((q) => { free[q] = col + 1 })
@@ -51,20 +53,27 @@ export function CircuitPreview({ spec, highlight, onPick }: {
           const hl = highlight === key
           const ink = hl ? '#ffffff' : '#ecebe8'
           const valid = (q: number) => q >= 0 && q < n
-          if ((op.gate === 'CX' || op.gate === 'CZ') && op.controls?.length && op.targets.length) {
-            const c = op.controls[0], t = op.targets[0]
-            if (!valid(c) || !valid(t)) return null
+          if (MULTI.has(op.gate) && op.controls?.length && op.targets.length) {
+            const cs = op.controls, t = op.targets[0]
+            if (!cs.every(valid) || !valid(t)) return null
+            const ys = [...cs, t].map(y)
+            const top = Math.min(...ys), bottom = Math.max(...ys)
             return (
               <g key={i} onMouseEnter={() => onPick(key)} style={{ cursor: 'pointer' }}>
-                <line x1={cx} x2={cx} y1={y(c)} y2={y(t)} stroke="var(--gold)" strokeWidth={2} />
-                <circle cx={cx} cy={y(c)} r={5.5} fill="var(--gold)" />
-                {op.gate === 'CX' ? (
+                <line x1={cx} x2={cx} y1={top} y2={bottom} stroke="var(--gold)" strokeWidth={2} />
+                {cs.map((c) => <circle key={c} cx={cx} cy={y(c)} r={5.5} fill="var(--gold)" />)}
+                {op.gate === 'CP' && (
+                  <text x={cx + 9} y={(top + bottom) / 2 + 4} fontSize={10.5} fill="var(--gold)" fontFamily="var(--mono)">
+                    P({angleText(op.params?.[0] ?? 0)})
+                  </text>
+                )}
+                {op.gate === 'CX' || op.gate === 'CCX' ? (
                   <g>
                     <circle cx={cx} cy={y(t)} r={11} fill="var(--panel-2)" stroke="var(--gold)" strokeWidth={2} />
                     <path d={`M${cx - 11} ${y(t)}h22M${cx} ${y(t) - 11}v22`} stroke="var(--gold)" strokeWidth={2} />
                   </g>
                 ) : <circle cx={cx} cy={y(t)} r={5.5} fill="var(--gold)" />}
-                {hl && <rect x={cx - 17} y={Math.min(y(c), y(t)) - 17} width={34} height={Math.abs(y(t) - y(c)) + 34} rx={6} fill="none" stroke="#fff" strokeDasharray="3 3" />}
+                {hl && <rect x={cx - 17} y={top - 17} width={34} height={bottom - top + 34} rx={6} fill="none" stroke="#fff" strokeDasharray="3 3" />}
               </g>
             )
           }
@@ -84,7 +93,7 @@ export function CircuitPreview({ spec, highlight, onPick }: {
           return (
             <g key={i} onMouseEnter={() => onPick(key)} style={{ cursor: 'pointer' }}>
               {op.targets.filter(valid).map((q) => {
-                const label = op.params?.length ? `${op.gate}` : op.gate
+                const label = SHORT[op.gate] ?? op.gate
                 return (
                   <g key={q}>
                     <rect x={cx - 17} y={y(q) - 15} width={34} height={30} rx={6}

@@ -1,0 +1,16 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 2,
+  "num_clbits": 2,
+  "operations": [
+    {"gate": "H", "targets": [0]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "Z", "targets": [0]},
+    {"gate": "X", "targets": [0]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "H", "targets": [0]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}],
+  "metadata": {"title": "Superdense coding (sends 11)", "notes": "Alice sends two classical bits by moving a single qubit of a shared Bell pair; Bob reads 11.", "origin": "manual"}
+}

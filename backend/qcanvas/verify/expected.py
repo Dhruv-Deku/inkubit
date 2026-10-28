@@ -16,7 +16,7 @@ from qcanvas.spec.models import CircuitSpec
 
 Distribution = dict[str, float]
 
-_ONE_Q = {"H": "h", "X": "x", "Y": "y", "Z": "z", "S": "s", "T": "t"}
+_ONE_Q = {"H": "h", "X": "x", "Y": "y", "Z": "z", "S": "s", "T": "t", "SDG": "sdg", "TDG": "tdg", "SX": "sx"}
 _ROT = {"RX": "rx", "RY": "ry", "RZ": "rz"}
 _EPS = 1e-12
 
@@ -36,6 +36,10 @@ def build_reference_circuit(spec: CircuitSpec) -> QuantumCircuit:
             qc.cx(op.controls[0], op.targets[0])
         elif g == "CZ":
             qc.cz(op.controls[0], op.targets[0])
+        elif g == "CP":
+            qc.cp(op.params[0], op.controls[0], op.targets[0])
+        elif g == "CCX":
+            qc.ccx(op.controls[0], op.controls[1], op.targets[0])
         elif g == "SWAP":
             qc.swap(op.targets[0], op.targets[1])
         # BARRIER and MEASURE do not change the state before terminal measurement

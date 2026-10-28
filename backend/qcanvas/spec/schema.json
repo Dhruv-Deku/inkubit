@@ -350,12 +350,17 @@
             "Z",
             "S",
             "T",
+            "SDG",
+            "TDG",
+            "SX",
             "RX",
             "RY",
             "RZ",
             "CX",
             "CZ",
+            "CP",
             "SWAP",
+            "CCX",
             "MEASURE",
             "BARRIER"
           ],
@@ -379,7 +384,7 @@
           "type": "array"
         },
         "params": {
-          "description": "Angles in radians (RX/RY/RZ).",
+          "description": "Angles in radians (RX/RY/RZ/CP).",
           "items": {
             "type": "number"
           },
