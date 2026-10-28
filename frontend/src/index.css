@@ -78,6 +78,7 @@ code, pre, .mono { font-family: var(--mono); font-size: 13px; }
   border: 1px solid var(--line-2); background: var(--panel-2); cursor: pointer; font-size: 14px; font-weight: 500;
   transition: background 120ms, border-color 120ms;
 }
+a.btn { color: var(--text); text-decoration: none; }
 .btn:hover:not(:disabled) { background: var(--panel-3); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }

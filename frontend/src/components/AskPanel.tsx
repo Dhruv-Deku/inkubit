@@ -44,7 +44,7 @@ export function AskPanel({ jobId, kind }: { jobId: string; kind: 'circuit' | 'ne
       )}
       <form className="row" style={{ gap: 10 }} onSubmit={(e) => { e.preventDefault(); ask(q) }}>
         <input type="text" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1 }}
-          placeholder="Ask anything about this run…" aria-label="Question about this result" />
+          placeholder="Ask anything about this run…" aria-label="Question about this result" spellCheck={false} />
         <button className="btn primary" type="submit" disabled={busy || !q.trim()}>Ask</button>
       </form>
       <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>

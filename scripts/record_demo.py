@@ -314,7 +314,30 @@ async def circuit_story(d: Director) -> None:
     await explain.wait_for(timeout=180_000)
     await d.caption(models_or(live, "**Muse Spark** explains the result for a student, using the real numbers.",
                               "A plain-language explanation, written from the real numbers."))
-    await d.scroll_to(explain, pause=5.2)
+    await d.scroll_to(explain, pause=4.6)
+
+    ask = page.locator(".panel", has=page.locator("h2", has_text="Ask about this result"))
+    await d.scroll_to(ask, block="center", pause=0.4)
+    await d.caption(models_or(live, "Ask **Muse Spark** anything about the run: it answers only from this run's numbers.",
+                              "Ask about the run: answers come only from this run's numbers."))
+    await d.click(ask.locator(".chip-btn", has_text="Why did the first attempt fail?"))
+    await ask.locator(".qa .a p").first.wait_for(timeout=120_000)
+    await d.wait(4.2)
+
+    inside = page.locator(".panel", has=page.locator("h2", has_text="Inside the circuit"))
+    await inside.wait_for(timeout=120_000)
+    await d.scroll_to(inside, pause=0.5)
+    await d.caption("Step through the exact state, gate by gate. When the CNOT entangles the qubits, "
+                    "their Bloch arrows shrink to the centre.")
+    await d.click(inside.locator("button", has_text="Play"))
+    await d.wait(3.6)
+    sweep = page.locator(".panel", has=page.locator("h2", has_text="How good must the hardware be"))
+    await d.caption("Which noise costs the most, and how much better the hardware must get for a 99% match.")
+    await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="Entanglement")), pause=2.6)
+    await d.scroll_to(sweep, block="center", pause=3.4)
+    await d.caption("And what the same circuit costs on real chip wirings.")
+    await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="On real chip layouts")), block="center",
+                      pause=3.0)
     code = page.locator(".panel", has=page.locator("h2", has_text="Code"))
     await d.scroll_to(code, pause=0.6)
     await d.caption("Standalone Qiskit you can download, with the exact change the repair made.")
@@ -329,6 +352,31 @@ async def circuit_story(d: Director) -> None:
         await d.scroll_to(figs, pause=3.8)
     await d.caption("Every result says which model produced it.")
     await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="Models used")), block="center", pause=3.4)
+
+
+async def words_story(d: Director) -> None:
+    page, live = d.page, d.live
+    await d.caption(None)
+    await d.scroll_top()
+    await d.click(page.locator("nav.steps button >> nth=0"))
+    await d.wait(0.5)
+    box = page.locator("input[aria-label='Describe a circuit or network']")
+    await d.scroll_to(box, block="center", pause=0.3)
+    await d.caption(models_or(live, "No sketch? Describe it in words, and **Muse Spark** builds the spec.",
+                              "No sketch? Describe it in words (offline: named algorithms and gate lists)."))
+    await d.click(box)
+    await page.keyboard.type("Bernstein-Vazirani with secret 1011", delay=55)
+    await d.wait(0.4)
+    await d.click(page.locator("button", has_text="Build it"))
+    await page.wait_for_selector(".ops", timeout=180_000)
+    await d.wait(1.6)
+    await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.3)
+    await d.caption("Step through it before running anything: one query to the oracle reveals the secret.")
+    await d.click(page.locator("button", has_text="Step through"))
+    await page.wait_for_selector(".inspector", timeout=60_000)
+    await d.scroll_to(page.locator(".inspector"), block="start", pause=0.4)
+    await d.click(page.locator(".inspector button", has_text="Play"))
+    await d.wait(7.5)
 
 
 async def network_story(d: Director) -> None:
@@ -395,6 +443,7 @@ async def record(base: str, out: Path) -> None:
                          "prediction, and repairs the code when it is wrong.", small=True, hold=5.2)
             await d.hide_card()
             await circuit_story(d)
+            await words_story(d)
             await network_story(d)
             await d.card("Q-Canvas", "From a pencil sketch to a verified quantum simulation.", chips,
                          "Every result checked. Every model answer labelled.", hold=4.5)

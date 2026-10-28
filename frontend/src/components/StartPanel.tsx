@@ -94,7 +94,7 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
         <form className="row" style={{ gap: 10, alignItems: 'stretch' }}
           onSubmit={(e) => { e.preventDefault(); if (words.trim()) onText(words) }}>
           <input type="text" value={words} onChange={(e) => setWords(e.target.value)} style={{ flex: 1 }}
-            placeholder="e.g. Grover search over 2 qubits, or: h 0; cx 0 1; measure all" aria-label="Describe a circuit or network" />
+            placeholder="e.g. Grover search over 2 qubits, or: h 0; cx 0 1; measure all" aria-label="Describe a circuit or network" spellCheck={false} />
           <button className="btn primary" type="submit" disabled={busy || !words.trim()}>{busy ? 'Reading…' : 'Build it'}</button>
         </form>
         <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>

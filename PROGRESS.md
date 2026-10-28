@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (116 tests pass offline; frontend builds; last checked 2026-10-28)
+## Done (170 tests pass offline; frontend builds; last checked 2026-10-29)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -14,10 +14,17 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - **P8 Explanation + diagram**: Muse Spark explanation and Muse Image illustration adapters; offline templates with real numbers; Qiskit/matplotlib diagrams.
 - **P9 Network**: analytic model (fiber, satellite downlink, Werner fidelity, memory decoherence, swapping, BBM92), bottleneck search with 5 fix types over 3 rounds, sanity checks, before/after.
 - **P10 Package**: README (Mermaid architecture, model usage, setup, spec, loop, limitations), DEMO_SCRIPT.md, `scripts/setup.sh`, `scripts/dev.sh`, screenshots + GIF.
-- **Demo video**: `scripts/record_demo.py` records a captioned 1080p walkthrough of the real app (D16); offline take renders in about 2 minutes.
+- **Demo video**: `scripts/record_demo.py` records a captioned 1080p walkthrough of the real app (D16); offline take renders in about 2.5 minutes.
+- **Added 2026-10-29** (each tested and committed):
+  - Gates S†, T†, √X, CP, Toffoli; gallery: Grover, Bernstein-Vazirani, Deutsch-Jozsa, phase estimation, superdense coding, Toffoli AND (D17).
+  - Insights (D18, D22): gate-by-gate state with Bloch spheres, entanglement ideal vs noisy, error budget, hardware sweep to 99%, readout correction, chip layouts (all-to-all, line, heavy-hex), OpenQASM 2/3 + spec export; "Step through" before running.
+  - Network purification (BBPSSW) as a spec field and agent fix; 600 km chain preset (D19).
+  - Describe it in words (Muse Spark live, offline parser), camera capture, share links, grouped examples (D20).
+  - Ask about a result (D21); explanations in 12 languages (D23); downloadable HTML report.
+  - Planted-fault benchmark `scripts/benchmark.py` → `docs/BENCHMARK.md`: 55/55 runs end correctly.
 
 ## In progress
-- Nothing. Fresh-clone check passed on 2026-10-28 (setup.sh 3.5 min, all tests, server, demo job, dev.sh with Vite proxy). Since then: robust fault injection for model-written code, grid-box overlay fallback, early results, parallel extras (116 tests).
+- Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the 170 offline tests and a browser check of every new screen.
 
 ## Known issues / limitations
 - Live Meta adapters are implemented from the docs and tested against recorded request shapes with a fake client, but **never called live** (no key on this machine). First live run may surface response-shape surprises; the fallback keeps the UI working and labels it.
@@ -33,8 +40,8 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
 ## Top 5 next steps
-1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py`.
+1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, and explanations in other languages).
 2. Tune the concept-phrase prompt on 3-4 real photos (different pens/lighting).
-3. Record the demo video.
+3. Record the demo video live (`scripts/record_demo.py`).
 4. Optional: let users click a box on the photo to add an operation that the reading missed.
 5. Optional: a "Muse Spark writes the code" toggle in the UI (backend already routes generation through the code model in live mode).

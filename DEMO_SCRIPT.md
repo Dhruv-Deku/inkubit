@@ -1,4 +1,4 @@
-# Q-Canvas demo video: shot list (2:30 target, 3:00 max)
+# Q-Canvas demo video: shot list (2:45 target, 3:00 max)
 
 **Fastest route: let the script record it.** With the backend running
 (`scripts/dev.sh`, or uvicorn on :8000):
@@ -7,7 +7,7 @@
 .venv/Scripts/python scripts/record_demo.py          # writes docs/video/q-canvas-demo.mp4 (+ .png thumbnail)
 ```
 
-It drives the real app and lays captions over it (about 1:40, 1080p). Run it once
+It drives the real app and lays captions over it (about 2:10, 1080p). Run it once
 to warm the cache, then again for the final take. In live Meta mode the captions
 name the models; offline, the title card says the answers are recorded mocks.
 Add your own voice-over and the hand-drawing shot (1) in any editor if you like.
@@ -30,9 +30,11 @@ Record at 1920x1080, browser zoom 100%, dark OS theme. Before recording:
 | 3 | 0:30-0:45 | Hover a box: its row lights up in the editor. Change one thing (e.g. a target qubit) to show the live circuit preview and the readable validation error, then undo. | "Nothing runs until you agree with the reading. Hover a box to find its line, fix anything by hand, and the spec is checked as you type." |
 | 4 | 0:45-1:25 | Click **Run** with Demo mode on. Keep the live log full screen-height. Let the failure land: red verify line, the attempt-1 histogram with bars at 00 and 01, the diagnosis line. Then the repair diff appears (`+ qc.cx(0, 1)`), attempt 2 passes. | "Demo mode plants a real bug in the first attempt: the CNOT is gone. The agent runs the code in a sandbox and compares it with an exact prediction it computes straight from the spec. Watch: expected 50% 00 and 50% 11, got 00 and 01. The two bits should agree and don't, so the entangling gate is missing. Muse Spark gets the spec, the code and that evidence, and fixes it. Attempt 2: verified." |
 | 5 | 1:25-1:50 | Scroll the results: Verified badge, the four metric tiles, histogram with predicted (outline), measured (solid) and the dashed ideal. Pause on the explanation paragraph. Click the Code tab "Changes from attempt 1". | "The numbers are honest: distance from the prediction 0.004, well inside the shot-noise limit; noise cost about 7% against a perfect machine. Muse Spark explains it for a student, using these exact numbers. And the code is standalone Qiskit you can download and run." |
-| 6 | 1:50-1:58 | Diagrams panel: exact Qiskit drawing next to the Muse Image illustration. Then the "Models used" table with **Meta live** badges. | "Muse Image draws a clean version, always next to the exact drawing. Every result says which model made it." |
-| 7 | 1:58-2:25 | Back to start, pick **Preset A: satellite link** (or the satellite sketch). Run. Show the log: link losses in dB, bottleneck, fixes tried, applied. Then Before/After tiles and the fix table. | "Q-Canvas also plans quantum networks. Two ground stations 1,200 km apart share entanglement from a satellite. It models every link from physics, finds the bottleneck, tries real fixes, re-simulates each one and keeps the best. The secret-key rate goes up more than a hundredfold, and every step passed its physics sanity checks." |
-| 8 | 2:25-2:35 | Title card: "Q-Canvas: sketch → verified quantum simulation. SAM 3.1 · Muse Spark · Muse Image · Muse Code." | "From a pencil sketch to verified quantum code, with every answer checked. That's Q-Canvas." |
+| 6 | 1:50-2:00 | Ask panel: click "Why did the first attempt fail?". | "Ask anything about the run. Muse Spark answers only from this run's numbers." |
+| 7 | 2:00-2:15 | "Inside the circuit": press Play; the Bloch arrows shrink to the centre at the CNOT. Then the error budget and the "How good must the hardware be?" chart. | "Step through the exact state. When the CNOT entangles the qubits, their arrows shrink: neither has a state of its own. Readout errors cost the most here, and for a 99% match the hardware needs to get about seven times better." |
+| 8 | 2:15-2:25 | Start page, type "Bernstein-Vazirani with secret 1011", Build it, Step through, Play to the end. | "No sketch? Describe it, and Muse Spark builds the spec. One query to the oracle reveals the secret." |
+| 9 | 2:25-2:40 | Pick **Preset A: satellite link** (or the satellite sketch). Run. Log, then Before/After tiles and the fix table. | "Q-Canvas also plans quantum networks: it models every link from physics, finds the bottleneck, tries real fixes, including entanglement purification, and keeps the best. The secret-key rate goes up more than a hundredfold." |
+| 10 | 2:40-2:48 | Title card: "Q-Canvas: sketch → verified quantum simulation. SAM 3.1 · Muse Spark · Muse Image." | "From a pencil sketch to verified quantum code, with every answer checked. That's Q-Canvas." |
 
 ## Backup plan
 
