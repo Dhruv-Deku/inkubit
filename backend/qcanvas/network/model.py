@@ -138,10 +138,16 @@ def simulate(spec: NetworkSpec) -> NetworkMetrics:
         else:  # must hear back before re-trying a memory: L / c per heralding round
             speed = ph.FREE_SPACE_SPEED_KM_S if free else ph.FIBER_SPEED_KM_S
             attempt = min(ph.SOURCE_RATE_HZ, ph.MULTIPLEX_MODES * speed / max(length, 1e-6))
+        f_fresh, seg_rate = ph.fidelity_from_werner(w_fresh), attempt * p_true
+        for _ in range(spec.purification_rounds):  # each round spends two pairs to make one better one
+            if f_fresh <= 0.5:
+                break
+            f_fresh, p_ok = ph.bbpssw(f_fresh)
+            seg_rate *= p_ok / 2
         segments.append(SegmentMetrics(
             nodes=nodes, length_km=length, loss_db=seg_loss, attempt_rate_hz=attempt, success_prob=p_true,
-            pair_rate_hz=attempt * p_true, fidelity_fresh=ph.fidelity_from_werner(w_fresh),
-            fidelity_stored=ph.fidelity_from_werner(w_fresh), memory_t2_ms=t2, wait_s=0.0,
+            pair_rate_hz=seg_rate, fidelity_fresh=f_fresh,
+            fidelity_stored=f_fresh, memory_t2_ms=t2, wait_s=0.0,
         ))
 
     n = len(segments)

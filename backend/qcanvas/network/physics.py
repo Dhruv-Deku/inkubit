@@ -79,6 +79,17 @@ def binary_entropy(p: float) -> float:
     return -p * math.log2(p) - (1 - p) * math.log2(1 - p)
 
 
+def bbpssw(f: float) -> tuple[float, float]:
+    """One BBPSSW purification round on two Werner pairs of fidelity ``f``.
+
+    Returns (fidelity of the surviving pair, probability the round succeeds). It only
+    helps above f = 1/2; the output is twirled back into a Werner state.
+    """
+    e = (1 - f) / 3
+    p = f * f + 2 * f * e + 5 * e * e
+    return (f * f + e * e) / p, p
+
+
 def werner_from_fidelity(f: float) -> float:
     """Werner parameter w with F = (3w + 1) / 4."""
     return (4 * f - 1) / 3

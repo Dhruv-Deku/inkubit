@@ -221,3 +221,16 @@ These analyses evolve the density matrix gate by gate with the same error
 channels as the verifier's Aer model, built in closed form (the generic
 three-qubit conversion takes seconds); tests check both agree to 1e-8.
 Above 10 qubits the noisy analyses are skipped with a note.
+
+## D19. Entanglement purification
+Networks can now purify: `purification_rounds` (0-3) applies BBPSSW to every
+segment's fresh pairs before swapping. Each round turns two Werner pairs of
+fidelity F into one of fidelity (F^2 + e^2) / p with success probability
+p = F^2 + 2Fe + 5e^2, e = (1 - F)/3 (output twirled back to Werner), so the
+segment rate is multiplied by p/2; rounds stop helping at F <= 1/2. The slower
+rate means longer memory waits, which the existing decoherence model charges
+for, so purification can hurt with poor memories: on the 600 km chain the agent
+first upgrades memories and only then adds a round (key 0 -> 0.05 bit/s). We
+assume the segment ends can hold the two pairs a round needs and ignore the
+classical round-trip of the purification itself. The agent proposes it only
+when the error rate, not the pair rate, is what blocks the key.

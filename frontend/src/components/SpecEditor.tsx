@@ -198,6 +198,10 @@ function NetworkForm({ spec, highlight, onPick, onChange }: {
         <select value={spec.source} onChange={(e) => update((s) => { s.source = e.target.value })}>{ids.map((id) => <option key={id}>{id}</option>)}</select>
         <label>to</label>
         <select value={spec.destination} onChange={(e) => update((s) => { s.destination = e.target.value })}>{ids.map((id) => <option key={id}>{id}</option>)}</select>
+        <label title="Entanglement purification (BBPSSW) on every segment before swapping: two noisy pairs in, one better pair out">Purification rounds</label>
+        <select value={spec.purification_rounds ?? 0} onChange={(e) => update((s) => { s.purification_rounds = Number(e.target.value) })}>
+          {[0, 1, 2, 3].map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
       </div>
       <h3 style={{ margin: '6px 0' }}>Nodes</h3>
       <table className="ops">

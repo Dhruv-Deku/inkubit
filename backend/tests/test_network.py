@@ -101,3 +101,27 @@ def test_loss_override_is_respected():
     data["links"][0]["loss_db"] = 3.0
     m = simulate(parse_spec(data))
     assert m.links[0]["loss_db"] == pytest.approx(3.0)
+
+
+def test_bbpssw_purification_round():
+    assert ph.bbpssw(1.0) == pytest.approx((1.0, 1.0))
+    assert ph.bbpssw(0.5)[0] == pytest.approx(0.5)  # no gain at the threshold
+    f, p = ph.bbpssw(0.9)
+    assert 0.9 < f < 1 and 0.5 < p < 1
+
+
+def test_purification_trades_rate_for_fidelity():
+    plain = simulate(parse_spec(chain([100] * 2, t2_ms=10_000))).segments[0]
+    data = chain([100] * 2, t2_ms=10_000)
+    data["purification_rounds"] = 1
+    pure = simulate(parse_spec(data)).segments[0]
+    assert pure.fidelity_fresh > plain.fidelity_fresh
+    assert pure.pair_rate_hz < plain.pair_rate_hz / 2
+
+
+def test_agent_rescues_the_long_chain_with_memory_then_purification():
+    result = run_network_agent(parse_spec(chain([100] * 6, t2_ms=1000)))
+    assert result.before.end_to_end.key_rate_bps == 0 and result.after.end_to_end.key_rate_bps > 0
+    applied = [c.kind for c in result.candidates if c.applied]
+    assert "purify" in applied and applied.index("better_memory") < applied.index("purify")
+    assert all(c.passed for c in result.checks)

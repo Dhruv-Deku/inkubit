@@ -170,6 +170,10 @@ class NetworkSpec(_Strict):
     links: list[Link] = Field(min_length=1)
     source: str = Field(description="Id of the node where the end-to-end pair starts.")
     destination: str = Field(description="Id of the node where the end-to-end pair ends.")
+    purification_rounds: int = Field(
+        default=0, ge=0, le=3,
+        description="Rounds of entanglement purification (BBPSSW) on every segment before swapping.",
+    )
     metadata: Metadata = Field(default_factory=Metadata)
 
     @model_validator(mode="after")

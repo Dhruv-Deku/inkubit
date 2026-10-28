@@ -153,6 +153,22 @@ def _better_memory(spec: NetworkSpec, m: NetworkMetrics) -> tuple[str, NetworkSp
     return f"upgrade repeater memories: coherence time T2 {old:g} → {new:g} ms", _rebuild(spec, nodes=nodes)
 
 
+MAX_PURIFICATION_ROUNDS = 2
+
+
+def _purify(spec: NetworkSpec, m: NetworkMetrics) -> tuple[str, NetworkSpec] | None:
+    """One more round of entanglement purification, when errors (not rate) are what kill the key."""
+    e = m.end_to_end
+    if spec.purification_rounds >= MAX_PURIFICATION_ROUNDS or e.pair_rate_hz <= 0 or e.qber < 0.02:
+        return None
+    if all(s.fidelity_fresh <= 0.5 for s in m.segments):
+        return None
+    new = spec.purification_rounds + 1
+    desc = (f"add {'a second round' if new == 2 else 'one round'} of entanglement purification (BBPSSW) "
+            f"on every segment: two noisy pairs in, one better pair out")
+    return desc, _rebuild(spec, purification_rounds=new)
+
+
 def candidates(spec: NetworkSpec, m: NetworkMetrics) -> list[Candidate]:
     """Every applicable fix for the current bottleneck, each re-simulated."""
     if not m.weakest_link:
@@ -164,6 +180,7 @@ def candidates(spec: NetworkSpec, m: NetworkMetrics) -> list[Candidate]:
         ("higher_pass", _higher_pass(spec, a, b)),
         ("bigger_telescope", _bigger_telescope(spec, a, b)),
         ("better_memory", _better_memory(spec, m)),
+        ("purify", _purify(spec, m)),
     ]
     out = []
     for kind, proposal in proposals:

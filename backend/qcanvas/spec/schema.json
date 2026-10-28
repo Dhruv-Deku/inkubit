@@ -235,6 +235,14 @@
           "title": "Destination",
           "type": "string"
         },
+        "purification_rounds": {
+          "default": 0,
+          "description": "Rounds of entanglement purification (BBPSSW) on every segment before swapping.",
+          "maximum": 3,
+          "minimum": 0,
+          "title": "Purification Rounds",
+          "type": "integer"
+        },
         "metadata": {
           "$ref": "#/$defs/Metadata"
         }

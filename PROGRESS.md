@@ -22,7 +22,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 ## Known issues / limitations
 - Live Meta adapters are implemented from the docs and tested against recorded request shapes with a fake client, but **never called live** (no key on this machine). First live run may surface response-shape surprises; the fallback keeps the UI working and labels it.
 - Muse Code CLI backend untested (CLI not installed).
-- Network model has no purification: chains with many swaps lose the key (documented, tested).
+- Network purification is the simple BBPSSW recurrence (D19); no nested or pumping schemes.
 - Generated sample PNGs embed random paper grain: re-running `make_sketches.py` changes hashes (fixtures are rewritten together, so they stay consistent).
 
 ## Needs human

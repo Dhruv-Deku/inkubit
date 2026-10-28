@@ -1,0 +1,24 @@
+{
+  "kind": "network",
+  "version": "1.0",
+  "nodes": [
+    {"id": "city_a", "type": "ground_station", "label": "City A", "position": {"x": 60, "y": 200}},
+    {"id": "r1", "type": "repeater", "label": "Repeater 1", "memory_t2_ms": 1000, "position": {"x": 180, "y": 200}},
+    {"id": "r2", "type": "repeater", "label": "Repeater 2", "memory_t2_ms": 1000, "position": {"x": 300, "y": 200}},
+    {"id": "r3", "type": "repeater", "label": "Repeater 3", "memory_t2_ms": 1000, "position": {"x": 420, "y": 200}},
+    {"id": "r4", "type": "repeater", "label": "Repeater 4", "memory_t2_ms": 1000, "position": {"x": 540, "y": 200}},
+    {"id": "r5", "type": "repeater", "label": "Repeater 5", "memory_t2_ms": 1000, "position": {"x": 660, "y": 200}},
+    {"id": "city_b", "type": "ground_station", "label": "City B", "position": {"x": 780, "y": 200}}
+  ],
+  "links": [
+    {"from": "city_a", "to": "r1", "medium": "fiber", "length_km": 100},
+    {"from": "r1", "to": "r2", "medium": "fiber", "length_km": 100},
+    {"from": "r2", "to": "r3", "medium": "fiber", "length_km": 100},
+    {"from": "r3", "to": "r4", "medium": "fiber", "length_km": 100},
+    {"from": "r4", "to": "r5", "medium": "fiber", "length_km": 100},
+    {"from": "r5", "to": "city_b", "medium": "fiber", "length_km": 100}
+  ],
+  "source": "city_a",
+  "destination": "city_b",
+  "metadata": {"title": "Preset C: 600 km repeater chain", "notes": "Six 100 km spans and five swaps: errors pile up past the secret-key limit until memories improve and pairs are purified.", "origin": "manual"}
+}

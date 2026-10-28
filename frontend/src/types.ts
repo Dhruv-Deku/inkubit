@@ -68,6 +68,7 @@ export interface NetworkSpec {
   links: NetLink[]
   source: string
   destination: string
+  purification_rounds?: number
   metadata?: Metadata
 }
 
