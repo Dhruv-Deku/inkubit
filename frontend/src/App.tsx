@@ -28,7 +28,7 @@ interface JobState {
 }
 
 const DEFAULT_OPTIONS: RunOptions = {
-  noise: 'realistic', shots: 4096, demo_mode: false, demo_fault: 'auto', explain: true, diagram: true,
+  noise: 'realistic', shots: 4096, demo_mode: false, demo_fault: 'auto', explain: true, diagram: true, language: 'English',
 }
 
 /** While a run is live: the newest verified attempt's histogram, so a failure is visible at once. */
@@ -274,6 +274,10 @@ export default function App() {
               </>
             )}
             {spec.kind === 'network' && <span className="sub">The agent models every link, finds the bottleneck, tries fixes and re-simulates.</span>}
+            <span className="label">Explain in</span>
+            <select value={options.language} onChange={(e) => setOptions({ ...options, language: e.target.value })} aria-label="Explanation language">
+              {(examples?.languages ?? ['English']).map((l) => <option key={l}>{l}</option>)}
+            </select>
             <span className="grow" />
             {startError && <span className="badge fail">{startError}</span>}
             <button className="btn big ghost" onClick={shareLink} title="Copy a link that opens this spec">{shared ?? 'Share link'}</button>

@@ -12,7 +12,8 @@ export function ExplanationPanel({ explanation }: { explanation?: Explanation })
   return (
     <div className="panel explain">
       <div className="panel-head"><h2>What happened, in plain words</h2><span className="spacer" /><CallBadge call={explanation.call} /></div>
-      {explanation.text.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)}
+      {explanation.note && <div className="notice" style={{ marginBottom: 10 }}>{explanation.note}</div>}
+      {explanation.text.split(/\n\s*\n/).map((p, i) => <p key={i} lang={explanation.language === 'English' ? 'en' : undefined}>{p}</p>)}
     </div>
   )
 }

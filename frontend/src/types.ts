@@ -184,6 +184,8 @@ export interface ImageOut {
 export interface Explanation {
   text: string
   call: ModelCall
+  language?: string
+  note?: string
 }
 
 export interface CircuitResult {
@@ -323,6 +325,7 @@ export interface Examples {
   images: { id: string; title: string; kind: string; url: string }[]
   noise_presets: { name: string; label: string }[]
   faults: { name: string; label: string; description: string }[]
+  languages: string[]
 }
 
 export interface RunOptions {
@@ -332,4 +335,5 @@ export interface RunOptions {
   demo_fault: string
   explain: boolean
   diagram: boolean
+  language: string
 }

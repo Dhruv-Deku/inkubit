@@ -82,7 +82,9 @@ def examples() -> dict[str, Any]:
         fx = json.loads(path.read_text(encoding="utf-8"))
         images.append({"id": fx["name"], "title": fx["spec"]["metadata"]["title"], "kind": fx["kind"],
                        "url": f"/api/examples/images/{fx['name']}.png"})
-    return {"specs": specs, "images": images,
+    from qcanvas.adapters.base import LANGUAGES
+
+    return {"specs": specs, "images": images, "languages": list(LANGUAGES),
             "noise_presets": [p.as_dict() for p in PRESETS.values()],
             "faults": [{"name": f.name, "label": f.label, "description": f.description} for f in FAULTS.values()]}
 

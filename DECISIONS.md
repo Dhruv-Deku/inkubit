@@ -264,3 +264,10 @@ distance-3 heavy-hex above 7 qubits). Extra SWAPs = extra CNOTs / 3 against the
 all-to-all compile. The success figure is labelled rough: it multiplies gate and
 readout fidelities of the preset and ignores decoherence; the verified numbers
 remain the exact ones.
+
+## D23. Explanations in 12 languages
+The run bar has an "Explain in" choice (English, Hindi, Spanish, French, German,
+Portuguese, Japanese, Chinese, Arabic, Bengali, Tamil, Indonesian). Live, Muse
+Spark writes the explanation in that language and keeps numbers, qubit names
+and bitstrings untouched. Offline templates exist only in English, so an offline
+run shows the English text with a note saying so, rather than pretending.

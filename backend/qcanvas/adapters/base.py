@@ -101,11 +101,17 @@ class RepairResult(BaseModel):
     call: ModelCall
 
 
+LANGUAGES = ("English", "Hindi", "Spanish", "French", "German", "Portuguese", "Japanese", "Chinese (Simplified)",
+             "Arabic", "Bengali", "Tamil", "Indonesian")
+
+
 class Explanation(BaseModel):
     """Plain-language explanation of a result."""
 
     text: str
     call: ModelCall
+    language: str = "English"
+    note: str = ""
 
 
 class DiagramResult(BaseModel):
@@ -135,7 +141,8 @@ class ReasoningModel(ABC):
         """Return (kind guess, noun phrases for SAM, call info)."""
 
     @abstractmethod
-    def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> Explanation: ...
+    def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any],
+                language: str = "English") -> Explanation: ...
 
     def spec_from_text(self, text: str) -> SpecDraft:
         """A spec from a plain-language description."""

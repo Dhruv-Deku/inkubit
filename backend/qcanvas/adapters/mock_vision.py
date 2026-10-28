@@ -83,14 +83,17 @@ class MockReasoningModel(ReasoningModel):
         except SpecError as err:
             return SpecDraft(spec=fx["spec"], valid=False, issues=[str(i) for i in err.issues], call=call)
 
-    def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> Explanation:
+    def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any],
+                language: str = "English") -> Explanation:
         if isinstance(spec, CircuitSpec):
             text = explain_circuit(spec, result)
         else:
             from qcanvas.network.explain import explain_network
 
             text = explain_network(spec, result)
-        return Explanation(text=text, call=ModelCall(provider="mock", model="explanation template", role="explain"))
+        note = "" if language == "English" else f"Offline explanations are in English only; Muse Spark writes them in {language}."
+        return Explanation(text=text, call=ModelCall(provider="mock", model="explanation template", role="explain"),
+                           note=note)
 
 
     def answer(self, question: str, context: dict[str, Any]) -> Explanation:

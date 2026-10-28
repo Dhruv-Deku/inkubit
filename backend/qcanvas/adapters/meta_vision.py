@@ -209,19 +209,22 @@ class MetaReasoningModel(ReasoningModel):
         return Explanation(text=content.strip(), call=ModelCall(provider="meta", model=self.model, role="answer",
                                                                 cached=cached, latency_s=time.perf_counter() - start))
 
-    def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> Explanation:
+    def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any],
+                language: str = "English") -> Explanation:
         start = time.perf_counter()
         facts = _explain_facts(spec, result)
+        lang = "" if language == "English" else (f" Write the explanation in {language}; keep numbers, qubit names "
+                                                 "like q0 and bitstrings like |00> as they are.")
         content, cached = self.client.chat(self.model, [
             {"role": "system", "content": EXPLAIN_SYSTEM},
             {"role": "user", "content": f"Design spec:\n{spec.model_dump_json(by_alias=True, exclude_none=True)}"
-                                        f"\n\nResults:\n{json.dumps(facts, indent=1)}\n\nExplain these results."},
+                                        f"\n\nResults:\n{json.dumps(facts, indent=1)}\n\nExplain these results.{lang}"},
         ], reasoning_effort="low", max_tokens=6000)
         call = ModelCall(provider="meta", model=self.model, role="explain", cached=cached,
                          latency_s=time.perf_counter() - start)
         if not content.strip():
             raise MetaAPIError("empty explanation")
-        return Explanation(text=content.strip(), call=call)
+        return Explanation(text=content.strip(), call=call, language=language)
 
 
 def _grid_segments(spec: dict[str, Any], model: str) -> list[Segment]:

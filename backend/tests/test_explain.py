@@ -5,6 +5,8 @@ from __future__ import annotations
 import base64
 import json
 
+import pytest
+
 from qcanvas.adapters.config import load_settings
 from qcanvas.adapters.meta_vision import MetaImageModel, MetaReasoningModel, diagram_prompt
 from qcanvas.adapters.mock_vision import MockImageModel, MockReasoningModel
@@ -68,6 +70,23 @@ def test_meta_explain_sends_the_numbers(example):
     sent = client.requests[0]["messages"][1]["content"]
     assert "measured_probabilities" in sent and "exact_noisy_prediction" in sent
     assert out.call.model == "muse-spark-1.3" and out.text.startswith("Your circuit")
+
+
+def test_explanations_in_other_languages(example):
+    client = FakeClient("आपका सर्किट एक बेल जोड़ी बनाता है।")
+    out = MetaReasoningModel(load_settings(), client).explain(  # type: ignore[arg-type]
+        parse_spec(example("bell")), bell_result(example), language="Hindi")
+    assert "Write the explanation in Hindi" in client.requests[0]["messages"][1]["content"]
+    assert out.language == "Hindi" and out.note == ""
+    offline = MockReasoningModel().explain(parse_spec(example("bell")), bell_result(example), language="Hindi")
+    assert offline.language == "English" and "English only" in offline.note
+
+
+def test_unknown_language_is_rejected():
+    from qcanvas.api.jobs import RunOptions
+
+    with pytest.raises(ValueError, match="available in"):
+        RunOptions(language="Klingon")
 
 
 def test_meta_image_request_shape(example):

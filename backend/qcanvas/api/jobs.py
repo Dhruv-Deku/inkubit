@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from qcanvas.adapters.registry import Models, get_models
 from qcanvas.agent import AgentOptions, EventBus, run_agent
@@ -31,6 +31,16 @@ class RunOptions(BaseModel):
     demo_fault: str = "auto"
     explain: bool = True
     diagram: bool = True
+    language: str = "English"
+
+    @field_validator("language")
+    @classmethod
+    def _known_language(cls, value: str) -> str:
+        from qcanvas.adapters.base import LANGUAGES
+
+        if value not in LANGUAGES:
+            raise ValueError(f"explanations are available in: {', '.join(LANGUAGES)}")
+        return value
     pace_s: float | None = Field(default=None, ge=0, le=2)
     insights: bool = True
 
@@ -88,7 +98,7 @@ def _explain(job: Job, models: Models, result: dict[str, Any]) -> dict[str, Any]
     bus = job.bus
     bus.emit("explain", "running", "Writing a plain-language explanation of these results…")
     try:
-        exp = models.reasoning.explain(job.spec, result)
+        exp = models.reasoning.explain(job.spec, result, language=job.options.language)
     except Exception as err:  # noqa: BLE001 - failing soft: the verified result stands on its own
         bus.emit("explain", "warn", f"Could not write an explanation: {err}")
         return None
