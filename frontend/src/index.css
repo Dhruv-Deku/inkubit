@@ -294,6 +294,13 @@ table.data tr.chosen td { background: rgba(76, 195, 138, 0.07); }
 .modal-body { width: min(760px, 100%); }
 .camera { width: 100%; border-radius: var(--radius-sm); background: #000; display: block; max-height: 60vh; }
 
+/* ask */
+.thread { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.qa .q { justify-self: end; margin-left: auto; width: fit-content; max-width: 80%; background: var(--panel-3);
+  border-radius: 12px 12px 4px 12px; padding: 8px 12px; font-size: 14px; }
+.qa .a { margin-top: 6px; max-width: 92%; }
+.qa .a p { margin: 0 0 6px; color: var(--text); font-size: 14px; line-height: 1.55; }
+
 @media (max-width: 1100px) {
   .two-col, .inspector-grid { grid-template-columns: 1fr; }
   .hero, .edit-grid, .run-grid { grid-template-columns: 1fr; }

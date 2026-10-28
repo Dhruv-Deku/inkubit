@@ -4,6 +4,7 @@ import { CallBadge, CallsTable } from './CallBadge'
 import { CodeViewer } from './CodeViewer'
 import { Histogram } from './Histogram'
 import { Check, Cross } from './Icons'
+import { AskPanel } from './AskPanel'
 import { ExportButtons, InsightsSection } from './Insights'
 
 export function ExplanationPanel({ explanation }: { explanation?: Explanation }) {
@@ -38,7 +39,9 @@ function Tile({ k, v, s, tone }: { k: string; v: string; s?: string; tone?: 'goo
   return <div className="tile"><div className="k">{k}</div><div className={`v ${tone ?? ''}`}>{v}</div>{s && <div className="s">{s}</div>}</div>
 }
 
-export function CircuitResults({ result, sketchCalls, spec }: { result: CircuitResult; sketchCalls: ModelCall[]; spec: CircuitSpec }) {
+export function CircuitResults({ result, sketchCalls, spec, jobId }: {
+  result: CircuitResult; sketchCalls: ModelCall[]; spec: CircuitSpec; jobId: string
+}) {
   const v = result.verdict
   const repairs = result.attempts.filter((a) => a.fix_summary).length
   const calls = [...sketchCalls, ...result.calls,
@@ -70,6 +73,7 @@ export function CircuitResults({ result, sketchCalls, spec }: { result: CircuitR
         </div>
       )}
       <ExplanationPanel explanation={result.explanation} />
+      <AskPanel jobId={jobId} kind="circuit" />
       {result.insights && <InsightsSection spec={spec} ins={result.insights} />}
       <div className="panel">
         <div className="panel-head">
@@ -105,7 +109,7 @@ function E2E({ title, m, other }: { title: string; m: NetworkResult['before']; o
   )
 }
 
-export function NetworkResults({ result, sketchCalls }: { result: NetworkResult; sketchCalls: ModelCall[] }) {
+export function NetworkResults({ result, sketchCalls, jobId }: { result: NetworkResult; sketchCalls: ModelCall[]; jobId: string }) {
   const b = result.before, a = result.after
   const weak = b.weakest_link
   const calls = [...sketchCalls, ...(result.explanation ? [result.explanation.call] : []), ...(result.diagram?.call ? [result.diagram.call] : [])]
@@ -163,6 +167,7 @@ export function NetworkResults({ result, sketchCalls }: { result: NetworkResult;
         </div>
       )}
       <ExplanationPanel explanation={result.explanation} />
+      <AskPanel jobId={jobId} kind="network" />
       <Figures figs={[result.diagram]} />
       {result.checks.length > 0 && (
         <div className="panel">

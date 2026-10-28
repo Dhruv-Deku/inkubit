@@ -53,6 +53,14 @@ TEXT_SYSTEM = (
     "assumption you had to make in notes."
 )
 
+ASK_SYSTEM = (
+    "You answer a student's question about one specific quantum simulation run in Q-Canvas. Use only the facts "
+    "given (the spec, the verification numbers, the agent's attempts, the analyses). Quote the real numbers. "
+    "If the facts do not contain the answer, say so plainly and suggest what in Q-Canvas would show it. "
+    "Two to five sentences, plain words, no headings, no lists, no LaTeX. Bitstrings follow Qiskit order: the "
+    "rightmost character is classical bit 0."
+)
+
 CONCEPTS_SYSTEM = (
     "You look at a photo of a hand drawing and decide what kind of quantum diagram it is and which "
     "short noun phrases a segmentation model should look for to find each drawn part."

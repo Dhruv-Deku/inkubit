@@ -310,8 +310,8 @@ export default function App() {
           <div>
             {job.error && <div className="notice error" style={{ marginBottom: 12 }}>{job.error}</div>}
             {!job.result && <LivePreview events={job.events} live={job.live} />}
-            {job.result && 'verified' in job.result && <CircuitResults result={job.result} sketchCalls={sketchCalls} spec={job.spec as CircuitSpec} />}
-            {job.result && 'before' in job.result && <NetworkResults result={job.result} sketchCalls={sketchCalls} />}
+            {job.result && 'verified' in job.result && <CircuitResults result={job.result} sketchCalls={sketchCalls} spec={job.spec as CircuitSpec} jobId={job.id} />}
+            {job.result && 'before' in job.result && <NetworkResults result={job.result} sketchCalls={sketchCalls} jobId={job.id} />}
           </div>
         </div>
       )}

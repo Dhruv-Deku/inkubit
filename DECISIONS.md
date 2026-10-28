@@ -245,3 +245,13 @@ lists what it understands, never a guess. The kind is chosen by keywords
 browser (getUserMedia) and sends it through the normal photo path. A share link
 carries the whole spec in the URL hash (deflate-raw + base64url, photo boxes
 dropped), so nothing is stored on a server.
+
+## D21. Ask about a result
+`POST /api/jobs/{id}/ask` answers a question about a finished run from that
+run's facts only (`qcanvas/ask.py`: spec without photo boxes, verdict, attempts
+with diagnoses and fixes, insight summaries, or network before/after, fixes and
+checks). Live, Muse Spark gets those facts and is told to say when they do not
+contain the answer. Offline, answers are assembled from the same facts by topic
+(repair, entanglement, noise budget, hardware, readout, verification,
+bottleneck, key rate); a question outside those topics gets a plain "can't
+answer that offline", never a loosely related paragraph.

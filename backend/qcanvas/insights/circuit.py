@@ -322,8 +322,8 @@ def error_budget(spec: CircuitSpec, preset: NoisePreset, ideal: Distribution) ->
         top = items[0]
         summary = f"{top.label} cost the most: {top.fidelity_loss:.1%} of the match to the noiseless ideal"
         if len(items) > 1:
-            summary += f", against {items[1].fidelity_loss:.1%} for {items[1].label.lower()}"
-        summary += f". All sources together cost {total:.1%}; improving {top.label.lower()} helps this circuit most."
+            summary += f", against {items[1].fidelity_loss:.1%} for {items[1].label[0].lower()}{items[1].label[1:]}"
+        summary += f". All sources together cost {total:.1%}; improving {top.label[0].lower()}{top.label[1:]} helps this circuit most."
     else:
         summary = f"Noise barely affects this circuit: all sources together cost {total:.1%}."
     return ErrorBudget(total_loss=total, items=items, summary=summary)

@@ -147,6 +147,31 @@ async def job_image(file: UploadFile = File(...)) -> dict[str, Any]:
     return analysis.model_dump(mode="json")
 
 
+class AskRequest(BaseModel):
+    question: str
+
+
+@app.post("/api/jobs/{job_id}/ask")
+async def ask(job_id: str, body: AskRequest) -> dict[str, Any]:
+    """Answer a question about a finished run from its facts (Muse Spark live; offline rules otherwise)."""
+    from qcanvas.ask import ask_context
+
+    job = store.get(job_id)
+    if job is None:
+        raise HTTPException(404, "no such job")
+    if job.result is None:
+        raise HTTPException(409, "the run has not finished yet")
+    question = body.question.strip()
+    if not question:
+        raise HTTPException(400, "ask a question first")
+    context = ask_context(job.spec, job.result)
+    try:
+        answer = await asyncio.to_thread(get_models().reasoning.answer, question[:600], context)
+    except ModelUnavailable as err:
+        raise HTTPException(502, f"A Meta model call failed and fallback is off: {err}") from None
+    return answer.model_dump(mode="json")
+
+
 class TextRequest(BaseModel):
     text: str
 
