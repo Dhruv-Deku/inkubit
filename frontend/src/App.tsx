@@ -5,11 +5,13 @@ import { CallBadge } from './components/CallBadge'
 import { Histogram } from './components/Histogram'
 import { Logo } from './components/Icons'
 import { OverlayView } from './components/OverlayView'
+import { InsightsSection } from './components/Insights'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
 import type {
-  AgentEvent, CircuitResult, Examples, Health, NetworkResult, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
+  AgentEvent, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, NetworkResult, RunOptions, SketchAnalysis,
+  Spec, SpecIssue, Verdict,
 } from './types'
 import { specTitle } from './util'
 
@@ -17,6 +19,7 @@ type Stage = 'start' | 'edit' | 'run'
 
 interface JobState {
   id: string
+  spec: Spec
   events: AgentEvent[]
   live: boolean
   status: string
@@ -61,6 +64,19 @@ export default function App() {
   const [highlight, setHighlight] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [startError, setStartError] = useState<string | null>(null)
+  const [preview, setPreview] = useState<{ ins: CircuitInsights | null; loading: boolean; error: string | null } | null>(null)
+
+  useEffect(() => { setPreview(null) }, [spec, options.noise])
+
+  const stepThrough = async () => {
+    if (!spec || spec.kind !== 'circuit') return
+    setPreview({ ins: null, loading: true, error: null })
+    try {
+      setPreview({ ins: await api.insights(spec, options.noise), loading: false, error: null })
+    } catch (e) {
+      setPreview({ ins: null, loading: false, error: (e as Error).message })
+    }
+  }
   const stopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
@@ -107,7 +123,7 @@ export default function App() {
     stopRef.current?.()
     try {
       const { job_id } = await api.startJob(spec, options)
-      setJob({ id: job_id, events: [], live: true, status: 'running', error: null, result: null })
+      setJob({ id: job_id, spec, events: [], live: true, status: 'running', error: null, result: null })
       setStage('run')
       stopRef.current = followJob(
         job_id,
@@ -213,10 +229,18 @@ export default function App() {
             {spec.kind === 'network' && <span className="sub">The agent models every link, finds the bottleneck, tries fixes and re-simulates.</span>}
             <span className="grow" />
             {startError && <span className="badge fail">{startError}</span>}
+            {spec.kind === 'circuit' && (
+              <button className="btn big" disabled={!valid || preview?.loading} onClick={stepThrough}
+                title="See the exact state after every gate, the entanglement and the noise budget, without running">
+                {preview?.loading ? 'Analysing…' : 'Step through'}
+              </button>
+            )}
             <button className="btn primary big" disabled={!valid} onClick={run}>
               {checking ? 'Checking…' : issues.length ? 'Fix the spec to run' : `Run ${specTitle(spec)}`}
             </button>
           </div>
+          {preview?.error && <div className="notice error">{preview.error}</div>}
+          {preview?.ins && spec.kind === 'circuit' && <InsightsSection spec={spec} ins={preview.ins} wide />}
         </div>
       )}
 
@@ -238,7 +262,7 @@ export default function App() {
           <div>
             {job.error && <div className="notice error" style={{ marginBottom: 12 }}>{job.error}</div>}
             {!job.result && <LivePreview events={job.events} live={job.live} />}
-            {job.result && 'verified' in job.result && <CircuitResults result={job.result} sketchCalls={sketchCalls} />}
+            {job.result && 'verified' in job.result && <CircuitResults result={job.result} sketchCalls={sketchCalls} spec={job.spec as CircuitSpec} />}
             {job.result && 'before' in job.result && <NetworkResults result={job.result} sketchCalls={sketchCalls} />}
           </div>
         </div>

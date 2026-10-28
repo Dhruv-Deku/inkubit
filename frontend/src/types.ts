@@ -198,6 +198,34 @@ export interface CircuitResult {
   exact_diagram?: ImageOut
   diagram?: ImageOut
   explanation?: Explanation
+  insights?: CircuitInsights
+}
+
+export interface Amplitude { basis: string; probability: number; phase: number }
+export interface StepState {
+  step: number
+  op_index: number | null
+  label: string
+  amplitudes: Amplitude[]
+  hidden_probability: number
+  bloch: [number, number, number][]
+  entangled: boolean[]
+}
+export interface PairEntanglement { a: number; b: number; ideal: number; noisy: number | null }
+export interface Entanglement { pairs: PairEntanglement[]; qubit_entropy: number[]; summary: string }
+export interface BudgetItem { source: string; label: string; fidelity_loss: number }
+export interface ErrorBudget { total_loss: number; items: BudgetItem[]; summary: string }
+export interface SweepPoint { scale: number; fidelity: number; success: number | null }
+export interface NoiseSweep { baseline: string; points: SweepPoint[]; target: number; scale_for_target: number | null; summary: string }
+export interface Mitigation { corrected: Distribution; fidelity_raw: number; fidelity_corrected: number; summary: string }
+export interface CircuitInsights {
+  steps: StepState[]
+  entanglement: Entanglement | null
+  budget: ErrorBudget | null
+  sweep: NoiseSweep | null
+  mitigation: Mitigation | null
+  exports: { qasm2: string; qasm3: string }
+  notes: string[]
 }
 
 export interface LinkMetrics {

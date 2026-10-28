@@ -1,9 +1,10 @@
-import type { CircuitResult, Explanation, ImageOut, ModelCall, NetworkResult } from '../types'
+import type { CircuitResult, CircuitSpec, Explanation, ImageOut, ModelCall, NetworkResult } from '../types'
 import { fmtRate, pct } from '../util'
 import { CallBadge, CallsTable } from './CallBadge'
 import { CodeViewer } from './CodeViewer'
 import { Histogram } from './Histogram'
 import { Check, Cross } from './Icons'
+import { ExportButtons, InsightsSection } from './Insights'
 
 export function ExplanationPanel({ explanation }: { explanation?: Explanation }) {
   if (!explanation) return null
@@ -37,7 +38,7 @@ function Tile({ k, v, s, tone }: { k: string; v: string; s?: string; tone?: 'goo
   return <div className="tile"><div className="k">{k}</div><div className={`v ${tone ?? ''}`}>{v}</div>{s && <div className="s">{s}</div>}</div>
 }
 
-export function CircuitResults({ result, sketchCalls }: { result: CircuitResult; sketchCalls: ModelCall[] }) {
+export function CircuitResults({ result, sketchCalls, spec }: { result: CircuitResult; sketchCalls: ModelCall[]; spec: CircuitSpec }) {
   const v = result.verdict
   const repairs = result.attempts.filter((a) => a.fix_summary).length
   const calls = [...sketchCalls, ...result.calls,
@@ -69,8 +70,12 @@ export function CircuitResults({ result, sketchCalls }: { result: CircuitResult;
         </div>
       )}
       <ExplanationPanel explanation={result.explanation} />
+      {result.insights && <InsightsSection spec={spec} ins={result.insights} />}
       <div className="panel">
-        <div className="panel-head"><h2>Code</h2><span className="sub">standalone Qiskit; runs with <code>python file.py</code></span></div>
+        <div className="panel-head">
+          <h2>Code</h2><span className="sub">standalone Qiskit; runs with <code>python file.py</code></span>
+          <span className="spacer" /><span className="sub">Export</span><ExportButtons ins={result.insights} spec={spec} />
+        </div>
         <CodeViewer attempts={result.attempts} finalCode={result.final_code} />
       </div>
       <Figures figs={[result.exact_diagram,

@@ -7,7 +7,7 @@ import { StatusIcon } from './Icons'
 const STEP_LABEL: Record<string, string> = {
   plan: 'Plan', generate: 'Write code', inject: 'Demo fault', run: 'Run', verify: 'Verify', diagnose: 'Diagnose',
   repair: 'Repair', network: 'Network', explain: 'Explain', diagram: 'Diagram', done: 'Result', bottleneck: 'Bottleneck',
-  fix: 'Fix', check: 'Check',
+  fix: 'Fix', check: 'Check', insights: 'Analyse',
 }
 
 /** Streaming, plain-language log of everything the agent does. */
