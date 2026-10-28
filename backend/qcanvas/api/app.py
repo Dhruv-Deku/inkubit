@@ -12,7 +12,7 @@ from typing import Any
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -147,6 +147,21 @@ async def job_image(file: UploadFile = File(...)) -> dict[str, Any]:
     except OSError as err:
         raise HTTPException(400, f"could not read the image: {err}") from None
     return analysis.model_dump(mode="json")
+
+
+@app.get("/api/jobs/{job_id}/report")
+def report(job_id: str) -> Response:
+    """A self-contained HTML report of a finished run."""
+    from qcanvas.report import render_report
+
+    job = store.get(job_id)
+    if job is None:
+        raise HTTPException(404, "no such job")
+    if job.result is None:
+        raise HTTPException(409, "the run has not finished yet")
+    name = "".join(c if c.isalnum() else "_" for c in (job.spec.metadata.title or "qcanvas")).strip("_").lower()
+    return Response(render_report(job.spec, job.result), media_type="text/html; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{name or "qcanvas"}_report.html"'})
 
 
 class AskRequest(BaseModel):

@@ -48,6 +48,18 @@ def test_network_questions(example):
     assert "applied" in offline_answer("What fixes did you try?", ctx)
 
 
+def test_html_report(example):
+    job = _finished(example("bell"), noise="realistic", demo_mode=True, demo_fault="missing_cnot")
+    resp = client.get(f"/api/jobs/{job}/report")
+    assert resp.status_code == 200 and "attachment" in resp.headers["content-disposition"]
+    page = resp.text
+    assert page.startswith("<!doctype html>") and "Verified" in page and "data:image/png;base64," in page
+    assert "What the agent repaired" in page and "Missing" in page and "Entanglement" in page
+    net = _finished(example("network_fiber_chain"))
+    assert "Fixes the agent tried" in client.get(f"/api/jobs/{net}/report").text
+    assert client.get("/api/jobs/nope/report").status_code == 404
+
+
 def test_ask_errors():
     assert client.post("/api/jobs/nope/ask", json={"question": "hi"}).status_code == 404
 

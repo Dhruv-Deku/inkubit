@@ -54,7 +54,8 @@ export function CircuitResults({ result, sketchCalls, spec, jobId }: {
           <div className={`verdict-badge ${result.verified ? 'pass' : 'fail'}`}>
             {result.verified ? <Check /> : <Cross />}{result.verified ? 'Verified' : 'Not verified'}
           </div>
-          <div className="sub" style={{ fontSize: 14, color: 'var(--text)' }}>{result.summary}</div>
+          <div className="sub" style={{ fontSize: 14, color: 'var(--text)', flex: 1 }}>{result.summary}</div>
+          <a className="btn small" href={`/api/jobs/${jobId}/report`} download>Download report</a>
         </div>
         {v && (
           <div className="tiles">
@@ -119,7 +120,8 @@ export function NetworkResults({ result, sketchCalls, jobId }: { result: Network
       <div className="panel">
         <div className="verdict">
           <div className={`verdict-badge ${result.fix ? 'pass' : 'fail'}`}>{result.fix ? <Check /> : <Cross />}{result.fix ? 'Bottleneck fixed' : 'No better design found'}</div>
-          <div className="sub" style={{ fontSize: 14, color: 'var(--text)' }}>{result.summary}</div>
+          <div className="sub" style={{ fontSize: 14, color: 'var(--text)', flex: 1 }}>{result.summary}</div>
+          <a className="btn small" href={`/api/jobs/${jobId}/report`} download>Download report</a>
         </div>
       </div>
       <div className="row" style={{ alignItems: 'stretch', gap: 16 }}>
