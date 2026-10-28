@@ -1,5 +1,18 @@
 # Q-Canvas demo video: shot list (2:30 target, 3:00 max)
 
+**Fastest route: let the script record it.** With the backend running
+(`scripts/dev.sh`, or uvicorn on :8000):
+
+```sh
+.venv/Scripts/python scripts/record_demo.py          # writes docs/video/q-canvas-demo.mp4 (+ .png thumbnail)
+```
+
+It drives the real app and lays captions over it (about 1:40, 1080p). Run it once
+to warm the cache, then again for the final take. In live Meta mode the captions
+name the models; offline, the title card says the answers are recorded mocks.
+Add your own voice-over and the hand-drawing shot (1) in any editor if you like.
+The shot list below is for recording by hand.
+
 Record at 1920x1080, browser zoom 100%, dark OS theme. Before recording:
 
 1. `.env` has `META_API_KEY` and `QCANVAS_MODEL_PROVIDER=meta`; the badge reads **Meta live**.

@@ -184,3 +184,14 @@ claims SAM found something it did not. Elements with neither get no location.
 The verified result is stored (and the UI shows it) as soon as the agent
 finishes; the Muse Spark explanation and the Muse Image diagram then run in
 parallel and fill in when ready. Muse Image can take tens of seconds.
+
+## D16. Automated demo video
+`scripts/record_demo.py` drives the real app in headless Edge and records the
+browser's own screencast (1920x1080, H.264 via the ffmpeg bundled in
+imageio-ffmpeg), with caption cards and a visible cursor laid over the page.
+Rules that keep it honest: every number on screen comes from the run being
+recorded; captions name a Meta model only when `/api/health` reports live Meta
+mode (offline recordings say so on the title card); waits for the sandbox or
+for model calls are sped up 4x only with an on-screen "4× speed" tag. Demo mode
+now paces the network log too (0.35 s per step, as for circuits), so a viewer
+can follow it.

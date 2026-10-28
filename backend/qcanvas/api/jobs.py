@@ -125,9 +125,9 @@ def _run_job(job: Job, models: Models | None) -> None:
     try:
         models = models or get_models()
         payload: dict[str, Any]
+        o = job.options
+        pace = o.pace_s if o.pace_s is not None else (0.35 if o.demo_mode else 0.0)  # demo mode paces the log
         if isinstance(job.spec, CircuitSpec):
-            o = job.options
-            pace = o.pace_s if o.pace_s is not None else (0.35 if o.demo_mode else 0.0)
             agent = run_agent(job.spec, models.code, AgentOptions(
                 noise=o.noise, shots=o.shots, demo_fault=o.demo_fault if o.demo_mode else None, pace_s=pace,
             ), job.bus)
@@ -137,7 +137,7 @@ def _run_job(job: Job, models: Models | None) -> None:
         else:
             from qcanvas.network.agent import run_network_agent
 
-            payload = run_network_agent(job.spec, job.bus, pace_s=job.options.pace_s or 0.0).model_dump(mode="json")
+            payload = run_network_agent(job.spec, job.bus, pace_s=pace).model_dump(mode="json")
         job.result = dict(payload)  # the verified result is available before the extras finish
         payload.update(_extras(job, models, payload))
         job.result = payload

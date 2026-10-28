@@ -14,6 +14,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - **P8 Explanation + diagram**: Muse Spark explanation and Muse Image illustration adapters; offline templates with real numbers; Qiskit/matplotlib diagrams.
 - **P9 Network**: analytic model (fiber, satellite downlink, Werner fidelity, memory decoherence, swapping, BBM92), bottleneck search with 5 fix types over 3 rounds, sanity checks, before/after.
 - **P10 Package**: README (Mermaid architecture, model usage, setup, spec, loop, limitations), DEMO_SCRIPT.md, `scripts/setup.sh`, `scripts/dev.sh`, screenshots + GIF.
+- **Demo video**: `scripts/record_demo.py` records a captioned 1080p walkthrough of the real app (D16); offline take renders in about 2 minutes.
 
 ## In progress
 - Nothing. Fresh-clone check passed on 2026-10-28 (setup.sh 3.5 min, all tests, server, demo job, dev.sh with Vite proxy). Since then: robust fault injection for model-written code, grid-box overlay fallback, early results, parallel extras (116 tests).
@@ -27,7 +28,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 ## Needs human
 1. Put the Meta key in `.env`: `META_API_KEY=LLM_...` and `QCANVAS_MODEL_PROVIDER=meta`. Then run `cd backend && ../.venv/Scripts/python -m pytest -m live -q` (three tiny calls, < $0.02).
 2. Try one real phone photo of a hand-drawn circuit in live mode; check SAM finds the parts (concept phrases are chosen by Muse Spark).
-3. Record the video following `DEMO_SCRIPT.md` (rehearse once so responses are cached).
+3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/q-canvas-demo.mp4`; optionally add a voice-over.
 4. Create the GitHub repo (private until submission?) and push; fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
