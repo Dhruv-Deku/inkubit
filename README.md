@@ -34,18 +34,28 @@ Q-Canvas closes that gap and refuses to fake success:
 
 | Step | What happens | Model |
 | --- | --- | --- |
-| 1. Sketch | Upload a photo (or pick a sample, or paste JSON) | |
+| 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words**, or paste JSON | **Muse Spark 1.3** turns a description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
 | 3. Read it | The boxes and the photo become a validated JSON spec, each operation linked to its box | **Muse Spark 1.3** with structured output |
 | 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors | |
 | 5. Run and verify | The agent writes the code, runs it in a sandboxed subprocess, verifies, diagnoses, repairs, retries (up to 4 attempts) | **Muse Spark 1.3** writes and repairs code (or the **Muse Code** CLI, opt-in) |
-| 6. Understand it | Histogram (predicted vs measured vs ideal), metrics, code with per-attempt diffs, plain-language explanation, clean diagram | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
-| Network mode | Physics model of every link, bottleneck search, fixes re-simulated, before/after | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
+| 6. Understand it | Histogram (predicted vs measured vs ideal), metrics, code with per-attempt diffs, plain-language explanation in 12 languages, clean diagram, one-file HTML report | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
+| 7. Look inside | Step through the exact state gate by gate (amplitudes, phases, a Bloch sphere per qubit), entanglement ideal vs noisy, error budget per noise source, how good the hardware must be for 99%, readout correction, cost on real chip wirings, OpenQASM 2/3 export. Also available before running ("Step through") | exact simulation, no model |
+| 8. Ask | Questions about this run, answered only from its numbers | **Muse Spark 1.3** |
+| Network mode | Physics model of every link, bottleneck search, fixes (relays, telescopes, memories, **entanglement purification**) re-simulated, before/after | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
 
 <table>
 <tr>
 <td><img src="docs/screenshots/2-overlay.png" alt="Photo overlay and spec editor"></td>
 <td><img src="docs/screenshots/4-results.png" alt="Verified result with metrics and histogram"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/6-inspector-entangled.png" alt="Gate-by-gate inspector with Bloch spheres"></td>
+<td><img src="docs/screenshots/7-hardware.png" alt="How good the hardware must be for a 99% match"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/8-ask.png" alt="Questions answered from the run's numbers"></td>
+<td><img src="docs/screenshots/7-layouts.png" alt="Cost on real chip layouts"></td>
 </tr>
 </table>
 
@@ -112,7 +122,11 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   3. writes the Qiskit script and, when verification fails, repairs it, given the
      spec, the code, the error, the verifier's verdict, the diagnosis and the
      history of earlier attempts;
-  4. explains the final result to a student using the real numbers.
+  4. explains the final result to a student using the real numbers, in any of 12 languages;
+  5. turns a plain-language description ("Bernstein-Vazirani with secret 1011", "300 km of fiber
+     with 2 repeaters") into a validated spec with the same structured-output schema;
+  6. answers questions about a finished run from that run's facts only, and says when
+     the facts do not contain the answer.
 - **Muse Image 1.0** (`muse-image-1.0`, `POST /v1/images/generations`,
   `response_format: b64_json`): a clean, annotated illustration of the final
   design. It is always shown next to the exact Qiskit drawing, so an imperfect
@@ -170,7 +184,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (116 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (170 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -191,11 +205,12 @@ One JSON document, discriminated by `kind`, version `1.0`. Full schema:
 }
 ```
 
-Gates: `H X Y Z S T RX RY RZ CX CZ SWAP MEASURE BARRIER` (small on purpose).
+Gates: `H X Y Z S T SDG TDG SX RX RY RZ CX CZ CP SWAP CCX MEASURE BARRIER` (enough for
+Grover, Bernstein-Vazirani, Deutsch-Jozsa, QFT and phase estimation; all in the example gallery).
 Measurements are terminal. Networks list `nodes` (`ground_station`, `satellite`,
 `repeater`, optional `memory_t2_ms`, `aperture_m`, `position`), `links`
 (`from`, `to`, `fiber`/`free_space`, `length_km`, optional `loss_db`,
-`depolarizing`) and a `source`/`destination` pair. Validation reports every
+`depolarizing`), a `source`/`destination` pair and optional `purification_rounds`. Validation reports every
 problem at once with a path, for example
 `operations[2] (RX): target qubit 3 is out of range; this circuit has 2 qubits (qubits 0-1).`
 
@@ -235,8 +250,30 @@ The agent finds the bottleneck (lossiest link, or memories too short for the
 waiting time), tries every applicable fix (midpoint relay, rebalanced repeater
 spacing, higher-elevation pass, bigger telescope, better memories) as a new,
 validated spec, re-simulates each, keeps the best, and repeats for up to three
-rounds. The fiber chain preset goes from no secret key to 0.39 bit/s; the
-satellite preset from 0.013 to 1.9 bit/s.
+rounds. Purification (BBPSSW: two noisy pairs in, one better pair out) is one of
+the fixes; because it halves the pair rate, pairs wait longer in memory, so the
+agent learns to upgrade memories first. The fiber chain preset goes from no
+secret key to 0.39 bit/s; the 600 km chain from none to 0.05 bit/s (memories,
+then purification); the satellite preset from 0.013 to 1.9 bit/s.
+
+### Inside the circuit
+
+After every circuit run (or before it, with **Step through**), Q-Canvas computes
+from the spec alone: the exact state after each gate with a Bloch sphere per
+qubit (a shrinking arrow means the qubit is entangled), pairwise concurrence ideal
+vs noisy (GHZ states are recognised as group entanglement), the fidelity each
+noise source costs on its own, the noise level the hardware would need for a 99%
+match, readout-error correction of the measured counts, and the cost of compiling
+onto all-to-all, line and heavy-hex chips. The noisy analyses evolve the density
+matrix with the verifier's own error channels and are tested to agree with Aer to
+1e-8.
+
+### Benchmark
+
+[`docs/BENCHMARK.md`](docs/BENCHMARK.md): every example circuit, clean and with
+every fault that can be planted in it, under realistic noise. **55 of 55 runs end
+correctly**: all 37 repairable faults verified after one repair, all 9 faked
+results caught. Regenerate with `scripts/benchmark.py`.
 
 ## Limitations (stated honestly)
 
@@ -248,11 +285,13 @@ satellite preset from 0.013 to 1.9 bit/s.
 - The code sandbox is a guard rail (AST check, subprocess, timeout, scrubbed
   environment), not an OS-level sandbox. Run untrusted model output on a machine
   you control.
-- The network model is analytic and simplified: no entanglement purification, no
-  multi-pair emission, no time-varying satellite passes, lumped atmospheric loss.
+- The network model is analytic and simplified: purification is the simple BBPSSW
+  recurrence (no nested schemes), no multi-pair emission, no time-varying satellite passes, lumped atmospheric loss.
   Its numbers are order-of-magnitude, not engineering predictions.
 - Offline mode recognises only the three bundled sketches; reading your own photo
-  needs the live Meta models. The live adapters are implemented from Meta's docs
+  needs the live Meta models. Offline, descriptions in words are limited to named
+  algorithms, gate lists and simple networks, explanations are English only, and
+  questions are answered by topic from the run's facts. The live adapters are implemented from Meta's docs
   and unit-tested against recorded request shapes, but were not exercised against
   the live API during development (no key was available); run `pytest -m live`
   first.
@@ -265,3 +304,6 @@ satellite preset from 0.013 to 1.9 bit/s.
 - `docs/hackathon/SUMMARY.md`: dates, tracks and judging criteria.
 - `scripts/make_sketches.py`: regenerates the sample sketches and fixtures.
 - `scripts/capture_ui.py`: drives the UI headlessly and refreshes `docs/screenshots/`.
+- `scripts/record_demo.py`: records the captioned demo video from the real app.
+- `scripts/benchmark.py`: the planted-fault benchmark (`docs/BENCHMARK.md`).
+- `SUBMISSION.md`: ready-to-paste hackathon submission text.

@@ -55,18 +55,38 @@ the time goes.
    verified** instead of faking success. Demo mode plants one of six real bugs
    so judges can watch the loop work.
 5. **Explains it.** Muse Spark explains the result to a student using the real
-   numbers; Muse Image draws a clean diagram, always shown next to the exact
-   Qiskit drawing so it can never mislead.
+   numbers, in any of 12 languages; Muse Image draws a clean diagram, always
+   shown next to the exact Qiskit drawing so it can never mislead. You can then
+   ask Muse Spark questions about the run ("why did attempt 1 fail?"), answered
+   only from that run's numbers.
+6. **Shows what happens inside.** Step through the exact quantum state gate by
+   gate, with a Bloch sphere per qubit; see how much entanglement survives the
+   noise, which noise source costs the most, how much better the hardware must
+   get for a 99% match (a Bell pair needs about 7x), what readout correction
+   recovers, and how many SWAPs real chip wirings add.
+
+**More ways in.** Besides a photo or the camera, you can describe a design in
+words ("Bernstein-Vazirani with secret 1011", "300 km of fiber with 2
+repeaters") and Muse Spark builds the spec. The gallery includes Grover search,
+Bernstein-Vazirani, Deutsch-Jozsa, phase estimation, superdense coding and a
+Toffoli AND, each verified against its textbook answer. Any design can be shared
+as a link or downloaded as a one-file HTML report.
 
 **Quantum networks.** The same canvas plans entanglement-distribution networks.
 Q-Canvas models every link from physics (fiber attenuation; satellite downlinks
 with diffraction, turbulence and atmosphere; Werner-state fidelity; quantum
 memory decoherence; entanglement swapping; BBM92 secret-key rate), finds the
 bottleneck, tries real fixes (relays, higher passes, bigger telescopes, better
-memories), re-simulates each one and keeps the best. On the bundled satellite
+memories, entanglement purification), re-simulates each one and keeps the best. On the bundled satellite
 case, close to the 2017 Micius experiment's geometry, the agent raises the
 secret-key rate from 0.013 to 1.87 bit/s (pairs 0.83 to 7.4 per second,
-fidelity 0.86 to 0.94), and every result passes physics sanity checks.
+fidelity 0.86 to 0.94), and every result passes physics sanity checks. On a
+600 km repeater chain that cannot make a key at all, it discovers that
+purification only pays off after the memories are upgraded, and gets there.
+
+**Reliability.** A benchmark plants every fault in every gallery circuit: 55 of
+55 runs end correctly (37 of 37 repairable bugs fixed, 9 of 9 faked results
+caught).
 
 **Honest by design.** Every model answer in the UI names the model that produced
 it. If a live call fails, the app falls back to a deterministic offline mock and
@@ -78,16 +98,17 @@ repeatable and cheap.
 | Model | Job |
 | --- | --- |
 | **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo |
-| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); writes and repairs the Qiskit code; explains the result |
+| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts |
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network |
 | **Muse Code** (opt-in, experimental) | Alternative repair backend: the verifier, not the agent's exit code, decides if a fix worked |
 
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 116 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 170 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
-fault, network physics, API). Every model sits behind an adapter with a real and
+fault, exact insights checked against Aer, network physics, the live adapters
+against recorded request shapes, API). Every model sits behind an adapter with a real and
 a mock implementation.
 
 ## Challenges
@@ -103,5 +124,6 @@ a mock implementation.
 
 ## What's next
 
-Running verified circuits on real quantum hardware, purification in the network
-model, and multi-page lab-notebook sketches.
+Running verified circuits on real quantum hardware, mid-circuit measurement
+(teleportation, error-correction codes), nested purification schemes, and
+multi-page lab-notebook sketches.
