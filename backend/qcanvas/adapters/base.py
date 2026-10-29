@@ -152,6 +152,10 @@ class ReasoningModel(ABC):
         """Answer a question about a design and its results, using only the given context."""
         raise NotImplementedError
 
+    def hint(self, facts: dict[str, Any]) -> Explanation:
+        """A nudge toward a challenge's goal that does not give the solution away."""
+        raise NotImplementedError
+
 
 class CodeModel(ABC):
     """Writes and repairs Qiskit code."""

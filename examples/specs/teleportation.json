@@ -1,0 +1,76 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 1,
+  "operations": [
+    {
+      "gate": "RY",
+      "targets": [
+        0
+      ],
+      "params": [
+        2.0943951023931953
+      ]
+    },
+    {
+      "gate": "H",
+      "targets": [
+        1
+      ]
+    },
+    {
+      "gate": "CX",
+      "targets": [
+        2
+      ],
+      "controls": [
+        1
+      ]
+    },
+    {
+      "gate": "CX",
+      "targets": [
+        1
+      ],
+      "controls": [
+        0
+      ]
+    },
+    {
+      "gate": "H",
+      "targets": [
+        0
+      ]
+    },
+    {
+      "gate": "CX",
+      "targets": [
+        2
+      ],
+      "controls": [
+        1
+      ]
+    },
+    {
+      "gate": "CZ",
+      "targets": [
+        2
+      ],
+      "controls": [
+        0
+      ]
+    }
+  ],
+  "measurements": [
+    {
+      "qubit": 2,
+      "clbit": 0
+    }
+  ],
+  "metadata": {
+    "title": "Teleportation (deferred measurement)",
+    "notes": "q0 holds RY(2pi/3)|0> (1 with 75%). A Bell pair on q1, q2 carries it to q2; the classically controlled fixes are written as CX and CZ (deferred measurement), so q2 reads 1 with 75% and q0 ends with nothing.",
+    "origin": "manual"
+  }
+}

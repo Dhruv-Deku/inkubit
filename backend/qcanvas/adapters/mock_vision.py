@@ -102,6 +102,10 @@ class MockReasoningModel(ReasoningModel):
         return Explanation(text=offline_answer(question, context),
                            call=ModelCall(provider="mock", model="offline answer rules", role="answer"))
 
+    def hint(self, facts: dict[str, Any]) -> Explanation:
+        return Explanation(text=facts["authored_hint"],
+                           call=ModelCall(provider="mock", model="puzzle author's hints", role="hint"))
+
     def spec_from_text(self, text: str) -> SpecDraft:
         from qcanvas.textspec import parse_description
 

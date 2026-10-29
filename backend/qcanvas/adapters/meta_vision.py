@@ -32,7 +32,7 @@ from qcanvas.adapters.base import (
 from qcanvas.adapters.config import Settings
 from qcanvas.adapters.imaging import annotate, data_url
 from qcanvas.adapters.meta_client import MetaAPIError, MetaClient
-from qcanvas.adapters.prompts import ASK_SYSTEM, CONCEPTS_SYSTEM, DRAFT_SYSTEM, EXPLAIN_SYSTEM, TEXT_SYSTEM
+from qcanvas.adapters.prompts import ASK_SYSTEM, CONCEPTS_SYSTEM, DRAFT_SYSTEM, EXPLAIN_SYSTEM, HINT_SYSTEM, TEXT_SYSTEM
 from qcanvas.adapters.sam_parse import parse_sam_output
 from qcanvas.sim.noise import get_preset
 from qcanvas.spec.draft import CONCEPTS_SCHEMA, draft_schema, draft_to_spec
@@ -207,6 +207,17 @@ class MetaReasoningModel(ReasoningModel):
         if not content.strip():
             raise MetaAPIError("empty answer")
         return Explanation(text=content.strip(), call=ModelCall(provider="meta", model=self.model, role="answer",
+                                                                cached=cached, latency_s=time.perf_counter() - start))
+
+    def hint(self, facts: dict[str, Any]) -> Explanation:
+        start = time.perf_counter()
+        content, cached = self.client.chat(self.model, [
+            {"role": "system", "content": HINT_SYSTEM},
+            {"role": "user", "content": f"Puzzle and progress:\n{json.dumps(facts, indent=1, default=str)}\n\nGive the hint."},
+        ], reasoning_effort="low", max_tokens=3000)
+        if not content.strip():
+            raise MetaAPIError("empty hint")
+        return Explanation(text=content.strip(), call=ModelCall(provider="meta", model=self.model, role="hint",
                                                                 cached=cached, latency_s=time.perf_counter() - start))
 
     def explain(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any],

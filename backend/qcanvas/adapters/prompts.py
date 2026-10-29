@@ -61,6 +61,14 @@ ASK_SYSTEM = (
     "rightmost character is classical bit 0."
 )
 
+HINT_SYSTEM = (
+    "You coach a student through a small quantum-circuit puzzle in Q-Canvas. You get the goal, the gates they may "
+    "use, their current circuit, an exact score of how close it is, and the hint the puzzle's author wrote for this "
+    "stage. Give one hint of one or two sentences that moves them one step forward from where their circuit is now. "
+    "Never give the full gate sequence and never name more than one gate to add. Plain words, no LaTeX, no lists. "
+    "Bitstrings follow Qiskit order: the rightmost character is qubit 0."
+)
+
 CONCEPTS_SYSTEM = (
     "You look at a photo of a hand drawing and decide what kind of quantum diagram it is and which "
     "short noun phrases a segmentation model should look for to find each drawn part."

@@ -14,7 +14,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 from qcanvas import EXAMPLES_DIR, PROJECT_DIR, __version__
@@ -23,7 +23,7 @@ from qcanvas.adapters.mock_vision import UnknownImageError
 from qcanvas.adapters.registry import ModelUnavailable, get_models
 from qcanvas.agent.faults import FAULTS
 from qcanvas.api.jobs import JobStore, RunOptions
-from qcanvas.sim.noise import PRESETS
+from qcanvas.sim.noise import PRESETS, get_preset
 from qcanvas.sketch import analyze_image
 from qcanvas.spec.validation import SpecError, parse_spec
 
@@ -60,7 +60,8 @@ def health() -> dict[str, Any]:
             **s.public()}
 
 
-ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and"}
+ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and",
+              "teleportation", "w_state"}
 
 
 @app.get("/api/examples")
@@ -128,6 +129,85 @@ def insights(body: InsightsRequest) -> dict[str, Any]:
     if body.noise not in PRESETS:
         raise HTTPException(status_code=422, detail=f"unknown noise preset '{body.noise}'")
     return analyze_circuit(spec, body.noise).model_dump(mode="json")
+
+
+class StateRequest(BaseModel):
+    spec: dict[str, Any]
+    noise: str = "realistic"
+    scale: float | None = Field(default=None, ge=0, le=20)
+
+
+@app.post("/api/state")
+def live_state(body: StateRequest) -> dict[str, Any]:
+    """Fast exact state for live editing: every step's ideal state and, with ``scale``, the noisy outcome odds."""
+    from qcanvas.insights.circuit import MAX_NOISY_QUBITS, noisy_distribution, scaled_preset, step_states
+    from qcanvas.spec.models import CircuitSpec
+    from qcanvas.verify import ideal_distribution
+    from qcanvas.verify.metrics import hellinger_fidelity
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(status_code=422, detail={"issues": _issues(err)}) from err
+    if not isinstance(spec, CircuitSpec):
+        raise HTTPException(status_code=422, detail="Live state is for circuits.")
+    if body.noise not in PRESETS:
+        raise HTTPException(status_code=422, detail=f"unknown noise preset '{body.noise}'")
+    out: dict[str, Any] = {"steps": [s.model_dump(mode="json") for s in step_states(spec)], "ideal": None, "noisy": None}
+    if spec.measured_pairs():
+        ideal = ideal_distribution(spec)
+        out["ideal"] = ideal
+        if body.scale is not None and spec.num_qubits <= MAX_NOISY_QUBITS:
+            base = get_preset(body.noise) if body.noise != "ideal" else get_preset("realistic")
+            dist = noisy_distribution(spec, scaled_preset(base, body.scale))
+            answer = max(ideal, key=ideal.get) if max(ideal.values()) > 0.99 else None
+            out["noisy"] = {"scale": body.scale, "baseline": base.name, "distribution": dist,
+                            "fidelity": hellinger_fidelity(ideal, dist),
+                            "success": dist.get(answer, 0.0) if answer else None}
+    return out
+
+
+class ChallengeRequest(BaseModel):
+    spec: dict[str, Any]
+    number: int = Field(default=0, ge=0, le=9)
+
+
+def _challenge(challenge_id: str) -> Any:
+    from qcanvas.challenges import BY_ID
+
+    ch = BY_ID.get(challenge_id)
+    if ch is None:
+        raise HTTPException(404, "no such challenge")
+    return ch
+
+
+@app.get("/api/challenges")
+def challenges() -> dict[str, Any]:
+    """The puzzle list, with each target (state amplitudes or a gate's truth table); never the solutions."""
+    from qcanvas.challenges import CHALLENGES, LEVELS, info
+
+    return {"levels": LEVELS, "challenges": [info(c).model_dump(mode="json") for c in CHALLENGES]}
+
+
+@app.post("/api/challenges/{challenge_id}/check")
+def challenge_check(challenge_id: str, body: ChallengeRequest) -> dict[str, Any]:
+    """Score a circuit against a challenge exactly: fidelity, stars against par, and what is still off."""
+    from qcanvas.challenges import check
+
+    return check(_challenge(challenge_id), body.spec).model_dump(mode="json")
+
+
+@app.post("/api/challenges/{challenge_id}/hint")
+async def challenge_hint(challenge_id: str, body: ChallengeRequest) -> dict[str, Any]:
+    """One hint for where the player's circuit is now (Muse Spark live; the author's hints offline)."""
+    from qcanvas.challenges import hint_facts
+
+    facts = hint_facts(_challenge(challenge_id), body.spec, body.number)
+    try:
+        hint = await asyncio.to_thread(get_models().reasoning.hint, facts)
+    except ModelUnavailable as err:
+        raise HTTPException(502, f"A Meta model call failed and fallback is off: {err}") from None
+    return hint.model_dump(mode="json")
 
 
 @app.post("/api/jobs/image")
