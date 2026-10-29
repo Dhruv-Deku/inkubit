@@ -88,6 +88,7 @@ def main() -> None:
         panel("How good must the hardware be").locator(".whatif input[type=range]").fill("48")
         page.wait_for_timeout(700)
         panel("How good must the hardware be").screenshot(path=str(OUT / "13-whatif.png"))
+        panel("Zero-noise extrapolation").screenshot(path=str(OUT / "14-zne.png"))
         panel("Error budget").screenshot(path=str(OUT / "7-budget.png"))
         panel("On real chip layouts").screenshot(path=str(OUT / "7-layouts.png"))
         page.click(".chip-btn:has-text('Why did the first attempt fail?')")
@@ -106,6 +107,19 @@ def main() -> None:
         page.wait_for_selector(".inspector")
         page.wait_for_timeout(600)
         page.screenshot(path=str(OUT / "9-describe.png"))
+
+        # find a shorter circuit, proven equal; the entanglement web of a W state
+        page.click("nav.steps button >> nth=0")
+        page.click(".spec-list button:has-text('Phase estimation')")
+        page.click(".optimizer button:has-text('Find a shorter circuit')")
+        page.wait_for_selector(".opt-table", timeout=60000)
+        page.wait_for_timeout(400)
+        page.locator(".optimizer").screenshot(path=str(OUT / "15-optimizer.png"))
+        page.click("nav.steps button >> nth=0")
+        page.click(".spec-list button:has-text('W state')")
+        page.wait_for_selector(".live-strip .ent-web")
+        page.wait_for_timeout(400)
+        page.locator(".live-strip").screenshot(path=str(OUT / "16-entanglement-web.png"))
 
         # a challenge solved with the click-to-compose palette
         page.click("nav.steps button >> nth=0")

@@ -312,3 +312,43 @@ span on fiber). Dots are a picture of the rate, not a simulation of photons;
 the numbers next to them are the model's. Motion is off under
 prefers-reduced-motion. The weakest link is drawn brighter, not yellow, so it is
 never confused with gold, which stays reserved for entanglement.
+
+## D27. Optimizer: proposals are proven, never trusted
+`backend/qcanvas/optimize.py`. Rewrite rules, the Qiskit transpiler (level 3,
+converted back into spec gates, with its qubit relabelling applied to the
+measurements), rules + Qiskit, and live Muse Spark each propose a circuit.
+`prove()` compares it with the original exactly: process fidelity
+|Tr(U^dagger V)|^2/d^2 (up to 8 qubits), state fidelity from |0...0>, and the
+total variation distance of the measured odds. The thresholds are floating
+point, not physics: 1 - F < 1e-12 (states within 1e-6) and TVD < 1e-9. Only
+"same measured odds" or stronger is accepted, because that is what the
+verifier and the user see; the label always says which level holds, so a
+circuit proven only on |0...0> is never presented as the same gate. Rules come in
+three classes (any input; starting state |0...0>, tracked as known basis states;
+measured odds: light cone of the measured qubits, diagonal gates and SWAPs
+before measurement) and are applied one at a time so each reason describes the
+circuit as it stood. A fuzz test runs 300 random circuits (all rules fire) and
+requires every rewrite to keep the odds; locally 4,000 more passed. Muse Spark
+sees the circuit, the measured qubits, its cost and the best cost so far (never
+another optimizer's circuit) and, if rejected, gets one retry with the exact
+reason. Cost order: two-qubit gates (CX/CZ 1, CP 2, SWAP 3, CCX 6), then gates,
+then depth. Hidden in challenge mode, where it would give answers away.
+
+## D28. Zero-noise extrapolation by global folding
+Folding (U (U^-1 U)^k) is what hardware can actually do, unlike scaling the
+noise model, so the simulation uses it: the folded circuit runs through the
+same per-gate channels as everything else. Readout error is inverted first, so
+extrapolation only has to undo gate noise. Richardson at 1x, 3x, 5x. Reported
+twice: exact probabilities (the method's ceiling) and 4,000 seeded shots per
+level, compared against readout correction alone from the same shots, since
+the honest question is whether extrapolation pays for its extra shots. Skipped
+above 8 qubits or 150 gates.
+
+## D29. Entanglement web
+Each step's state now carries every qubit's entanglement entropy and the
+concurrence of each entangled pair (Wootters formula in numpy, tested against
+Qiskit's), so the live strip and the step inspector can draw who is entangled
+with whom. Pairs get gold threads (width by concurrence); a qubit's gold arc
+is its entropy. Group entanglement with no pair entangled on its own (GHZ) is
+drawn as a dashed hull and named, because concurrence alone would show nothing.
+Listed up to 8 qubits.

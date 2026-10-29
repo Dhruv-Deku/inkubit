@@ -5,6 +5,7 @@ import { angleText, clone, parseAngle, parseIntList, resizeCircuit } from '../ut
 import { CircuitPreview, SHORT, wiresFor, type Compose } from './CircuitPreview'
 import { Down, Trash, Up } from './Icons'
 import { LiveStrip } from './LiveState'
+import { Optimizer } from './Optimizer'
 
 interface Props {
   spec: Spec
@@ -14,9 +15,10 @@ interface Props {
   onChange: (spec: Spec) => void
   allowed?: Gate[] | null  // a challenge may restrict the palette
   valid?: boolean
+  optimizer?: boolean  // off in challenges, where it would give the answer away
 }
 
-export function SpecEditor({ spec, issues, highlight, onPick, onChange, allowed, valid = true }: Props) {
+export function SpecEditor({ spec, issues, highlight, onPick, onChange, allowed, valid = true, optimizer = true }: Props) {
   const [mode, setMode] = useState<'form' | 'json'>('form')
   return (
     <div className="panel">
@@ -31,7 +33,7 @@ export function SpecEditor({ spec, issues, highlight, onPick, onChange, allowed,
       </div>
       {mode === 'json' ? <JsonEditor spec={spec} onChange={onChange} />
         : spec.kind === 'circuit'
-          ? <CircuitForm spec={spec} highlight={highlight} onPick={onPick} onChange={onChange} allowed={allowed} valid={valid} />
+          ? <CircuitForm spec={spec} highlight={highlight} onPick={onPick} onChange={onChange} allowed={allowed} valid={valid} optimizer={optimizer} />
           : <NetworkForm spec={spec} highlight={highlight} onPick={onPick} onChange={onChange} />}
       {issues.length > 0 && (
         <div className="notice error" style={{ marginTop: 14 }}>
@@ -97,9 +99,9 @@ function composeHint(tool: Gate | 'ERASE' | null, picked: number): string {
   return tool === 'CCX' && picked === 1 ? 'Click the second control.' : 'Click the control qubit.'
 }
 
-function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid }: {
+function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimizer }: {
   spec: CircuitSpec; highlight: string | null; onPick: (k: string | null) => void; onChange: (s: Spec) => void
-  allowed?: Gate[] | null; valid: boolean
+  allowed?: Gate[] | null; valid: boolean; optimizer: boolean
 }) {
   const [tool, setTool] = useState<Gate | 'ERASE' | null>(null)
   const [pending, setPending] = useState<number[]>([])
@@ -193,6 +195,7 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid }: {
       <div className="compose-hint sub">{composeHint(tool, pending.length)}{tool && <span className="muted"> · Esc to stop</span>}</div>
       <CircuitPreview spec={spec} highlight={highlight} onPick={onPick} compose={compose} />
       <LiveStrip spec={spec} valid={valid} />
+      {optimizer && <Optimizer spec={spec} valid={valid} onUse={(s) => commit(s)} />}
       <table className="ops" style={{ marginTop: 12 }} onMouseLeave={() => onPick(null)}>
         <thead>
           <tr><th>#</th><th>Gate</th><th>Target</th><th>Control</th><th>Angle</th><th>From sketch</th><th /></tr>

@@ -65,13 +65,29 @@ the time goes.
    get for a 99% match (a Bell pair needs about 7x), what readout correction
    recovers, and how many SWAPs real chip wirings add.
 
+**Shorter circuits, proven equal.** One click races rewrite rules (each with
+a reason a student can check), the Qiskit compiler and Muse Spark to find a
+cheaper circuit. Exact simulation then proves each proposal gives the same gate,
+the same state or the same measured odds, or rejects it with the outcome that
+differs; a rejected Muse Spark proposal goes back once with that reason. Fewer
+gates means less noise, and the panel shows by how much (phase estimation goes
+from 15 two-qubit gates to none, and the panel explains why: its answer was
+fixed in advance).
+
+**Error mitigation.** Zero-noise extrapolation folds every gate to run the
+circuit at 3x and 5x its noise, then extrapolates back to zero: a Grover search
+goes from a 0.882 match as measured to 0.999. It is shown with exact
+probabilities and with 4,000 shots per level, because extrapolation amplifies
+shot noise and the honest question is whether it pays off.
+
 **Play with it.** Eleven challenges (make a Bell pair, a singlet, a W state;
 build SWAP from CNOTs or NOT from H and Z) are scored exactly against a hidden
 reference, with par like golf, stars, and a lesson on success. Muse Spark gives
 hints from the player's exact score without ever seeing the solution. You can
 solve them by clicking gates onto wires, by describing the answer, or by
 drawing it on paper and taking a photo. A live state strip shows 3D Bloch
-spheres (drag to turn) with each qubit's path, recomputed on every edit, and a
+spheres (drag to turn) with each qubit's path and an entanglement web (gold
+threads between entangled pairs; GHZ states drawn as one group), recomputed on every edit, and a
 slider shows how the outcome changes as the hardware gets better or worse.
 Network results are drawn as an animated map, before and after the fix.
 
@@ -109,14 +125,14 @@ repeatable and cheap.
 | Model | Job |
 | --- | --- |
 | **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo |
-| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts |
+| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove |
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network |
 | **Muse Code** (opt-in, experimental) | Alternative repair backend: the verifier, not the agent's exit code, decides if a fix worked |
 
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 193 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 219 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and

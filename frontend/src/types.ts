@@ -222,6 +222,8 @@ export interface StepState {
   hidden_probability: number
   bloch: [number, number, number][]
   entangled: boolean[]
+  entropy?: number[]
+  links?: [number, number, number][]  // [a, b, concurrence]
 }
 export interface PairEntanglement { a: number; b: number; ideal: number; noisy: number | null }
 export interface Entanglement { pairs: PairEntanglement[]; qubit_entropy: number[]; summary: string }
@@ -230,6 +232,24 @@ export interface ErrorBudget { total_loss: number; items: BudgetItem[]; summary:
 export interface SweepPoint { scale: number; fidelity: number; success: number | null }
 export interface NoiseSweep { baseline: string; points: SweepPoint[]; target: number; scale_for_target: number | null; summary: string }
 export interface Mitigation { corrected: Distribution; fidelity_raw: number; fidelity_corrected: number; summary: string }
+export interface ZeroNoise {
+  scales: number[]
+  coefficients: number[]
+  fidelity_at: number[]
+  mitigated: Distribution
+  fidelity_raw: number
+  fidelity_readout: number
+  fidelity_mitigated: number
+  fidelity_shots: number
+  fidelity_readout_shots: number
+  shots: number
+  shot_overhead: number
+  outcome: string
+  outcome_ideal: number
+  outcome_at: number[]
+  outcome_zero: number
+  summary: string
+}
 export interface LayoutCost {
   layout: string
   description: string
@@ -244,6 +264,7 @@ export interface CircuitInsights {
   budget: ErrorBudget | null
   sweep: NoiseSweep | null
   mitigation: Mitigation | null
+  zne?: ZeroNoise | null
   layouts: LayoutCost[]
   layout_summary: string
   exports: { qasm2: string; qasm3: string }
@@ -351,6 +372,28 @@ export interface LiveState {
   steps: StepState[]
   ideal: Record<string, number> | null
   noisy: { scale: number; baseline: string; distribution: Record<string, number>; fidelity: number; success: number | null } | null
+}
+
+export interface OptimizeCost { gates: number; two_qubit: number; depth: number; fidelity: number | null }
+export interface OptimizeCandidate {
+  source: 'rules' | 'qiskit' | 'combined' | 'muse'
+  label: string
+  spec: CircuitSpec | null
+  cost: OptimizeCost | null
+  proof: { level: 'unitary' | 'state' | 'outcomes' | 'none'; process_fidelity: number | null; state_fidelity: number; outcome_tvd: number; detail: string } | null
+  accepted: boolean
+  better: boolean
+  note: string
+  rewrites: { rule: string; level: string; text: string }[]
+  call: ModelCall | null
+  attempts: number
+}
+export interface OptimizeResult {
+  original: OptimizeCost
+  candidates: OptimizeCandidate[]
+  best: number | null
+  summary: string
+  ai_note: string
 }
 
 export interface ChallengeInfo {

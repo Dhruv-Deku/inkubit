@@ -37,10 +37,11 @@ Q-Canvas closes that gap and refuses to fake success:
 | 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words**, or paste JSON | **Muse Spark 1.3** turns a description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
 | 3. Read it | The boxes and the photo become a validated JSON spec, each operation linked to its box | **Muse Spark 1.3** with structured output |
-| 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors. **Compose by clicking**: pick a gate from the palette, click a wire (control first for CNOTs), erase, undo; a **live state** strip (3D Bloch spheres you can turn, each qubit's path, amplitudes) updates on every edit | exact simulation, no model |
+| 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors. **Compose by clicking**: pick a gate from the palette, click a wire (control first for CNOTs), erase, undo; a **live state** strip (3D Bloch spheres you can turn, each qubit's path, amplitudes, and an **entanglement web**: gold threads between entangled pairs, arcs for entanglement with the rest) updates on every edit | exact simulation, no model |
+| Shorten it | **Find a shorter circuit**: rewrite rules (each with a reason), the Qiskit compiler and Muse Spark each propose one; exact simulation proves each equal (same gate, same state, or same measured odds) or rejects it with the outcome that differs. Use it in one click; Undo brings yours back | **Muse Spark 1.3** proposes, gets one retry with the rejection reason |
 | 5. Run and verify | The agent writes the code, runs it in a sandboxed subprocess, verifies, diagnoses, repairs, retries (up to 4 attempts) | **Muse Spark 1.3** writes and repairs code (or the **Muse Code** CLI, opt-in) |
 | 6. Understand it | Histogram (predicted vs measured vs ideal), metrics, code with per-attempt diffs, plain-language explanation in 12 languages, clean diagram, one-file HTML report | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
-| 7. Look inside | Step through the exact state gate by gate (amplitudes, phases, a Bloch sphere per qubit), entanglement ideal vs noisy, error budget per noise source, how good the hardware must be for 99%, readout correction, cost on real chip wirings, OpenQASM 2/3 export. Also available before running ("Step through") | exact simulation, no model |
+| 7. Look inside | Step through the exact state gate by gate (amplitudes, phases, a Bloch sphere per qubit, the entanglement web), entanglement ideal vs noisy, error budget per noise source, how good the hardware must be for 99%, readout correction, **zero-noise extrapolation** (fold every gate to run at 3x and 5x the noise, extrapolate back to zero, with and without shot noise), cost on real chip wirings, OpenQASM 2/3 export. Also available before running ("Step through") | exact simulation, no model |
 | 8. Ask | Questions about this run, answered only from its numbers | **Muse Spark 1.3** |
 | 9. What if | Drag the hardware quality from perfect to 10x worse and watch the exact outcome odds change | exact simulation, no model |
 | Challenges | 11 puzzles in three levels (warm-up, entanglement, gate golf): build a target state or gate, scored exactly with par like golf, stars saved in the browser, a lesson on success. Solve them with the palette, a photo of your paper answer, or words | **Muse Spark 1.3** gives hints that never spell out the answer |
@@ -66,6 +67,10 @@ Q-Canvas closes that gap and refuses to fake success:
 <tr>
 <td><img src="docs/screenshots/12-network-map.png" alt="Animated network map"></td>
 <td><img src="docs/screenshots/13-whatif.png" alt="What if the hardware were better"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/15-optimizer.png" alt="Shorter circuits, each proven equal or rejected"></td>
+<td><img src="docs/screenshots/14-zne.png" alt="Zero-noise extrapolation"></td>
 </tr>
 </table>
 
@@ -138,7 +143,10 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   6. answers questions about a finished run from that run's facts only, and says when
      the facts do not contain the answer;
   7. coaches a player through a challenge: it sees the goal, the player's circuit and
-     its exact score (never the reference solution) and gives one next-step hint.
+     its exact score (never the reference solution) and gives one next-step hint;
+  8. proposes a shorter circuit with the same measured odds (structured output). Exact
+     simulation accepts or rejects it; a rejected proposal goes back once with the
+     outcome that differs, so the model can fix its own mistake.
 - **Muse Image 1.0** (`muse-image-1.0`, `POST /v1/images/generations`,
   `response_format: b64_json`): a clean, annotated illustration of the final
   design. It is always shown next to the exact Qiskit drawing, so an imperfect
@@ -196,7 +204,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (193 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (219 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -280,6 +288,38 @@ match, readout-error correction of the measured counts, and the cost of compilin
 onto all-to-all, line and heavy-hex chips. The noisy analyses evolve the density
 matrix with the verifier's own error channels and are tested to agree with Aer to
 1e-8.
+
+### Shorter circuits, proven equal
+
+**Find a shorter circuit** (in the editor) runs up to four optimizers:
+rewrite rules, the Qiskit transpiler at level 3, the two together, and
+(live) Muse Spark. Each rule comes with a reason a student can check: H·H = 1;
+S then S becomes Z; H on both sides turns CX into CZ; a CNOT whose control is
+still |0⟩ never fires; a CZ whose partner is |1⟩ is a Z on the other qubit
+(phase kickback); a diagonal gate right before measurement changes nothing a
+measurement can see; a SWAP before measurement becomes a relabelling of the
+classical bits; gates that never reach a measured qubit go. Every proposal is
+then simulated exactly against the original and labelled with the strongest
+claim that holds: the same gate for every input (process fidelity), the same
+final state, or the same measured odds; anything else is rejected with the
+outcome where it differs. The rules are fuzz-tested on random circuits and
+never change the odds. Cheaper means fewer two-qubit gates first (CX 1, CP 2,
+SWAP 3, Toffoli 6), then fewer gates; the panel also shows the exact match to
+the ideal on realistic hardware before and after. When the result only flips
+bits, it says so: the circuit's answer was fixed in advance (phase estimation
+of a known phase shrinks to one X), which is true and worth knowing, not a
+trick for unknown inputs.
+
+### Zero-noise extrapolation
+
+Readout error is undone first; then the circuit is run at 1x, 3x and 5x its gate
+noise by folding (U, then U U⁻¹ U, then U U⁻¹ U U⁻¹ U: the same ideal result
+with three and five times the gates) and every outcome's probability is
+extrapolated back to zero noise with Richardson weights (15/8, -5/4, 3/8). With
+exact probabilities a Grover search goes from 0.882 as measured to 0.999. The
+panel also repeats it with 4,000 sampled shots per level, because on hardware
+extrapolation amplifies shot noise (about 5.2x the shots for the same error
+bars); for some circuits that eats the gain, and the panel says so.
 
 ### Challenges
 

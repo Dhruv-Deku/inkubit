@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, RunOptions,
+  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, RunOptions,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -58,6 +58,7 @@ export const api = {
   insights: (spec: Spec, noise: string) => call<CircuitInsights>('/api/insights', json({ spec, noise })),
   state: (spec: Spec, noise: string, scale?: number, signal?: AbortSignal) =>
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
+  optimize: (spec: Spec, ai = true) => call<OptimizeResult>('/api/optimize', json({ spec, ai })),
   challenges: () => call<{ levels: Record<string, string>; challenges: ChallengeInfo[] }>('/api/challenges'),
   checkChallenge: (id: string, spec: Spec, signal?: AbortSignal) =>
     call<ChallengeCheck>(`/api/challenges/${id}/check`, { ...json({ spec }), signal }),

@@ -3,6 +3,7 @@ import { api } from '../api'
 import type { Amplitude, CircuitSpec, LiveState } from '../types'
 import { pct } from '../util'
 import { BlochSphere } from './Bloch'
+import { EntanglementWeb } from './EntanglementWeb'
 
 /** Phase in units of pi, e.g. "π/2", "-π/4", "0". */
 export function phaseText(phase: number): string {
@@ -82,6 +83,7 @@ export function LiveStrip({ spec, valid }: { spec: CircuitSpec; valid: boolean }
           ))}
         </div>
         <div style={{ minWidth: 0 }}><AmplitudeTable amps={last.amplitudes} hidden={last.hidden_probability} max={8} /></div>
+        {n >= 2 && n <= 8 && <EntanglementWeb step={last} size={140} />}
       </div>
     </div>
   )

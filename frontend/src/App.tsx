@@ -322,7 +322,7 @@ export default function App() {
               </div>
             )}
             <SpecEditor spec={spec} issues={issues} highlight={highlight} onPick={setHighlight} onChange={setSpec}
-              allowed={challenge?.allowed} valid={issues.length === 0 && !checking} />
+              allowed={challenge?.allowed} valid={issues.length === 0 && !checking} optimizer={!challenge} />
           </div>
           <div className="panel run-bar">
             {spec.kind === 'circuit' && (

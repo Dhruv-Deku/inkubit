@@ -339,6 +339,11 @@ async def circuit_story(d: Director) -> None:
     await d.caption("And what the same circuit costs on real chip wirings.")
     await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="On real chip layouts")), block="center",
                       pause=3.0)
+    zne = page.locator(".panel", has=page.locator("h2", has_text="Zero-noise extrapolation"))
+    if await zne.count():
+        await d.caption("Error mitigation: run it noisier on purpose (every gate folded), then extrapolate back "
+                        "to zero noise. Shown with exact odds and with real shot counts.")
+        await d.scroll_to(zne, block="center", pause=4.4)
     code = page.locator(".panel", has=page.locator("h2", has_text="Code"))
     await d.scroll_to(code, pause=0.6)
     await d.caption("Standalone Qiskit you can download, with the exact change the repair made.")
@@ -378,6 +383,30 @@ async def words_story(d: Director) -> None:
     await d.scroll_to(page.locator(".inspector"), block="start", pause=0.4)
     await d.click(page.locator(".inspector button", has_text="Play"))
     await d.wait(7.5)
+
+
+async def optimizer_story(d: Director) -> None:
+    page, live = d.page, d.live
+    await d.caption(None)
+    await d.scroll_top()
+    await d.click(page.locator("nav.steps button >> nth=0"))
+    await d.wait(0.5)
+    item = page.locator(".spec-list button", has_text="Phase estimation")
+    await d.scroll_to(item, block="center", pause=0.3)
+    await d.click(item)
+    await page.wait_for_selector(".optimizer button", timeout=60_000)
+    opt = page.locator(".optimizer")
+    await d.scroll_to(opt, block="start", pause=0.3)
+    await d.caption(models_or(live, "Find a shorter circuit: rewrite rules, the Qiskit compiler and **Muse Spark** compete. "
+                                    "Exact simulation proves each answer, or rejects it.",
+                              "Find a shorter circuit: rewrite rules and the Qiskit compiler compete. "
+                              "Exact simulation proves each answer, or rejects it."))
+    await d.click(opt.locator("button", has_text="Find a shorter circuit"))
+    await page.wait_for_selector(".opt-table", timeout=180_000)
+    await d.wait(2.4)
+    await d.caption("Every step has a reason you can check. Phase estimation of a known phase shrinks to one X: "
+                    "its answer was fixed in advance, and the panel says so.")
+    await d.scroll_to(page.locator(".opt-detail"), block="center", pause=5.0)
 
 
 async def challenge_story(d: Director) -> None:
@@ -482,6 +511,7 @@ async def record(base: str, out: Path) -> None:
             await d.hide_card()
             await circuit_story(d)
             await words_story(d)
+            await optimizer_story(d)
             await challenge_story(d)
             await network_story(d)
             await d.card("Q-Canvas", "From a pencil sketch to a verified quantum simulation.", chips,

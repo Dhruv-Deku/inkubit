@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
-import type { CircuitInsights, CircuitSpec, Entanglement, ErrorBudget, LiveState, Mitigation, NoiseSweep, StepState } from '../types'
+import type { CircuitInsights, CircuitSpec, Entanglement, ErrorBudget, LiveState, Mitigation, NoiseSweep, StepState, ZeroNoise } from '../types'
 import { downloadText, pct } from '../util'
 import { BlochSphere } from './Bloch'
 import { CircuitPreview } from './CircuitPreview'
+import { EntanglementWeb } from './EntanglementWeb'
 import { Histogram } from './Histogram'
 import { AmplitudeTable } from './LiveState'
 
@@ -59,6 +60,12 @@ export function StepInspector({ spec, steps }: { spec: CircuitSpec; steps: StepS
                 trail={steps.slice(0, i + 1).map((t) => t.bloch[q])} />
             ))}
           </div>
+          {n >= 2 && n <= 8 && (
+            <>
+              <div className="label" style={{ margin: '12px 0 4px' }}>Who is entangled with whom <span className="muted">(gold threads: pairs; arcs: entanglement with the rest)</span></div>
+              <EntanglementWeb step={s} size={150} />
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -287,6 +294,66 @@ export function ReadoutPanel({ m }: { m: Mitigation }) {
   )
 }
 
+/** Probability of the ideal answer at 1x, 3x, 5x noise, the parabola through them, and where it meets zero noise. */
+function ZneChart({ z }: { z: ZeroNoise }) {
+  const W = 520, H = 204, L = 44, R = 16, T = 28, B = 34
+  const xs = z.scales, ys = z.outcome_at
+  const all = [...ys, z.outcome_zero, z.outcome_ideal]
+  const lo = Math.max(0, Math.min(...all) - 0.04), hi = Math.min(1, Math.max(...all) + 0.03)
+  const xMax = Math.max(...xs) + 0.5
+  const px = (x: number) => L + (x / xMax) * (W - L - R)
+  const py = (y: number) => T + ((hi - y) / (hi - lo)) * (H - T - B)
+  // the Lagrange parabola through the three points; at x = 0 it equals the Richardson value
+  const quad = (x: number) => xs.reduce((acc, xi, i) => acc + ys[i] * xs.reduce((p, xj, j) => (j === i ? p : p * ((x - xj) / (xi - xj))), 1), 0)
+  const path = (from: number, to: number, k = 40) =>
+    Array.from({ length: k + 1 }, (_, i) => { const x = from + ((to - from) * i) / k; return `${i ? 'L' : 'M'}${px(x).toFixed(1)} ${py(quad(x)).toFixed(1)}` }).join('')
+  const ticks = [lo, (lo + hi) / 2, hi].map((t) => Math.round(t * 100) / 100)
+  const tick = (t: number) => `${Math.round(t * 100)}%`
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block' }} role="img"
+      aria-label={`Probability of ${z.outcome}: ${ys.map((y, i) => `${pct(y)} at ${xs[i]}x noise`).join(', ')}; extrapolated to ${pct(z.outcome_zero)} at zero noise; ideal ${pct(z.outcome_ideal)}`}>
+      {ticks.map((t) => (
+        <g key={t}>
+          <line x1={L} x2={W - R} y1={py(t)} y2={py(t)} stroke="var(--line)" />
+          <text x={L - 6} y={py(t) + 4} textAnchor="end" fontSize={10.5} fill="var(--muted)" fontFamily="var(--mono)">{tick(t)}</text>
+        </g>
+      ))}
+      <line x1={L} x2={W - R} y1={py(z.outcome_ideal)} y2={py(z.outcome_ideal)} stroke="var(--text-2)" strokeDasharray="2 4" />
+      <text x={W - R} y={py(z.outcome_ideal) - 5} textAnchor="end" fontSize={10.5} fill="var(--text-2)">noiseless ideal</text>
+      <path d={path(xs[0], xs[xs.length - 1])} fill="none" stroke="var(--measured)" strokeWidth={2} />
+      <path d={path(0, xs[0], 12)} fill="none" stroke="var(--measured)" strokeWidth={2} strokeDasharray="4 4" />
+      {xs.map((x, i) => (
+        <g key={x}>
+          <circle cx={px(x)} cy={py(ys[i])} r={5} fill="var(--measured)" stroke="var(--panel)" strokeWidth={2}><title>{`${x}x noise: ${pct(ys[i])}`}</title></circle>
+          <text x={px(x)} y={H - B + 16} textAnchor="middle" fontSize={11} fill="var(--text-2)" fontFamily="var(--mono)">{x}x</text>
+        </g>
+      ))}
+      <circle cx={px(0)} cy={py(z.outcome_zero)} r={6} fill="var(--panel)" stroke="var(--text)" strokeWidth={2}><title>{`extrapolated to zero noise: ${pct(z.outcome_zero)}`}</title></circle>
+      <text x={px(0) + 10} y={py(z.outcome_zero) - 10} fontSize={11} fill="var(--text)">zero noise: {pct(z.outcome_zero)}</text>
+      <text x={px(0)} y={H - B + 16} textAnchor="middle" fontSize={11} fill="var(--text-2)" fontFamily="var(--mono)">0</text>
+      <text x={(L + W - R) / 2} y={H - 4} textAnchor="middle" fontSize={11} fill="var(--muted)">noise level (every gate folded into G·G⁻¹·G)</text>
+    </svg>
+  )
+}
+
+export function ZnePanel({ z }: { z: ZeroNoise }) {
+  return (
+    <div className="panel">
+      <div className="panel-head"><h2>Zero-noise extrapolation</h2><span className="sub">run it noisier on purpose, then extrapolate back to no noise</span></div>
+      <div className="tiles zne-tiles">
+        <div className="tile"><div className="k">As measured</div><div className="v">{z.fidelity_raw.toFixed(3)}</div><div className="s">match to the ideal</div></div>
+        <div className="tile"><div className="k">Readout corrected</div><div className="v">{z.fidelity_readout.toFixed(3)}</div></div>
+        <div className="tile"><div className="k">Extrapolated (exact)</div><div className="v good">{z.fidelity_mitigated.toFixed(3)}</div></div>
+        <div className="tile"><div className="k">With {z.shots.toLocaleString()} shots per level</div><div className="v">{z.fidelity_shots.toFixed(3)}</div>
+          <div className="s">vs {z.fidelity_readout_shots.toFixed(3)} without</div></div>
+      </div>
+      <div className="label" style={{ marginBottom: 4 }}>Probability of |{z.outcome}⟩ as the noise is raised</div>
+      <ZneChart z={z} />
+      <p className="lead" style={{ margin: '10px 0 0' }}>{z.summary}</p>
+    </div>
+  )
+}
+
 export function ExportButtons({ ins, spec }: { ins?: CircuitInsights; spec: CircuitSpec }) {
   const base = (spec.metadata?.title || 'circuit').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || 'circuit'
   return (
@@ -313,6 +380,7 @@ export function InsightsSection({ spec, ins, wide = false }: { spec: CircuitSpec
       {ins.sweep && <SweepChart sweep={ins.sweep} spec={spec} />}
       <LayoutsPanel ins={ins} />
       {ins.mitigation && <ReadoutPanel m={ins.mitigation} />}
+      {ins.zne && <ZnePanel z={ins.zne} />}
       {ins.notes.map((t, k) => <div key={k} className="notice">{t}</div>)}
     </div>
   )
