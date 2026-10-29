@@ -155,6 +155,7 @@ export default function App() {
       const analysis = await api.analyzeImage(file, name)
       setFromText(null)
       setSketch({ url: URL.createObjectURL(file), analysis })
+      if (analysis.spec.kind !== 'circuit') setChallenge(null)  // a network cannot answer a circuit puzzle
       setSpec(analysis.spec)
       setStage('edit')
     } catch (e) {
@@ -179,6 +180,7 @@ export default function App() {
       const draft = await api.fromText(text)
       setSketch(null)
       setFromText({ text, notes: draft.notes, call: draft.call })
+      if (draft.spec.kind !== 'circuit') setChallenge(null)
       setSpec(draft.spec)
       setStage('edit')
     } catch (e) {
@@ -290,8 +292,8 @@ export default function App() {
 
       {stage === 'edit' && spec && (
         <div className="stack">
-          {challenge && (
-            <ChallengePanel ch={challenge} spec={spec.kind === 'circuit' ? spec : null} best={progress[challenge.id] ?? 0}
+          {challenge && spec.kind === 'circuit' && (
+            <ChallengePanel ch={challenge} spec={spec} best={progress[challenge.id] ?? 0}
               onScore={(n) => score(challenge.id, n)} hasNext={!!nextChallenge}
               onNext={() => nextChallenge && startChallenge(nextChallenge)}
               onExit={() => { setChallenge(null); setStage('start') }} />

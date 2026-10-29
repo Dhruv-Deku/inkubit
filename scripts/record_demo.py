@@ -280,10 +280,11 @@ async def circuit_story(d: Director) -> None:
         await page.wait_for_selector(".notice.error", state="detached", timeout=10_000)
         await d.wait(0.8)
 
-    await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.6)
+    await d.scroll_top()
     await d.caption("**Demo mode** plants a real bug in the first attempt, so you can watch the agent catch it.")
     await d.click(page.locator("header label.toggle"))
     await d.wait(1.6)
+    await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.6)
     await d.click(page.locator("button.btn.primary.big"))
     await d.wait(0.6)
     await d.caption(models_or(live, "**Muse Spark** writes the Qiskit code. It runs in a sandbox under realistic noise.",
@@ -416,7 +417,9 @@ async def network_story(d: Director) -> None:
     await d.click(page.locator("nav.steps button >> nth=0"))
     await d.wait(0.6)
     await d.caption("Q-Canvas also plans **quantum networks**: here, two ground stations share entanglement through a satellite.")
-    await d.click(page.locator(".sample", has_text="Satellite"))
+    sat = page.locator(".sample", has_text="Satellite")
+    await d.scroll_to(sat, block="center", pause=0.4)
+    await d.click(sat)
     await page.wait_for_selector(".overlay-wrap svg rect", timeout=180_000)
     await d.wait(3.4)
     await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.4)
