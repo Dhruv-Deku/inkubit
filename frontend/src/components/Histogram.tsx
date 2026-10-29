@@ -4,9 +4,10 @@ import { pct } from '../util'
 
 interface Props {
   predicted: Distribution
-  measured: Distribution
+  measured?: Distribution  // omitted: an exact prediction only, no sampled run
   ideal: Distribution
-  shots: number
+  shots?: number
+  predictedLabel?: string
 }
 
 const H = 230
@@ -17,7 +18,8 @@ const PAD = { l: 44, r: 12, t: 14, b: 34 }
  * Predicted is an outlined bar and measured is solid, so identity never rests
  * on colour alone; a dashed tick marks the noiseless ideal.
  */
-export function Histogram({ predicted, measured, ideal, shots }: Props) {
+export function Histogram({ predicted, measured = {}, ideal, shots = 0, predictedLabel = 'Predicted from the spec (exact, with noise)' }: Props) {
+  const sampled = shots > 0
   const [tip, setTip] = useState<{ k: string; x: number; y: number } | null>(null)
   const [showIdeal, setShowIdeal] = useState(true)
   const keys = Array.from(new Set([...Object.keys(predicted), ...Object.keys(measured), ...Object.keys(ideal)]))
@@ -37,8 +39,8 @@ export function Histogram({ predicted, measured, ideal, shots }: Props) {
     <div>
       <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
         <div className="legend-row" style={{ marginTop: 0 }}>
-          <span><i style={{ border: '2px solid var(--predicted)', background: 'rgba(217,89,38,0.18)' }} />Predicted from the spec (exact, with noise)</span>
-          <span><i style={{ background: 'var(--measured)' }} />Measured ({shots} shots)</span>
+          <span><i style={{ border: '2px solid var(--predicted)', background: 'rgba(217,89,38,0.18)' }} />{predictedLabel}</span>
+          {sampled && <span><i style={{ background: 'var(--measured)' }} />Measured ({shots} shots)</span>}
           {showIdeal && <span><i style={{ borderTop: '2px dashed var(--text)', height: 0, marginBottom: 3 }} />Noiseless ideal</span>}
         </div>
         <label className="toggle" style={{ fontSize: 12 }}>
@@ -68,10 +70,12 @@ export function Histogram({ predicted, measured, ideal, shots }: Props) {
                 onMouseMove={(e) => setTip({ k, x: e.clientX, y: e.clientY })}
                 onMouseLeave={() => setTip(null)}>
                 <rect x={gx - groupW / 2} y={PAD.t} width={groupW} height={H - PAD.t - PAD.b} fill="transparent" />
-                {p > 0 && <path d={bar(gx - bw - 1, p)} fill="rgba(217,89,38,0.16)" stroke="var(--predicted)" strokeWidth={1.6} />}
+                {p > 0 && <path d={bar(sampled ? gx - bw - 1 : gx - bw / 2, p)} fill="rgba(217,89,38,0.16)" stroke="var(--predicted)"
+                  strokeWidth={1.6} style={{ transition: 'd .22s ease' }} />}
                 {m > 0 && <path d={bar(gx + 1, m)} fill="var(--measured)" />}
                 {showIdeal && id > 0 && (
-                  <line x1={gx - bw - 4} x2={gx + bw + 4} y1={yv(id)} y2={yv(id)} stroke="var(--text)" strokeWidth={1.6} strokeDasharray="4 3" />
+                  <line x1={gx - (sampled ? bw : bw / 2) - 4} x2={gx + (sampled ? bw : bw / 2) + 4} y1={yv(id)} y2={yv(id)}
+                    stroke="var(--text)" strokeWidth={1.6} strokeDasharray="4 3" />
                 )}
                 <text x={gx} y={H - PAD.b + 18} textAnchor="middle" fontSize={12} fill="var(--text-2)" fontFamily="var(--mono)">|{k}⟩</text>
               </g>
@@ -85,7 +89,7 @@ export function Histogram({ predicted, measured, ideal, shots }: Props) {
         <div className="chart-tip" style={{ left: tip.x + 14, top: tip.y + 14 }}>
           <div className="mono" style={{ marginBottom: 4 }}>|{tip.k}⟩</div>
           <div className="r"><span><span className="sw" style={{ border: '1.5px solid var(--predicted)' }} />Predicted</span><span>{pct(predicted[tip.k] ?? 0)}</span></div>
-          <div className="r"><span><span className="sw" style={{ background: 'var(--measured)' }} />Measured</span><span>{pct(measured[tip.k] ?? 0)}</span></div>
+          {sampled && <div className="r"><span><span className="sw" style={{ background: 'var(--measured)' }} />Measured</span><span>{pct(measured[tip.k] ?? 0)}</span></div>}
           <div className="r"><span className="muted">Noiseless ideal</span><span>{pct(ideal[tip.k] ?? 0)}</span></div>
         </div>
       )}

@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (170 tests pass offline; frontend builds; last checked 2026-10-29)
+## Done (193 tests pass offline; frontend builds; last checked 2026-10-29)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -22,9 +22,12 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
   - Describe it in words (Muse Spark live, offline parser), camera capture, share links, grouped examples (D20).
   - Ask about a result (D21); explanations in 12 languages (D23); downloadable HTML report.
   - Planted-fault benchmark `scripts/benchmark.py` → `docs/BENCHMARK.md`: 55/55 runs end correctly.
+  - Challenge mode (D24): 11 exact puzzles in 3 levels with par, stars (localStorage), lessons, author hints offline and Muse Spark hints live; solvable by palette, photo or words.
+  - Click-to-compose palette with ghost placement, erase, undo; live state strip with draggable 3D Bloch spheres and each qubit's path (D25).
+  - What-if hardware slider with exact odds; animated network map with before/after (D26). Teleportation and W-state examples.
 
 ## In progress
-- Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the 170 offline tests and a browser check of every new screen.
+- Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the offline tests and a headless-browser check of every new screen (desktop and 390 px phone width).
 
 ## Known issues / limitations
 - Live Meta adapters are implemented from the docs and tested against recorded request shapes with a fake client, but **never called live** (no key on this machine). First live run may surface response-shape surprises; the fallback keeps the UI working and labels it.
@@ -40,7 +43,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
 ## Top 5 next steps
-1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, and explanations in other languages).
+1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, and explanations in other languages).
 2. Tune the concept-phrase prompt on 3-4 real photos (different pens/lighting).
 3. Record the demo video live (`scripts/record_demo.py`).
 4. Optional: let users click a box on the photo to add an operation that the reading missed.

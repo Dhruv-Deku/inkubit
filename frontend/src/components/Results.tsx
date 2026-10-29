@@ -1,4 +1,4 @@
-import type { CircuitResult, CircuitSpec, Explanation, ImageOut, ModelCall, NetworkResult } from '../types'
+import type { CircuitResult, CircuitSpec, Explanation, ImageOut, ModelCall, NetworkResult, NetworkSpec } from '../types'
 import { fmtRate, pct } from '../util'
 import { CallBadge, CallsTable } from './CallBadge'
 import { CodeViewer } from './CodeViewer'
@@ -6,6 +6,7 @@ import { Histogram } from './Histogram'
 import { Check, Cross } from './Icons'
 import { AskPanel } from './AskPanel'
 import { ExportButtons, InsightsSection } from './Insights'
+import { NetworkMap } from './NetworkMap'
 
 export function ExplanationPanel({ explanation }: { explanation?: Explanation }) {
   if (!explanation) return null
@@ -111,7 +112,9 @@ function E2E({ title, m, other }: { title: string; m: NetworkResult['before']; o
   )
 }
 
-export function NetworkResults({ result, sketchCalls, jobId }: { result: NetworkResult; sketchCalls: ModelCall[]; jobId: string }) {
+export function NetworkResults({ result, sketchCalls, jobId, spec }: {
+  result: NetworkResult; sketchCalls: ModelCall[]; jobId: string; spec: NetworkSpec
+}) {
   const b = result.before, a = result.after
   const weak = b.weakest_link
   const calls = [...sketchCalls, ...(result.explanation ? [result.explanation.call] : []), ...(result.diagram?.call ? [result.diagram.call] : [])]
@@ -124,6 +127,7 @@ export function NetworkResults({ result, sketchCalls, jobId }: { result: Network
           <a className="btn small" href={`/api/jobs/${jobId}/report`} download>Download report</a>
         </div>
       </div>
+      <NetworkMap spec={spec} specAfter={result.spec_after} before={b} after={a} />
       <div className="row" style={{ alignItems: 'stretch', gap: 16 }}>
         <E2E title="Before" m={b} />
         {a && <E2E title="After the fix" m={a} other={b} />}

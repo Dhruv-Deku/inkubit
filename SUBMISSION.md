@@ -65,12 +65,23 @@ the time goes.
    get for a 99% match (a Bell pair needs about 7x), what readout correction
    recovers, and how many SWAPs real chip wirings add.
 
+**Play with it.** Eleven challenges (make a Bell pair, a singlet, a W state;
+build SWAP from CNOTs or NOT from H and Z) are scored exactly against a hidden
+reference, with par like golf, stars, and a lesson on success. Muse Spark gives
+hints from the player's exact score without ever seeing the solution. You can
+solve them by clicking gates onto wires, by describing the answer, or by
+drawing it on paper and taking a photo. A live state strip shows 3D Bloch
+spheres (drag to turn) with each qubit's path, recomputed on every edit, and a
+slider shows how the outcome changes as the hardware gets better or worse.
+Network results are drawn as an animated map, before and after the fix.
+
 **More ways in.** Besides a photo or the camera, you can describe a design in
 words ("Bernstein-Vazirani with secret 1011", "300 km of fiber with 2
 repeaters") and Muse Spark builds the spec. The gallery includes Grover search,
-Bernstein-Vazirani, Deutsch-Jozsa, phase estimation, superdense coding and a
-Toffoli AND, each verified against its textbook answer. Any design can be shared
-as a link or downloaded as a one-file HTML report.
+Bernstein-Vazirani, Deutsch-Jozsa, phase estimation, superdense coding,
+teleportation, the W state and a Toffoli AND, each verified against its textbook
+answer. Any design can be shared as a link or downloaded as a one-file HTML
+report.
 
 **Quantum networks.** The same canvas plans entanglement-distribution networks.
 Q-Canvas models every link from physics (fiber attenuation; satellite downlinks
@@ -105,7 +116,7 @@ repeatable and cheap.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 170 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 193 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and

@@ -37,12 +37,14 @@ Q-Canvas closes that gap and refuses to fake success:
 | 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words**, or paste JSON | **Muse Spark 1.3** turns a description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
 | 3. Read it | The boxes and the photo become a validated JSON spec, each operation linked to its box | **Muse Spark 1.3** with structured output |
-| 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors | |
+| 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors. **Compose by clicking**: pick a gate from the palette, click a wire (control first for CNOTs), erase, undo; a **live state** strip (3D Bloch spheres you can turn, each qubit's path, amplitudes) updates on every edit | exact simulation, no model |
 | 5. Run and verify | The agent writes the code, runs it in a sandboxed subprocess, verifies, diagnoses, repairs, retries (up to 4 attempts) | **Muse Spark 1.3** writes and repairs code (or the **Muse Code** CLI, opt-in) |
 | 6. Understand it | Histogram (predicted vs measured vs ideal), metrics, code with per-attempt diffs, plain-language explanation in 12 languages, clean diagram, one-file HTML report | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
 | 7. Look inside | Step through the exact state gate by gate (amplitudes, phases, a Bloch sphere per qubit), entanglement ideal vs noisy, error budget per noise source, how good the hardware must be for 99%, readout correction, cost on real chip wirings, OpenQASM 2/3 export. Also available before running ("Step through") | exact simulation, no model |
 | 8. Ask | Questions about this run, answered only from its numbers | **Muse Spark 1.3** |
-| Network mode | Physics model of every link, bottleneck search, fixes (relays, telescopes, memories, **entanglement purification**) re-simulated, before/after | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
+| 9. What if | Drag the hardware quality from perfect to 10x worse and watch the exact outcome odds change | exact simulation, no model |
+| Challenges | 11 puzzles in three levels (warm-up, entanglement, gate golf): build a target state or gate, scored exactly with par like golf, stars saved in the browser, a lesson on success. Solve them with the palette, a photo of your paper answer, or words | **Muse Spark 1.3** gives hints that never spell out the answer |
+| Network mode | Physics model of every link, bottleneck search, fixes (relays, telescopes, memories, **entanglement purification**) re-simulated, before/after on an animated **network map** (entangled pairs in flight, thicker links deliver more, the weakest link marked) | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
 
 <table>
 <tr>
@@ -56,6 +58,14 @@ Q-Canvas closes that gap and refuses to fake success:
 <tr>
 <td><img src="docs/screenshots/8-ask.png" alt="Questions answered from the run's numbers"></td>
 <td><img src="docs/screenshots/7-layouts.png" alt="Cost on real chip layouts"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/10-challenge.png" alt="A solved challenge with stars and the lesson"></td>
+<td><img src="docs/screenshots/11-compose.png" alt="Click-to-compose palette with the live state"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/12-network-map.png" alt="Animated network map"></td>
+<td><img src="docs/screenshots/13-whatif.png" alt="What if the hardware were better"></td>
 </tr>
 </table>
 
@@ -126,7 +136,9 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   5. turns a plain-language description ("Bernstein-Vazirani with secret 1011", "300 km of fiber
      with 2 repeaters") into a validated spec with the same structured-output schema;
   6. answers questions about a finished run from that run's facts only, and says when
-     the facts do not contain the answer.
+     the facts do not contain the answer;
+  7. coaches a player through a challenge: it sees the goal, the player's circuit and
+     its exact score (never the reference solution) and gives one next-step hint.
 - **Muse Image 1.0** (`muse-image-1.0`, `POST /v1/images/generations`,
   `response_format: b64_json`): a clean, annotated illustration of the final
   design. It is always shown next to the exact Qiskit drawing, so an imperfect
@@ -184,7 +196,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (170 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (193 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -206,7 +218,8 @@ One JSON document, discriminated by `kind`, version `1.0`. Full schema:
 ```
 
 Gates: `H X Y Z S T SDG TDG SX RX RY RZ CX CZ CP SWAP CCX MEASURE BARRIER` (enough for
-Grover, Bernstein-Vazirani, Deutsch-Jozsa, QFT and phase estimation; all in the example gallery).
+Grover, Bernstein-Vazirani, Deutsch-Jozsa, QFT, phase estimation, teleportation and the W state;
+all but QFT are in the example gallery, and QFT is one sentence away in "describe it in words").
 Measurements are terminal. Networks list `nodes` (`ground_station`, `satellite`,
 `repeater`, optional `memory_t2_ms`, `aperture_m`, `position`), `links`
 (`from`, `to`, `fiber`/`free_space`, `length_km`, optional `loss_db`,
@@ -268,6 +281,19 @@ onto all-to-all, line and heavy-hex chips. The noisy analyses evolve the density
 matrix with the verifier's own error channels and are tested to agree with Aer to
 1e-8.
 
+### Challenges
+
+Each puzzle is defined by a reference circuit kept on the server: its state (or,
+for gate puzzles, its unitary) is the target, compared up to global phase, so
+any correct answer counts. Solved means fidelity at least 0.999; stars are
+solved, within par + 2, at or under par. Near misses get a specific note: "the
+probabilities are already right; a relative phase is off", or "2 of 4 basis
+inputs already map correctly". On success the panel shows what the puzzle
+teaches and how much of the state survives realistic noise; Run then sends the
+answer through the full agent and verifier. Puzzles: fair coin, minus sign,
+quarter turn, NOT without X (H and Z only), Bell pair, singlet, hidden phase
+(a graph state), GHZ, SWAP from CNOTs, CZ from one CNOT, and the W state.
+
 ### Benchmark
 
 [`docs/BENCHMARK.md`](docs/BENCHMARK.md): every example circuit, clean and with
@@ -280,8 +306,9 @@ results caught. Regenerate with `scripts/benchmark.py`.
 - Verification compares measurement statistics. It cannot see a pure phase error
   that does not change the outcome distribution, and it does not catch changes
   smaller than the threshold (e.g. an angle off by a few degrees). See D8.
-- Mid-circuit measurement and classical control are not supported; circuits are
-  capped at 12 qubits.
+- Mid-circuit measurement and classical control are not supported (the
+  teleportation example uses deferred measurement, which gives the same
+  statistics); circuits are capped at 12 qubits.
 - The code sandbox is a guard rail (AST check, subprocess, timeout, scrubbed
   environment), not an OS-level sandbox. Run untrusted model output on a machine
   you control.

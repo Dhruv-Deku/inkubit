@@ -271,3 +271,44 @@ Portuguese, Japanese, Chinese, Arabic, Bengali, Tamil, Indonesian). Live, Muse
 Spark writes the explanation in that language and keeps numbers, qubit names
 and bitstrings untouched. Offline templates exist only in English, so an offline
 run shows the English text with a note saying so, rather than pretending.
+
+## D24. Challenge mode
+Eleven puzzles (`backend/qcanvas/challenges.py`), each defined by a reference
+circuit that never leaves the server. State puzzles compare |<target|psi>|^2;
+gate puzzles compare the process fidelity |Tr(U_t^dagger U)|^2 / d^2, so global
+phase never counts and any correct construction is accepted. Solved means at
+least 0.999. Stars are golf-like (solved; within par + 2; at or under par) so a
+long-winded answer is still rewarded, and each reference solution is tested to
+reach exactly par. Allowed-gate lists turn gate identities (HZH = X, three
+CNOTs = SWAP, H CX H = CZ) into puzzles. Feedback distinguishes "right odds,
+wrong phase" from low overlap, and gate puzzles count correctly mapped basis
+inputs. Hints: offline, the author's hints in order; live, Muse Spark gets the
+goal, the player's circuit, the exact score and the author's hint for that
+stage, never the solution, and is told to name at most one gate. Progress is
+kept in localStorage: per-viewer, nothing to lose. A challenge stays active
+while the player photographs or describes an answer, so a paper solution is
+scored the moment it reaches the editor.
+
+## D25. Click-to-compose and the live state
+The editor's palette adds a gate by clicking wires (controls first, the target
+last; a ghost shows where it will land, at the column the layout will really
+give it). Erase removes a clicked gate; Undo covers palette edits. Every valid
+edit calls `POST /api/state`, which returns each step's exact ideal state
+(tens of milliseconds for small circuits), shown as Bloch spheres with each
+qubit's path through the circuit plus the amplitudes. The spheres are drawn in
+3D (SVG projection, front and back halves of each great circle drawn
+differently) and share one camera, so turning one turns all and they stay
+comparable.
+
+## D26. What-if slider and network map
+The hardware sweep panel has a slider over the same noise scaling as the sweep
+(0 = perfect, then 0.01x to 10x on a log scale); each position asks
+`/api/state` for the exact noisy distribution, so the histogram is exact, not
+interpolated between sweep points, and a line on the sweep chart tracks the
+slider. The network map draws the path with satellites above the ground line,
+link width on a log scale of pairs per second, free-space links dashed, and gold
+dots for entangled photons flying from each pair source (the satellite, or mid-
+span on fiber). Dots are a picture of the rate, not a simulation of photons;
+the numbers next to them are the model's. Motion is off under
+prefers-reduced-motion. The weakest link is drawn brighter, not yellow, so it is
+never confused with gold, which stays reserved for entanglement.

@@ -1,47 +1,13 @@
 import { useEffect, useState } from 'react'
-import type { CircuitInsights, CircuitSpec, Entanglement, ErrorBudget, Mitigation, NoiseSweep, StepState } from '../types'
+import { api } from '../api'
+import type { CircuitInsights, CircuitSpec, Entanglement, ErrorBudget, LiveState, Mitigation, NoiseSweep, StepState } from '../types'
 import { downloadText, pct } from '../util'
+import { BlochSphere } from './Bloch'
 import { CircuitPreview } from './CircuitPreview'
+import { Histogram } from './Histogram'
+import { AmplitudeTable } from './LiveState'
 
-/** Phase in units of pi, e.g. "π/2", "-π/4", "0". */
-function phaseText(phase: number): string {
-  const k = phase / Math.PI
-  if (Math.abs(k) < 1e-3) return '0'
-  for (const d of [1, 2, 4, 8, 3, 6]) {
-    const n = Math.round(k * d)
-    if (Math.abs(k * d - n) < 1e-3) return `${n < 0 ? '-' : ''}${Math.abs(n) === 1 ? '' : Math.abs(n)}π${d === 1 ? '' : `/${d}`}`
-  }
-  return `${k.toFixed(2)}π`
-}
-
-/** One qubit's Bloch sphere, drawn in a fixed oblique view; a shorter arrow means it is entangled or noisy. */
-export function BlochSphere({ vec, entangled, label, size = 104 }: {
-  vec: [number, number, number]; entangled: boolean; label: string; size?: number
-}) {
-  const c = size / 2, r = size * 0.36
-  const [x, y, z] = vec
-  const px = c + r * 0.94 * (y - 0.36 * x)
-  const py = c + r * (-0.94 * z + 0.24 * x)
-  const len = Math.hypot(x, y, z)
-  const ink = entangled ? 'var(--gold)' : 'var(--primary)'
-  return (
-    <figure className="bloch" style={{ margin: 0 }}>
-      <svg width={size} height={size} role="img" aria-label={`${label} Bloch vector x ${x.toFixed(2)}, y ${y.toFixed(2)}, z ${z.toFixed(2)}`}>
-        <circle cx={c} cy={c} r={r} fill="var(--panel-2)" stroke="var(--line-2)" />
-        <ellipse cx={c} cy={c} rx={r} ry={r * 0.3} fill="none" stroke="var(--line-2)" strokeDasharray="3 3" />
-        <line x1={c} x2={c} y1={c - r} y2={c + r} stroke="var(--line-2)" />
-        <text x={c} y={c - r - 4} textAnchor="middle" fontSize={10} fill="var(--muted)" fontFamily="var(--mono)">|0⟩</text>
-        <text x={c} y={c + r + 12} textAnchor="middle" fontSize={10} fill="var(--muted)" fontFamily="var(--mono)">|1⟩</text>
-        {len > 0.02 && <line x1={c} y1={c} x2={px} y2={py} stroke={ink} strokeWidth={2.4} strokeLinecap="round" />}
-        <circle cx={len > 0.02 ? px : c} cy={len > 0.02 ? py : c} r={4.5} fill={ink} stroke="var(--panel)" strokeWidth={1.5} />
-      </svg>
-      <figcaption>
-        <span className="mono">{label}</span>
-        <span className={entangled ? 'gold' : 'muted'}>{entangled ? `entangled · ${len.toFixed(2)}` : len > 0.999 ? 'pure' : len.toFixed(2)}</span>
-      </figcaption>
-    </figure>
-  )
-}
+export { BlochSphere }
 
 function stepNote(s: StepState, prev?: StepState): string {
   const now = s.entangled.flatMap((e, q) => (e ? [q] : []))
@@ -83,32 +49,15 @@ export function StepInspector({ spec, steps }: { spec: CircuitSpec; steps: StepS
       <div className="inspector-grid">
         <div>
           <div className="label" style={{ marginBottom: 6 }}>Amplitudes <span className="muted">(phase relative to the largest)</span></div>
-          <table className="amps">
-            <tbody>
-              {s.amplitudes.map((a) => (
-                <tr key={a.basis}>
-                  <td className="mono">|{a.basis}⟩</td>
-                  <td style={{ width: '100%' }}>
-                    <div className="amp-track"><div className="amp-bar" style={{ width: `${Math.max(1.5, a.probability * 100)}%` }} /></div>
-                  </td>
-                  <td className="num">{pct(a.probability)}</td>
-                  <td className="num">
-                    <svg width={18} height={18} aria-hidden="true" style={{ verticalAlign: -4 }}>
-                      <circle cx={9} cy={9} r={7.5} fill="none" stroke="var(--line-2)" />
-                      <line x1={9} y1={9} x2={9 + 7 * Math.cos(a.phase)} y2={9 - 7 * Math.sin(a.phase)} stroke="var(--text)" strokeWidth={1.6} strokeLinecap="round" />
-                    </svg>
-                  </td>
-                  <td className="mono muted" style={{ whiteSpace: 'nowrap' }}>{phaseText(a.phase)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {s.hidden_probability > 1e-6 && <div className="sub">+ {pct(s.hidden_probability)} spread over smaller amplitudes</div>}
+          <AmplitudeTable amps={s.amplitudes} hidden={s.hidden_probability} />
         </div>
         <div>
-          <div className="label" style={{ marginBottom: 6 }}>Each qubit on its own</div>
+          <div className="label" style={{ marginBottom: 6 }}>Each qubit on its own <span className="muted">(drag to turn; the trail is its path so far)</span></div>
           <div className="spheres">
-            {Array.from({ length: n }, (_, q) => <BlochSphere key={q} vec={s.bloch[q]} entangled={s.entangled[q]} label={`q${q}`} />)}
+            {Array.from({ length: n }, (_, q) => (
+              <BlochSphere key={q} vec={s.bloch[q]} entangled={s.entangled[q]} label={`q${q}`} size={112}
+                trail={steps.slice(0, i + 1).map((t) => t.bloch[q])} />
+            ))}
           </div>
         </div>
       </div>
@@ -182,9 +131,53 @@ export function ErrorBudgetPanel({ budget }: { budget: ErrorBudget }) {
 
 const SW = 640, SH = 230, SP = { l: 46, r: 16, t: 14, b: 38 }
 
+/** Slider position 0..120 -> noise scale: 0 is perfect hardware, 80 is today, 120 is ten times worse. */
+const sliderScale = (k: number) => (k <= 0 ? 0 : Math.pow(10, (k - 80) / 40))
+function scaleText(s: number): string {
+  if (s === 0) return 'perfect hardware'
+  if (Math.abs(s - 1) < 0.02) return "today's noise"
+  return s < 1 ? `${Number((1 / s).toPrecision(2))}× better hardware` : `${Number(s.toPrecision(2))}× today's noise`
+}
+
+/** Drag the hardware quality and watch the outcome odds change (exact, from the spec). */
+function WhatIf({ spec, baseline, onScale }: { spec: CircuitSpec; baseline: string; onScale: (s: number | null) => void }) {
+  const [k, setK] = useState(80)
+  const [live, setLive] = useState<LiveState | null>(null)
+  const scale = sliderScale(k)
+  useEffect(() => {
+    const ctl = new AbortController()
+    const t = setTimeout(() => {
+      api.state(spec, baseline, scale, ctl.signal).then(setLive).catch(() => { /* superseded, or the backend is away */ })
+    }, 40)
+    return () => { clearTimeout(t); ctl.abort() }
+  }, [spec, baseline, scale])
+  useEffect(() => () => onScale(null), [])
+  const noisy = live?.noisy
+  return (
+    <div className="whatif">
+      <div className="row wrap" style={{ gap: 12 }}>
+        <span className="label">What if the hardware were better?</span>
+        <input type="range" min={0} max={120} value={k} aria-label="Noise level"
+          onChange={(e) => { const v = Number(e.target.value); setK(v); onScale(sliderScale(v)) }} style={{ flex: 1, minWidth: 180 }} />
+        <span className="mono whatif-scale">{scaleText(scale)}</span>
+      </div>
+      {noisy && live?.ideal && (
+        <>
+          <div className="row wrap" style={{ gap: 18, margin: '10px 0 4px' }}>
+            <span className="sub">Match to ideal <strong className="mono" style={{ color: noisy.fidelity >= 0.99 ? 'var(--pass)' : 'var(--text)' }}>{pct(noisy.fidelity, 2)}</strong></span>
+            {noisy.success !== null && <span className="sub">Right answer <strong className="mono">{pct(noisy.success, 1)}</strong></span>}
+          </div>
+          <Histogram predicted={noisy.distribution} ideal={live.ideal} predictedLabel={`Exact odds with ${scaleText(scale)}`} />
+        </>
+      )}
+    </div>
+  )
+}
+
 /** Match to the ideal as hardware noise is scaled down or up from today's preset. */
-export function SweepChart({ sweep }: { sweep: NoiseSweep }) {
+export function SweepChart({ sweep, spec }: { sweep: NoiseSweep; spec?: CircuitSpec }) {
   const [tip, setTip] = useState<number | null>(null)
+  const [probe, setProbe] = useState<number | null>(null)
   const pts = sweep.points
   const lo = Math.max(0, Math.floor((Math.min(sweep.target, ...pts.map((p) => p.fidelity)) - 0.02) * 20) / 20)
   const xs = (k: number) => SP.l + (k / (pts.length - 1)) * (SW - SP.l - SP.r)
@@ -230,6 +223,9 @@ export function SweepChart({ sweep }: { sweep: NoiseSweep }) {
               <text x={xScale(hit)} y={SH - SP.b - 6} textAnchor="middle" fontSize={11} fill="var(--pass)">{Number(hit.toPrecision(2))}×</text>
             </g>
           )}
+          {probe !== null && probe <= pts[pts.length - 1].scale && (
+            <line x1={xScale(probe)} x2={xScale(probe)} y1={SP.t} y2={SH - SP.b} stroke="var(--text)" strokeWidth={1.2} />
+          )}
           <path d={path} fill="none" stroke="var(--primary)" strokeWidth={2} />
           {pts.map((p, k) => (
             <g key={p.scale} onMouseEnter={() => setTip(k)} onMouseLeave={() => setTip(null)}>
@@ -248,6 +244,7 @@ export function SweepChart({ sweep }: { sweep: NoiseSweep }) {
           </div>
         )}
       </div>
+      {spec && <WhatIf spec={spec} baseline={sweep.baseline} onScale={setProbe} />}
     </div>
   )
 }
@@ -313,7 +310,7 @@ export function InsightsSection({ spec, ins, wide = false }: { spec: CircuitSpec
         {ins.entanglement && <EntanglementPanel ent={ins.entanglement} />}
         {ins.budget && <ErrorBudgetPanel budget={ins.budget} />}
       </div>
-      {ins.sweep && <SweepChart sweep={ins.sweep} />}
+      {ins.sweep && <SweepChart sweep={ins.sweep} spec={spec} />}
       <LayoutsPanel ins={ins} />
       {ins.mitigation && <ReadoutPanel m={ins.mitigation} />}
       {ins.notes.map((t, k) => <div key={k} className="notice">{t}</div>)}

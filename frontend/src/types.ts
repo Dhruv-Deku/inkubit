@@ -346,3 +346,42 @@ export interface RunOptions {
   diagram: boolean
   language: string
 }
+
+export interface LiveState {
+  steps: StepState[]
+  ideal: Record<string, number> | null
+  noisy: { scale: number; baseline: string; distribution: Record<string, number>; fidelity: number; success: number | null } | null
+}
+
+export interface ChallengeInfo {
+  id: string
+  level: number
+  level_name: string
+  title: string
+  goal: string
+  kind: 'state' | 'gate'
+  num_qubits: number
+  par: number
+  allowed: Gate[] | null
+  hint_count: number
+  target_text: string
+  target: Amplitude[] | null
+  target_bloch: [number, number, number][] | null
+  table: { input: string; output: string }[] | null
+  starter: CircuitSpec
+}
+
+export interface ChallengeCheck {
+  solved: boolean
+  fidelity: number
+  gates: number
+  par: number
+  stars: number
+  message: string
+  illegal: string[]
+  state: Amplitude[] | null
+  bloch: [number, number, number][] | null
+  rows_right: number | null
+  noisy_fidelity: number | null
+  lesson: string | null
+}

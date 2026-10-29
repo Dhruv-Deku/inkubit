@@ -379,6 +379,36 @@ async def words_story(d: Director) -> None:
     await d.wait(7.5)
 
 
+async def challenge_story(d: Director) -> None:
+    page, live = d.page, d.live
+    await d.caption(None)
+    await d.scroll_top()
+    await d.click(page.locator("nav.steps button >> nth=0"))
+    await d.wait(0.5)
+    board = page.locator(".panel", has=page.locator("h2", has_text="Challenges"))
+    await d.scroll_to(board, block="center", pause=0.4)
+    await d.caption(models_or(live, "Or learn by playing: puzzles scored exactly against a hidden answer. "
+                                    "**Muse Spark** gives hints, never the solution.",
+                              "Or learn by playing: puzzles scored exactly against a hidden answer, with par like golf."))
+    await d.wait(1.2)
+    await d.click(board.locator(".challenge-card", has_text="Bell pair"))
+    await page.wait_for_selector(".check-msg", timeout=60_000)
+    await d.wait(1.4)
+    await d.scroll_to(page.locator(".palette"), block="start", pause=0.4)
+    await d.caption("Pick a gate, click a wire. The live state and the score update on every click.")
+    for gate, wires in (("H", [0]), ("CX", [0, 1])):
+        await d.click(page.locator(f".gate-btn:text-is('{gate}')"))
+        for q in wires:
+            await d.move(page.locator(f".preview rect[aria-label='Add to q{q}']"), fx=0.18)
+            await d.wait(0.5)
+            await page.mouse.click(d.x, d.y)
+            await d.wait(0.6)
+    await page.wait_for_selector(".solved-box", timeout=30_000)
+    await d.wait(1.0)
+    await d.caption("Solved at par: three stars, what it teaches, and how much survives real noise.")
+    await d.scroll_to(page.locator(".panel.challenge"), block="start", pause=4.2)
+
+
 async def network_story(d: Director) -> None:
     page, live = d.page, d.live
     await d.caption(None)
@@ -397,8 +427,13 @@ async def network_story(d: Director) -> None:
     await d.caption("Then it finds the bottleneck, tries real fixes, re-simulates each one and keeps the best.")
     await page.wait_for_selector(".verdict-badge", timeout=240_000)
     await d.wait(1.8)
-    await d.caption("Before and after, from the same physics model.")
-    await d.wait(4)
+    await d.caption("Before and after, from the same physics model: entangled pairs in flight, thicker links deliver more.")
+    netmap = page.locator(".panel", has=page.locator("h2", has_text="Network map"))
+    await d.scroll_to(netmap, block="center", pause=2.4)
+    await d.click(netmap.locator("button", has_text="Before"))
+    await d.wait(2.2)
+    await d.click(netmap.locator("button", has_text="After the fix"))
+    await d.wait(2.4)
     await d.caption("Every candidate fix, with its re-simulated rates.")
     await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="Fixes the agent tried")), block="center", pause=4)
     checks = page.locator(".panel", has=page.locator("h2", has_text="Sanity checks"))
@@ -444,6 +479,7 @@ async def record(base: str, out: Path) -> None:
             await d.hide_card()
             await circuit_story(d)
             await words_story(d)
+            await challenge_story(d)
             await network_story(d)
             await d.card("Q-Canvas", "From a pencil sketch to a verified quantum simulation.", chips,
                          "Every result checked. Every model answer labelled.", hold=4.5)

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ApiError, api, followJob } from './api'
 import { AgentLog } from './components/AgentLog'
 import { CallBadge } from './components/CallBadge'
+import { ChallengeList, ChallengePanel, loadProgress, saveProgress, type Progress } from './components/Challenge'
 import { Histogram } from './components/Histogram'
 import { Logo } from './components/Icons'
 import { OverlayView } from './components/OverlayView'
@@ -10,10 +11,10 @@ import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
 import type {
-  AgentEvent, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, JobSummary, ModelCall, NetworkResult,
-  RecentRun, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
+  AgentEvent, ChallengeInfo, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, JobSummary, ModelCall,
+  NetworkResult, NetworkSpec, RecentRun, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
 } from './types'
-import { decodeSpec, encodeSpec, specTitle } from './util'
+import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 
 type Stage = 'start' | 'edit' | 'run'
 
@@ -74,6 +75,26 @@ export default function App() {
   const [shared, setShared] = useState<string | null>(null)
   const [recent, setRecent] = useState<RecentRun[]>([])
   const [preview, setPreview] = useState<{ ins: CircuitInsights | null; loading: boolean; error: string | null } | null>(null)
+  const [challenges, setChallenges] = useState<ChallengeInfo[]>([])
+  const [challenge, setChallenge] = useState<ChallengeInfo | null>(null)
+  const [progress, setProgress] = useState<Progress>(loadProgress)
+
+  const startChallenge = (c: ChallengeInfo) => {
+    stopRef.current?.()
+    setSketch(null)
+    setFromText(null)
+    setChallenge(c)
+    setSpec(clone(c.starter))
+    setStage('edit')
+    window.scrollTo({ top: 0 })
+  }
+  const score = (id: string, stars: number) => setProgress((p) => {
+    if ((p[id] ?? 0) >= stars) return p
+    const next = { ...p, [id]: stars }
+    saveProgress(next)
+    return next
+  })
+  const nextChallenge = challenge ? challenges[challenges.findIndex((c) => c.id === challenge.id) + 1] : undefined
 
   useEffect(() => { setPreview(null) }, [spec, options.noise])
 
@@ -92,6 +113,7 @@ export default function App() {
     Promise.all([api.health(), api.examples()])
       .then(([h, ex]) => { setHealth(h); setExamples(ex) })
       .catch((e: Error) => setBackendError(e.message))
+    api.challenges().then((r) => setChallenges(r.challenges)).catch(() => { /* the board just stays hidden */ })
     // a share link carries the whole spec in the URL hash
     const m = window.location.hash.match(/^#s=(.+)$/)
     if (m) {
@@ -145,6 +167,7 @@ export default function App() {
   const onSpec = (s: Spec) => {
     setSketch(null)
     setFromText(null)
+    setChallenge(null)
     setSpec(s)
     setStage('edit')
   }
@@ -192,6 +215,7 @@ export default function App() {
       const s = await api.job(jobId)
       setSketch(null)
       setFromText(null)
+      setChallenge(null)
       setSpec(s.spec)
       setJob({ id: jobId, spec: s.spec, events: [], live: s.status === 'running' || s.status === 'queued',
                status: s.status, error: s.error, result: s.result })
@@ -249,12 +273,29 @@ export default function App() {
       {backendError && <div className="notice error" style={{ marginBottom: 16 }}>{backendError} Start it with <code>scripts/dev.sh</code>.</div>}
 
       {stage === 'start' && (
-        <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
-          live={health?.mode === 'meta'} recent={recent} onOpen={openJob} />
+        <>
+          {challenge && (
+            <div className="notice row wrap" style={{ gap: 10, marginBottom: 16 }}>
+              <span>Challenge in progress: <strong>{challenge.title}</strong>. Draw your answer on paper and photograph it,
+                or describe it in words: the result is scored as soon as it reaches the editor.</span>
+              <span className="spacer" />
+              <button className="btn small" onClick={() => setStage('edit')} disabled={!spec}>Back to the challenge</button>
+            </div>
+          )}
+          <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
+            live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
+            extra={<ChallengeList list={challenges} progress={progress} onStart={startChallenge} />} />
+        </>
       )}
 
       {stage === 'edit' && spec && (
         <div className="stack">
+          {challenge && (
+            <ChallengePanel ch={challenge} spec={spec.kind === 'circuit' ? spec : null} best={progress[challenge.id] ?? 0}
+              onScore={(n) => score(challenge.id, n)} hasNext={!!nextChallenge}
+              onNext={() => nextChallenge && startChallenge(nextChallenge)}
+              onExit={() => { setChallenge(null); setStage('start') }} />
+          )}
           {fromText && (
             <div className="notice row wrap" style={{ gap: 8 }}>
               <span>Built from your words: <em>“{fromText.text}”</em></span><CallBadge call={fromText.call} />
@@ -278,7 +319,8 @@ export default function App() {
                 )}
               </div>
             )}
-            <SpecEditor spec={spec} issues={issues} highlight={highlight} onPick={setHighlight} onChange={setSpec} />
+            <SpecEditor spec={spec} issues={issues} highlight={highlight} onPick={setHighlight} onChange={setSpec}
+              allowed={challenge?.allowed} valid={issues.length === 0 && !checking} />
           </div>
           <div className="panel run-bar">
             {spec.kind === 'circuit' && (
@@ -347,7 +389,9 @@ export default function App() {
             {job.error && <div className="notice error" style={{ marginBottom: 12 }}>{job.error}</div>}
             {!job.result && <LivePreview events={job.events} live={job.live} />}
             {job.result && 'verified' in job.result && <CircuitResults result={job.result} sketchCalls={sketchCalls} spec={job.spec as CircuitSpec} jobId={job.id} />}
-            {job.result && 'before' in job.result && <NetworkResults result={job.result} sketchCalls={sketchCalls} jobId={job.id} />}
+            {job.result && 'before' in job.result && (
+              <NetworkResults result={job.result} sketchCalls={sketchCalls} jobId={job.id} spec={job.spec as NetworkSpec} />
+            )}
           </div>
         </div>
       )}

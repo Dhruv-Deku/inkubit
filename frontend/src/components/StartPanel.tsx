@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import type { Examples, RecentRun, Spec } from '../types'
 import { CameraCapture } from './CameraCapture'
 import { Upload } from './Icons'
@@ -16,9 +16,15 @@ interface Props {
   live: boolean
   recent: RecentRun[]
   onOpen: (id: string) => void
+  extra?: ReactNode  // the challenge board
 }
 
-export function StartPanel({ examples, busy, error, onImage, onSpec, onText, live, recent, onOpen }: Props) {
+const BLANK: Spec = {
+  kind: 'circuit', version: '1.0', num_qubits: 2, num_clbits: 2, operations: [],
+  measurements: [{ qubit: 0, clbit: 0 }, { qubit: 1, clbit: 1 }], metadata: { title: 'My circuit', origin: 'manual' },
+}
+
+export function StartPanel({ examples, busy, error, onImage, onSpec, onText, live, recent, onOpen, extra }: Props) {
   const input = useRef<HTMLInputElement>(null)
   const [camera, setCamera] = useState(false)
   const [words, setWords] = useState('')
@@ -133,9 +139,14 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
         </div>
       </div>
 
+      {extra}
       <div className="hero">
         <div className="panel">
-          <div className="panel-head"><h2>Start from a spec</h2></div>
+          <div className="panel-head"><h2>Start from a spec</h2><span className="spacer" />
+            <button className="btn small primary" onClick={() => onSpec(BLANK)} title="An empty two-qubit circuit: pick gates from the palette and click wires">
+              Blank circuit
+            </button>
+          </div>
           {[...new Set(examples?.specs.map((s) => s.group) ?? [])].map((g) => (
             <div key={g} style={{ marginBottom: 12 }}>
               <div className="label" style={{ marginBottom: 6 }}>{g}</div>

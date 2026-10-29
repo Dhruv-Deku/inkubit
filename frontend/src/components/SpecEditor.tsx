@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CircuitSpec, Gate, NetLink, NetNode, NetworkSpec, Operation, Spec, SpecIssue } from '../types'
 import { GATE_LABEL, GATES } from '../types'
 import { angleText, clone, parseAngle, parseIntList, resizeCircuit } from '../util'
-import { CircuitPreview } from './CircuitPreview'
+import { CircuitPreview, SHORT, wiresFor, type Compose } from './CircuitPreview'
 import { Down, Trash, Up } from './Icons'
+import { LiveStrip } from './LiveState'
 
 interface Props {
   spec: Spec
@@ -11,9 +12,11 @@ interface Props {
   highlight: string | null
   onPick: (key: string | null) => void
   onChange: (spec: Spec) => void
+  allowed?: Gate[] | null  // a challenge may restrict the palette
+  valid?: boolean
 }
 
-export function SpecEditor({ spec, issues, highlight, onPick, onChange }: Props) {
+export function SpecEditor({ spec, issues, highlight, onPick, onChange, allowed, valid = true }: Props) {
   const [mode, setMode] = useState<'form' | 'json'>('form')
   return (
     <div className="panel">
@@ -28,7 +31,7 @@ export function SpecEditor({ spec, issues, highlight, onPick, onChange }: Props)
       </div>
       {mode === 'json' ? <JsonEditor spec={spec} onChange={onChange} />
         : spec.kind === 'circuit'
-          ? <CircuitForm spec={spec} highlight={highlight} onPick={onPick} onChange={onChange} />
+          ? <CircuitForm spec={spec} highlight={highlight} onPick={onPick} onChange={onChange} allowed={allowed} valid={valid} />
           : <NetworkForm spec={spec} highlight={highlight} onPick={onPick} onChange={onChange} />}
       {issues.length > 0 && (
         <div className="notice error" style={{ marginTop: 14 }}>
@@ -73,9 +76,72 @@ function JsonEditor({ spec, onChange }: { spec: Spec; onChange: (s: Spec) => voi
 const needsControl = (g: Gate) => g === 'CX' || g === 'CZ' || g === 'CP' || g === 'CCX'
 const needsAngle = (g: Gate) => g === 'RX' || g === 'RY' || g === 'RZ' || g === 'CP'
 
-function CircuitForm({ spec, highlight, onPick, onChange }: {
+const PALETTE: Gate[] = ['H', 'X', 'Y', 'Z', 'S', 'T', 'SDG', 'TDG', 'SX', 'RX', 'RY', 'RZ', 'CX', 'CZ', 'CP', 'SWAP', 'CCX']
+const PALETTE_TIP: Partial<Record<Gate, string>> = {
+  H: 'Hadamard: |0⟩ → equal superposition', X: 'NOT: swaps |0⟩ and |1⟩', Y: 'Y: bit and phase flip', Z: 'Z: minus sign on |1⟩',
+  S: 'S: phase i on |1⟩ (quarter turn)', T: 'T: phase e^(iπ/4) on |1⟩', SDG: 'S†: undoes S', TDG: 'T†: undoes T', SX: '√X: half a NOT',
+  RX: 'Rotate about x (π/2; edit the angle below)', RY: 'Rotate about y (π/2; edit the angle below)', RZ: 'Rotate about z (π/2; edit the angle below)',
+  CX: 'CNOT: click the control, then the target', CZ: 'CZ: click two qubits', CP: 'Controlled phase: control, then target',
+  SWAP: 'SWAP: click two qubits', CCX: 'Toffoli: two controls, then the target',
+}
+
+/** What the next click does, in words. */
+function composeHint(tool: Gate | 'ERASE' | null, picked: number): string {
+  if (!tool) return 'Pick a gate, then click a wire to add it. Or edit the table below.'
+  if (tool === 'ERASE') return 'Click a gate in the drawing to remove it.'
+  const need = wiresFor(tool)
+  const name = SHORT[tool] ?? tool
+  if (need === 1) return `Click a wire to add ${name}.`
+  if (tool === 'SWAP') return picked ? 'Now click the second qubit.' : 'Click the first qubit to swap.'
+  if (picked === need - 1) return `Now click the target of the ${name}.`
+  return tool === 'CCX' && picked === 1 ? 'Click the second control.' : 'Click the control qubit.'
+}
+
+function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid }: {
   spec: CircuitSpec; highlight: string | null; onPick: (k: string | null) => void; onChange: (s: Spec) => void
+  allowed?: Gate[] | null; valid: boolean
 }) {
+  const [tool, setTool] = useState<Gate | 'ERASE' | null>(null)
+  const [pending, setPending] = useState<number[]>([])
+  const undo = useRef<CircuitSpec[]>([])
+  const [, bump] = useState(0)
+  const palette = allowed?.length ? PALETTE.filter((g) => allowed.includes(g)) : PALETTE
+  useEffect(() => { setPending([]) }, [tool, spec.num_qubits])
+  useEffect(() => {
+    if (!tool) return
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { setTool(null); setPending([]) } }
+    window.addEventListener('keydown', esc)
+    return () => window.removeEventListener('keydown', esc)
+  }, [tool])
+  const commit = (next: CircuitSpec) => {
+    undo.current = [...undo.current.slice(-49), spec]
+    bump((k) => k + 1)
+    onChange(next)
+  }
+  const compose: Compose = {
+    tool, pending,
+    onWire: (q) => {
+      if (!tool || tool === 'ERASE') return
+      if (pending.includes(q)) { setPending(pending.filter((p) => p !== q)); return }
+      const picked = [...pending, q]
+      const need = wiresFor(tool)
+      if (picked.length < need) { setPending(picked); return }
+      const params = needsAngle(tool) ? [Math.PI / 2] : []
+      const op: Operation = tool === 'SWAP' ? { gate: 'SWAP', targets: picked, controls: [], params }
+        : need > 1 ? { gate: tool, controls: picked.slice(0, -1), targets: [picked[picked.length - 1]], params }
+          : { gate: tool, targets: [q], controls: [], params }
+      const next = clone(spec)
+      next.operations.push(op)
+      setPending([])
+      commit(next)
+    },
+    onGate: (i) => {
+      if (tool !== 'ERASE') return
+      const next = clone(spec)
+      next.operations.splice(i, 1)
+      commit(next)
+    },
+  }
   const update = (fn: (s: CircuitSpec) => void) => { const s = clone(spec); fn(s); onChange(s) }
   const setOp = (i: number, patch: Partial<Operation>) => update((s) => { s.operations[i] = { ...s.operations[i], ...patch } })
   const move = (i: number, d: number) => update((s) => {
@@ -111,7 +177,22 @@ function CircuitForm({ spec, highlight, onPick, onChange }: {
         <input type="number" min={1} max={12} style={{ width: 64 }} value={spec.num_qubits}
           onChange={(e) => onChange(resizeCircuit(spec, Math.max(1, Math.min(12, Number(e.target.value) || 1))))} />
       </div>
-      <CircuitPreview spec={spec} highlight={highlight} onPick={onPick} />
+      <div className="palette" role="toolbar" aria-label="Gate palette">
+        {palette.map((g) => (
+          <button key={g} className={`gate-btn ${tool === g ? 'on' : ''} ${wiresFor(g) > 1 ? 'multi' : ''}`} title={PALETTE_TIP[g]}
+            onClick={() => setTool(tool === g ? null : g)} disabled={wiresFor(g) > spec.num_qubits}>{SHORT[g] ?? g}</button>
+        ))}
+        <span className="palette-sep" />
+        <button className={`gate-btn ${tool === 'ERASE' ? 'on erase' : ''}`} title="Remove gates by clicking them"
+          onClick={() => setTool(tool === 'ERASE' ? null : 'ERASE')} disabled={!spec.operations.length}>Erase</button>
+        <button className="gate-btn" title="Undo the last palette change" disabled={!undo.current.length}
+          onClick={() => { const prev = undo.current.pop(); bump((k) => k + 1); if (prev) onChange(prev) }}>Undo</button>
+        <button className="gate-btn" title="Remove every gate" disabled={!spec.operations.length}
+          onClick={() => { const next = clone(spec); next.operations = []; commit(next) }}>Clear</button>
+      </div>
+      <div className="compose-hint sub">{composeHint(tool, pending.length)}{tool && <span className="muted"> · Esc to stop</span>}</div>
+      <CircuitPreview spec={spec} highlight={highlight} onPick={onPick} compose={compose} />
+      <LiveStrip spec={spec} valid={valid} />
       <table className="ops" style={{ marginTop: 12 }} onMouseLeave={() => onPick(null)}>
         <thead>
           <tr><th>#</th><th>Gate</th><th>Target</th><th>Control</th><th>Angle</th><th>From sketch</th><th /></tr>

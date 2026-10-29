@@ -85,6 +85,9 @@ def main() -> None:
         page.wait_for_timeout(500)
         panel("Inside the circuit").screenshot(path=str(OUT / "6-inspector-entangled.png"))
         panel("How good must the hardware be").screenshot(path=str(OUT / "7-hardware.png"))
+        panel("How good must the hardware be").locator(".whatif input[type=range]").fill("48")
+        page.wait_for_timeout(700)
+        panel("How good must the hardware be").screenshot(path=str(OUT / "13-whatif.png"))
         panel("Error budget").screenshot(path=str(OUT / "7-budget.png"))
         panel("On real chip layouts").screenshot(path=str(OUT / "7-layouts.png"))
         page.click(".chip-btn:has-text('Why did the first attempt fail?')")
@@ -104,6 +107,24 @@ def main() -> None:
         page.wait_for_timeout(600)
         page.screenshot(path=str(OUT / "9-describe.png"))
 
+        # a challenge solved with the click-to-compose palette
+        page.click("nav.steps button >> nth=0")
+        page.click(".challenge-card:has-text('Bell pair')")
+        page.wait_for_selector(".check-msg")
+        page.click(".gate-btn:text-is('H')")
+        page.click(".preview rect[aria-label='Add to q0']")
+        page.click(".gate-btn:text-is('CX')")
+        page.click(".preview rect[aria-label='Add to q0']")
+        panel("Spec").evaluate("el => el.scrollIntoView({block: 'start'})")
+        box = page.locator(".preview rect[aria-label='Add to q1']").bounding_box()
+        page.mouse.move(box["x"] + 120, box["y"] + box["height"] / 2)
+        page.wait_for_timeout(400)
+        panel("Spec").screenshot(path=str(OUT / "11-compose.png"))
+        page.click(".preview rect[aria-label='Add to q1']")
+        page.wait_for_selector(".solved-box")
+        page.wait_for_timeout(1200)
+        page.locator(".panel.challenge").screenshot(path=str(OUT / "10-challenge.png"))
+
         # network: preset A from the spec list
         page.click("nav.steps button >> nth=0")
         page.click("text=Preset A: satellite link")
@@ -112,6 +133,7 @@ def main() -> None:
         page.wait_for_selector(".verdict-badge", timeout=120000)
         page.wait_for_timeout(800)
         page.screenshot(path=str(OUT / "5-network.png"), full_page=True)
+        panel("Network map").screenshot(path=str(OUT / "12-network-map.png"))
         browser.close()
         if errors:
             print("console errors:", *errors, sep="\n  ")

@@ -1,5 +1,6 @@
 import type {
-  AgentEvent, CircuitInsights, Examples, Explanation, Health, JobSummary, RunOptions, SketchAnalysis, Spec, SpecIssue, TextDraft,
+  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, RunOptions,
+  SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
 export class ApiError extends Error {
@@ -55,6 +56,12 @@ export const api = {
   ask: (jobId: string, question: string) => call<Explanation>(`/api/jobs/${jobId}/ask`, json({ question })),
   fromText: (text: string) => call<TextDraft>('/api/jobs/text', json({ text })),
   insights: (spec: Spec, noise: string) => call<CircuitInsights>('/api/insights', json({ spec, noise })),
+  state: (spec: Spec, noise: string, scale?: number, signal?: AbortSignal) =>
+    call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
+  challenges: () => call<{ levels: Record<string, string>; challenges: ChallengeInfo[] }>('/api/challenges'),
+  checkChallenge: (id: string, spec: Spec, signal?: AbortSignal) =>
+    call<ChallengeCheck>(`/api/challenges/${id}/check`, { ...json({ spec }), signal }),
+  hint: (id: string, spec: Spec, number: number) => call<Explanation>(`/api/challenges/${id}/hint`, json({ spec, number })),
 }
 
 /** Follow a job's live log. Returns a function that stops listening. */
