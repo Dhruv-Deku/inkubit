@@ -39,7 +39,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 1. Put the Meta key in `.env`: `META_API_KEY=LLM_...` and `QCANVAS_MODEL_PROVIDER=meta`. Then run `cd backend && ../.venv/Scripts/python -m pytest -m live -q` (three tiny calls, < $0.02).
 2. Try one real phone photo of a hand-drawn circuit in live mode; check SAM finds the parts (concept phrases are chosen by Muse Spark).
 3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/q-canvas-demo.mp4`; optionally add a voice-over.
-4. Create the GitHub repo (private until submission?) and push; fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
+4. Repo is pushed to https://github.com/Dhruv-Deku/q-canvas (**private**): make it public before submitting (`gh repo edit Dhruv-Deku/q-canvas --visibility public --accept-visibility-change-consequences`), then fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
 ## Top 5 next steps
