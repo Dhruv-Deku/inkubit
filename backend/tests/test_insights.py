@@ -1,4 +1,4 @@
-"""Circuit insights: step states, entanglement, error budget, noise sweep, readout correction, exports."""
+"""Circuit insights: step states, entanglement, error budget, noise sweep, readout correction, ZNE, exports."""
 
 from __future__ import annotations
 
@@ -7,17 +7,26 @@ import math
 import numpy as np
 import pytest
 from qiskit import qasm2
-from qiskit.quantum_info import SuperOp
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import DensityMatrix, Operator, SuperOp, concurrence, random_density_matrix
 
 from qcanvas.insights.circuit import (
     TARGET_FIDELITY,
+    ZNE_SCALES,
+    _concurrence,
     analyze_circuit,
     correct_readout,
+    fold,
     gate_channels,
+    inverse_operation,
     noisy_distribution,
+    richardson,
     scaled_preset,
     step_states,
+    zero_noise,
 )
+from qcanvas.spec.models import Operation
+from qcanvas.verify.expected import append_operation
 from qcanvas.sim.noise import gate_errors, get_preset
 from qcanvas.spec import parse_spec
 from qcanvas.verify.expected import apply_readout_error, ideal_distribution
@@ -119,3 +128,66 @@ def test_analysis_is_fast_enough_for_every_example(example):
         analyze_circuit(parse_spec(example(name)), "realistic")
         assert time.perf_counter() - start < 5, name
     assert math.isfinite(start)
+
+
+def test_concurrence_matches_qiskit():
+    for seed in range(20):
+        rho = random_density_matrix(4, seed=seed)
+        assert _concurrence(rho.data) == pytest.approx(float(concurrence(rho)), abs=1e-9)
+    bell = DensityMatrix.from_label("00").evolve(QuantumCircuit(2).compose(_bell_qc()))
+    assert _concurrence(bell.data) == pytest.approx(1.0)
+
+
+def _bell_qc():
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    return qc
+
+
+def test_entanglement_web_tells_pairs_from_group_entanglement(example):
+    bell = step_states(parse_spec(example("bell")))
+    assert bell[0].links == [] and bell[-1].links == [[0, 1, pytest.approx(1.0)]]
+    assert bell[-1].entropy == pytest.approx([1.0, 1.0])
+    ghz = step_states(parse_spec(example("ghz3")))[-1]
+    assert ghz.links == [] and ghz.entropy == pytest.approx([1.0, 1.0, 1.0])  # the whole group, no pair alone
+    w = step_states(parse_spec(example("w_state")))[-1]
+    assert [c for _, _, c in w.links] == pytest.approx([2 / 3] * 3, abs=1e-4)  # W keeps pairwise entanglement
+
+
+@pytest.mark.parametrize("gate,params,qs", [
+    ("H", [], ([0], [])), ("S", [], ([0], [])), ("T", [], ([0], [])), ("SX", [], ([0], [])),
+    ("RX", [0.3], ([0], [])), ("RZ", [1.1], ([0], [])), ("CP", [0.7], ([1], [0])), ("CX", [], ([1], [0])),
+    ("SWAP", [], ([0, 1], [])), ("CCX", [], ([2], [0, 1])),
+])
+def test_every_gate_has_an_inverse(gate, params, qs):
+    op = Operation(gate=gate, targets=qs[0], controls=qs[1], params=params)
+    qc = QuantumCircuit(3)
+    append_operation(qc, op)
+    append_operation(qc, inverse_operation(op))
+    u = Operator(qc).data
+    assert abs(np.trace(u)) / 8 == pytest.approx(1.0)  # identity up to a global phase
+
+
+def test_folding_keeps_the_ideal_result_and_multiplies_the_gates(example):
+    spec = parse_spec(example("ghz3"))
+    for s in ZNE_SCALES:
+        folded = fold(spec, s)
+        gates = [op for op in folded.operations if op.gate != "MEASURE"]
+        assert len(gates) == s * 3
+        assert ideal_distribution(folded) == pytest.approx(ideal_distribution(spec))
+    assert richardson((1, 3, 5)) == pytest.approx([15 / 8, -5 / 4, 3 / 8])
+    assert sum(richardson((1, 2, 4, 8))) == pytest.approx(1.0)
+
+
+def test_zero_noise_extrapolation_recovers_most_of_the_ideal(example):
+    spec = parse_spec(example("phase_estimation"))
+    ideal = ideal_distribution(spec)
+    z = zero_noise(spec, get_preset("realistic"), ideal)
+    assert z is not None
+    assert z.fidelity_raw < z.fidelity_readout < z.fidelity_mitigated
+    assert z.fidelity_mitigated > 0.99 and z.fidelity_at[0] > z.fidelity_at[1] > z.fidelity_at[2]
+    assert z.shot_overhead == pytest.approx(sum(c * c for c in richardson(ZNE_SCALES)), abs=1e-4)
+    assert z.shots == 4000 and "shot" in z.summary
+    assert zero_noise(spec, get_preset("ideal"), ideal) is None
+    assert analyze_circuit(spec).zne is not None

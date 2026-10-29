@@ -23,6 +23,7 @@ from qcanvas.adapters.base import (
     Explanation,
     ImageModel,
     ModelCall,
+    Proposal,
     ReasoningModel,
     Segment,
     SegmentationModel,
@@ -32,10 +33,18 @@ from qcanvas.adapters.base import (
 from qcanvas.adapters.config import Settings
 from qcanvas.adapters.imaging import annotate, data_url
 from qcanvas.adapters.meta_client import MetaAPIError, MetaClient
-from qcanvas.adapters.prompts import ASK_SYSTEM, CONCEPTS_SYSTEM, DRAFT_SYSTEM, EXPLAIN_SYSTEM, HINT_SYSTEM, TEXT_SYSTEM
+from qcanvas.adapters.prompts import (
+    ASK_SYSTEM,
+    CONCEPTS_SYSTEM,
+    DRAFT_SYSTEM,
+    EXPLAIN_SYSTEM,
+    HINT_SYSTEM,
+    OPTIMIZE_SYSTEM,
+    TEXT_SYSTEM,
+)
 from qcanvas.adapters.sam_parse import parse_sam_output
 from qcanvas.sim.noise import get_preset
-from qcanvas.spec.draft import CONCEPTS_SCHEMA, draft_schema, draft_to_spec
+from qcanvas.spec.draft import CONCEPTS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
 from qcanvas.spec.models import CircuitSpec, NetworkSpec
 from qcanvas.spec.validation import SpecError, parse_spec
 
@@ -208,6 +217,21 @@ class MetaReasoningModel(ReasoningModel):
             raise MetaAPIError("empty answer")
         return Explanation(text=content.strip(), call=ModelCall(provider="meta", model=self.model, role="answer",
                                                                 cached=cached, latency_s=time.perf_counter() - start))
+
+    def optimize(self, facts: dict[str, Any]) -> Proposal:
+        start = time.perf_counter()
+        messages = [
+            {"role": "system", "content": OPTIMIZE_SYSTEM},
+            {"role": "user", "content": f"Circuit and cost:\n{json.dumps(facts, indent=1)}\n\n"
+                                        "Return a cheaper circuit with the same measured outcome odds."},
+        ]
+        data, cached, _ = self._json(messages, REWRITE_SCHEMA, "circuit_rewrite", "medium")
+        ops = data.get("operations")
+        if not isinstance(ops, list):
+            raise MetaAPIError(f"{self.model} returned no operations list")
+        return Proposal(operations=[o for o in ops if isinstance(o, dict)], idea=str(data.get("idea", "")),
+                        call=ModelCall(provider="meta", model=self.model, role="optimize", cached=cached,
+                                       latency_s=time.perf_counter() - start))
 
     def hint(self, facts: dict[str, Any]) -> Explanation:
         start = time.perf_counter()

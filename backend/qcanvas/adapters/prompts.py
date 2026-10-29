@@ -69,6 +69,19 @@ HINT_SYSTEM = (
     "Bitstrings follow Qiskit order: the rightmost character is qubit 0."
 )
 
+OPTIMIZE_SYSTEM = (
+    "You simplify quantum circuits for Q-Canvas. You get a circuit as a list of operations (Qiskit conventions; "
+    "every qubit starts in |0>), which qubits are measured at the end, its cost, and the best cost found so far. "
+    "Return a cheaper circuit that gives exactly the same measured outcome probabilities: fewer two-qubit gates "
+    "first (CX and CZ cost 1, CP 2, SWAP 3, CCX 6), then fewer gates. Use the same qubit numbers; do not add "
+    "qubits; leave out measurements, they are kept as they are. Angles are in radians. Useful facts: gates that "
+    "act on a qubit still in |0> may do nothing; diagonal gates (Z, S, T, RZ, CZ, CP) right before measurement do "
+    "not change the odds; gates on qubits that are never measured and never interact again can go; a phase gate "
+    "controlled by a qubit in |1> is a phase on the other qubit. Every answer is checked by exact simulation and "
+    "rejected if any outcome probability changes, so only propose what you are sure of. If you get a previous "
+    "attempt and its problem, fix that problem."
+)
+
 CONCEPTS_SYSTEM = (
     "You look at a photo of a hand drawing and decide what kind of quantum diagram it is and which "
     "short noun phrases a segmentation model should look for to find each drawn part."

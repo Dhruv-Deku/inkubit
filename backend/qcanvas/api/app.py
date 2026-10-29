@@ -28,6 +28,7 @@ from qcanvas.sketch import analyze_image
 from qcanvas.spec.validation import SpecError, parse_spec
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logging.getLogger("qiskit").setLevel(logging.WARNING)  # the transpiler logs every pass at INFO
 MAX_UPLOAD = 15 * 1024 * 1024
 
 app = FastAPI(title="Q-Canvas", version=__version__)
@@ -165,6 +166,32 @@ def live_state(body: StateRequest) -> dict[str, Any]:
                             "fidelity": hellinger_fidelity(ideal, dist),
                             "success": dist.get(answer, 0.0) if answer else None}
     return out
+
+
+class OptimizeRequest(BaseModel):
+    spec: dict[str, Any]
+    ai: bool = True
+
+
+@app.post("/api/optimize")
+async def optimize_circuit(body: OptimizeRequest) -> dict[str, Any]:
+    """Cheaper equivalent circuits from rewrite rules, Qiskit and (live) Muse Spark, each proven or rejected."""
+    from qcanvas.optimize import optimize
+    from qcanvas.spec.models import CircuitSpec
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(status_code=422, detail={"issues": _issues(err)}) from err
+    if not isinstance(spec, CircuitSpec):
+        raise HTTPException(status_code=422, detail="Optimizing is for circuits.")
+    models = get_models()
+    live = models.settings.provider == "meta" and models.settings.has_key
+    note = "" if live else ("Muse Spark joins with the live Meta model; offline, the rules and Qiskit compete."
+                            if body.ai else "")
+    propose = models.reasoning.optimize if (live and body.ai) else None
+    result = await asyncio.to_thread(optimize, spec, propose, note)
+    return result.model_dump(mode="json")
 
 
 class ChallengeRequest(BaseModel):

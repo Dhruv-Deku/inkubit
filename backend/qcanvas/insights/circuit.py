@@ -3,7 +3,8 @@
 The state after every step (amplitudes and one Bloch vector per qubit), the
 entanglement it creates and how much survives the noise, which noise source
 costs the most (the error budget), how good the hardware must get for a 99%
-match, readout-error correction of the measured counts, and OpenQASM exports.
+match, readout-error correction of the measured counts, zero-noise
+extrapolation, and OpenQASM exports.
 
 Like the verifier, nothing here reads generated code: everything is exact
 statevector or density-matrix simulation of the spec, so it is deterministic.
@@ -39,6 +40,11 @@ MAX_AMPLITUDES = 16
 SWEEP_SCALES = (0.0, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0)
 TARGET_FIDELITY = 0.99
 ENTANGLED_BELOW = 0.999  # Bloch vector length of a qubit that shares information with others
+MAX_WEB_QUBITS = 8  # pairwise entanglement per step is listed up to this size
+ZNE_SCALES = (1, 3, 5)  # noise levels for zero-noise extrapolation (gate folding)
+ZNE_SHOTS = 4000
+MAX_ZNE_QUBITS = 8
+MAX_ZNE_GATES = 150
 
 
 class Amplitude(BaseModel):
@@ -55,6 +61,8 @@ class StepState(BaseModel):
     hidden_probability: float = 0.0  # probability in basis states not listed
     bloch: list[list[float]]  # [x, y, z] per qubit
     entangled: list[bool]
+    entropy: list[float] = Field(default_factory=list)  # bits of entanglement of each qubit with the rest
+    links: list[list[float]] = Field(default_factory=list)  # [a, b, concurrence] for entangled pairs
 
 
 class PairEntanglement(BaseModel):
@@ -112,6 +120,25 @@ class LayoutCost(BaseModel):
     estimated_success: float  # rough: product of gate and readout fidelities, decoherence ignored
 
 
+class ZeroNoise(BaseModel):
+    scales: list[int]
+    coefficients: list[float]  # Richardson weights: mitigated = sum c_i * p(scale_i)
+    fidelity_at: list[float]  # match to the ideal at each noise level, readout corrected
+    mitigated: Distribution
+    fidelity_raw: float  # as the hardware reports it (gate noise and readout error)
+    fidelity_readout: float  # after readout correction alone
+    fidelity_mitigated: float  # after extrapolation, exact probabilities
+    fidelity_shots: float  # the same with ZNE_SHOTS shots per noise level (seeded)
+    fidelity_readout_shots: float  # readout correction alone from the same shots at 1x, for a fair comparison
+    shots: int
+    shot_overhead: float  # sum c_i^2: extra shots for the same error bars
+    outcome: str  # the ideal's most likely outcome, for the extrapolation chart
+    outcome_ideal: float
+    outcome_at: list[float]  # its probability at each noise level (readout corrected, exact)
+    outcome_zero: float  # the Richardson value at zero noise: the quadratic through outcome_at, at 0
+    summary: str
+
+
 class Exports(BaseModel):
     qasm2: str
     qasm3: str
@@ -123,6 +150,7 @@ class CircuitInsights(BaseModel):
     budget: ErrorBudget | None = None
     sweep: NoiseSweep | None = None
     mitigation: Mitigation | None = None
+    zne: ZeroNoise | None = None
     layouts: list[LayoutCost] = Field(default_factory=list)
     layout_summary: str = ""
     exports: Exports
@@ -175,6 +203,16 @@ def _entropy_bits(rho: np.ndarray) -> float:
     return float(-sum(v * math.log2(v) for v in vals if v > 1e-12))
 
 
+_YY = np.kron([[0, -1j], [1j, 0]], [[0, -1j], [1j, 0]])
+
+
+def _concurrence(rho: np.ndarray) -> float:
+    """Wootters concurrence of a two-qubit density matrix (equal to Qiskit's; a test checks it)."""
+    r = rho @ _YY @ rho.conj() @ _YY
+    lam = np.sqrt(np.clip(np.sort(np.linalg.eigvals(r).real)[::-1], 0.0, None))
+    return float(max(0.0, lam[0] - lam[1] - lam[2] - lam[3]))
+
+
 def _state(psi: np.ndarray, n: int, step: int, op_index: int | None, label: str) -> StepState:
     probs = np.abs(psi) ** 2
     order = np.argsort(-probs, kind="stable")
@@ -182,14 +220,25 @@ def _state(psi: np.ndarray, n: int, step: int, op_index: int | None, label: str)
     shown = [int(i) for i in order[:MAX_AMPLITUDES] if probs[i] > 1e-10]
     amps = [Amplitude(basis=format(i, f"0{n}b"), probability=round(float(probs[i]), 6),
                       phase=round(float(np.angle(psi[i])) if probs[i] > 1e-10 else 0.0, 6)) for i in shown]
-    bloch, entangled = [], []
+    bloch, entangled, entropy = [], [], []
     for q in range(n):
-        vec = _bloch(_reduced(psi, n, [q]))
+        rho = _reduced(psi, n, [q])
+        vec = _bloch(rho)
         bloch.append(vec)
         entangled.append(math.dist(vec, (0, 0, 0)) < ENTANGLED_BELOW)
+        entropy.append(round(_entropy_bits(rho), 4))
+    links: list[list[float]] = []
+    if n <= MAX_WEB_QUBITS:
+        tangled = [q for q in range(n) if entangled[q]]
+        for i, a in enumerate(tangled):
+            for b in tangled[i + 1:]:
+                c = _concurrence(_reduced(psi, n, [a, b]))
+                if c > 0.01:
+                    links.append([a, b, round(c, 4)])
     hidden = max(0.0, 1.0 - sum(a.probability for a in amps))
     return StepState(step=step, op_index=op_index, label=label, amplitudes=amps,
-                     hidden_probability=round(hidden, 6), bloch=bloch, entangled=entangled)
+                     hidden_probability=round(hidden, 6), bloch=bloch, entangled=entangled,
+                     entropy=entropy, links=links)
 
 
 def step_states(spec: CircuitSpec) -> list[StepState]:
@@ -390,16 +439,12 @@ def noise_sweep(spec: CircuitSpec, preset: NoisePreset, ideal: Distribution) -> 
     return NoiseSweep(baseline=base.name, points=points, scale_for_target=scale, summary=summary)
 
 
-def correct_readout(spec: CircuitSpec, measured: Distribution, preset: NoisePreset,
-                    ideal: Distribution) -> Mitigation | None:
-    """Undo the known readout error by inverting each bit's confusion matrix."""
-    p01, p10 = preset.readout_p01, preset.readout_p10
-    if not (p01 or p10) or not measured:
-        return None
+def _invert_readout(spec: CircuitSpec, dist: Distribution, p01: float, p10: float) -> dict[str, float]:
+    """Apply the inverse of each measured bit's confusion matrix (the result may dip below zero)."""
     det = (1 - p01) * (1 - p10) - p01 * p10
     inv = [[(1 - p10) / det, -p10 / det], [-p01 / det, (1 - p01) / det]]  # inv[true][read]
     nc = spec.num_clbits
-    dist = dict(measured)
+    dist = dict(dist)
     for _, c in spec.measured_pairs():
         idx = nc - 1 - c
         out: dict[str, float] = {}
@@ -409,15 +454,125 @@ def correct_readout(spec: CircuitSpec, measured: Distribution, preset: NoisePres
                 k = key[:idx] + str(true) + key[idx + 1:]
                 out[k] = out.get(k, 0.0) + inv[true][read] * p
         dist = out
+    return dist
+
+
+def _clip(dist: dict[str, float]) -> Distribution:
+    """Clip negative estimates to zero and renormalise."""
     clipped = {k: max(v, 0.0) for k, v in dist.items()}
     total = sum(clipped.values()) or 1.0
-    corrected = {k: round(v / total, 6) for k, v in clipped.items() if v / total > 1e-6}
+    return {k: round(v / total, 6) for k, v in clipped.items() if v / total > 1e-6}
+
+
+def correct_readout(spec: CircuitSpec, measured: Distribution, preset: NoisePreset,
+                    ideal: Distribution) -> Mitigation | None:
+    """Undo the known readout error by inverting each bit's confusion matrix."""
+    p01, p10 = preset.readout_p01, preset.readout_p10
+    if not (p01 or p10) or not measured:
+        return None
+    corrected = _clip(_invert_readout(spec, measured, p01, p10))
     raw_f, cor_f = hellinger_fidelity(ideal, measured), hellinger_fidelity(ideal, corrected)
     summary = (f"Undoing the known readout error lifts the match to the noiseless ideal from {raw_f:.3f} to "
                f"{cor_f:.3f}. What is left comes from gate errors and decoherence, which readout "
                f"correction cannot undo.")
     return Mitigation(corrected=corrected, fidelity_raw=round(raw_f, 6), fidelity_corrected=round(cor_f, 6),
                       summary=summary)
+
+
+# ---------------------------------------------------------------- zero-noise extrapolation
+
+_INVERSE = {"S": "SDG", "SDG": "S", "T": "TDG", "TDG": "T"}
+
+
+def inverse_operation(op: Operation) -> Operation:
+    """The gate that undoes ``op`` (up to a global phase: the inverse of SX is written RX(-pi/2))."""
+    if op.gate in _INVERSE:
+        return op.model_copy(update={"gate": _INVERSE[op.gate]})
+    if op.gate in ("RX", "RY", "RZ", "CP"):
+        return op.model_copy(update={"params": [-op.params[0]]})
+    if op.gate == "SX":
+        return op.model_copy(update={"gate": "RX", "params": [-math.pi / 2]})
+    return op  # H, X, Y, Z, CX, CZ, SWAP, CCX are their own inverses
+
+
+def fold(spec: CircuitSpec, scale: int) -> CircuitSpec:
+    """Global unitary folding: U (U^-1 U)^k, the same circuit with ``scale`` = 2k + 1 times the gates.
+
+    This is how zero-noise extrapolation raises the noise on real hardware: every
+    extra gate adds its own error while the ideal result stays the same.
+    """
+    gates = [op for op in spec.operations if op.gate not in ("MEASURE", "BARRIER")]
+    meas = [op for op in spec.operations if op.gate == "MEASURE"]
+    back = [inverse_operation(op) for op in reversed(gates)]
+    ops = list(gates)
+    for _ in range((scale - 1) // 2):
+        ops += back + gates
+    return spec.model_copy(update={"operations": ops + meas})
+
+
+def richardson(scales: tuple[int, ...]) -> list[float]:
+    """Weights c_i with sum c_i f(s_i) = f(0) for any polynomial f of degree < len(scales)."""
+    return [math.prod(sj / (sj - si) for sj in scales if sj != si) for si in scales]
+
+
+def zero_noise(spec: CircuitSpec, preset: NoisePreset, ideal: Distribution) -> ZeroNoise | None:
+    """Zero-noise extrapolation by gate folding, after readout correction.
+
+    Readout error is removed first (exactly, by the inverse confusion matrix), then
+    the circuit runs at 1x, 3x and 5x its gate noise and each outcome's probability
+    is extrapolated back to zero noise. Done twice: with exact probabilities, and
+    with ``ZNE_SHOTS`` sampled shots per noise level, since on hardware every
+    probability is estimated from shots and extrapolation amplifies their noise.
+    """
+    gates = sum(1 for op in spec.operations if op.gate not in ("MEASURE", "BARRIER"))
+    if preset.is_ideal or spec.num_qubits > MAX_ZNE_QUBITS or not gates or gates > MAX_ZNE_GATES:
+        return None
+    coeffs = richardson(ZNE_SCALES)
+    gate_only = replace(preset, readout_p01=0.0, readout_p10=0.0)
+    exact = [noisy_distribution(fold(spec, s), gate_only) for s in ZNE_SCALES]
+    keys = sorted(set(ideal).union(*exact))
+    mitigated = _clip({k: sum(c * d.get(k, 0.0) for c, d in zip(coeffs, exact)) for k in keys})
+
+    rng = np.random.default_rng(1234)
+    sampled = []
+    for s in ZNE_SCALES:
+        full = noisy_distribution(fold(spec, s), preset)
+        ks = sorted(full)
+        p = np.array([full[k] for k in ks])
+        counts = rng.multinomial(ZNE_SHOTS, p / p.sum())
+        est = {k: n / ZNE_SHOTS for k, n in zip(ks, counts) if n}
+        if preset.readout_p01 or preset.readout_p10:
+            est = _invert_readout(spec, est, preset.readout_p01, preset.readout_p10)
+        sampled.append(est)
+    keys = sorted(set(keys).union(*sampled))
+    from_shots = _clip({k: sum(c * d.get(k, 0.0) for c, d in zip(coeffs, sampled)) for k in keys})
+
+    top = max(ideal, key=ideal.get)
+    top_at = [round(d.get(top, 0.0), 6) for d in exact]
+    top_zero = round(sum(c * p for c, p in zip(coeffs, top_at)), 6)
+    raw = hellinger_fidelity(ideal, noisy_distribution(spec, preset))
+    at = [round(hellinger_fidelity(ideal, d), 6) for d in exact]
+    mit, shots_f = hellinger_fidelity(ideal, mitigated), hellinger_fidelity(ideal, from_shots)
+    ro_shots = hellinger_fidelity(ideal, _clip(sampled[0]))
+    overhead = sum(c * c for c in coeffs)
+    verb = "lifts" if mit > at[0] + 1e-4 else "barely changes"
+    summary = (f"Zero-noise extrapolation {verb} the match to the noiseless ideal: {raw:.3f} as measured, "
+               f"{at[0]:.3f} after readout correction, {mit:.3f} after extrapolating from "
+               f"{', '.join(f'{s}x' for s in ZNE_SCALES)} noise, with exact probabilities. ")
+    if shots_f > ro_shots + 1e-3:
+        summary += (f"With {ZNE_SHOTS:,} shots per level it still helps ({ro_shots:.3f} to {shots_f:.3f}), "
+                    f"at {sum(ZNE_SCALES)}x the gate executions and about {overhead:.1f}x the shots for the "
+                    f"same error bars, since extrapolation amplifies shot noise.")
+    else:
+        summary += (f"With {ZNE_SHOTS:,} shots per level, shot noise eats the gain ({ro_shots:.3f} without "
+                    f"extrapolation, {shots_f:.3f} with it): extrapolation amplifies shot noise about "
+                    f"{overhead:.1f}x, so it needs more shots to pay off.")
+    return ZeroNoise(scales=list(ZNE_SCALES), coefficients=[round(c, 6) for c in coeffs], fidelity_at=at,
+                     mitigated=mitigated, fidelity_raw=round(raw, 6), fidelity_readout=at[0],
+                     fidelity_mitigated=round(mit, 6), fidelity_shots=round(shots_f, 6),
+                     fidelity_readout_shots=round(ro_shots, 6), shots=ZNE_SHOTS,
+                     shot_overhead=round(overhead, 4), outcome=top, outcome_ideal=round(ideal[top], 6),
+                     outcome_at=top_at, outcome_zero=top_zero, summary=summary)
 
 
 # ---------------------------------------------------------------- real chip layouts
@@ -498,6 +653,7 @@ def analyze_circuit(spec: CircuitSpec, noise: str = "realistic",
         budget=error_budget(spec, preset, ideal) if noisy_ok and not preset.is_ideal else None,
         sweep=noise_sweep(spec, preset, ideal) if noisy_ok else None,
         mitigation=correct_readout(spec, measured, preset, ideal) if measured else None,
+        zne=zero_noise(spec, preset, ideal) if noisy_ok else None,
         exports=exports(spec),
         notes=notes,
     )

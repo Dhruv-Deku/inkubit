@@ -114,6 +114,14 @@ class Explanation(BaseModel):
     note: str = ""
 
 
+class Proposal(BaseModel):
+    """A cheaper circuit a model proposes (operations, no measurements) and its one-line idea."""
+
+    operations: list[dict[str, Any]]
+    idea: str = ""
+    call: ModelCall
+
+
 class DiagramResult(BaseModel):
     """A rendered diagram (PNG/WebP bytes, base64)."""
 
@@ -151,6 +159,10 @@ class ReasoningModel(ABC):
     def answer(self, question: str, context: dict[str, Any]) -> Explanation:
         """Answer a question about a design and its results, using only the given context."""
         raise NotImplementedError
+
+    def optimize(self, facts: dict[str, Any]) -> Proposal:
+        """Propose a cheaper circuit with the same measured odds (checked by exact simulation afterwards)."""
+        raise NotImplementedError("circuit proposals need the live model")
 
     def hint(self, facts: dict[str, Any]) -> Explanation:
         """A nudge toward a challenge's goal that does not give the solution away."""

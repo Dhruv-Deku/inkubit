@@ -66,6 +66,16 @@ NETWORK_DRAFT_SCHEMA = _obj({
     "notes": {"type": "string"},
 })
 
+REWRITE_SCHEMA = _obj({
+    "idea": {"type": "string", "description": "One sentence: what you simplified and why the results stay the same."},
+    "operations": {"type": "array", "items": _obj({
+        "gate": {"type": "string", "enum": [g for g in _GATES if g not in ("MEASURE", "BARRIER")]},
+        "targets": _INTS,
+        "controls": _INTS,
+        "params": {"type": "array", "items": {"type": "number"}, "description": "Angles in radians."},
+    })},
+})
+
 CONCEPTS_SCHEMA = _obj({
     "kind": {"type": "string", "enum": ["circuit", "network"]},
     "concepts": {"type": "array", "items": {"type": "string"},
