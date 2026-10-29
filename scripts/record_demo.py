@@ -273,6 +273,7 @@ async def circuit_story(d: Director) -> None:
     if row >= 0:
         control = page.locator(f".ops tbody tr >> nth={row}").locator("td >> nth=3").locator("input")
         await d.caption("Nothing runs until you agree with the reading. Every edit is checked as you type.")
+        await d.scroll_to(control, block="center", pause=0.4)
         await d.type_into(control, "1")
         await page.wait_for_selector(".notice.error", timeout=10_000)
         await d.scroll_to(page.locator(".notice.error"), block="center", pause=2.6)
@@ -392,7 +393,7 @@ async def optimizer_story(d: Director) -> None:
     await d.click(page.locator("nav.steps button >> nth=0"))
     await d.wait(0.5)
     item = page.locator(".spec-list button", has_text="Phase estimation")
-    await d.scroll_to(item, block="center", pause=0.3)
+    await d.scroll_to(item, block="center", pause=1.1)  # let the smooth scroll settle before reading its position
     await d.click(item)
     await page.wait_for_selector(".optimizer button", timeout=60_000)
     opt = page.locator(".optimizer")
