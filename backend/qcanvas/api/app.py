@@ -214,6 +214,25 @@ def lab_shor(a: int = 7) -> dict[str, Any]:
     return shor_lab(a).model_dump(mode="json")
 
 
+class QaoaRequest(BaseModel):
+    n: int = Field(ge=3, le=8)
+    edges: list[tuple[int, int]] = Field(max_length=40)
+    labels: list[str] | None = Field(default=None, max_length=8)
+
+
+@app.post("/api/lab/qaoa")
+async def lab_qaoa(body: QaoaRequest) -> dict[str, Any]:
+    """QAOA Max-Cut on a small graph: brute-force answer, depth-1 landscape, optimized depths 1 to 3."""
+    from qcanvas.qaoa import qaoa_lab
+
+    labels = [str(x).strip()[:12] for x in body.labels] if body.labels else None
+    try:
+        lab = await asyncio.to_thread(qaoa_lab, body.n, body.edges, "realistic", labels)
+    except ValueError as err:
+        raise HTTPException(422, str(err)) from None
+    return lab.model_dump(mode="json")
+
+
 class ChallengeRequest(BaseModel):
     spec: dict[str, Any]
     number: int = Field(default=0, ge=0, le=9)

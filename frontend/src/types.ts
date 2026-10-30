@@ -204,6 +204,46 @@ export interface CircuitResult {
   insights?: CircuitInsights
 }
 
+export interface QaoaSplit {
+  teams: number[]
+  cut: number
+  prob: number
+  optimal: boolean
+}
+
+export interface QaoaDepth {
+  p: number
+  gammas: number[]
+  betas: number[]
+  expected: number
+  ratio: number
+  p_best: number
+  p_best_noisy: number | null
+  ratio_noisy: number | null
+  top: QaoaSplit[]
+  evals: number
+  cx: number
+  gates: number
+  spec: CircuitSpec
+}
+
+export interface QaoaLab {
+  n: number
+  edges: [number, number][]
+  max_cut: number
+  optimal_count: number
+  splits: number
+  random_ratio: number
+  gammas: number[]
+  betas: number[]
+  landscape: number[][]
+  path: [number, number][]
+  depths: QaoaDepth[]
+  noise: string
+  noise_label: string
+  summary: string
+}
+
 export interface Transcript {
   text: string
   duration_ms: number

@@ -438,3 +438,25 @@ details summary { cursor: pointer; }
 .shor-lucky { background: var(--panel-2); border-radius: 11px; padding: 14px 16px; }
 .shor-eq { font-size: 20px; font-weight: 600; }
 @media (max-width: 900px) { .shor-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* QAOA: split the party */
+.qaoa-grid { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 24px; align-items: start; transition: opacity .2s; }
+.busy { opacity: .55; transition: opacity .2s; }
+.qaoa-readout { min-height: 18px; margin-bottom: 4px; }
+.qaoa-splits { display: grid; gap: 2px; margin-top: 10px; }
+.qaoa-split { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(60px, 1fr) 54px 54px; align-items: center; gap: 12px;
+  background: transparent; border: 0; border-radius: 8px; padding: 6px 8px; color: var(--text-2); text-align: left; cursor: pointer; font: inherit; }
+.qaoa-split:hover, .qaoa-split.on { background: var(--panel-2); color: var(--text); }
+.qaoa-split .names { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qaoa-split .names .muted { color: var(--muted); }
+.qaoa-split .track { height: 10px; border-left: 1px solid var(--line-2); }
+.qaoa-split .track span { display: block; height: 100%; background: var(--primary); border-radius: 0 4px 4px 0; }
+.qaoa-split .track span.best { background: var(--pass); }
+.qaoa-split .cut { font-size: 12px; }
+.qaoa-split .cut.best { color: var(--pass); }
+.qaoa-split .p { font-size: 12px; text-align: right; }
+@media (max-width: 900px) { .qaoa-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .qaoa-split { grid-template-columns: minmax(0, 1fr) 48px 48px; row-gap: 4px; }
+  .qaoa-split .track { grid-column: 1 / -1; grid-row: 2; }
+}

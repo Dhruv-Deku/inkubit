@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -65,6 +65,8 @@ export const api = {
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
   repetitionLab: (scale: number, signal?: AbortSignal) =>
     call<RepetitionLab>(`/api/lab/repetition?scale=${scale.toPrecision(3)}`, { signal }),
+  qaoaLab: (graph: { n: number; edges: [number, number][]; labels?: string[] }, signal?: AbortSignal) =>
+    call<QaoaLab>('/api/lab/qaoa', { ...json(graph), signal }),
   shorLab: (a: number, signal?: AbortSignal) => call<ShorLab>(`/api/lab/shor?a=${a}`, { signal }),
   optimize: (spec: Spec, ai = true) => call<OptimizeResult>('/api/optimize', json({ spec, ai })),
   challenges: () => call<{ levels: Record<string, string>; challenges: ChallengeInfo[] }>('/api/challenges'),
