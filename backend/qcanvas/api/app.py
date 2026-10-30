@@ -62,7 +62,7 @@ def health() -> dict[str, Any]:
 
 
 ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and",
-              "teleportation", "w_state"}
+              "teleportation", "w_state", "bit_flip_code"}
 
 
 @app.get("/api/examples")
@@ -192,6 +192,16 @@ async def optimize_circuit(body: OptimizeRequest) -> dict[str, Any]:
     propose = models.reasoning.optimize if (live and body.ai) else None
     result = await asyncio.to_thread(optimize, spec, propose, note)
     return result.model_dump(mode="json")
+
+
+@app.get("/api/lab/repetition")
+def lab_repetition(scale: float = 1.0) -> dict[str, Any]:
+    """The bit-flip code against a bare qubit, with perfect and with ``scale`` x realistic gates."""
+    from qcanvas.qec import repetition_lab
+
+    if not 0 <= scale <= 20:
+        raise HTTPException(422, "scale must be between 0 and 20")
+    return repetition_lab(float(f"{scale:.3g}")).model_dump(mode="json")
 
 
 class ChallengeRequest(BaseModel):

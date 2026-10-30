@@ -1,0 +1,87 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 1,
+  "operations": [
+    {
+      "gate": "RY",
+      "targets": [
+        0
+      ],
+      "params": [
+        2.0943951023931953
+      ]
+    },
+    {
+      "gate": "CX",
+      "controls": [
+        0
+      ],
+      "targets": [
+        1
+      ]
+    },
+    {
+      "gate": "CX",
+      "controls": [
+        0
+      ],
+      "targets": [
+        2
+      ]
+    },
+    {
+      "gate": "BARRIER",
+      "targets": []
+    },
+    {
+      "gate": "X",
+      "targets": [
+        1
+      ]
+    },
+    {
+      "gate": "BARRIER",
+      "targets": []
+    },
+    {
+      "gate": "CX",
+      "controls": [
+        0
+      ],
+      "targets": [
+        1
+      ]
+    },
+    {
+      "gate": "CX",
+      "controls": [
+        0
+      ],
+      "targets": [
+        2
+      ]
+    },
+    {
+      "gate": "CCX",
+      "controls": [
+        2,
+        1
+      ],
+      "targets": [
+        0
+      ]
+    }
+  ],
+  "measurements": [
+    {
+      "qubit": 0,
+      "clbit": 0
+    }
+  ],
+  "metadata": {
+    "title": "Bit-flip code (an error on q1)",
+    "notes": "q0 holds a state (75% 1); two CNOTs copy it onto q1 and q2; an X between the barriers is the error; the decoder (two CNOTs and a Toffoli) votes and repairs q0. Move or delete the X, or put it on q0 or q2: the odds of q0 stay 25/75. Two errors at once break it."
+  }
+}

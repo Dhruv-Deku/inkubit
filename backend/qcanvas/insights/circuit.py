@@ -23,6 +23,8 @@ from qiskit.quantum_info import DensityMatrix, Statevector, SuperOp, concurrence
 from qiskit_aer.noise import thermal_relaxation_error
 
 from qcanvas.codegen.template import format_angle
+from qcanvas.insights.bell import BellTest, bell_tests
+from qcanvas.insights.tomography import MAX_TOMO_QUBITS, Tomography, tomography
 from qcanvas.sim.noise import TOFFOLI_CNOTS, NoisePreset, get_preset, toffoli_error
 from qcanvas.spec.models import CircuitSpec, Operation
 from qcanvas.verify.expected import (
@@ -151,6 +153,8 @@ class CircuitInsights(BaseModel):
     sweep: NoiseSweep | None = None
     mitigation: Mitigation | None = None
     zne: ZeroNoise | None = None
+    bell: BellTest | None = None
+    tomography: Tomography | None = None
     layouts: list[LayoutCost] = Field(default_factory=list)
     layout_summary: str = ""
     exports: Exports
@@ -645,10 +649,21 @@ def analyze_circuit(spec: CircuitSpec, noise: str = "realistic",
         notes.append(f"Noise analyses skipped above {MAX_NOISY_QUBITS} qubits (the exact density matrix gets too large).")
     rho = noisy_state(spec, preset) if noisy_ok and not preset.is_ideal else None
     layouts, layout_summary = chip_layouts(spec, preset)
+    steps = step_states(spec)
+    bell = tomo = None
+    psi = Statevector.from_instruction(build_reference_circuit(spec)).data
+    if spec.num_qubits <= MAX_TOMO_QUBITS:
+        tomo = tomography(psi, rho, preset)
+    if spec.num_qubits <= MAX_WEB_QUBITS:
+        last = steps[-1]
+        bell = bell_tests(psi, spec.num_qubits, [(int(a), int(b)) for a, b, _ in last.links],
+                          [q for q, e in enumerate(last.entropy) if e > 0.01], rho, preset)
     return CircuitInsights(
         layouts=layouts,
         layout_summary=layout_summary,
-        steps=step_states(spec),
+        steps=steps,
+        bell=bell,
+        tomography=tomo,
         entanglement=entanglement(spec, preset, rho),
         budget=error_budget(spec, preset, ideal) if noisy_ok and not preset.is_ideal else None,
         sweep=noise_sweep(spec, preset, ideal) if noisy_ok else None,

@@ -22,6 +22,7 @@ GALLERY = {
     "toffoli_and": {"000": 0.25, "001": 0.25, "010": 0.25, "111": 0.25},
     "teleportation": {"0": 0.25, "1": 0.75},
     "w_state": {"001": 1 / 3, "010": 1 / 3, "100": 1 / 3},
+    "bit_flip_code": {"0": 0.25, "1": 0.75},  # the error on q1 is corrected
 }
 
 
