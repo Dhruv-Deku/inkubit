@@ -265,6 +265,8 @@ export interface CircuitInsights {
   sweep: NoiseSweep | null
   mitigation: Mitigation | null
   zne?: ZeroNoise | null
+  bell?: BellTest | null
+  tomography?: Tomography | null
   layouts: LayoutCost[]
   layout_summary: string
   exports: { qasm2: string; qasm3: string }
@@ -372,6 +374,47 @@ export interface LiveState {
   steps: StepState[]
   ideal: Record<string, number> | null
   noisy: { scale: number; baseline: string; distribution: Record<string, number>; fidelity: number; success: number | null } | null
+}
+
+export interface BellResult {
+  kind: 'CHSH' | 'Mermin'
+  qubits: number[]
+  classical_bound: number
+  quantum_bound: number
+  ideal: number
+  noisy: number | null
+  shots_value: number | null
+  shots_error: number | null
+  shots: number
+  sigmas: number | null
+  settings: number[][][]
+  violates: boolean
+  verdict: string
+}
+export interface BellTest { tests: BellResult[]; summary: string }
+export interface Tomography {
+  n: number
+  settings: number
+  shots_per_setting: number
+  ideal_re: number[][]
+  ideal_im: number[][]
+  recon_re: number[][]
+  recon_im: number[][]
+  fidelity_ideal: number
+  fidelity_noisy: number
+  noisy_fidelity_ideal: number
+  purity: number
+  summary: string
+}
+export interface LabCurves { perfect: number[]; realistic: number[]; break_even: number | null }
+export interface RepetitionLab {
+  scale: number
+  p: number[]
+  bare: number[]
+  bit: LabCurves
+  phase: LabCurves
+  gate_error_2q: number
+  summary: string
 }
 
 export interface OptimizeCost { gates: number; two_qubit: number; depth: number; fidelity: number | null }

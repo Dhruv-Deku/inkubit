@@ -7,6 +7,7 @@ import { Histogram } from './components/Histogram'
 import { Logo } from './components/Icons'
 import { OverlayView } from './components/OverlayView'
 import { InsightsSection } from './components/Insights'
+import { RepetitionLabPanel } from './components/Labs'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -173,6 +174,9 @@ export default function App() {
     setStage('edit')
   }
 
+  const code = examples?.specs.find((e) => e.id === 'bit_flip_code')
+  const tryCode = code ? () => onSpec(clone(code.spec)) : undefined
+
   const onText = async (text: string) => {
     setBusy(true)
     setStartError(null)
@@ -286,7 +290,10 @@ export default function App() {
           )}
           <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
             live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
-            extra={<ChallengeList list={challenges} progress={progress} onStart={startChallenge} />} />
+            extra={<>
+              <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
+              <RepetitionLabPanel onTry={tryCode} />
+            </>} />
         </>
       )}
 

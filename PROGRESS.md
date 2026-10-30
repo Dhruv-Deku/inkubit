@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (219 tests pass offline; frontend builds; last checked 2026-10-29)
+## Done (231 tests pass offline; frontend builds; last checked 2026-10-29)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -27,6 +27,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
   - What-if hardware slider with exact odds; animated network map with before/after (D26). Teleportation and W-state examples.
   - Optimizer (D27): rules with reasons, Qiskit level 3, rules + Qiskit, live Muse Spark with one retry; every proposal proven (unitary / state / odds) or rejected; fuzz-tested.
   - Zero-noise extrapolation by gate folding, exact and with shots (D28); entanglement web in the live strip and inspector (D29).
+  - Bell tests: CHSH per entangled pair, Mermin for three qubits, ideal / noisy / shots with error bars (D30). State tomography with a 3D cityscape (D31). Error-correction lab with break-even vs gate quality, and a bit-flip code example (D32). "Say it" voice input (D33).
 
 ## In progress
 - Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the offline tests and a headless-browser check of every new screen (desktop and 390 px phone width).

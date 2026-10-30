@@ -80,6 +80,15 @@ goes from a 0.882 match as measured to 0.999. It is shown with exact
 probabilities and with 4,000 shots per level, because extrapolation amplifies
 shot noise and the honest question is whether it pays off.
 
+**Is it really quantum?** For every entangled pair Q-Canvas runs a Bell test
+(CHSH; Mermin for three qubits) ideal, with realistic noise, and from simulated
+shots with error bars: a Bell pair still beats every classical explanation by
+16 standard errors on realistic hardware, and a W state shows that no pair
+needs to violate for the trio to. State tomography rebuilds the state from
+27 measurement settings, as a lab must, and draws it as a 3D density-matrix
+cityscape. An error-correction lab shows where the bit-flip code starts to beat
+a bare qubit, and how that break-even point falls as the gates improve.
+
 **Play with it.** Eleven challenges (make a Bell pair, a singlet, a W state;
 build SWAP from CNOTs or NOT from H and Z) are scored exactly against a hidden
 reference, with par like golf, stars, and a lesson on success. Muse Spark gives
@@ -92,7 +101,7 @@ slider shows how the outcome changes as the hardware gets better or worse.
 Network results are drawn as an animated map, before and after the fix.
 
 **More ways in.** Besides a photo or the camera, you can describe a design in
-words ("Bernstein-Vazirani with secret 1011", "300 km of fiber with 2
+words (typed or spoken) ("Bernstein-Vazirani with secret 1011", "300 km of fiber with 2
 repeaters") and Muse Spark builds the spec. The gallery includes Grover search,
 Bernstein-Vazirani, Deutsch-Jozsa, phase estimation, superdense coding,
 teleportation, the W state and a Toffoli AND, each verified against its textbook
@@ -132,7 +141,7 @@ repeatable and cheap.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 219 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 231 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and

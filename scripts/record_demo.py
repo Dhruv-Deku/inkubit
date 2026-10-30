@@ -337,9 +337,11 @@ async def circuit_story(d: Director) -> None:
     await d.caption("Which noise costs the most, and how much better the hardware must get for a 99% match.")
     await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="Entanglement")), pause=2.6)
     await d.scroll_to(sweep, block="center", pause=3.4)
-    await d.caption("And what the same circuit costs on real chip wirings.")
-    await d.scroll_to(page.locator(".panel", has=page.locator("h2", has_text="On real chip layouts")), block="center",
-                      pause=3.0)
+    bell = page.locator(".panel", has=page.locator("h2", has_text="Bell test"))
+    if await bell.count():
+        await d.caption("A Bell test: could any classical explanation fake these correlations? "
+                        "Even with realistic noise, no: by over ten standard errors.")
+        await d.scroll_to(bell, block="center", pause=4.0)
     zne = page.locator(".panel", has=page.locator("h2", has_text="Zero-noise extrapolation"))
     if await zne.count():
         await d.caption("Error mitigation: run it noisier on purpose (every gate folded), then extrapolate back "

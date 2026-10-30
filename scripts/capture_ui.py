@@ -44,6 +44,12 @@ def main() -> None:
         page.wait_for_selector(".sample img")
         page.wait_for_timeout(600)
         page.screenshot(path=str(OUT / "1-start.png"))
+        lab = page.locator(".panel", has=page.locator("h2", has_text="Error-correction lab"))
+        page.wait_for_selector(".panel:has(h2:has-text('Error-correction lab')) svg path")
+        lab.scroll_into_view_if_needed()
+        page.wait_for_timeout(300)
+        lab.screenshot(path=str(OUT / "19-qec-lab.png"))
+        page.evaluate("window.scrollTo(0, 0)")
 
         # circuit: sample sketch -> overlay -> demo run
         page.click(".sample >> nth=0")
@@ -120,6 +126,16 @@ def main() -> None:
         page.wait_for_selector(".live-strip .ent-web")
         page.wait_for_timeout(400)
         page.locator(".live-strip").screenshot(path=str(OUT / "16-entanglement-web.png"))
+        page.click("button:has-text('Step through')")
+        page.wait_for_selector(".panel:has(h2:has-text('Bell test'))", timeout=60000)
+        page.wait_for_timeout(300)
+        panel("Bell test").screenshot(path=str(OUT / "17-bell-test.png"))
+        page.click("nav.steps button >> nth=0")
+        page.click(".spec-list button:has-text('GHZ')")
+        page.click("button:has-text('Step through')")
+        page.wait_for_selector(".panel:has(h2:has-text('State tomography'))", timeout=60000)
+        page.wait_for_timeout(300)
+        panel("State tomography").screenshot(path=str(OUT / "18-tomography.png"))
 
         # a challenge solved with the click-to-compose palette
         page.click("nav.steps button >> nth=0")

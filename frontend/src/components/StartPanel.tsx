@@ -2,6 +2,7 @@ import { useRef, useState, type ReactNode } from 'react'
 import type { Examples, RecentRun, Spec } from '../types'
 import { CameraCapture } from './CameraCapture'
 import { Upload } from './Icons'
+import { VoiceButton } from './VoiceButton'
 
 const IDEAS = ['GHZ state on 4 qubits', 'Bernstein-Vazirani with secret 1011', 'QFT on 3 qubits of 5',
   'h 0; cx 0 1; rz pi/4 1', '300 km of fiber with 2 repeaters']
@@ -116,10 +117,11 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
         <div className="panel-head"><h2>Or describe it in words</h2>
           <span className="sub">{live ? 'Muse Spark turns any description into a spec' : 'offline: named algorithms, gate lists and simple networks'}</span>
         </div>
-        <form className="row" style={{ gap: 10, alignItems: 'stretch' }}
+        <form className="row wrap" style={{ gap: 10, alignItems: 'stretch' }}
           onSubmit={(e) => { e.preventDefault(); if (words.trim()) onText(words) }}>
-          <input type="text" value={words} onChange={(e) => setWords(e.target.value)} style={{ flex: 1 }}
+          <input type="text" value={words} onChange={(e) => setWords(e.target.value)} style={{ flex: '1 1 220px', minWidth: 0 }}
             placeholder="e.g. Grover search over 2 qubits, or: h 0; cx 0 1; measure all" aria-label="Describe a circuit or network" spellCheck={false} />
+          <VoiceButton onText={setWords} onDone={(t) => onText(t)} disabled={busy} />
           <button className="btn primary" type="submit" disabled={busy || !words.trim()}>{busy ? 'Reading…' : 'Build it'}</button>
         </form>
         <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>

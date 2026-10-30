@@ -352,3 +352,37 @@ with whom. Pairs get gold threads (width by concurrence); a qubit's gold arc
 is its entropy. Group entanglement with no pair entangled on its own (GHZ) is
 drawn as a dashed hull and named, because concurrence alone would show nothing.
 Listed up to 8 qubits.
+
+## D30. Bell tests
+`backend/qcanvas/insights/bell.py`. CHSH uses the Horodecki closed form for the
+maximum and its explicit settings (tested against brute-force search), so
+there is no optimisation to trust. Mermin has no closed form; six directions are
+optimised with BFGS from 16 fixed starts (deterministic) and the panel says the
+settings are found, not proven optimal. Settings are chosen for the ideal state
+and then applied to the noisy one, because that is what an experiment does.
+Shot estimates include readout error and use 4,000 shots per setting with a
+binomial standard error per correlator; "N standard errors above classical" is
+reported only above 3. Pairs are tested only when entangled (concurrence >
+0.01): separable states can sit exactly at S = 2 and would add noise to the panel.
+
+## D31. State tomography
+Linear inversion over all 3^n settings, readout error inverted per setting,
+then the Smolin-Gambetta-Smith projection to the nearest physical state.
+Limited to 3 qubits (27 settings) to keep the panel readable and the cost
+trivial. The settings' rotations are taken as perfect; the summary separates the
+fidelity lost to hardware noise (perfect tomography of the noisy state) from the
+part that is shot noise.
+
+## D32. Error-correction lab
+Exact 3-qubit density matrices with the same gate channels; the flip channel is
+applied in numpy and the decoder as one superoperator, so a whole curve takes
+milliseconds (a test checks it against the plain Qiskit evolution). Readout error
+is left out because it is identical for the bare qubit and the code. The
+break-even point is the first crossing below the bare-qubit line, interpolated
+in log p; the meeting at p = 1/2, where both are 50%, is not a crossing.
+
+## D33. Say it
+The describe box has a "Say it" button using the browser's own speech
+recognition (hidden where unavailable). The transcript goes through the same
+describe-in-words path as typed text. Its tooltip says the browser may send audio
+to its maker's service; Q-Canvas itself never receives audio.

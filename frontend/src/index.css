@@ -358,7 +358,7 @@ table.truth { margin-top: 4px; max-width: 360px; }
 @media (prefers-reduced-motion: reduce) { .star.pop, .solved-box.fresh { animation: none; } }
 
 @media (max-width: 1100px) {
-  .two-col, .inspector-grid, .challenge-cols, .live-grid { grid-template-columns: 1fr; }
+  .two-col, .inspector-grid, .challenge-cols, .live-grid { grid-template-columns: minmax(0, 1fr); }
   .hero, .edit-grid, .run-grid { grid-template-columns: 1fr; }
   .tiles { grid-template-columns: repeat(2, 1fr); }
   .figs { grid-template-columns: 1fr; }
@@ -399,3 +399,26 @@ ol.rewrites .badge { font-size: 10.5px; padding: 1px 7px; margin-right: 4px; }
 .ent-web figcaption { max-width: 190px; }
 .inspector .ent-web { align-items: flex-start; }
 .inspector .ent-web figcaption { text-align: left; }
+
+/* ---------- Bell test ---------- */
+.bell-row { padding: 10px 0; border-top: 1px solid var(--line); }
+.bell-row:first-of-type { border-top: none; }
+.badge.gold-badge { background: rgba(217, 164, 65, 0.14); color: var(--gold); }
+.legend svg { vertical-align: -2px; margin-right: 4px; }
+details summary { cursor: pointer; }
+
+/* ---------- tomography ---------- */
+.city-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.city { margin: 0; }
+.bar3d polygon { transition: opacity .2s; }
+.bar3d:hover polygon { opacity: .75; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+@media (max-width: 760px) { .city-pair { grid-template-columns: 1fr; } }
+
+/* ---------- voice ---------- */
+.btn.mic { display: inline-flex; align-items: center; gap: 6px; }
+.btn.mic.on { border-color: var(--fail); color: #ffb3b5; }
+.btn.mic.on svg { animation: pulse 1.1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .btn.mic.on svg { animation: none; } }
+@media (max-width: 640px) { .panel table.data { display: block; overflow-x: auto; white-space: nowrap; } }

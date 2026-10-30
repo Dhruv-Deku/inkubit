@@ -34,17 +34,18 @@ Q-Canvas closes that gap and refuses to fake success:
 
 | Step | What happens | Model |
 | --- | --- | --- |
-| 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words**, or paste JSON | **Muse Spark 1.3** turns a description into a spec |
+| 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words or say it out loud** (browser speech recognition), or paste JSON | **Muse Spark 1.3** turns a description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
 | 3. Read it | The boxes and the photo become a validated JSON spec, each operation linked to its box | **Muse Spark 1.3** with structured output |
 | 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors. **Compose by clicking**: pick a gate from the palette, click a wire (control first for CNOTs), erase, undo; a **live state** strip (3D Bloch spheres you can turn, each qubit's path, amplitudes, and an **entanglement web**: gold threads between entangled pairs, arcs for entanglement with the rest) updates on every edit | exact simulation, no model |
 | Shorten it | **Find a shorter circuit**: rewrite rules (each with a reason), the Qiskit compiler and Muse Spark each propose one; exact simulation proves each equal (same gate, same state, or same measured odds) or rejects it with the outcome that differs. Use it in one click; Undo brings yours back | **Muse Spark 1.3** proposes, gets one retry with the rejection reason |
 | 5. Run and verify | The agent writes the code, runs it in a sandboxed subprocess, verifies, diagnoses, repairs, retries (up to 4 attempts) | **Muse Spark 1.3** writes and repairs code (or the **Muse Code** CLI, opt-in) |
 | 6. Understand it | Histogram (predicted vs measured vs ideal), metrics, code with per-attempt diffs, plain-language explanation in 12 languages, clean diagram, one-file HTML report | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
-| 7. Look inside | Step through the exact state gate by gate (amplitudes, phases, a Bloch sphere per qubit, the entanglement web), entanglement ideal vs noisy, error budget per noise source, how good the hardware must be for 99%, readout correction, **zero-noise extrapolation** (fold every gate to run at 3x and 5x the noise, extrapolate back to zero, with and without shot noise), cost on real chip wirings, OpenQASM 2/3 export. Also available before running ("Step through") | exact simulation, no model |
+| 7. Look inside | Step through the exact state gate by gate (amplitudes, phases, a Bloch sphere per qubit, the entanglement web), entanglement ideal vs noisy, error budget per noise source, how good the hardware must be for 99%, readout correction, **zero-noise extrapolation** (fold every gate to run at 3x and 5x the noise, extrapolate back to zero, with and without shot noise), a **Bell test** (CHSH for every entangled pair, Mermin for three qubits: can any classical explanation fake these correlations, ideal, noisy and from shots with error bars), **state tomography** (the state rebuilt from 27 simulated measurement settings, drawn as a 3D density-matrix cityscape next to the intended one), cost on real chip wirings, OpenQASM 2/3 export. Also available before running ("Step through") | exact simulation, no model |
 | 8. Ask | Questions about this run, answered only from its numbers | **Muse Spark 1.3** |
 | 9. What if | Drag the hardware quality from perfect to 10x worse and watch the exact outcome odds change | exact simulation, no model |
 | Challenges | 11 puzzles in three levels (warm-up, entanglement, gate golf): build a target state or gate, scored exactly with par like golf, stars saved in the browser, a lesson on success. Solve them with the palette, a photo of your paper answer, or words | **Muse Spark 1.3** gives hints that never spell out the answer |
+| Error-correction lab | The three-qubit bit-flip code against a bare qubit on log-log axes, perfect vs realistic gates; drag the gate quality and watch the break-even point move (the threshold idea); switch to phase flips to see the same code make things worse. One click opens the code, with an error, in the editor | exact simulation, no model |
 | Network mode | Physics model of every link, bottleneck search, fixes (relays, telescopes, memories, **entanglement purification**) re-simulated, before/after on an animated **network map** (entangled pairs in flight, thicker links deliver more, the weakest link marked) | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
 
 <table>
@@ -71,6 +72,14 @@ Q-Canvas closes that gap and refuses to fake success:
 <tr>
 <td><img src="docs/screenshots/15-optimizer.png" alt="Shorter circuits, each proven equal or rejected"></td>
 <td><img src="docs/screenshots/14-zne.png" alt="Zero-noise extrapolation"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/17-bell-test.png" alt="Bell test: the W state's pairs stay classical, the trio does not"></td>
+<td><img src="docs/screenshots/18-tomography.png" alt="State tomography cityscape of a GHZ state"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/19-qec-lab.png" alt="Error-correction lab with the break-even point"></td>
+<td><img src="docs/screenshots/16-entanglement-web.png" alt="Live entanglement web"></td>
 </tr>
 </table>
 
@@ -204,7 +213,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (219 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (231 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -320,6 +329,40 @@ exact probabilities a Grover search goes from 0.882 as measured to 0.999. The
 panel also repeats it with 4,000 sampled shots per level, because on hardware
 extrapolation amplifies shot noise (about 5.2x the shots for the same error
 bars); for some circuits that eats the gain, and the panel says so.
+
+### Bell test
+
+For every entangled pair, the CHSH value under the best measurement settings
+(Horodecki criterion: S = 2 sqrt(m1 + m2) from the pair's correlation matrix;
+classical theories allow at most 2, quantum mechanics 2.83); when exactly three
+qubits are entangled, the Mermin value over all measurement directions
+(classical at most 2, quantum 4). Each comes three ways: ideal; the noisy
+state measured with the settings planned for the ideal one; and 4,000 sampled
+shots per setting with readout error, with a standard error. A Bell pair gives
+2.828 ideal and 2.395 ± 0.025 on realistic hardware, 16 standard errors above
+classical. A GHZ state has no entangled pair at all, yet reaches Mermin 4. A W
+state's pairs are entangled but stay classical (1.886), while the trio
+reaches 3.046, the known value.
+
+### State tomography
+
+Up to three qubits: measure along X, Y or Z in all 27 combinations (1,000 shots
+each, readout error included and then inverted), estimate every Pauli
+expectation, invert to a density matrix and project it onto physical states
+(Smolin, Gambetta and Smith 2012). Shown as two 3D cityscapes, intended vs
+rebuilt, with the fidelity, the purity and how much of the gap is hardware noise
+and how much is finite shots.
+
+### Error-correction lab
+
+A logical qubit spread over three, every qubit flipped with probability p, then
+decoded (two CNOTs and a Toffoli: syndrome measurement and correction in
+deferred form). With perfect gates the logical error is 3p² − 2p³, simulated
+and checked against that formula; with realistic gates the code's own gates
+put a floor under it, so it only beats a bare qubit above a break-even rate
+(10.8% today, 0.87% with gates ten times better). Against phase flips the same
+code is worse than no code. The bit-flip code example in the gallery shows a
+single error being corrected, gate by gate.
 
 ### Challenges
 

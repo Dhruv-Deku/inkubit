@@ -5,6 +5,7 @@ import { downloadText, pct } from '../util'
 import { BlochSphere } from './Bloch'
 import { CircuitPreview } from './CircuitPreview'
 import { EntanglementWeb } from './EntanglementWeb'
+import { BellPanel, TomographyPanel } from './Labs'
 import { Histogram } from './Histogram'
 import { AmplitudeTable } from './LiveState'
 
@@ -377,6 +378,8 @@ export function InsightsSection({ spec, ins, wide = false }: { spec: CircuitSpec
         {ins.entanglement && <EntanglementPanel ent={ins.entanglement} />}
         {ins.budget && <ErrorBudgetPanel budget={ins.budget} />}
       </div>
+      {ins.bell && <BellPanel bell={ins.bell} />}
+      {ins.tomography && <TomographyPanel tomo={ins.tomography} />}
       {ins.sweep && <SweepChart sweep={ins.sweep} spec={spec} />}
       <LayoutsPanel ins={ins} />
       {ins.mitigation && <ReadoutPanel m={ins.mitigation} />}
