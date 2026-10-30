@@ -40,6 +40,9 @@ def example() -> Any:
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     if os.environ.get("QCANVAS_LIVE_OK") == "1":
         return
+    from qcanvas.adapters.config import load_settings  # reads .env, like the app
+
+    has_key = load_settings().has_key
     for item in items:
-        if "live" in item.keywords and not (os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY")):
+        if "live" in item.keywords and not has_key:
             item.add_marker(pytest.mark.skip(reason="no META_API_KEY set"))

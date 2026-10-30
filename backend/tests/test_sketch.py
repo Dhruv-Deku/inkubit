@@ -93,6 +93,28 @@ def test_draft_to_spec_links_segments():
     assert parsed.operations[0].source.bbox == (1, 2, 3, 4)
 
 
+def test_draft_measure_ops_become_measurements():
+    # Seen live: meters listed as MEASURE operations, with no classical bit.
+    spec = draft_to_spec("circuit", {
+        "title": "GHZ", "num_qubits": 3, "num_clbits": 3, "notes": "",
+        "operations": [{"gate": "H", "targets": [0], "controls": [], "params": [], "segment_id": ""},
+                       {"gate": "CX", "targets": [1], "controls": [0], "params": [], "segment_id": ""},
+                       {"gate": "CX", "targets": [2], "controls": [1], "params": [], "segment_id": ""}]
+        + [{"gate": "MEASURE", "targets": [q], "controls": [q], "params": [], "segment_id": ""} for q in range(3)],
+        "measurements": [{"qubit": 2, "clbit": 2, "segment_id": ""}],
+    }, [])
+    parsed = parse_spec(spec)
+    assert [op.gate for op in parsed.operations] == ["H", "CX", "CX"]
+    assert sorted((m.qubit, m.clbit) for m in parsed.measurements) == [(0, 0), (1, 1), (2, 2)]
+
+
+def test_draft_schema_keeps_meters_out_of_operations():
+    from qcanvas.spec.draft import CIRCUIT_DRAFT_SCHEMA
+
+    gates = CIRCUIT_DRAFT_SCHEMA["properties"]["operations"]["items"]["properties"]["gate"]["enum"]
+    assert "MEASURE" not in gates and "H" in gates
+
+
 class FakeClient:
     """Stands in for MetaClient: records requests, replays canned responses."""
 

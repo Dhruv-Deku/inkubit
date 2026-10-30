@@ -13,6 +13,7 @@ from typing import Any
 from qcanvas.spec.models import GateName
 
 _GATES = list(GateName.__args__)  # type: ignore[attr-defined]
+_DRAFT_GATES = [g for g in _GATES if g != "MEASURE"]  # meters go in "measurements", which carries the clbit
 
 
 def _obj(props: dict[str, Any]) -> dict[str, Any]:
@@ -29,7 +30,7 @@ CIRCUIT_DRAFT_SCHEMA = _obj({
     "num_qubits": {"type": "integer", "minimum": 1, "maximum": 12},
     "num_clbits": {"type": "integer", "minimum": 0, "maximum": 12},
     "operations": {"type": "array", "items": _obj({
-        "gate": {"type": "string", "enum": _GATES},
+        "gate": {"type": "string", "enum": _DRAFT_GATES},
         "targets": _INTS,
         "controls": _INTS,
         "params": {"type": "array", "items": {"type": "number"}, "description": "Angles in radians."},
@@ -106,6 +107,16 @@ def _source(item: dict[str, Any], segments: dict[str, dict[str, Any]],
     return None
 
 
+def _add_measurements(measurements: list[dict[str, Any]], qubits: list[Any]) -> None:
+    """Measure each of ``qubits`` not yet measured, into the same-index clbit when it is free."""
+    for q in qubits:
+        if not isinstance(q, int) or any(m.get("qubit") == q for m in measurements):
+            continue
+        taken = {m.get("clbit") for m in measurements}
+        clbit = q if q not in taken else next(i for i in range(len(taken) + 1) if i not in taken)
+        measurements.append({"qubit": q, "clbit": clbit})
+
+
 def draft_to_spec(kind: str, draft: dict[str, Any], segments: list[dict[str, Any]],
                   size: tuple[int, int] | None = None) -> dict[str, Any]:
     """Convert a filled draft into a spec dict with image sources attached.
@@ -117,18 +128,26 @@ def draft_to_spec(kind: str, draft: dict[str, Any], segments: list[dict[str, Any
     meta = {"title": draft.get("title") or None, "notes": draft.get("notes") or None, "origin": "image"}
     if kind == "circuit":
         ops = []
+        measurements = [{"qubit": m.get("qubit"), "clbit": m.get("clbit")} for m in draft.get("measurements", [])]
         for op in draft.get("operations", []):
+            if op.get("gate") == "MEASURE":  # a meter put in the wrong list: it has no clbit, so give it one
+                _add_measurements(measurements, op.get("targets") or [])
+                continue
             item: dict[str, Any] = {k: op.get(k, []) for k in ("targets", "controls", "params")}
             item["gate"] = op.get("gate")
             src = _source(op, by_id, size)
             if src:
                 item["source"] = src
             ops.append(item)
+        num_clbits = draft.get("num_clbits")
+        used = [m["clbit"] for m in measurements if isinstance(m.get("clbit"), int)]
+        if used and isinstance(num_clbits, int) and max(used) >= num_clbits:
+            num_clbits = max(used) + 1
         return {
             "kind": "circuit", "version": "1.0",
-            "num_qubits": draft.get("num_qubits"), "num_clbits": draft.get("num_clbits"),
+            "num_qubits": draft.get("num_qubits"), "num_clbits": num_clbits,
             "operations": ops,
-            "measurements": [{"qubit": m.get("qubit"), "clbit": m.get("clbit")} for m in draft.get("measurements", [])],
+            "measurements": measurements,
             "metadata": meta,
         }
     nodes = []

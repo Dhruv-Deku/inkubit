@@ -39,7 +39,8 @@ DRAFT_SYSTEM = (
     "Operations are listed left to right. Link every operation or node to the segment it came "
     "from by putting that segment's id in segment_id, and always give its box on a 0-1000 grid of the "
     "photo (x1, y1, x2, y2; 0,0 is the top-left), even when no segment matches. Do not add anything that is not drawn, "
-    "except: if no measurements are drawn, measure every qubit into the classical bit of the same index."
+    "except: if no measurements are drawn, measure every qubit into the classical bit of the same index. "
+    "Meters go in measurements (qubit and classical bit), never in operations."
 )
 
 TEXT_SYSTEM = (
