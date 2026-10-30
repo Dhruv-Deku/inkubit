@@ -213,7 +213,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (231 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (233 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -401,10 +401,9 @@ results caught. Regenerate with `scripts/benchmark.py`.
 - Offline mode recognises only the three bundled sketches; reading your own photo
   needs the live Meta models. Offline, descriptions in words are limited to named
   algorithms, gate lists and simple networks, explanations are English only, and
-  questions are answered by topic from the run's facts. The live adapters are implemented from Meta's docs
-  and unit-tested against recorded request shapes, but were not exercised against
-  the live API during development (no key was available); run `pytest -m live`
-  first.
+  questions are answered by topic from the run's facts. The live adapters were
+  exercised end to end against the Meta Model API with fallback off (D34);
+  `pytest -m live` repeats a cheap check of each model.
 - The Muse Code CLI backend is opt-in and untested here (the CLI was not installed).
 
 ## Repository guide

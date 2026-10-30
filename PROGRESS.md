@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (231 tests pass offline; frontend builds; last checked 2026-10-29)
+## Done (233 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-10-30)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -28,12 +28,13 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
   - Optimizer (D27): rules with reasons, Qiskit level 3, rules + Qiskit, live Muse Spark with one retry; every proposal proven (unitary / state / odds) or rejected; fuzz-tested.
   - Zero-noise extrapolation by gate folding, exact and with shots (D28); entanglement web in the live strip and inspector (D29).
   - Bell tests: CHSH per entangled pair, Mermin for three qubits, ideal / noisy / shots with error bars (D30). State tomography with a 3D cityscape (D31). Error-correction lab with break-even vs gate quality, and a bit-flip code example (D32). "Say it" voice input (D33).
+  - First live run against the Meta Model API, 2026-10-30 (D34): every model path works with fallback off; two problems found and fixed (meters in the sketch draft, Hindi in Latin letters). About $0.40 of credit used.
 
 ## In progress
 - Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the offline tests and a headless-browser check of every new screen (desktop and 390 px phone width).
 
 ## Known issues / limitations
-- Live Meta adapters are implemented from the docs and tested against recorded request shapes with a fake client, but **never called live** (no key on this machine). First live run may surface response-shape surprises; the fallback keeps the UI working and labels it.
+- Live runs are non-deterministic: a sketch read or a code draft can differ between fresh calls (responses are cached, so a recorded demo replays exactly). The verifier and the spec validator still decide what is shown as verified.
 - Muse Code CLI backend untested (CLI not installed).
 - Network purification is the simple BBPSSW recurrence (D19); no nested or pumping schemes.
 - Generated sample PNGs embed random paper grain: re-running `make_sketches.py` changes hashes (fixtures are rewritten together, so they stay consistent).

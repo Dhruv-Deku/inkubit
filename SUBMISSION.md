@@ -1,8 +1,7 @@
 # Submission text (ready to paste)
 
 Fill the two links, then paste each block into the matching form field.
-Every number below comes from a run of this repo; re-check them after the
-live-mode recording.
+Every number below comes from a run of this repo.
 
 **Track:** Indie developer · **Theme:** Push the Frontier
 
@@ -138,10 +137,18 @@ repeatable and cheap.
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network |
 | **Muse Code** (opt-in, experimental) | Alternative repair backend: the verifier, not the agent's exit code, decides if a fix worked |
 
+Tested live end to end: all three sample sketches read correctly (SAM 3.1 finds
+the parts, Muse Spark fills in what it missed and says so), Muse Spark's Qiskit
+code verified on the first attempt, and explanations come back in each
+language's own script. On the two-qubit Grover example, whose answer is fixed
+in advance, Muse Spark noticed the circuit only ever produces |11> and proposed
+two X gates; exact simulation proved it, where rewrite rules plus Qiskit's
+level-3 transpiler stopped at 7 gates.
+
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 231 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 233 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and

@@ -386,3 +386,18 @@ The describe box has a "Say it" button using the browser's own speech
 recognition (hidden where unavailable). The transcript goes through the same
 describe-in-words path as typed text. Its tooltip says the browser may send audio
 to its maker's service; Q-Canvas itself never receives audio.
+
+## D34. First live run
+2026-10-30, every path with `QCANVAS_ALLOW_FALLBACK=0` so nothing could hide
+behind the mock: sketch reading (concepts, SAM 3.1, draft) on the three samples,
+a run (code, verification, explanation, Muse Image diagram), ask, text to spec
+for a circuit and a network, the optimizer and a challenge hint. Two fixes came
+out of it. The circuit draft schema allowed MEASURE as an operation but had no
+classical-bit field, and Muse Spark put the GHZ sketch's meters there, so the
+spec could never validate: MEASURE is out of the draft's gate enum, the prompt
+says meters go in measurements, and a MEASURE operation that still arrives is
+converted. Hindi came back transliterated into Latin letters: the prompt now
+names each language's script, checked live for Hindi and Arabic. SAM's
+confidences on the hand-drawn samples were lower than on the offline fixtures
+(0.5 to 0.8, and it missed some boxes); Muse Spark's own boxes cover those and
+are labelled as such. Total cost of the run, from the cached usage: about $0.40.
