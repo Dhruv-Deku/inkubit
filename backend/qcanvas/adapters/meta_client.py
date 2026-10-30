@@ -7,6 +7,7 @@ Authorization header and never logged.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import random
@@ -71,6 +72,37 @@ class MetaClient:
                 if wait is not None and attempt < self._retries:
                     time.sleep(min(wait, 20.0))
                     continue
+            if attempt < self._retries:
+                time.sleep(min(2 ** attempt + random.random(), 20.0))
+        log.warning("Meta API call to %s failed: %s", path, last_error)
+        raise MetaAPIError(f"{path} failed: {last_error}")
+
+    def post_multipart(self, path: str, request: dict[str, Any], audio: bytes, filename: str, mime: str,
+                       use_cache: bool = True) -> tuple[dict[str, Any], bool]:
+        """POST a ``request`` JSON part and an ``audio`` part (the transcription endpoint). Returns (json, cached)."""
+        key = request_key(path + "#multipart", {"request": request, "audio_sha256": hashlib.sha256(audio).hexdigest()})
+        if use_cache:
+            hit = self.cache.get(key)
+            if hit is not None:
+                return hit, True
+        url = self._settings.base_url + path
+        headers = {"Authorization": f"Bearer {self._key}", "Accept": "application/json"}
+        files = {"request": (None, json.dumps(request), "application/json"), "audio": (filename, audio, mime)}
+        last_error = "no attempt made"
+        for attempt in range(self._retries + 1):
+            try:
+                resp = httpx.post(url, headers=headers, files=files, timeout=self._timeout)
+            except httpx.HTTPError as err:
+                last_error = f"network error: {type(err).__name__}"
+            else:
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if use_cache:
+                        self.cache.put(key, data)
+                    return data, False
+                last_error = f"HTTP {resp.status_code}: {_error_message(resp)}"
+                if resp.status_code not in RETRY_STATUS:
+                    break
             if attempt < self._retries:
                 time.sleep(min(2 ** attempt + random.random(), 20.0))
         log.warning("Meta API call to %s failed: %s", path, last_error)

@@ -134,6 +134,14 @@ class DiagramResult(BaseModel):
     call: ModelCall
 
 
+class Transcript(BaseModel):
+    """Speech turned into text."""
+
+    text: str
+    duration_ms: int = 0
+    call: ModelCall
+
+
 class SegmentationModel(ABC):
     """SAM 3.1: image -> segments."""
 
@@ -180,6 +188,13 @@ class CodeModel(ABC):
 
     @abstractmethod
     def repair(self, request: RepairRequest) -> RepairResult: ...
+
+
+class SpeechModel(ABC):
+    """Muse Voice Transcribe: a short recording -> text."""
+
+    @abstractmethod
+    def transcribe(self, wav: bytes, keywords: list[str] | None = None) -> Transcript: ...
 
 
 class ImageModel(ABC):

@@ -15,6 +15,7 @@ DEFAULT_REASONING_MODEL = "muse-spark-1.3"
 DEFAULT_CODE_MODEL = "muse-spark-1.3"
 DEFAULT_IMAGE_MODEL = "muse-image-1.0"
 DEFAULT_SEGMENT_MODEL = "sam-3.1"
+DEFAULT_VOICE_MODEL = "muse-voice-transcribe-1.0"  # docs/meta-api/api-reference_voice_transcribe.md
 META_BASE_URL = "https://api.meta.ai/v1"
 
 Provider = Literal["meta", "mock"]
@@ -31,6 +32,7 @@ class Settings:
     image_model: str
     segment_model: str
     base_url: str
+    voice_model: str
     cache_dir: str
     code_backend: str
     api_key: str | None = None
@@ -50,6 +52,7 @@ class Settings:
                 "code": self.code_model,
                 "image": self.image_model,
                 "segmentation": self.segment_model,
+                "voice": self.voice_model,
             },
             "code_backend": self.code_backend,
         }
@@ -75,6 +78,7 @@ def load_settings() -> Settings:
         image_model=os.environ.get("QCANVAS_IMAGE_MODEL", DEFAULT_IMAGE_MODEL),
         segment_model=os.environ.get("QCANVAS_SEGMENT_MODEL", DEFAULT_SEGMENT_MODEL),
         base_url=os.environ.get("QCANVAS_META_BASE_URL", META_BASE_URL).rstrip("/"),
+        voice_model=os.environ.get("QCANVAS_VOICE_MODEL", DEFAULT_VOICE_MODEL),
         cache_dir=os.environ.get("QCANVAS_CACHE_DIR", str(BACKEND_DIR / ".qcanvas_cache")),
         code_backend=os.environ.get("QCANVAS_CODE_BACKEND", "api"),
         api_key=(os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY") or None),

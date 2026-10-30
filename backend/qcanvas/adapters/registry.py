@@ -12,7 +12,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from qcanvas.adapters.base import CodeModel, ImageModel, ModelCall, ReasoningModel, SegmentationModel
+from qcanvas.adapters.base import CodeModel, ImageModel, ModelCall, ReasoningModel, SegmentationModel, SpeechModel
 from qcanvas.adapters.config import Settings, load_settings
 
 log = logging.getLogger("qcanvas.adapters")
@@ -67,19 +67,22 @@ class _WithFallback:
 
 @dataclass
 class Models:
-    """The four adapters the app uses."""
+    """The five adapters the app uses."""
 
     segmentation: SegmentationModel
     reasoning: ReasoningModel
     code: CodeModel
     image: ImageModel
     settings: Settings
+    speech: SpeechModel
 
 
 def _mocks() -> dict[str, Any]:
     from qcanvas.adapters.mock_code import MockCodeModel
 
-    out: dict[str, Any] = {"code": MockCodeModel()}
+    from qcanvas.adapters.voice import MockSpeechModel
+
+    out: dict[str, Any] = {"code": MockCodeModel(), "speech": MockSpeechModel()}
     try:
         from qcanvas.adapters.mock_vision import MockImageModel, MockReasoningModel, MockSegmentationModel
 
@@ -98,8 +101,10 @@ def _metas(settings: Settings) -> dict[str, Any]:
         client = MetaClient(settings)
     except Exception as err:  # noqa: BLE001
         reason = str(err)
-        return {k: _Unavailable(reason) for k in ("segmentation", "reasoning", "code", "image")}
-    out: dict[str, Any] = {"code": MetaCodeModel(settings, client)}
+        return {k: _Unavailable(reason) for k in ("segmentation", "reasoning", "code", "image", "speech")}
+    from qcanvas.adapters.voice import MetaSpeechModel
+
+    out: dict[str, Any] = {"code": MetaCodeModel(settings, client), "speech": MetaSpeechModel(settings, client)}
     if settings.code_backend == "muse-cli":
         from qcanvas.adapters.muse_cli import MuseCodeCliModel
 

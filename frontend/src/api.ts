@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, RepetitionLab, ShorLab, RunOptions,
+  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -55,6 +55,11 @@ export const api = {
   job: (id: string) => call<JobSummary>(`/api/jobs/${id}`),
   ask: (jobId: string, question: string) => call<Explanation>(`/api/jobs/${jobId}/ask`, json({ question })),
   fromText: (text: string) => call<TextDraft>('/api/jobs/text', json({ text })),
+  transcribe: (audio: Blob) => {
+    const form = new FormData()
+    form.append('audio', audio, 'speech.wav')
+    return call<Transcript>('/api/transcribe', { method: 'POST', body: form })
+  },
   insights: (spec: Spec, noise: string) => call<CircuitInsights>('/api/insights', json({ spec, noise })),
   state: (spec: Spec, noise: string, scale?: number, signal?: AbortSignal) =>
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),

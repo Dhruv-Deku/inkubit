@@ -72,7 +72,7 @@ export default function App() {
   const [highlight, setHighlight] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [startError, setStartError] = useState<string | null>(null)
-  const [fromText, setFromText] = useState<{ text: string; notes: string; call: ModelCall } | null>(null)
+  const [fromText, setFromText] = useState<{ text: string; notes: string; call: ModelCall; voice?: ModelCall } | null>(null)
   const [shared, setShared] = useState<string | null>(null)
   const [recent, setRecent] = useState<RecentRun[]>([])
   const [preview, setPreview] = useState<{ ins: CircuitInsights | null; loading: boolean; error: string | null } | null>(null)
@@ -177,13 +177,13 @@ export default function App() {
   const code = examples?.specs.find((e) => e.id === 'bit_flip_code')
   const tryCode = code ? () => onSpec(clone(code.spec)) : undefined
 
-  const onText = async (text: string) => {
+  const onText = async (text: string, voice?: ModelCall) => {
     setBusy(true)
     setStartError(null)
     try {
       const draft = await api.fromText(text)
       setSketch(null)
-      setFromText({ text, notes: draft.notes, call: draft.call })
+      setFromText({ text, notes: draft.notes, call: draft.call, voice })
       if (draft.spec.kind !== 'circuit') setChallenge(null)
       setSpec(draft.spec)
       setStage('edit')
@@ -308,7 +308,8 @@ export default function App() {
           )}
           {fromText && (
             <div className="notice row wrap" style={{ gap: 8 }}>
-              <span>Built from your words: <em>“{fromText.text}”</em></span><CallBadge call={fromText.call} />
+              <span>{fromText.voice ? 'Built from what you said' : 'Built from your words'}: <em>“{fromText.text}”</em></span>
+              {fromText.voice && <CallBadge call={fromText.voice} />}<CallBadge call={fromText.call} />
               {fromText.notes && <span className="sub">{fromText.notes}</span>}
             </div>
           )}

@@ -339,6 +339,30 @@ async def job_text(body: TextRequest) -> dict[str, Any]:
     return {"kind": draft.spec.get("kind"), **draft.model_dump(mode="json", exclude={"extra_segments"})}
 
 
+@app.post("/api/transcribe")
+async def transcribe(audio: UploadFile = File(...)) -> dict[str, Any]:
+    """A short spoken description -> text (Muse Voice Transcribe; live mode only, never faked offline)."""
+    from qcanvas.adapters.voice import AudioError, check_wav
+
+    raw = await audio.read()
+    if len(raw) > 4_000_000:
+        raise HTTPException(413, "keep the recording under a minute")
+    try:
+        check_wav(raw)
+    except AudioError as err:
+        raise HTTPException(400, str(err)) from None
+    models = get_models()
+    if models.settings.provider != "meta":
+        raise HTTPException(409, "offline mode cannot transcribe audio; the browser's own speech recognition is used instead")
+    try:
+        out = await asyncio.to_thread(models.speech.transcribe, raw)
+    except Exception as err:  # noqa: BLE001 - reported, never replaced by a made-up transcript
+        raise HTTPException(502, f"Transcription failed: {err}") from None
+    if not out.text:
+        raise HTTPException(422, "no speech was heard in the recording")
+    return out.model_dump(mode="json")
+
+
 @app.post("/api/jobs/spec")
 def job_spec(body: SpecRequest) -> dict[str, Any]:
     """Validate the spec and start an agent run; returns the job id."""

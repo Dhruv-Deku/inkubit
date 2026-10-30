@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react'
-import type { Examples, RecentRun, Spec } from '../types'
+import type { Examples, ModelCall, RecentRun, Spec } from '../types'
 import { CameraCapture } from './CameraCapture'
 import { Upload } from './Icons'
 import { VoiceButton } from './VoiceButton'
@@ -13,7 +13,7 @@ interface Props {
   error: string | null
   onImage: (file: Blob, name: string) => void
   onSpec: (spec: Spec) => void
-  onText: (text: string) => void
+  onText: (text: string, voice?: ModelCall) => void
   live: boolean
   recent: RecentRun[]
   onOpen: (id: string) => void
@@ -121,7 +121,7 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
           onSubmit={(e) => { e.preventDefault(); if (words.trim()) onText(words) }}>
           <input type="text" value={words} onChange={(e) => setWords(e.target.value)} style={{ flex: '1 1 220px', minWidth: 0 }}
             placeholder="e.g. Grover search over 2 qubits, or: h 0; cx 0 1; measure all" aria-label="Describe a circuit or network" spellCheck={false} />
-          <VoiceButton onText={setWords} onDone={(t) => onText(t)} disabled={busy} />
+          <VoiceButton onText={setWords} onDone={(t, voice) => onText(t, voice)} disabled={busy} live={live} />
           <button className="btn primary" type="submit" disabled={busy || !words.trim()}>{busy ? 'Reading…' : 'Build it'}</button>
         </form>
         <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>

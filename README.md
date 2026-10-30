@@ -34,7 +34,7 @@ Q-Canvas closes that gap and refuses to fake success:
 
 | Step | What happens | Model |
 | --- | --- | --- |
-| 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words or say it out loud** (browser speech recognition), or paste JSON | **Muse Spark 1.3** turns a description into a spec |
+| 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words or say it out loud**, or paste JSON | **Muse Voice Transcribe 1.0** hears it, **Muse Spark 1.3** turns the description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
 | 3. Read it | The boxes and the photo become a validated JSON spec, each operation linked to its box | **Muse Spark 1.3** with structured output |
 | 4. Correct it | Side-by-side photo overlay and editor (form or raw JSON); hover a box to find its line; live validation with readable errors. **Compose by clicking**: pick a gate from the palette, click a wire (control first for CNOTs), erase, undo; a **live state** strip (3D Bloch spheres you can turn, each qubit's path, amplitudes, and an **entanglement web**: gold threads between entangled pairs, arcs for entanglement with the rest) updates on every edit | exact simulation, no model |
@@ -156,6 +156,12 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   8. proposes a shorter circuit with the same measured odds (structured output). Exact
      simulation accepts or rejects it; a rejected proposal goes back once with the
      outcome that differs, so the model can fix its own mistake.
+- **Muse Voice Transcribe 1.0** (`muse-voice-transcribe-1.0`, `POST /v1/asr/transcribe`,
+  multipart, `PUSH_TO_TALK`): "Say it" records the microphone in the browser,
+  encodes a mono 16 kHz WAV and sends it with a keyword list (qubit, Hadamard,
+  CNOT, GHZ, Shor, ...) that biases the recogniser toward quantum words. The
+  transcript then takes the describe-in-words path. Offline there is no speech
+  model, so the browser's own recogniser is used and the server refuses to guess.
 - **Muse Image 1.0** (`muse-image-1.0`, `POST /v1/images/generations`,
   `response_format: b64_json`): a clean, annotated illustration of the final
   design. It is always shown next to the exact Qiskit drawing, so an imperfect

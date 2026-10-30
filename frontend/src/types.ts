@@ -204,6 +204,12 @@ export interface CircuitResult {
   insights?: CircuitInsights
 }
 
+export interface Transcript {
+  text: string
+  duration_ms: number
+  call: ModelCall
+}
+
 export interface TextDraft {
   kind: 'circuit' | 'network'
   spec: Spec

@@ -401,3 +401,15 @@ names each language's script, checked live for Hindi and Arabic. SAM's
 confidences on the hand-drawn samples were lower than on the offline fixtures
 (0.5 to 0.8, and it missed some boxes); Muse Spark's own boxes cover those and
 are labelled as such. Total cost of the run, from the cached usage: about $0.40.
+
+## D35. Say it with Muse Voice Transcribe
+Live, "Say it" records the microphone with Web Audio, averages it down to
+16 kHz, encodes a mono 16-bit WAV in the browser and posts it to
+`/api/transcribe`, which checks the format and forwards it to Muse Voice
+Transcribe (`PUSH_TO_TALK`, with quantum keywords for biasing). The browser does
+the encoding so the server needs no ffmpeg. Recordings stop at 30 s. Offline the
+endpoint answers 409 and the button uses the browser's recogniser (D33); the
+mock never invents a transcript. The banner over the spec credits both the voice
+model and Muse Spark. Checked live: three Windows-TTS clips through a fake
+microphone in headless Edge, transcribed in 3 to 4 s and turned into the right
+GHZ, Shor and satellite specs.
