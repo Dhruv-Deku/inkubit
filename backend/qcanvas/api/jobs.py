@@ -131,7 +131,7 @@ def _insights(job: Job, result: dict[str, Any]) -> dict[str, Any] | None:
     try:
         verdict = result.get("verdict") or {}
         measured = verdict.get("measured") if result.get("verified") else None
-        ins = analyze_circuit(job.spec, job.options.noise, measured)
+        ins = analyze_circuit(job.spec, job.options.noise, measured, job.options.shots)
     except Exception as err:  # noqa: BLE001 - failing soft, like the other extras
         bus.emit("insights", "warn", f"Could not analyse the circuit: {err}")
         return None

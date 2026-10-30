@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
-import type { BellResult, BellTest, RepetitionLab, Tomography } from '../types'
+import type { BellResult, BellTest, CircuitSpec, RepetitionLab, ShorLab, Tomography } from '../types'
 import { pct } from '../util'
 
 // ---------------------------------------------------------------- Bell test
@@ -276,4 +276,150 @@ export function RepetitionLabPanel({ onTry }: { onTry?: () => void }) {
       )}
     </div>
   )
+}
+
+// ---------------------------------------------------------------- Shor's algorithm
+
+const BASES = Array.from({ length: 13 }, (_, i) => i + 2)
+const gcd = (x: number, y: number): number => (y ? gcd(y, x % y) : x)
+
+/** The counting register's eight readings: realistic-noise odds (bars), perfect odds (outlines) and shots (dots). */
+function useNarrow(query = '(max-width: 600px)') {
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia?.(query)
+    if (!mq) return
+    const on = () => setNarrow(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [query])
+  return narrow
+}
+
+function ShorBars({ lab, pick, onPick }: { lab: ShorLab; pick: number; onPick: (y: number) => void }) {
+  const narrow = useNarrow()
+  const W = narrow ? 360 : 560, H = narrow ? 190 : 210, L = narrow ? 34 : 40, R = 4, T = 10, B = 48
+  const top = Math.max(...lab.outcomes.map((o) => Math.max(o.ideal, o.noisy, o.measured ?? 0)))
+  const yMax = Math.ceil(top * 1.12 * 10) / 10
+  const band = (W - L - R) / lab.outcomes.length
+  const bw = Math.min(30, band * 0.46)
+  const y = (v: number) => T + (1 - v / yMax) * (H - T - B)
+  const good = lab.outcomes.filter((o) => o.ok).map((o) => o.bits)
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block' }} role="img"
+      aria-label={`Counting register readings for a = ${lab.a}. ${good.length ? `${good.join(' and ')} give the factors.` : 'No reading gives the factors.'}`}>
+      {[0, yMax / 2, yMax].map((v) => (
+        <g key={v}>
+          <line x1={L} x2={W - R} y1={y(v)} y2={y(v)} stroke="var(--line)" />
+          <text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize={10.5} fill="var(--muted)" fontFamily="var(--mono)">{pct(v, 0)}</text>
+        </g>
+      ))}
+      {lab.outcomes.map((o, i) => {
+        const cx = L + band * (i + 0.5)
+        const tone = o.ok ? 'var(--pass)' : 'var(--text-2)'
+        const on = o.y === pick
+        return (
+          <g key={o.bits} onClick={() => onPick(o.y)} onMouseEnter={() => onPick(o.y)} style={{ cursor: 'pointer' }}>
+            <rect x={cx - band / 2 + 2} y={T} width={band - 4} height={H - T - 4} rx={6} fill={on ? 'var(--panel-3)' : 'transparent'} fillOpacity={on ? 0.6 : 0} />
+            {o.noisy > 0.0005 && <rect x={cx - bw / 2} y={y(o.noisy)} width={bw} height={Math.max(1, y(0) - y(o.noisy))} rx={4} fill={tone} fillOpacity={o.ok ? 0.85 : 0.45} />}
+            {o.ideal > 1e-9 && <rect x={cx - bw / 2 - 3} y={y(o.ideal)} width={bw + 6} height={y(0) - y(o.ideal)} rx={5} fill="none" stroke="var(--text)" strokeOpacity={0.55} strokeDasharray="3 3" />}
+            {o.measured !== null && o.measured > 0 && <circle cx={cx} cy={y(o.measured)} r={4} fill="var(--measured)" stroke="var(--panel)" strokeWidth={2} />}
+            <text x={cx} y={H - B + 17} textAnchor="middle" fontSize={11.5} fill={on ? 'var(--text)' : 'var(--text-2)'} fontFamily="var(--mono)">{o.bits}</text>
+            <text x={cx} y={H - B + 33} textAnchor="middle" fontSize={10.5} fill="var(--muted)" fontFamily="var(--mono)">{o.fraction}</text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+/** Shor's algorithm for 15: the period peaks, then the classical finish for one reading. */
+export function ShorPanel({ lab, title, sub, shotsLabel, picker, onOpen }: {
+  lab: ShorLab; title: string; sub: string; shotsLabel: string
+  picker?: { a: number; set: (a: number) => void }; onOpen?: (spec: CircuitSpec) => void
+}) {
+  const first = lab.outcomes.find((o) => o.ok) ?? lab.outcomes.find((o) => o.ideal > 1e-9 && o.y > 0) ?? lab.outcomes[0]
+  const [pick, setPick] = useState<number>(first?.y ?? 0)
+  useEffect(() => { setPick(first?.y ?? 0) }, [lab.a]) // eslint-disable-line react-hooks/exhaustive-deps
+  const o = lab.outcomes.find((x) => x.y === pick) ?? first
+  const runs = lab.success_noisy > 0 ? 1 / lab.success_noisy : null
+  const spec = lab.spec
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <h2>{title}</h2>
+        <span className="sub">{sub}</span>
+        <span className="spacer" />
+        {onOpen && spec && <button className="btn small" onClick={() => onOpen(spec)}>Open the circuit in the editor</button>}
+      </div>
+      {picker && (
+        <div className="row wrap" style={{ gap: 6, marginBottom: 12 }}>
+          <span className="label" style={{ marginRight: 4 }}>Base a</span>
+          <div className="seg bases">
+            {BASES.map((b) => (
+              <button key={b} className={b === picker.a ? 'on' : gcd(b, 15) > 1 ? 'shares' : ''} onClick={() => picker.set(b)}
+                title={gcd(b, 15) > 1 ? `${b} shares a factor with 15` : `period finding for ${b}ˣ mod 15`}>{b}</button>
+            ))}
+          </div>
+        </div>
+      )}
+      {!lab.coprime ? (
+        <div className="shor-lucky">
+          <div className="shor-eq mono">gcd({lab.a}, 15) = {lab.shortcut} → 15 = {lab.shortcut} × {15 / (lab.shortcut ?? 1)}</div>
+          <p className="lead" style={{ margin: '8px 0 0' }}>{lab.summary}</p>
+        </div>
+      ) : (
+        <>
+          <div className="shor-grid">
+            <div>
+              <ShorBars lab={lab} pick={pick} onPick={setPick} />
+              <div className="row wrap legend" style={{ gap: 14 }}>
+                <span className="sub"><svg width={14} height={10} aria-hidden><rect x={1} y={1} width={12} height={8} rx={2} fill="var(--pass)" fillOpacity={0.85} /></svg> gives the factors</span>
+                <span className="sub"><svg width={14} height={10} aria-hidden><rect x={1} y={1} width={12} height={8} rx={2} fill="var(--text-2)" fillOpacity={0.45} /></svg> does not</span>
+                <span className="sub"><svg width={14} height={10} aria-hidden><rect x={1} y={1} width={12} height={8} rx={2} fill="none" stroke="var(--text)" strokeOpacity={0.55} strokeDasharray="3 3" /></svg> perfect qubits</span>
+                {lab.success_measured !== null && <span className="sub"><svg width={10} height={10} aria-hidden><circle cx={5} cy={5} r={4} fill="var(--measured)" /></svg> {shotsLabel}</span>}
+                <span className="sub">bars: {lab.noise_label.toLowerCase()} noise · reading q2 q1 q0, phase y/8</span>
+              </div>
+            </div>
+            {o && (
+              <div className="shor-steps">
+                <div className="k">Reading <span className="mono">{o.bits}</span>, step by step</div>
+                <ol>
+                  {o.steps.map((s, i) => <li key={i} className={i === o.steps.length - 1 ? (o.ok ? 'end ok' : 'end') : undefined}>{s}</li>)}
+                </ol>
+                <div className="sub mono">perfect {pct(o.ideal, 1)} · noisy {pct(o.noisy, 1)}{o.measured !== null ? ` · ${shotsLabel} ${pct(o.measured, 1)}` : ''}</div>
+              </div>
+            )}
+          </div>
+          <div className="tiles">
+            <div className="tile"><div className="k">Period of {lab.a}ˣ mod 15</div><div className="v">r = {lab.period}</div></div>
+            <div className="tile"><div className="k">Factors per run, perfect</div><div className={`v ${lab.success_ideal > 0 ? 'good' : 'bad'}`}>{pct(lab.success_ideal, 0)}</div></div>
+            <div className="tile"><div className="k">With noise</div><div className="v">{pct(lab.success_noisy, 0)}</div>
+              <div className="s">{runs && runs < 100 ? `about ${runs.toFixed(1)} runs to succeed` : 'never succeeds'}</div></div>
+            <div className="tile"><div className="k">{lab.success_measured !== null ? `In ${shotsLabel}` : 'Shots'}</div>
+              <div className="v">{lab.success_measured !== null ? pct(lab.success_measured, 0) : '–'}</div>
+              <div className="s">{lab.success_measured !== null ? 'of readings gave 3 × 5' : 'run it to sample'}</div></div>
+          </div>
+          <p className="lead" style={{ margin: '12px 0 0' }}>{lab.summary}</p>
+        </>
+      )}
+    </div>
+  )
+}
+
+/** The start-page lab: pick a base and watch the period, the odds and the factors change. */
+export function ShorLabPanel({ onOpen }: { onOpen?: (spec: CircuitSpec) => void }) {
+  const [a, setA] = useState(7)
+  const [lab, setLab] = useState<ShorLab | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  useEffect(() => {
+    const ctl = new AbortController()
+    api.shorLab(a, ctl.signal).then((r) => { setLab(r); setError(null) })
+      .catch((e: Error) => { if (!ctl.signal.aborted) setError(e.message) })
+    return () => ctl.abort()
+  }, [a])
+  if (error) return <div className="panel"><div className="panel-head"><h2>Shor's algorithm lab</h2></div><div className="notice error">{error}</div></div>
+  if (!lab) return null
+  return <ShorPanel lab={lab} title="Shor's algorithm lab" sub="factor 15 by finding a period"
+    shotsLabel={`${(lab.shots ?? 0).toLocaleString()} shots`} picker={{ a, set: setA }} onOpen={onOpen} />
 }

@@ -62,7 +62,7 @@ def health() -> dict[str, Any]:
 
 
 ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and",
-              "teleportation", "w_state", "bit_flip_code"}
+              "teleportation", "w_state", "bit_flip_code", "shor15"}
 
 
 @app.get("/api/examples")
@@ -202,6 +202,16 @@ def lab_repetition(scale: float = 1.0) -> dict[str, Any]:
     if not 0 <= scale <= 20:
         raise HTTPException(422, "scale must be between 0 and 20")
     return repetition_lab(float(f"{scale:.3g}")).model_dump(mode="json")
+
+
+@app.get("/api/lab/shor")
+def lab_shor(a: int = 7) -> dict[str, Any]:
+    """Shor's algorithm for 15 with base ``a``: exact odds, seeded shots and the classical finish."""
+    from qcanvas.shor import shor_lab
+
+    if not 2 <= a <= 14:
+        raise HTTPException(422, "a must be between 2 and 14")
+    return shor_lab(a).model_dump(mode="json")
 
 
 class ChallengeRequest(BaseModel):

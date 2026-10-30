@@ -13,6 +13,7 @@ statevector or density-matrix simulation of the spec, so it is deterministic.
 from __future__ import annotations
 
 import math
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from functools import lru_cache
 
@@ -25,6 +26,7 @@ from qiskit_aer.noise import thermal_relaxation_error
 from qcanvas.codegen.template import format_angle
 from qcanvas.insights.bell import BellTest, bell_tests
 from qcanvas.insights.tomography import MAX_TOMO_QUBITS, Tomography, tomography
+from qcanvas.shor import ShorLab, shor_readout
 from qcanvas.sim.noise import TOFFOLI_CNOTS, NoisePreset, get_preset, toffoli_error
 from qcanvas.spec.models import CircuitSpec, Operation
 from qcanvas.verify.expected import (
@@ -155,6 +157,7 @@ class CircuitInsights(BaseModel):
     zne: ZeroNoise | None = None
     bell: BellTest | None = None
     tomography: Tomography | None = None
+    factoring: ShorLab | None = None
     layouts: list[LayoutCost] = Field(default_factory=list)
     layout_summary: str = ""
     exports: Exports
@@ -539,8 +542,8 @@ def zero_noise(spec: CircuitSpec, preset: NoisePreset, ideal: Distribution) -> Z
 
     rng = np.random.default_rng(1234)
     sampled = []
-    for s in ZNE_SCALES:
-        full = noisy_distribution(fold(spec, s), preset)
+    full_at = [apply_readout_error(d, spec, preset.readout_p01, preset.readout_p10) for d in exact]  # same state
+    for full in full_at:
         ks = sorted(full)
         p = np.array([full[k] for k in ks])
         counts = rng.multinomial(ZNE_SHOTS, p / p.sum())
@@ -554,7 +557,7 @@ def zero_noise(spec: CircuitSpec, preset: NoisePreset, ideal: Distribution) -> Z
     top = max(ideal, key=ideal.get)
     top_at = [round(d.get(top, 0.0), 6) for d in exact]
     top_zero = round(sum(c * p for c, p in zip(coeffs, top_at)), 6)
-    raw = hellinger_fidelity(ideal, noisy_distribution(spec, preset))
+    raw = hellinger_fidelity(ideal, full_at[0])
     at = [round(hellinger_fidelity(ideal, d), 6) for d in exact]
     mit, shots_f = hellinger_fidelity(ideal, mitigated), hellinger_fidelity(ideal, from_shots)
     ro_shots = hellinger_fidelity(ideal, _clip(sampled[0]))
@@ -639,7 +642,7 @@ def exports(spec: CircuitSpec) -> Exports:
 # ---------------------------------------------------------------- all together
 
 def analyze_circuit(spec: CircuitSpec, noise: str = "realistic",
-                    measured: Distribution | None = None) -> CircuitInsights:
+                    measured: Distribution | None = None, shots: int | None = None) -> CircuitInsights:
     """Every insight for one circuit under one noise preset."""
     preset = get_preset(noise)
     ideal = ideal_distribution(spec)
@@ -658,17 +661,23 @@ def analyze_circuit(spec: CircuitSpec, noise: str = "realistic",
         last = steps[-1]
         bell = bell_tests(psi, spec.num_qubits, [(int(a), int(b)) for a, b, _ in last.links],
                           [q for q, e in enumerate(last.entropy) if e > 0.01], rho, preset)
+    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="qcanvas-insight") as pool:  # Aer releases the GIL
+        budget = pool.submit(error_budget, spec, preset, ideal) if noisy_ok and not preset.is_ideal else None
+        sweep = pool.submit(noise_sweep, spec, preset, ideal) if noisy_ok else None
+        zne = pool.submit(zero_noise, spec, preset, ideal) if noisy_ok else None
+        factoring = shor_readout(spec, noise, measured, shots if measured else None)
     return CircuitInsights(
         layouts=layouts,
         layout_summary=layout_summary,
         steps=steps,
         bell=bell,
         tomography=tomo,
+        factoring=factoring,
         entanglement=entanglement(spec, preset, rho),
-        budget=error_budget(spec, preset, ideal) if noisy_ok and not preset.is_ideal else None,
-        sweep=noise_sweep(spec, preset, ideal) if noisy_ok else None,
+        budget=budget.result() if budget else None,
+        sweep=sweep.result() if sweep else None,
         mitigation=correct_readout(spec, measured, preset, ideal) if measured else None,
-        zne=zero_noise(spec, preset, ideal) if noisy_ok else None,
+        zne=zne.result() if zne else None,
         exports=exports(spec),
         notes=notes,
     )

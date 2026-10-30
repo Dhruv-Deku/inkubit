@@ -7,7 +7,7 @@ import { Histogram } from './components/Histogram'
 import { Logo } from './components/Icons'
 import { OverlayView } from './components/OverlayView'
 import { InsightsSection } from './components/Insights'
-import { RepetitionLabPanel } from './components/Labs'
+import { RepetitionLabPanel, ShorLabPanel } from './components/Labs'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -292,6 +292,7 @@ export default function App() {
             live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
             extra={<>
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
+              <ShorLabPanel onOpen={(s) => onSpec(clone(s))} />
               <RepetitionLabPanel onTry={tryCode} />
             </>} />
         </>

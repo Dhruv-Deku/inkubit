@@ -94,6 +94,12 @@ def _named_circuit(text: str) -> tuple[dict[str, Any], str] | None:
         n = max(2, min(12, _number_after(t, "qubits?|qubit|-qubit", 3)))
         ops = [{"gate": "H", "targets": [0]}] + [{"gate": "CX", "controls": [q], "targets": [q + 1]} for q in range(n - 1)]
         return _circuit(n, ops, f"GHZ-{n}", f"{n} qubits that are all 0 or all 1 together."), f"a GHZ state on {n} qubits"
+    if "shor" in t or re.search(r"\bfactor(ing|ise|ize)?\b.*\b(15|fifteen)\b", t):
+        from qcanvas.shor import COPRIME, shor_spec
+
+        m = re.search(r"\b(?:a|base)\s*(?:=|is|of)?\s*(\d{1,2})\b", t)
+        a = int(m.group(1)) if m and int(m.group(1)) in COPRIME else 7
+        return _with_origin(shor_spec(a)), f"Shor's algorithm factoring 15 with a = {a}"
     if "grover" in t:
         return _with_origin(_example("grover2")), "Grover search over 2 qubits (marked item 11)"
     if "bernstein" in t or re.search(r"\bbv\b", t):

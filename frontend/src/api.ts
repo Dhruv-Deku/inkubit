@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, RepetitionLab, RunOptions,
+  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, RepetitionLab, ShorLab, RunOptions,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -60,6 +60,7 @@ export const api = {
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
   repetitionLab: (scale: number, signal?: AbortSignal) =>
     call<RepetitionLab>(`/api/lab/repetition?scale=${scale.toPrecision(3)}`, { signal }),
+  shorLab: (a: number, signal?: AbortSignal) => call<ShorLab>(`/api/lab/shor?a=${a}`, { signal }),
   optimize: (spec: Spec, ai = true) => call<OptimizeResult>('/api/optimize', json({ spec, ai })),
   challenges: () => call<{ levels: Record<string, string>; challenges: ChallengeInfo[] }>('/api/challenges'),
   checkChallenge: (id: string, spec: Spec, signal?: AbortSignal) =>

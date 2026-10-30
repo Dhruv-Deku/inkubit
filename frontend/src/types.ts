@@ -267,6 +267,7 @@ export interface CircuitInsights {
   zne?: ZeroNoise | null
   bell?: BellTest | null
   tomography?: Tomography | null
+  factoring?: ShorLab | null
   layouts: LayoutCost[]
   layout_summary: string
   exports: { qasm2: string; qasm3: string }
@@ -414,6 +415,37 @@ export interface RepetitionLab {
   bit: LabCurves
   phase: LabCurves
   gate_error_2q: number
+  summary: string
+}
+
+export interface ShorOutcome {
+  bits: string
+  y: number
+  phase: string
+  fraction: string
+  cf: number[]
+  r: number | null
+  ok: boolean
+  factors: number[] | null
+  steps: string[]
+  ideal: number
+  noisy: number
+  measured: number | null
+}
+export interface ShorLab {
+  N: number
+  a: number
+  coprime: boolean
+  shortcut: number | null
+  period: number | null
+  outcomes: ShorOutcome[]
+  success_ideal: number
+  success_noisy: number
+  success_measured: number | null
+  shots: number | null
+  noise: string
+  noise_label: string
+  spec: CircuitSpec | null
   summary: string
 }
 

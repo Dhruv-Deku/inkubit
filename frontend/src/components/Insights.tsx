@@ -5,7 +5,7 @@ import { downloadText, pct } from '../util'
 import { BlochSphere } from './Bloch'
 import { CircuitPreview } from './CircuitPreview'
 import { EntanglementWeb } from './EntanglementWeb'
-import { BellPanel, TomographyPanel } from './Labs'
+import { BellPanel, ShorPanel, TomographyPanel } from './Labs'
 import { Histogram } from './Histogram'
 import { AmplitudeTable } from './LiveState'
 
@@ -378,6 +378,8 @@ export function InsightsSection({ spec, ins, wide = false }: { spec: CircuitSpec
         {ins.entanglement && <EntanglementPanel ent={ins.entanglement} />}
         {ins.budget && <ErrorBudgetPanel budget={ins.budget} />}
       </div>
+      {ins.factoring && <ShorPanel lab={ins.factoring} title="From counts to factors" sub="Shor's algorithm: the classical finish for every reading"
+        shotsLabel={ins.factoring.shots ? `this run's ${ins.factoring.shots.toLocaleString()} shots` : 'this run'} />}
       {ins.bell && <BellPanel bell={ins.bell} />}
       {ins.tomography && <TomographyPanel tomo={ins.tomography} />}
       {ins.sweep && <SweepChart sweep={ins.sweep} spec={spec} />}

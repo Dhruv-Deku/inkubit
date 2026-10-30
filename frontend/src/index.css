@@ -422,3 +422,17 @@ details summary { cursor: pointer; }
 @keyframes pulse { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .btn.mic.on svg { animation: none; } }
 @media (max-width: 640px) { .panel table.data { display: block; overflow-x: auto; white-space: nowrap; } }
+
+/* Shor's algorithm */
+.seg.bases { flex-wrap: wrap; }
+.seg.bases button { min-width: 34px; padding-left: 8px; padding-right: 8px; font-family: var(--mono); }
+.seg.bases button.shares { color: var(--muted); }
+.shor-grid { display: grid; grid-template-columns: minmax(0, 580px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.shor-steps { background: var(--panel-2); border-radius: 11px; padding: 12px 14px; }
+.shor-steps .k { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.shor-steps ol { margin: 0 0 8px; padding-left: 20px; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; color: var(--text-2); }
+.shor-steps li.end { color: var(--text); }
+.shor-steps li.end.ok { color: var(--pass); font-weight: 600; font-size: 14px; }
+.shor-lucky { background: var(--panel-2); border-radius: 11px; padding: 14px 16px; }
+.shor-eq { font-size: 20px; font-weight: 600; }
+@media (max-width: 900px) { .shor-grid { grid-template-columns: minmax(0, 1fr); } }
