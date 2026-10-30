@@ -25,6 +25,7 @@ from qcanvas.adapters.base import (
     ModelCall,
     Proposal,
     ReasoningModel,
+    SCRIPTS,
     Segment,
     SegmentationModel,
     SegmentationResult,
@@ -248,8 +249,9 @@ class MetaReasoningModel(ReasoningModel):
                 language: str = "English") -> Explanation:
         start = time.perf_counter()
         facts = _explain_facts(spec, result)
-        lang = "" if language == "English" else (f" Write the explanation in {language}; keep numbers, qubit names "
-                                                 "like q0 and bitstrings like |00> as they are.")
+        script = f", in {SCRIPTS[language]} script, not in Latin letters" if language in SCRIPTS else ""
+        lang = "" if language == "English" else (f" Write the explanation in {language}{script}; keep numbers, "
+                                                 "qubit names like q0 and bitstrings like |00> as they are.")
         content, cached = self.client.chat(self.model, [
             {"role": "system", "content": EXPLAIN_SYSTEM},
             {"role": "user", "content": f"Design spec:\n{spec.model_dump_json(by_alias=True, exclude_none=True)}"

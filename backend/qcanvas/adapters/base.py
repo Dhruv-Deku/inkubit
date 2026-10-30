@@ -103,6 +103,9 @@ class RepairResult(BaseModel):
 
 LANGUAGES = ("English", "Hindi", "Spanish", "French", "German", "Portuguese", "Japanese", "Chinese (Simplified)",
              "Arabic", "Bengali", "Tamil", "Indonesian")
+# Seen live: without this, Hindi came back transliterated into Latin letters.
+SCRIPTS = {"Hindi": "Devanagari", "Japanese": "Japanese (kanji and kana)", "Chinese (Simplified)": "simplified Chinese",
+           "Arabic": "Arabic", "Bengali": "Bengali", "Tamil": "Tamil"}
 
 
 class Explanation(BaseModel):

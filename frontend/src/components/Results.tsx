@@ -8,13 +8,18 @@ import { AskPanel } from './AskPanel'
 import { ExportButtons, InsightsSection } from './Insights'
 import { NetworkMap } from './NetworkMap'
 
+const LANG_CODES: Record<string, string> = {
+  English: 'en', Hindi: 'hi', Spanish: 'es', French: 'fr', German: 'de', Portuguese: 'pt', Japanese: 'ja',
+  'Chinese (Simplified)': 'zh-Hans', Arabic: 'ar', Bengali: 'bn', Tamil: 'ta', Indonesian: 'id',
+}
+
 export function ExplanationPanel({ explanation }: { explanation?: Explanation }) {
   if (!explanation) return null
   return (
     <div className="panel explain">
       <div className="panel-head"><h2>What happened, in plain words</h2><span className="spacer" /><CallBadge call={explanation.call} /></div>
       {explanation.note && <div className="notice" style={{ marginBottom: 10 }}>{explanation.note}</div>}
-      {explanation.text.split(/\n\s*\n/).map((p, i) => <p key={i} lang={explanation.language === 'English' ? 'en' : undefined}>{p}</p>)}
+      {explanation.text.split(/\n\s*\n/).map((p, i) => <p key={i} lang={LANG_CODES[explanation.language ?? 'English']} dir="auto">{p}</p>)}
     </div>
   )
 }

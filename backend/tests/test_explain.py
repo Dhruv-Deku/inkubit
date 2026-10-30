@@ -76,7 +76,7 @@ def test_explanations_in_other_languages(example):
     client = FakeClient("आपका सर्किट एक बेल जोड़ी बनाता है।")
     out = MetaReasoningModel(load_settings(), client).explain(  # type: ignore[arg-type]
         parse_spec(example("bell")), bell_result(example), language="Hindi")
-    assert "Write the explanation in Hindi" in client.requests[0]["messages"][1]["content"]
+    assert "Write the explanation in Hindi, in Devanagari script" in client.requests[0]["messages"][1]["content"]
     assert out.language == "Hindi" and out.note == ""
     offline = MockReasoningModel().explain(parse_spec(example("bell")), bell_result(example), language="Hindi")
     assert offline.language == "English" and "English only" in offline.note
