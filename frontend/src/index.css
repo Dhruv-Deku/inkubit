@@ -460,3 +460,23 @@ details summary { cursor: pointer; }
   .qaoa-split { grid-template-columns: minmax(0, 1fr) 48px 48px; row-gap: 4px; }
   .qaoa-split .track { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* Bug hunt */
+.bug-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; padding: 10px 12px; background: var(--panel-2); border-radius: 11px; }
+.bug-score { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--text-2); }
+.bug-score b { color: var(--text); font-size: 15px; margin-left: 4px; }
+.bug-score .muted { color: var(--muted); }
+.bug-clock { font-size: 18px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 64px; text-align: right; }
+.bug-clock.on { color: var(--text); }
+.bug-muse { font-size: 12px; color: var(--text-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.bug-muse.thinking::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--primary); margin-right: 7px; animation: pulse 1.1s ease-in-out infinite; }
+.bug-muse.ready { color: var(--text); border-color: var(--primary); }
+.bug-circuit { margin-top: 12px; }
+.bug-circuit.live .op { cursor: pointer; }
+.bug-reveal { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+.bug-verdict { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.bug-verdict.ok { color: var(--pass); }
+.bug-verdict.no { color: #ff8a8d; }
+.bug-muse-says { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px; background: var(--panel-2); border-radius: 11px; font-size: 13px; color: var(--text-2); }
+.bug-muse-says .muted { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .bug-muse.thinking::before { animation: none; } }

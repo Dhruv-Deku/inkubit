@@ -9,6 +9,7 @@ import { OverlayView } from './components/OverlayView'
 import { InsightsSection } from './components/Insights'
 import { RepetitionLabPanel, ShorLabPanel } from './components/Labs'
 import { QaoaLabPanel } from './components/Qaoa'
+import { BugHuntPanel } from './components/BugHunt'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -293,6 +294,7 @@ export default function App() {
             live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
             extra={<>
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
+              <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <ShorLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QaoaLabPanel onOpen={(s) => onSpec(clone(s))} />
               <RepetitionLabPanel onTry={tryCode} />

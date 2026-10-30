@@ -19,6 +19,7 @@ from typing import Any
 from PIL import Image
 
 from qcanvas.adapters.base import (
+    BugGuess,
     DiagramResult,
     Explanation,
     ImageModel,
@@ -36,6 +37,7 @@ from qcanvas.adapters.imaging import annotate, data_url
 from qcanvas.adapters.meta_client import MetaAPIError, MetaClient
 from qcanvas.adapters.prompts import (
     ASK_SYSTEM,
+    BUGHUNT_SYSTEM,
     CONCEPTS_SYSTEM,
     DRAFT_SYSTEM,
     EXPLAIN_SYSTEM,
@@ -45,7 +47,7 @@ from qcanvas.adapters.prompts import (
 )
 from qcanvas.adapters.sam_parse import parse_sam_output
 from qcanvas.sim.noise import get_preset
-from qcanvas.spec.draft import CONCEPTS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
+from qcanvas.spec.draft import BUG_SCHEMA, CONCEPTS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
 from qcanvas.spec.models import CircuitSpec, NetworkSpec
 from qcanvas.spec.validation import SpecError, parse_spec
 
@@ -232,6 +234,21 @@ class MetaReasoningModel(ReasoningModel):
             raise MetaAPIError(f"{self.model} returned no operations list")
         return Proposal(operations=[o for o in ops if isinstance(o, dict)], idea=str(data.get("idea", "")),
                         call=ModelCall(provider="meta", model=self.model, role="optimize", cached=cached,
+                                       latency_s=time.perf_counter() - start))
+
+    def find_bug(self, facts: dict[str, Any]) -> BugGuess:
+        start = time.perf_counter()
+        messages = [
+            {"role": "system", "content": BUGHUNT_SYSTEM},
+            {"role": "user", "content": f"Broken circuit and results:\n{json.dumps(facts, indent=1)}\n\n"
+                                        "Which operation is wrong?"},
+        ]
+        data, cached, _ = self._json(messages, BUG_SCHEMA, "bug_report", "medium")
+        index = data.get("index")
+        if not isinstance(index, int):
+            raise MetaAPIError(f"{self.model} returned no operation index")
+        return BugGuess(index=index, fix=str(data.get("fix", ""))[:200], reason=str(data.get("reason", ""))[:500],
+                        call=ModelCall(provider="meta", model=self.model, role="find bug", cached=cached,
                                        latency_s=time.perf_counter() - start))
 
     def hint(self, facts: dict[str, Any]) -> Explanation:

@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -65,6 +65,10 @@ export const api = {
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
   repetitionLab: (scale: number, signal?: AbortSignal) =>
     call<RepetitionLab>(`/api/lab/repetition?scale=${scale.toPrecision(3)}`, { signal }),
+  bugRound: (level: number, seed: number, signal?: AbortSignal) =>
+    call<BugRound>(`/api/bughunt/round?level=${level}&seed=${seed}`, { signal }),
+  bugGuess: (level: number, seed: number, index: number) => call<BugVerdict>('/api/bughunt/guess', json({ level, seed, index })),
+  bugMuse: (level: number, seed: number) => call<BugGuess>('/api/bughunt/muse', json({ level, seed })),
   qaoaLab: (graph: { n: number; edges: [number, number][]; labels?: string[] }, signal?: AbortSignal) =>
     call<QaoaLab>('/api/lab/qaoa', { ...json(graph), signal }),
   shorLab: (a: number, signal?: AbortSignal) => call<ShorLab>(`/api/lab/shor?a=${a}`, { signal }),

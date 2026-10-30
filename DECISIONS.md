@@ -413,3 +413,36 @@ mock never invents a transcript. The banner over the spec credits both the voice
 model and Muse Spark. Checked live: three Windows-TTS clips through a fake
 microphone in headless Edge, transcribed in 3 to 4 s and turned into the right
 GHZ, Shor and satellite specs.
+
+## D36. Split the party (QAOA Max-Cut)
+The QAOA lab simulates the ansatz directly in NumPy (|+>^n, the cost phase
+exp(-i gamma C), then exp(-i beta X) on every qubit) because the optimizer calls it
+hundreds of times; a test checks it against Qiskit's Statevector of the generated
+spec. The cost layer is CX-RZ(-gamma)-CX per edge, so the circuit uses only spec
+gates and runs through the normal pipeline. Depth 1 is a 48 x 24 grid over
+[0, pi] x [0, pi/2] (a full period after the E(g, b) = E(-g, -b) symmetry), then
+BFGS from the best cell; depths 2 and 3 start from INTERP (Zhou et al. 2020) and
+from the previous optimum padded with a zero layer, so more layers never do
+worse. Splits are folded with their complements (swapping the tables changes
+nothing). Brute force over every split gives the true answer, and the summary
+says plainly that at this size QAOA shows the mechanism, not a speedup. Noise
+uses the realistic preset's density-matrix simulation (about 2 s per graph,
+cached). Checked: the 6-ring at depth 1 gives exactly 3/4 of the best cut, the
+known value, and depth 3 solves it.
+
+## D37. Bug hunt
+Rounds are stateless: (level, seed) regenerates the same round, so the server
+stores nothing and the page never receives the answer before it guesses. Bugs
+are planted at the spec level as realistic mistakes and must move at least 20%
+of the probability (total variation), so they can be seen in 1,000 shots.
+Grading is by exact search, not by matching the planted index: every one-gate
+edit (delete, swap the gate, move it, flip control and target, change the angle)
+is simulated, and any gate whose edit restores the intended odds exactly counts.
+Some circuits have many such gates (Bell has two gates; Shor measures 3 of 7
+qubits, so 22 of its 28 gates counted), so a round is re-planted when more than
+50%, 40% or 25% (by level) of its gates would count. Shor left the pool, and
+the QAOA party circuit (31 gates, every qubit measured) joined Hard. The search
+runs once while planting and is reused for grading. Live, Muse Spark plays the
+same round in parallel with structured output (index, fix, reason) from exactly
+what the player sees; offline it does not play, rather than a mock pretending.
+Checked live: it found the bug in 4 of 4 rounds, in 9 to 24 s.

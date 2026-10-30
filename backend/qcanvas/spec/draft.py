@@ -77,6 +77,12 @@ REWRITE_SCHEMA = _obj({
     })},
 })
 
+BUG_SCHEMA = _obj({
+    "index": {"type": "integer", "description": "Index of the one wrong operation, as given in the list."},
+    "fix": {"type": "string", "description": "The edit that repairs it, in a few words (e.g. 'move the H to q0')."},
+    "reason": {"type": "string", "description": "One or two sentences: what in the counts points to this operation."},
+})
+
 CONCEPTS_SCHEMA = _obj({
     "kind": {"type": "string", "enum": ["circuit", "network"]},
     "concepts": {"type": "array", "items": {"type": "string"},

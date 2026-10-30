@@ -142,6 +142,15 @@ class Transcript(BaseModel):
     call: ModelCall
 
 
+class BugGuess(BaseModel):
+    """A model's pick in the bug hunt."""
+
+    index: int
+    fix: str = ""
+    reason: str = ""
+    call: ModelCall
+
+
 class SegmentationModel(ABC):
     """SAM 3.1: image -> segments."""
 
@@ -178,6 +187,10 @@ class ReasoningModel(ABC):
     def hint(self, facts: dict[str, Any]) -> Explanation:
         """A nudge toward a challenge's goal that does not give the solution away."""
         raise NotImplementedError
+
+    def find_bug(self, facts: dict[str, Any]) -> BugGuess:
+        """Pick the one wrong operation in a bug-hunt round."""
+        raise NotImplementedError("the bug hunt opponent needs the live model")
 
 
 class CodeModel(ABC):

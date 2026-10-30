@@ -233,6 +233,51 @@ async def lab_qaoa(body: QaoaRequest) -> dict[str, Any]:
     return lab.model_dump(mode="json")
 
 
+@app.get("/api/bughunt/round")
+async def bughunt_round(level: int = 1, seed: int = 0) -> dict[str, Any]:
+    """A bug-hunt round: a known circuit with one wrong gate, what it should give and what it gave."""
+    from qcanvas.bughunt import LEVELS, bug_round
+
+    if level not in LEVELS or not 0 <= seed < 10**9:
+        raise HTTPException(422, "level is 1, 2 or 3 and seed a non-negative integer")
+    return (await asyncio.to_thread(bug_round, level, seed)).model_dump(mode="json")
+
+
+class BugGuessRequest(BaseModel):
+    level: int = Field(ge=1, le=3)
+    seed: int = Field(ge=0, lt=10**9)
+    index: int = Field(ge=0, le=200)
+
+
+@app.post("/api/bughunt/guess")
+async def bughunt_guess(body: BugGuessRequest) -> dict[str, Any]:
+    """Grade a pick: right if one edit of that gate restores the intended odds exactly; reveals the machine's search."""
+    from qcanvas.bughunt import judge
+
+    return (await asyncio.to_thread(judge, body.level, body.seed, body.index)).model_dump(mode="json")
+
+
+class BugRoundRequest(BaseModel):
+    level: int = Field(ge=1, le=3)
+    seed: int = Field(ge=0, lt=10**9)
+
+
+@app.post("/api/bughunt/muse")
+async def bughunt_muse(body: BugRoundRequest) -> dict[str, Any]:
+    """Muse Spark's pick for the same round (live only; it sees what the player sees)."""
+    from qcanvas.bughunt import muse_facts
+
+    models = get_models()
+    if models.settings.provider != "meta" or not models.settings.has_key:
+        raise HTTPException(409, "Muse Spark plays in live mode")
+    facts = await asyncio.to_thread(muse_facts, body.level, body.seed)
+    try:
+        guess = await asyncio.to_thread(models.reasoning.find_bug, facts)
+    except Exception as err:  # noqa: BLE001 - reported, never replaced by a made-up pick
+        raise HTTPException(502, f"Muse Spark could not play: {err}") from None
+    return guess.model_dump(mode="json")
+
+
 class ChallengeRequest(BaseModel):
     spec: dict[str, Any]
     number: int = Field(default=0, ge=0, le=9)

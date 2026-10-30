@@ -244,6 +244,38 @@ export interface QaoaLab {
   summary: string
 }
 
+export interface BugRound {
+  id: string
+  level: number
+  level_label: string
+  seed: number
+  title: string
+  spec: CircuitSpec
+  intended: Distribution
+  observed: Record<string, number>
+  shots: number
+  gates: number
+}
+
+export interface BugFix { index: number; edit: string }
+
+export interface BugVerdict {
+  correct: boolean
+  index: number
+  planted: number
+  label: string
+  detail: string
+  fixed: CircuitSpec
+  machine: { checked: number; seconds: number; fixes: BugFix[]; culprits: number[] }
+}
+
+export interface BugGuess {
+  index: number
+  fix: string
+  reason: string
+  call: ModelCall
+}
+
 export interface Transcript {
   text: string
   duration_ms: number

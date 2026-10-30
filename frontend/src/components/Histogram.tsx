@@ -8,6 +8,8 @@ interface Props {
   ideal: Distribution
   shots?: number
   predictedLabel?: string
+  measuredLabel?: string
+  idealMarks?: boolean  // false when the prediction already is the ideal (no dashed ticks, no toggle)
 }
 
 const H = 230
@@ -18,10 +20,11 @@ const PAD = { l: 44, r: 12, t: 14, b: 34 }
  * Predicted is an outlined bar and measured is solid, so identity never rests
  * on colour alone; a dashed tick marks the noiseless ideal.
  */
-export function Histogram({ predicted, measured = {}, ideal, shots = 0, predictedLabel = 'Predicted from the spec (exact, with noise)' }: Props) {
+export function Histogram({ predicted, measured = {}, ideal, shots = 0, predictedLabel = 'Predicted from the spec (exact, with noise)', measuredLabel = 'Measured', idealMarks = true }: Props) {
   const sampled = shots > 0
   const [tip, setTip] = useState<{ k: string; x: number; y: number } | null>(null)
-  const [showIdeal, setShowIdeal] = useState(true)
+  const [ideals, setShowIdeal] = useState(true)
+  const showIdeal = idealMarks && ideals
   const keys = Array.from(new Set([...Object.keys(predicted), ...Object.keys(measured), ...Object.keys(ideal)]))
     .filter((k) => (predicted[k] ?? 0) > 0.002 || (measured[k] ?? 0) > 0 || (ideal[k] ?? 0) > 0)
     .sort()
@@ -40,13 +43,15 @@ export function Histogram({ predicted, measured = {}, ideal, shots = 0, predicte
       <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
         <div className="legend-row" style={{ marginTop: 0 }}>
           <span><i style={{ border: '2px solid var(--predicted)', background: 'rgba(217,89,38,0.18)' }} />{predictedLabel}</span>
-          {sampled && <span><i style={{ background: 'var(--measured)' }} />Measured ({shots} shots)</span>}
+          {sampled && <span><i style={{ background: 'var(--measured)' }} />{measuredLabel} ({shots} shots)</span>}
           {showIdeal && <span><i style={{ borderTop: '2px dashed var(--text)', height: 0, marginBottom: 3 }} />Noiseless ideal</span>}
         </div>
-        <label className="toggle" style={{ fontSize: 12 }}>
-          <input type="checkbox" hidden checked={showIdeal} onChange={(e) => setShowIdeal(e.target.checked)} />
-          <span className="sub">{showIdeal ? 'Hide' : 'Show'} ideal</span>
-        </label>
+        {idealMarks && (
+          <label className="toggle" style={{ fontSize: 12 }}>
+            <input type="checkbox" hidden checked={showIdeal} onChange={(e) => setShowIdeal(e.target.checked)} />
+            <span className="sub">{showIdeal ? 'Hide' : 'Show'} ideal</span>
+          </label>
+        )}
       </div>
       <div style={{ overflowX: 'auto' }}>
         <svg width={Math.max(W, 320)} height={H} role="img" aria-label="Predicted versus measured outcome probabilities">
@@ -89,7 +94,7 @@ export function Histogram({ predicted, measured = {}, ideal, shots = 0, predicte
         <div className="chart-tip" style={{ left: tip.x + 14, top: tip.y + 14 }}>
           <div className="mono" style={{ marginBottom: 4 }}>|{tip.k}⟩</div>
           <div className="r"><span><span className="sw" style={{ border: '1.5px solid var(--predicted)' }} />Predicted</span><span>{pct(predicted[tip.k] ?? 0)}</span></div>
-          {sampled && <div className="r"><span><span className="sw" style={{ background: 'var(--measured)' }} />Measured</span><span>{pct(measured[tip.k] ?? 0)}</span></div>}
+          {sampled && <div className="r"><span><span className="sw" style={{ background: 'var(--measured)' }} />{measuredLabel}</span><span>{pct(measured[tip.k] ?? 0)}</span></div>}
           <div className="r"><span className="muted">Noiseless ideal</span><span>{pct(ideal[tip.k] ?? 0)}</span></div>
         </div>
       )}

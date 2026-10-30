@@ -83,6 +83,16 @@ OPTIMIZE_SYSTEM = (
     "attempt and its problem, fix that problem."
 )
 
+BUGHUNT_SYSTEM = (
+    "You debug small quantum circuits in a game against a person. Exactly one operation in the list is wrong: a "
+    "one-qubit gate on the wrong qubit, a CNOT or Toffoli with a control and the target swapped, a look-alike gate "
+    "(X for Z, S for T, H for SX, CX for CZ, RX for RY and so on), an angle with the wrong sign or doubled, or a "
+    "stray extra gate. You get the operations with their indices (Qiskit conventions, every qubit starts in |0>), "
+    "which qubits are measured, the outcome probabilities the correct circuit gives, and the counts the broken one "
+    "gave. Find the wrong operation. Bitstrings follow Qiskit order: the rightmost character is classical bit 0. "
+    "Answer with its index, the fix, and what in the counts gave it away."
+)
+
 CONCEPTS_SYSTEM = (
     "You look at a photo of a hand drawing and decide what kind of quantum diagram it is and which "
     "short noun phrases a segmentation model should look for to find each drawn part."

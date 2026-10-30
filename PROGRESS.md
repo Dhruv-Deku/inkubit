@@ -31,6 +31,8 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
   - First live run against the Meta Model API, 2026-10-30 (D34): every model path works with fallback off; two problems found and fixed (meters in the sketch draft, Hindi in Latin letters). About $0.40 of credit used.
   - Shor's algorithm lab: factor 15 for every base a, from the measured phase to the period to the primes, with the failing bases explained.
   - Muse Voice Transcribe is the fifth Meta model (D35): "Say it" records a 16 kHz WAV in the browser, `/api/transcribe` sends it with quantum keywords, and the spec banner credits both models. Checked live through a fake microphone in headless Edge.
+  - Split the party (D36): QAOA Max-Cut lab with a clickable graph, brute-force answer, depth-1 landscape you can click to try your own angles, optimized depths 1-3, realistic-noise odds, circuit to the editor.
+  - Bug hunt (D37): find the one wrong gate from the histogram, graded by an exact search of every one-gate edit; Muse Spark plays the same round live; three levels, score and streak in the browser.
 
 ## In progress
 - Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the offline tests and a headless-browser check of every new screen (desktop and 390 px phone width).
