@@ -805,3 +805,15 @@ export interface Reproduction {
   hardware: string; spec: Record<string, unknown>; ideal: Record<string, number>; noisy: Record<string, number> | null
   claims: ReproClaim[]; tvd_to_ideal: number | null; notes: string; calls: ModelCall[]
 }
+
+export interface DecoderPoint { p: number; unprotected: number; mwpm: number; mwpm_ci: number; neural: number; neural_ci: number; shots: number }
+export interface DecoderReport {
+  curve: DecoderPoint[]; train_shots: number; train_p: number[]; rounds: number
+  example: { p: number; errors: number[][]; final_flips: number[]; dz: number[][]; dx: number[][]; flip: number; mwpm: number; neural: number }
+}
+export interface PulseReport {
+  run: { duration_ns: number; drag: boolean; beta: number; times: number[]; omega_x_mhz: number[]; omega_y_mhz: number[]
+    populations: [number, number, number][]; fidelity: number; leakage: number; fidelity_no_decoherence: number }
+  sweep: { durations: number[]; gaussian_error: number[]; drag_error: number[]; gaussian_leak: number[]; drag_leak: number[]
+    decoherence_only: number[]; best_gaussian: [number, number]; best_drag: [number, number] }
+}

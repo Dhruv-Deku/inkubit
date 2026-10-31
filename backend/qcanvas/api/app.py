@@ -478,6 +478,29 @@ async def reproduce_paper(text: str = Form(""), image: UploadFile | None = File(
     return res.model_dump(mode="json")
 
 
+@app.get("/api/decoder")
+def decoder_report(p: float = 0.01, seed: int = 1) -> dict[str, Any]:
+    """Surface-code decoders: matching against the neural network (stored evaluation) and one sampled shot."""
+    from qcanvas.decoder import example, model
+
+    if not 0.001 <= p <= 0.1:
+        raise HTTPException(422, "p must be between 0.001 and 0.1")
+    m = model()
+    return {"curve": m["curve"], "train_shots": m["train_shots"], "train_p": m["train_p"], "rounds": m["rounds"],
+            "example": example(round(p, 4), seed)}
+
+
+@app.get("/api/pulse")
+async def pulse_lab(duration: float = 20.0, drag: bool = True) -> dict[str, Any]:
+    """Pulse lab: a pi pulse on a three-level transmon with T1/T2, Gaussian or DRAG, and the duration sweep."""
+    from qcanvas.pulse import run, sweep
+
+    if not 4 <= duration <= 100:
+        raise HTTPException(422, "duration must be between 4 and 100 ns")
+    r, s = await asyncio.gather(asyncio.to_thread(run, round(duration, 1), drag), asyncio.to_thread(sweep))
+    return {"run": r.model_dump(mode="json"), "sweep": s.model_dump(mode="json")}
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""
