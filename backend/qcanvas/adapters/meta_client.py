@@ -180,6 +180,24 @@ class MetaClient:
         return content or "", cached
 
 
+    def chat_message(self, model: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]], *,
+                     reasoning_effort: str | None = None, max_tokens: int | None = None) -> tuple[dict[str, Any], bool]:
+        """Chat Completions with tools; returns (the full assistant message, cached). See docs/meta-api/tool-calling.md."""
+        payload: dict[str, Any] = {"model": model, "messages": messages, "tools": tools}
+        if reasoning_effort:
+            payload["reasoning_effort"] = reasoning_effort
+        if max_tokens:
+            payload["max_completion_tokens"] = max_tokens
+        data, cached = self.post("/chat/completions", payload)
+        try:
+            msg = data["choices"][0]["message"]
+        except (KeyError, IndexError, TypeError):
+            raise MetaAPIError("chat completion returned no message") from None
+        if isinstance(msg.get("content"), list):
+            msg = {**msg, "content": "".join(p.get("text", "") for p in msg["content"] if isinstance(p, dict))}
+        return msg, cached
+
+
 class _Retry(Exception):
     pass
 

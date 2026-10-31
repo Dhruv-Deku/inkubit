@@ -6,7 +6,7 @@ const mha = (e: number) => `${(e * 1000).toFixed(1)} mHa`
 
 // ---------------------------------------------------------------- chemistry: H2 with VQE
 
-function EnergyChart({ lab, onPick }: { lab: ChemLab; onPick: (r: number) => void }) {
+export function EnergyChart({ lab, onPick }: { lab: ChemLab; onPick: (r: number) => void }) {
   const W = 620, H = 290, L = 54, R = 16, T = 14, B = 38
   const pts = lab.curve
   const rMin = 0.3, rMax = 3.0
@@ -150,7 +150,7 @@ export function ChemLabPanel({ onOpen }: { onOpen?: (spec: CircuitSpec) => void 
 
 // ---------------------------------------------------------------- security: BB84, catch the spy
 
-function QberChart({ lab }: { lab: QkdLab }) {
+export function QberChart({ lab }: { lab: QkdLab }) {
   const W = 380, H = 210, L = 40, R = 12, T = 12, B = 34
   const top = 0.3
   const x = (f: number) => L + f * (W - L - R)

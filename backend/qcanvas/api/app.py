@@ -254,6 +254,27 @@ async def lab_qaoa(body: QaoaRequest) -> dict[str, Any]:
     return lab.model_dump(mode="json")
 
 
+class CopilotRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    history: list[dict[str, str]] = Field(default_factory=list, max_length=12)
+
+
+@app.post("/api/copilot")
+async def copilot(body: CopilotRequest) -> dict[str, Any]:
+    """Ask Q-Canvas: Muse Spark calls the exact tools; every number in the answer is traced to a tool result."""
+    from qcanvas.copilot import ask_live, ask_offline
+
+    models = get_models()
+    if models.settings.provider == "meta" and models.settings.has_key:
+        try:
+            reply = await asyncio.to_thread(ask_live, body.message, body.history, models.reasoning.tool_chat)
+        except Exception as err:  # noqa: BLE001 - reported, never replaced by a made-up answer
+            raise HTTPException(502, f"The assistant failed: {err}") from None
+    else:
+        reply = await asyncio.to_thread(ask_offline, body.message)
+    return reply.model_dump(mode="json")
+
+
 class ArenaRequest(BaseModel):
     spec: dict[str, Any]
 

@@ -200,6 +200,10 @@ class ReasoningModel(ABC):
         """Pick the one wrong operation in a bug-hunt round."""
         raise NotImplementedError("the bug hunt opponent needs the live model")
 
+    def tool_chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> tuple[dict[str, Any], ModelCall]:
+        """One assistant turn with tools: the full message (text or tool calls) and the call record."""
+        raise NotImplementedError("the assistant needs the live model")
+
     def predict_odds(self, facts: dict[str, Any]) -> OddsGuess:
         """Answer like a chatbot: predict the outcome odds without running anything."""
         raise NotImplementedError("asking the AI alone needs the live model")

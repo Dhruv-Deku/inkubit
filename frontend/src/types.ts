@@ -244,6 +244,16 @@ export interface QaoaLab {
   summary: string
 }
 
+export interface CopilotTool { name: string; args: Record<string, unknown>; facts: Record<string, unknown>; card: Record<string, unknown> | null; error: string | null; seconds: number }
+
+export interface CopilotReply {
+  answer: string
+  tools: CopilotTool[]
+  trace: { checked: number; traced: number; given: number; untraced: string[] }
+  calls: ModelCall[]
+  router: 'muse' | 'offline'
+}
+
 export interface ChemPoint { r: number; hf: number; exact: number; vqe: number; vqe_err: number; mitigated: number; mitigated_err: number; weight_u: number }
 
 export interface ChemLab {
