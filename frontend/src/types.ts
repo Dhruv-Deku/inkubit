@@ -680,3 +680,28 @@ export interface ChallengeCheck {
   noisy_fidelity: number | null
   lesson: string | null
 }
+
+export interface ObsSeries { id: string; label: string; points: [number, number | null][] }
+export interface ObsReference { value: number; label: string; axis: 'x' | 'y' }
+export interface ObsChart {
+  id: string
+  title: string
+  finding: string
+  x_label: string
+  y_label: string
+  x_log: boolean
+  y_log: boolean
+  series: ObsSeries[]
+  references: ObsReference[]
+  method: string
+}
+export interface ObsWalkFrames { positions: number[]; steps: number[]; quantum: number[][]; classical: number[][] }
+export interface ObsGrover { qubits: number; marked: string; best_k: number; cx_per_query: number; chart: ObsChart }
+export interface Observatory {
+  satellite: ObsChart
+  walk: ObsChart
+  walk_frames: ObsWalkFrames
+  grover: ObsGrover[]
+  entanglement: ObsChart
+  wall: ObsChart
+}

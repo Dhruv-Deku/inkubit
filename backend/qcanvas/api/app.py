@@ -194,6 +194,14 @@ async def optimize_circuit(body: OptimizeRequest) -> dict[str, Any]:
     return result.model_dump(mode="json")
 
 
+@app.get("/api/observatory")
+async def observatory_charts() -> dict[str, Any]:
+    """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""
+    from qcanvas.observatory import observatory
+
+    return (await asyncio.to_thread(observatory)).model_dump(mode="json")
+
+
 @app.get("/api/lab/repetition")
 def lab_repetition(scale: float = 1.0) -> dict[str, Any]:
     """The bit-flip code against a bare qubit, with perfect and with ``scale`` x realistic gates."""

@@ -543,7 +543,7 @@ async def trust_story(d: Director) -> None:
 
 async def usecases_story(d: Director) -> None:
     page = d.page
-    hub = panel(page, "Who it is for")
+    hub = panel(page, "What it can do")
     await d.scroll_to(hub, block="start", pause=0.8)
     await d.caption("One app for teachers, students, chemists, security, logistics, network planners and researchers.", hold=3.0)
     for who in ("Chemist", "Security", "Logistics"):
