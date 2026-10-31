@@ -22,8 +22,9 @@ simulations, and every number they say is checked.
 
 ## Short description (about 50 words)
 
-Q-Canvas is a quantum lab you can draw on and talk to. Sketch a circuit or a
-satellite link, describe it, or ask by voice: SAM 3.1, Muse Spark, Muse Wonder
+Q-Canvas is a quantum lab you can draw on, talk to, and read: it translates
+the language of quantum computing both ways. Sketch a circuit or a satellite
+link, write a ket, describe it, or ask by voice: SAM 3.1, Muse Spark, Muse Wonder
 and Muse Voice Transcribe turn it into exact simulations of circuits, molecules,
 secret keys and networks, and every number the AI says is checked against them.
 
@@ -69,14 +70,29 @@ the time goes.
 
 **Ask it anything.** "Ask Q-Canvas" is one assistant for the whole lab, typed
 or spoken (Muse Voice Transcribe). Muse Spark, or Muse Wonder for questions that
-take several steps, chooses among eight exact tools (circuit simulation, the
+take several steps, chooses among nine exact tools (circuit simulation, the
 optimizer, the H₂ molecule, BB84 key distribution, QAOA Max-Cut, Shor's
-algorithm, network links, error correction), calls them in parallel when it
+algorithm, network links, error correction, the Rosetta), calls them in parallel when it
 needs several, and answers with live result cards. The model is told never to
 work out a result itself, and afterwards every number in its answer is matched
 against the tool results: the page shows "13 of 13 numbers traced" or lists the
 ones that were not. Every live answer so far traced completely (3 of 3, 5 of 5,
 14 of 14; Muse Wonder 13 of 13, with two tool calls in parallel, in 8.9 s).
+
+**Speak quantum: the Quantum Rosetta.** The hardest part of quantum computing
+for newcomers is its language: kets, gates, five programming languages. The
+Rosetta translates between all of them, both ways, and checks every
+translation. Type, paste, say or photograph a state or a program: Dirac
+notation such as (|01⟩ − |10⟩)/√2 or LaTeX pasted from a paper, OpenQASM 2 or
+3, Quil, Qiskit, Cirq, PennyLane, Q#, Braket, or plain words. Out comes the
+state written like a textbook (independent qubits factored out, which qubits
+are entangled, LaTeX to copy), a circuit that prepares it, proven by exact
+simulation (fidelity 1.000000), a sentence for every gate saying what it did to
+this state, and the same program in eight languages; the Qiskit, OpenQASM and
+Cirq versions are run and must reproduce the same state. Muse Spark is used only
+where an exact parser cannot be: other code languages and photos of a textbook
+or whiteboard, which it transcribes without solving. A 28-word dictionary gives
+every term an example state computed exactly.
 
 **Why check at all? We measured it.** Asked to predict circuits on its own, the
 way a chatbot answers, Muse Spark was exact on 13 of 13 textbook circuits and 10
@@ -174,7 +190,7 @@ repeatable and cheap.
 | Model | Job |
 | --- | --- |
 | **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo |
-| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over eight exact tools; plays the bug hunt; predicts circuits alone for the AI-alone comparison |
+| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over nine exact tools; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
 | **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Q-Canvas: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing; the nine use-case photos |
 | **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser |
@@ -191,7 +207,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 317 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 355 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and
