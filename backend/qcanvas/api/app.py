@@ -457,6 +457,27 @@ async def orbits(a: str = "delingha", b: str = "lijiang", night: bool = True) ->
         raise HTTPException(422, str(err)) from None
 
 
+@app.post("/api/reproduce")
+async def reproduce_paper(text: str = Form(""), image: UploadFile | None = File(None)) -> dict[str, Any]:
+    """Paper reproducibility: a figure and/or its caption and OpenQASM; the circuit re-run exactly; each claim judged."""
+    from qcanvas.reproduce import reproduce
+
+    raw = await image.read() if image is not None else b""
+    if len(raw) > MAX_UPLOAD:
+        raise HTTPException(413, "the image is larger than 15 MB")
+    if not raw and not text.strip():
+        raise HTTPException(422, "give a figure, or paste a caption with OpenQASM")
+    models = get_models()
+    live = models.settings.provider == "meta" and models.settings.has_key
+    try:
+        res = await asyncio.to_thread(reproduce, raw or None, text[:6000], models if live else None)
+    except ValueError as err:
+        raise HTTPException(422, str(err)) from None
+    except ModelUnavailable as err:
+        raise HTTPException(502, f"A Meta model call failed: {err}") from None
+    return res.model_dump(mode="json")
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""

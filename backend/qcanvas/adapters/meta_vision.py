@@ -250,11 +250,13 @@ class MetaReasoningModel(ReasoningModel):
                               latency_s=time.perf_counter() - start)
 
     def structured(self, system: str, user: str, schema: dict[str, Any], name: str, effort: str = "low",
-                   max_tokens: int = 8000, model: str | None = None) -> tuple[dict[str, Any], ModelCall]:
+                   max_tokens: int = 8000, model: str | None = None, image: bytes | None = None,
+                   mime: str = "image/png") -> tuple[dict[str, Any], ModelCall]:
         start = time.perf_counter()
         model = model or self.model
+        body: Any = user if image is None else [{"type": "text", "text": user}, _image_part(image, mime)]
         content, cached = self.client.chat(model, [{"role": "system", "content": system},
-                                                   {"role": "user", "content": user}],
+                                                   {"role": "user", "content": body}],
                                            schema=schema, schema_name=name, reasoning_effort=effort,
                                            max_tokens=max_tokens)
         try:

@@ -225,8 +225,9 @@ class ReasoningModel(ABC):
         raise NotImplementedError("asking the AI alone needs the live model")
 
     def structured(self, system: str, user: str, schema: dict[str, Any], name: str, effort: str = "low",
-                   max_tokens: int = 8000, model: str | None = None) -> tuple[dict[str, Any], ModelCall]:
-        """One JSON-schema answer (mission plans, step repairs, mission reports) and the call record."""
+                   max_tokens: int = 8000, model: str | None = None, image: bytes | None = None,
+                   mime: str = "image/png") -> tuple[dict[str, Any], ModelCall]:
+        """One JSON-schema answer (mission plans, step repairs, reports, figure reading) and the call record."""
         raise NotImplementedError("mission control's planner needs the live model")
 
 

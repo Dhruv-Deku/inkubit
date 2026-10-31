@@ -798,3 +798,10 @@ export interface OrbitPlan {
   track: [number, number][]; sun: [number, number][]; el_a: number[]; el_b: number[]; night_a: boolean[]; night_b: boolean[]
   passes: OrbitPass[]; shared_key_bits_per_day: number; entangled_pairs_per_day: number; trusted_key_bits_per_day: number; finding: string
 }
+
+export interface ReproClaim { outcome: string; ours: string; claimed: number; ideal: number; noisy: number | null; tolerance: number; verdict: string; ok: boolean }
+export interface Reproduction {
+  verdict: string; headline: string; read_from: string; bit_order: string; bit_order_inferred: boolean; shots: number
+  hardware: string; spec: Record<string, unknown>; ideal: Record<string, number>; noisy: Record<string, number> | null
+  claims: ReproClaim[]; tvd_to_ideal: number | null; notes: string; calls: ModelCall[]
+}
