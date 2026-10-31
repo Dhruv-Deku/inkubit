@@ -228,8 +228,21 @@ class Director:
         await self.page.evaluate("window.scrollTo({top: 0, behavior: 'smooth'})")
         await self.wait(0.8)
 
+    async def settle(self, target: Locator, timeout: float = 5.0) -> dict | None:
+        """The target's box once it has stopped moving (smooth scrolls and late layout shift the page)."""
+        await target.first.wait_for(state="visible", timeout=60_000)
+        last, waited = None, 0.0
+        while waited < timeout:
+            box = await target.first.bounding_box()
+            if box and last and all(abs(box[k] - last[k]) < 0.5 for k in ("x", "y", "width", "height")):
+                return box
+            last = box
+            await self.page.wait_for_timeout(150)
+            waited += 0.15
+        return last
+
     async def move(self, target: Locator, fx: float = 0.5, fy: float = 0.5, steps: int = 30) -> None:
-        box = await target.first.bounding_box()
+        box = await self.settle(target)
         if box is None:
             raise RuntimeError(f"not visible: {target}")
         self.x, self.y = box["x"] + box["width"] * fx, box["y"] + box["height"] * fy
@@ -497,12 +510,16 @@ async def copilot_story(d: Director) -> None:
          "Chemistry from first principles: two tool calls in parallel, one per bond length."),
     ]
     for i, (q, cap) in enumerate(questions):
+        if i:
+            await d.scroll_to(page.locator(".copilot form"), block="center", pause=0.8)
         await d.type_into(page.locator(".copilot-input"), q)
         await d.click(page.locator(".copilot button[type=submit]"))
         await d.caption(cap)
         await d.fast(4, "the model and the tools at work")
+        print(f"assistant question {i + 1} sent", flush=True)
         await page.wait_for_function(f"document.querySelectorAll('.copilot-turn .copilot-a, .copilot-turn .notice').length > {i}",
                                      timeout=240_000)
+        print(f"assistant question {i + 1} answered", flush=True)
         await d.normal()
         turn = page.locator(".copilot-turn").nth(i)
         await d.scroll_to(turn, block="start", pause=0.8)
@@ -642,14 +659,20 @@ async def record(base: str, out: Path) -> None:
                          small=True, hold=5.0)
             await d.hide_card()
             await d.scroll_to(page.locator(".sample", has_text="Bell pair"), block="center", pause=0.9)
+            print('circuit_story', flush=True)
             await circuit_story(d)
+            print('optimizer_story', flush=True)
             await optimizer_story(d)
             await d.scroll_top()
             await d.click(page.locator("nav.steps button >> nth=0"))
             await d.wait(0.8)
+            print('trust_story', flush=True)
             await trust_story(d)
+            print('usecases_story', flush=True)
             await usecases_story(d)
+            print('bughunt_story', flush=True)
             await bughunt_story(d)
+            print('labs_story', flush=True)
             await labs_story(d)
             await d.card("Q-Canvas", "Sketch it, say it, or ask it. Chemistry, security, optimization, networks, algorithms.",
                          chips, "Every number checked by exact simulation. Every model answer labelled.", hold=5.0)
