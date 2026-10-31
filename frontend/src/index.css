@@ -245,6 +245,7 @@ pre.diff .hunk { color: var(--muted); display: block; }
 .calls { width: 100%; border-collapse: collapse; font-size: 13px; }
 .calls td, .calls th { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; }
 .calls th { color: var(--muted); font-weight: 500; font-size: 12px; }
+@media (max-width: 640px) { table.calls { display: block; overflow-x: auto; white-space: nowrap; } }
 
 table.data { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
 table.data th { color: var(--muted); font-weight: 500; font-size: 12px; text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
@@ -480,3 +481,27 @@ details summary { cursor: pointer; }
 .bug-muse-says { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px; background: var(--panel-2); border-radius: 11px; font-size: 13px; color: var(--text-2); }
 .bug-muse-says .muted { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { .bug-muse.thinking::before { animation: none; } }
+
+/* AI alone vs Q-Canvas */
+.arena-rows { display: grid; gap: 2px; margin-top: 14px; }
+.arena-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 4px 8px; font-size: 13px; font-weight: 600; color: var(--text); }
+.arena-group .sub { font-weight: 400; }
+.arena-row { display: grid; grid-template-columns: minmax(0, 1.5fr) 96px minmax(80px, 1fr) 104px; gap: 12px; align-items: center; padding: 6px 8px; border-radius: 8px; }
+.arena-row:hover { background: var(--panel-2); }
+.arena-row .t { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arena-row .track { height: 10px; border-left: 1px solid var(--line-2); }
+.arena-row .track span { display: block; height: 100%; border-radius: 0 4px 4px 0; }
+.arena-row .track .bad { background: var(--fail); }
+.arena-row .track .warn { background: var(--warn); }
+.arena-row .track .good { background: var(--pass); }
+.arena-row .verdict { font-size: 12px; font-family: var(--mono); text-align: right; }
+.verdict.bad, .arena-verdict.bad { color: #ff8a8d; }
+.verdict.warn, .arena-verdict.warn { color: var(--warn); }
+.verdict.good, .arena-verdict.good { color: var(--pass); }
+.arena-ask { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.arena-verdict { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+@media (max-width: 640px) {
+  .arena-row { grid-template-columns: minmax(0, 1fr) 96px; row-gap: 4px; }
+  .arena-row .track { grid-column: 1 / -1; grid-row: 2; }
+  .arena-row .sub { display: none; }
+}

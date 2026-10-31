@@ -6,6 +6,7 @@ import { CircuitPreview, SHORT, wiresFor, type Compose } from './CircuitPreview'
 import { Down, Trash, Up } from './Icons'
 import { LiveStrip } from './LiveState'
 import { Optimizer } from './Optimizer'
+import { AskAlone } from './Arena'
 
 interface Props {
   spec: Spec
@@ -196,6 +197,7 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
       <CircuitPreview spec={spec} highlight={highlight} onPick={onPick} compose={compose} />
       <LiveStrip spec={spec} valid={valid} />
       {optimizer && <Optimizer spec={spec} valid={valid} onUse={(s) => commit(s)} />}
+      {optimizer && <AskAlone spec={spec} valid={valid} />}
       <table className="ops" style={{ marginTop: 12 }} onMouseLeave={() => onPick(null)}>
         <thead>
           <tr><th>#</th><th>Gate</th><th>Target</th><th>Control</th><th>Angle</th><th>From sketch</th><th /></tr>

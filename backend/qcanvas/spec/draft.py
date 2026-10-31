@@ -77,6 +77,14 @@ REWRITE_SCHEMA = _obj({
     })},
 })
 
+ODDS_SCHEMA = _obj({
+    "outcomes": {"type": "array", "items": _obj({
+        "bits": {"type": "string", "description": "A measured bitstring in Qiskit order (rightmost = classical bit 0)."},
+        "probability": {"type": "number", "description": "Its probability, 0 to 1."},
+    }), "description": "Every outcome with a non-zero probability."},
+    "reasoning": {"type": "string", "description": "Two or three sentences on how you worked it out."},
+})
+
 BUG_SCHEMA = _obj({
     "index": {"type": "integer", "description": "Index of the one wrong operation, as given in the list."},
     "fix": {"type": "string", "description": "The edit that repairs it, in a few words (e.g. 'move the H to q0')."},

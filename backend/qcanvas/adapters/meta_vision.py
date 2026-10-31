@@ -20,6 +20,7 @@ from PIL import Image
 
 from qcanvas.adapters.base import (
     BugGuess,
+    OddsGuess,
     DiagramResult,
     Explanation,
     ImageModel,
@@ -38,6 +39,7 @@ from qcanvas.adapters.meta_client import MetaAPIError, MetaClient
 from qcanvas.adapters.prompts import (
     ASK_SYSTEM,
     BUGHUNT_SYSTEM,
+    ODDS_SYSTEM,
     CONCEPTS_SYSTEM,
     DRAFT_SYSTEM,
     EXPLAIN_SYSTEM,
@@ -47,7 +49,7 @@ from qcanvas.adapters.prompts import (
 )
 from qcanvas.adapters.sam_parse import parse_sam_output
 from qcanvas.sim.noise import get_preset
-from qcanvas.spec.draft import BUG_SCHEMA, CONCEPTS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
+from qcanvas.spec.draft import BUG_SCHEMA, CONCEPTS_SCHEMA, ODDS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
 from qcanvas.spec.models import CircuitSpec, NetworkSpec
 from qcanvas.spec.validation import SpecError, parse_spec
 
@@ -106,9 +108,9 @@ class MetaReasoningModel(ReasoningModel):
         self.client = client
 
     def _json(self, messages: list[dict[str, Any]], schema: dict[str, Any], name: str,
-              effort: str) -> tuple[dict[str, Any], bool, str]:
+              effort: str, max_tokens: int = 12000) -> tuple[dict[str, Any], bool, str]:
         content, cached = self.client.chat(self.model, messages, schema=schema, schema_name=name,
-                                           reasoning_effort=effort, max_tokens=12000)
+                                           reasoning_effort=effort, max_tokens=max_tokens)
         try:
             return json.loads(content), cached, content
         except json.JSONDecodeError:
@@ -235,6 +237,25 @@ class MetaReasoningModel(ReasoningModel):
         return Proposal(operations=[o for o in ops if isinstance(o, dict)], idea=str(data.get("idea", "")),
                         call=ModelCall(provider="meta", model=self.model, role="optimize", cached=cached,
                                        latency_s=time.perf_counter() - start))
+
+    def predict_odds(self, facts: dict[str, Any]) -> OddsGuess:
+        start = time.perf_counter()
+        messages = [
+            {"role": "system", "content": ODDS_SYSTEM},
+            {"role": "user", "content": f"Circuit:\n{json.dumps(facts, indent=1)}\n\n"
+                                        "What are the measured outcome probabilities?"},
+        ]
+        data, cached, _ = self._json(messages, ODDS_SCHEMA, "outcome_odds", "medium", max_tokens=24000)
+        outcomes: dict[str, float] = {}
+        for o in data.get("outcomes", []) if isinstance(data.get("outcomes"), list) else []:
+            if isinstance(o, dict) and isinstance(o.get("bits"), str) and isinstance(o.get("probability"), (int, float)):
+                bits = o["bits"].strip().replace(" ", "")
+                outcomes[bits] = outcomes.get(bits, 0.0) + max(0.0, float(o["probability"]))
+        if not outcomes:
+            raise MetaAPIError(f"{self.model} returned no outcomes")
+        return OddsGuess(outcomes=outcomes, reasoning=str(data.get("reasoning", ""))[:600],
+                         call=ModelCall(provider="meta", model=self.model, role="predict alone", cached=cached,
+                                        latency_s=time.perf_counter() - start))
 
     def find_bug(self, facts: dict[str, Any]) -> BugGuess:
         start = time.perf_counter()

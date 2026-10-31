@@ -244,6 +244,32 @@ export interface QaoaLab {
   summary: string
 }
 
+export interface ArenaComparison {
+  truth: Distribution
+  guess: Record<string, number>
+  guess_sum: number
+  tvd: number
+  verdict: 'matched' | 'close' | 'wrong'
+  impossible: string[]
+  missed: string[]
+}
+
+export interface ArenaResult { comparison: ArenaComparison; reasoning: string; call: ModelCall }
+
+export interface ArenaRow { id: string; set: 'textbook' | 'new' | 'bigger'; title: string; qubits: number; gates: number; tvd: number | null; verdict: string; impossible: number; missed: number; seconds: number }
+
+export interface ArenaSet { count: number; matched: number; close: number; wrong: number; no_answer: number; mean_tvd: number }
+
+export interface ArenaBenchmark {
+  model: string
+  date: string
+  rows: ArenaRow[]
+  textbook: ArenaSet
+  new: ArenaSet
+  bigger: ArenaSet
+  verifier: string
+}
+
 export interface BugRound {
   id: string
   level: number

@@ -43,7 +43,7 @@ export function Histogram({ predicted, measured = {}, ideal, shots = 0, predicte
       <div className="row" style={{ justifyContent: 'space-between', marginBottom: 8 }}>
         <div className="legend-row" style={{ marginTop: 0 }}>
           <span><i style={{ border: '2px solid var(--predicted)', background: 'rgba(217,89,38,0.18)' }} />{predictedLabel}</span>
-          {sampled && <span><i style={{ background: 'var(--measured)' }} />{measuredLabel} ({shots} shots)</span>}
+          {sampled && <span><i style={{ background: 'var(--measured)' }} />{measuredLabel}{shots > 1 ? ` (${shots} shots)` : ''}</span>}
           {showIdeal && <span><i style={{ borderTop: '2px dashed var(--text)', height: 0, marginBottom: 3 }} />Noiseless ideal</span>}
         </div>
         {idealMarks && (

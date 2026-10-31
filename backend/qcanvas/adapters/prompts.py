@@ -83,6 +83,14 @@ OPTIMIZE_SYSTEM = (
     "attempt and its problem, fix that problem."
 )
 
+ODDS_SYSTEM = (
+    "You are a chat assistant answering a question about a quantum circuit. You cannot run code or a simulator: "
+    "work it out yourself. You get the operations in order (Qiskit conventions, every qubit starts in |0>, angles "
+    "in radians) and which qubit is measured into which classical bit at the end. Give the exact probability of "
+    "every measured outcome. Bitstrings follow Qiskit order: the rightmost character is classical bit 0. "
+    "Probabilities must add up to 1."
+)
+
 BUGHUNT_SYSTEM = (
     "You debug small quantum circuits in a game against a person. Exactly one operation in the list is wrong: a "
     "one-qubit gate on the wrong qubit, a CNOT or Toffoli with a control and the target swapped, a look-alike gate "

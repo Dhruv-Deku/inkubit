@@ -446,3 +446,21 @@ runs once while planting and is reused for grading. Live, Muse Spark plays the
 same round in parallel with structured output (index, fix, reason) from exactly
 what the player sees; offline it does not play, rather than a mock pretending.
 Checked live: it found the bug in 4 of 4 rounds, in 9 to 24 s.
+
+## D38. AI alone vs Q-Canvas, measured instead of claimed
+The pitch that a chatbot hallucinates and Q-Canvas does not is tested, not
+asserted. The same model (Muse Spark, medium effort, 24k tokens) gets each
+circuit as data with no title or notes and no simulator, and predicts every
+outcome's probability with structured output; exact simulation scores it by
+total variation distance (exact < 1%, close < 5%). The first run disproved the
+easy version of the claim: it was exact on all 13 textbook circuits and on 10 of
+10 new seeded small circuits (3 to 5 qubits, arbitrary angles), so the page says
+so. It failed where hand calculation gets exponentially harder: no usable answer
+for the 31-gate QAOA circuit, and on six bigger seeded circuits (6 to 8 qubits,
+all in superposition first, 4 measured) exact on 3, close on 1, no answer on 1,
+and one confident answer (every outcome 1/16, described as a near-maximally
+mixed marginal) that put 43% of the probability in the wrong place. The recorded
+run is examples/arena_benchmark.json (shown offline, dated, with the model id);
+"Ask the AI alone" repeats the test live on any circuit, and offline it refuses
+rather than inventing an answer. The models table now names the check behind
+every model step.

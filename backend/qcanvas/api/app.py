@@ -233,6 +233,42 @@ async def lab_qaoa(body: QaoaRequest) -> dict[str, Any]:
     return lab.model_dump(mode="json")
 
 
+class ArenaRequest(BaseModel):
+    spec: dict[str, Any]
+
+
+@app.post("/api/arena")
+async def arena(body: ArenaRequest) -> dict[str, Any]:
+    """Ask Muse Spark alone (no simulator) what the circuit outputs, and score it against the exact truth."""
+    from qcanvas.arena import ask_alone
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(422, {"message": "The spec has problems", "issues": _issues(err)}) from None
+    if spec.kind != "circuit" or not spec.measured_pairs():
+        raise HTTPException(422, "needs a circuit with measurements")
+    models = get_models()
+    if models.settings.provider != "meta" or not models.settings.has_key:
+        raise HTTPException(409, "asking the AI alone needs the live model; the start page shows the recorded results")
+    try:
+        res = await asyncio.to_thread(ask_alone, spec, models.reasoning.predict_odds)
+    except Exception as err:  # noqa: BLE001 - reported, never replaced by a made-up answer
+        raise HTTPException(502, f"Muse Spark could not answer: {err}") from None
+    return res.model_dump(mode="json")
+
+
+@app.get("/api/arena/benchmark")
+def arena_benchmark() -> dict[str, Any]:
+    """The recorded AI-alone benchmark (scripts/arena_bench.py)."""
+    from qcanvas.arena import load_benchmark
+
+    bench = load_benchmark()
+    if bench is None:
+        raise HTTPException(404, "no recorded benchmark yet")
+    return bench.model_dump(mode="json")
+
+
 @app.get("/api/bughunt/round")
 async def bughunt_round(level: int = 1, seed: int = 0) -> dict[str, Any]:
     """A bug-hunt round: a known circuit with one wrong gate, what it should give and what it gave."""

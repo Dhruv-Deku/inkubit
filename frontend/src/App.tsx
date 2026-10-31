@@ -10,6 +10,7 @@ import { InsightsSection } from './components/Insights'
 import { RepetitionLabPanel, ShorLabPanel } from './components/Labs'
 import { QaoaLabPanel } from './components/Qaoa'
 import { BugHuntPanel } from './components/BugHunt'
+import { ArenaPanel } from './components/Arena'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -293,6 +294,7 @@ export default function App() {
           <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
             live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
             extra={<>
+              <ArenaPanel />
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
               <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <ShorLabPanel onOpen={(s) => onSpec(clone(s))} />

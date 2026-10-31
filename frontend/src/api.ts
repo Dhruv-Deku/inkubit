@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -65,6 +65,8 @@ export const api = {
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
   repetitionLab: (scale: number, signal?: AbortSignal) =>
     call<RepetitionLab>(`/api/lab/repetition?scale=${scale.toPrecision(3)}`, { signal }),
+  arena: (spec: Spec) => call<ArenaResult>('/api/arena', json({ spec })),
+  arenaBenchmark: () => call<ArenaBenchmark>('/api/arena/benchmark'),
   bugRound: (level: number, seed: number, signal?: AbortSignal) =>
     call<BugRound>(`/api/bughunt/round?level=${level}&seed=${seed}`, { signal }),
   bugGuess: (level: number, seed: number, index: number) => call<BugVerdict>('/api/bughunt/guess', json({ level, seed, index })),

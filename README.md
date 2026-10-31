@@ -46,6 +46,7 @@ Q-Canvas closes that gap and refuses to fake success:
 | 9. What if | Drag the hardware quality from perfect to 10x worse and watch the exact outcome odds change | exact simulation, no model |
 | Challenges | 11 puzzles in three levels (warm-up, entanglement, gate golf): build a target state or gate, scored exactly with par like golf, stars saved in the browser, a lesson on success. Solve them with the palette, a photo of your paper answer, or words | **Muse Spark 1.3** gives hints that never spell out the answer |
 | Error-correction lab | The three-qubit bit-flip code against a bare qubit on log-log axes, perfect vs realistic gates; drag the gate quality and watch the break-even point move (the threshold idea); switch to phase flips to see the same code make things worse. One click opens the code, with an error, in the editor | exact simulation, no model |
+| AI alone vs Q-Canvas | The same model, asked to predict circuits' outcome odds on its own like a chatbot, scored against exact simulation ([docs/ARENA.md](docs/ARENA.md)): exact on 13 of 13 textbook circuits and 10 of 11 new small ones, but only 3 of 6 bigger ones (6 to 8 qubits), with one confidently wrong answer that put 43% of the probability in the wrong place and one with no usable answer. "Ask the AI alone" under the editor runs the same test on any circuit; the models table says how each model step is checked | **Muse Spark 1.3** answers alone; exact simulation scores it |
 | Bug hunt | One gate in a known circuit is wrong (wrong wire, control and target swapped, a look-alike gate, an angle slip, a stray gate). Compare what it should give with what it gave and click the culprit, against the clock. An exact search tries every one-gate edit, so any gate whose fix restores the odds counts, and rounds where too many gates would count are re-planted. Three levels; score and streak saved in the browser | Live, **Muse Spark 1.3** plays the same round in parallel from the same facts, and its pick and reasoning appear after yours |
 | Split the party (QAOA) | Guests and feuds as a graph you edit by clicking; QAOA seats them at two tables (Max-Cut). Brute force gives the true best; the depth-1 landscape shows every angle pair with the optimizer's path, and you can click it to try your own angles; depths 1 to 3 are optimized exactly, with the odds of a best seating with perfect and with realistic qubits. The circuit opens in the editor | exact simulation, no model |
 | Network mode | Physics model of every link, bottleneck search, fixes (relays, telescopes, memories, **entanglement purification**) re-simulated, before/after on an animated **network map** (entangled pairs in flight, thicker links deliver more, the weakest link marked) | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
@@ -86,6 +87,10 @@ Q-Canvas closes that gap and refuses to fake success:
 <tr>
 <td><img src="docs/screenshots/20-bug-hunt.png" alt="Bug hunt: the player against the exact search and Muse Spark"></td>
 <td><img src="docs/screenshots/21-qaoa.png" alt="Split the party: QAOA seats feuding guests at two tables"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/22-ai-alone.png" alt="The AI alone says every outcome is equally likely; the exact truth has four peaks"></td>
+<td><img src="docs/screenshots/23-arena.png" alt="AI alone vs Q-Canvas: exact on small circuits, unreliable on bigger ones"></td>
 </tr>
 </table>
 
@@ -165,6 +170,8 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   9. plays the bug hunt: given a broken circuit's operations, the intended odds and the
      observed counts (exactly what the player sees), it names the wrong gate, the fix and
      its reasoning (structured output); the exact search grades it like the player.
+  10. answers alone, like a chatbot with no simulator, for the "AI alone vs Q-Canvas" comparison
+     (structured output: every outcome and its probability), scored against exact simulation.
 - **Muse Voice Transcribe 1.0** (`muse-voice-transcribe-1.0`, `POST /v1/asr/transcribe`,
   multipart, `PUSH_TO_TALK`): "Say it" records the microphone in the browser,
   encodes a mono 16 kHz WAV and sends it with a keyword list (qubit, Hadamard,

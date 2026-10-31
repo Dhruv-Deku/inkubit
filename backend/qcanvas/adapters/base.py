@@ -142,6 +142,14 @@ class Transcript(BaseModel):
     call: ModelCall
 
 
+class OddsGuess(BaseModel):
+    """A model's own prediction of a circuit's outcome odds, with no simulator."""
+
+    outcomes: dict[str, float]
+    reasoning: str = ""
+    call: ModelCall
+
+
 class BugGuess(BaseModel):
     """A model's pick in the bug hunt."""
 
@@ -191,6 +199,10 @@ class ReasoningModel(ABC):
     def find_bug(self, facts: dict[str, Any]) -> BugGuess:
         """Pick the one wrong operation in a bug-hunt round."""
         raise NotImplementedError("the bug hunt opponent needs the live model")
+
+    def predict_odds(self, facts: dict[str, Any]) -> OddsGuess:
+        """Answer like a chatbot: predict the outcome odds without running anything."""
+        raise NotImplementedError("asking the AI alone needs the live model")
 
 
 class CodeModel(ABC):

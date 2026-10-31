@@ -13,12 +13,30 @@ export function CallBadge({ call, showModel = true }: { call: ModelCall; showMod
   )
 }
 
+/** What each model step is checked by before its output is trusted (the app's answer to hallucination). */
+const CHECK: Record<string, string> = {
+  'segment': 'boxes shown on your photo to confirm',
+  'choose concepts': 'only steers the segmenter',
+  'read sketch': 'spec validator, then your review',
+  'read description': 'spec validator, then your review',
+  'write code': 'run, then exact simulation',
+  'repair code': 'run, then exact simulation',
+  'explain': "given the run's numbers only",
+  'answer': "given the run's numbers only",
+  'diagram': 'shown beside the exact drawing',
+  'hint': 'never sees the solution',
+  'optimize': 'proven equal or rejected',
+  'transcribe': 'you see the text before it runs',
+  'find bug': 'graded by exact search',
+  'predict alone': 'scored against exact simulation',
+}
+
 export function CallsTable({ calls }: { calls: ModelCall[] }) {
   if (!calls.length) return null
   return (
     <table className="calls">
       <thead>
-        <tr><th>Job</th><th>Model</th><th>Source</th><th>Time</th></tr>
+        <tr><th>Job</th><th>Model</th><th>Source</th><th>How it was checked</th><th>Time</th></tr>
       </thead>
       <tbody>
         {calls.map((c, i) => (
@@ -26,6 +44,7 @@ export function CallsTable({ calls }: { calls: ModelCall[] }) {
             <td>{c.role}</td>
             <td className="mono">{c.model}</td>
             <td><CallBadge call={c} showModel={false} /></td>
+            <td className="muted">{CHECK[c.role] ?? '—'}</td>
             <td className="muted">{c.latency_s > 0 ? `${c.latency_s.toFixed(1)} s` : '—'}</td>
           </tr>
         ))}
