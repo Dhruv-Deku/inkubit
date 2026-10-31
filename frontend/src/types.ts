@@ -244,6 +244,52 @@ export interface QaoaLab {
   summary: string
 }
 
+export interface ChemPoint { r: number; hf: number; exact: number; vqe: number; vqe_err: number; mitigated: number; mitigated_err: number; weight_u: number }
+
+export interface ChemLab {
+  r: number
+  hamiltonian: { a: number; b: number; c: number }
+  hf: number
+  exact: number
+  vqe: number
+  vqe_err: number
+  mitigated: number
+  mitigated_err: number
+  theta: number
+  weight_u: number
+  correlation: number
+  curve: ChemPoint[]
+  scan: { theta: number; exact: number; noisy: number; shots: number | null; err: number | null }[]
+  atoms: number
+  noise: string
+  noise_label: string
+  shots: number
+  spec: CircuitSpec
+  summary: string
+}
+
+export interface QkdPhoton { bit: number; basis: string; eve: string | null; eve_bit: number | null; bob_basis: string; bob_bit: number; kept: boolean; error: boolean }
+
+export interface QkdLab {
+  photons: number
+  eve: number
+  noise: number
+  seed: number
+  shown: QkdPhoton[]
+  sifted: number
+  checked: number
+  errors_seen: number
+  qber: number
+  qber_err: number
+  expected_qber: number
+  caught: boolean
+  key_bits: number
+  eve_knows: number
+  curve: [number, number][]
+  spec: CircuitSpec
+  summary: string
+}
+
 export interface ArenaComparison {
   truth: Distribution
   guess: Record<string, number>

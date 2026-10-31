@@ -214,6 +214,27 @@ def lab_shor(a: int = 7) -> dict[str, Any]:
     return shor_lab(a).model_dump(mode="json")
 
 
+@app.get("/api/lab/chem")
+async def lab_chem(r: float = 0.74) -> dict[str, Any]:
+    """H2 from first principles at bond length ``r`` (angstrom): Hartree-Fock, exact, and VQE raw and mitigated."""
+    from qcanvas.chem import chem_lab
+
+    if not 0.25 <= r <= 3.5:
+        raise HTTPException(422, "bond length must be between 0.25 and 3.5 angstrom")
+    return (await asyncio.to_thread(chem_lab, round(r, 2))).model_dump(mode="json")
+
+
+@app.get("/api/lab/qkd")
+def lab_qkd(photons: int = 1000, eve: float = 0.0, noise: float = 0.01, seed: int = 7) -> dict[str, Any]:
+    """BB84 with an intercept-resend eavesdropper on a share ``eve`` of the photons."""
+    from qcanvas.qkd import bb84
+
+    try:
+        return bb84(photons, eve, noise, seed).model_dump(mode="json")
+    except ValueError as err:
+        raise HTTPException(422, str(err)) from None
+
+
 class QaoaRequest(BaseModel):
     n: int = Field(ge=3, le=8)
     edges: list[tuple[int, int]] = Field(max_length=40)

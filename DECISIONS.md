@@ -464,3 +464,32 @@ run is examples/arena_benchmark.json (shown offline, dated, with the model id);
 "Ask the AI alone" repeats the test live on any circuit, and offline it refuses
 rather than inventing an answer. The models table now names the check behind
 every model step.
+
+## D39. Molecule lab (H2 from first principles)
+No chemistry package: the STO-3G integrals for two s functions have closed
+forms (Szabo and Ostlund ch. 3), so they are computed directly and tested
+against the book's values at 1.4 bohr (S12 0.6593, h11 -1.1204, (11|11) 0.7746,
+E_HF -1.1167, full CI -1.1373) and the dissociation limit (2 x -0.46658). By
+symmetry two configurations remain, so the problem is one qubit, H = a I + b Z +
+c X; the page says so rather than dressing it up. VQE measures Z and X; noise
+comes from the realistic preset's density matrices. A noise channel that does
+not depend on the angle maps the Bloch vector affinely, so three simulations
+fix the noisy expectation for every angle (checked against direct simulation to
+1e-5), which took the lab from 110 s to under 4 s. Under realistic noise raw
+VQE is worse than Hartree-Fock near equilibrium; undoing the calibrated map
+(what calibration circuits measure on hardware) lands within shot noise of
+exact at all 28 bond lengths.
+
+## D40. Catch the spy (BB84)
+Per-photon outcomes follow the measurement rule (same basis: the bit; other
+basis: a coin flip) with a seeded generator, and the tests check that rule
+against Qiskit on the photon circuit, including Eve as a CX onto her own qubit.
+Half of the sifted bits are revealed to estimate the error rate; abort above
+11% (one-way BB84); the kept key shrinks to n (1 - 2 h(QBER)). Eve on a share f
+gives QBER = f/4 plus channel noise (minus the overlap), and at f = 1 she guesses
+75% of the bits, both checked statistically.
+
+## D41. Who it is for
+Nine use-case cards open the existing features directly (scroll to a panel by
+its heading, load a sample sketch, or load an example spec), so the breadth is
+visible in the first screen without new navigation.

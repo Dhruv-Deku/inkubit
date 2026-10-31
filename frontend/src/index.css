@@ -505,3 +505,40 @@ details summary { cursor: pointer; }
   .arena-row .track { grid-column: 1 / -1; grid-row: 2; }
   .arena-row .sub { display: none; }
 }
+
+/* Use cases */
+.uc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.uc-card { display: flex; flex-direction: column; gap: 5px; text-align: left; background: var(--panel-2); border: 1px solid transparent;
+  border-radius: 12px; padding: 13px 14px; color: var(--text-2); font: inherit; cursor: pointer; transition: border-color .15s, background .15s; }
+.uc-card:hover:not(:disabled) { border-color: var(--line-2); background: var(--panel-3); }
+.uc-card:disabled { opacity: .55; cursor: not-allowed; }
+.uc-who { font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.uc-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.uc-text { font-size: 13px; line-height: 1.45; }
+.uc-cta { font-size: 12.5px; color: var(--primary-hover); margin-top: auto; padding-top: 4px; }
+.panel.flash { animation: flash 1.2s ease-out; }
+@keyframes flash { 0% { box-shadow: 0 0 0 2px var(--primary); } 100% { box-shadow: 0 0 0 2px transparent; } }
+@media (max-width: 1000px) { .uc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .uc-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .panel.flash { animation: none; } }
+
+/* Molecule lab */
+.chem-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 270px); gap: 20px; align-items: center; }
+.chem-mol { background: var(--panel-2); border-radius: 11px; padding: 12px 14px; }
+.chem-mix { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; margin: 8px 0 6px; }
+.chem-mix .g { background: var(--primary); }
+.chem-mix .u { background: var(--predicted); }
+@media (max-width: 900px) { .chem-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Catch the spy */
+.qkd-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 22px; margin-bottom: 12px; }
+.qkd-controls > .row.wrap { grid-column: 1 / -1; }
+.qkd-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 20px; align-items: start; }
+.qkd-table-wrap { overflow-x: auto; }
+.qkd-table { border-collapse: separate; border-spacing: 2px; font-size: 12.5px; }
+.qkd-table th { text-align: left; font-weight: 500; color: var(--muted); font-family: var(--sans, inherit); font-size: 12px; padding-right: 8px; white-space: nowrap; }
+.qkd-table td { width: 22px; min-width: 22px; height: 24px; text-align: center; color: var(--text-2); border-radius: 5px; }
+.qkd-table td.kept { background: var(--panel-3); color: var(--text); }
+.qkd-table td.err { color: #ff8a8d; font-weight: 700; }
+.qkd-table tr.eve td { color: var(--warn); }
+@media (max-width: 900px) { .qkd-grid, .qkd-controls { grid-template-columns: minmax(0, 1fr); } }

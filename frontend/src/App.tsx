@@ -11,6 +11,8 @@ import { RepetitionLabPanel, ShorLabPanel } from './components/Labs'
 import { QaoaLabPanel } from './components/Qaoa'
 import { BugHuntPanel } from './components/BugHunt'
 import { ArenaPanel } from './components/Arena'
+import { ChemLabPanel, QkdLabPanel } from './components/Science'
+import { UseCases } from './components/UseCases'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -294,11 +296,14 @@ export default function App() {
           <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
             live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
             extra={<>
+              <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />
               <ArenaPanel />
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
               <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <ShorLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QaoaLabPanel onOpen={(s) => onSpec(clone(s))} />
+              <ChemLabPanel onOpen={(s) => onSpec(clone(s))} />
+              <QkdLabPanel onOpen={(s) => onSpec(clone(s))} />
               <RepetitionLabPanel onTry={tryCode} />
             </>} />
         </>
