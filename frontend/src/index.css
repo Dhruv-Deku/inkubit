@@ -671,3 +671,20 @@ details summary { cursor: pointer; }
 }
 @keyframes mnode-breathe { 50% { border-color: var(--line-2); } }
 .mission-checks li.note > span:first-child { color: var(--warn); }
+
+/* discovery lab */
+.disc-ket { flex: 1 1 220px; min-width: 0; background: var(--panel-2); color: var(--text); border: 1px solid var(--line-2); border-radius: var(--radius-sm); padding: 7px 10px; font-size: 13px; }
+.disc-log { list-style: none; margin: 12px 0 0; padding: 10px 12px; background: var(--panel-2); border-radius: 10px; font-family: var(--mono); font-size: 11.5px; color: var(--text-2); display: grid; gap: 3px; }
+.disc-log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.disc-result { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+.disc-bars { display: grid; gap: 6px; margin: 8px 0 10px; max-width: 720px; }
+.disc-bar-row { display: grid; grid-template-columns: 170px 1fr 52px; gap: 10px; align-items: center; font-size: 12.5px; color: var(--text-2); }
+.disc-bar-row b { color: var(--text); }
+.disc-bar-track { height: 10px; background: var(--panel-2); border-radius: 5px; overflow: hidden; }
+.disc-bar { display: block; height: 100%; background: var(--text-2); border-radius: 5px; }
+.disc-bar.found { background: var(--primary); }
+.disc-bar-val { text-align: right; color: var(--text); font-size: 12px; }
+.disc-table { margin-top: 10px; }
+.disc-table tr.sel td { background: var(--panel-3); }
+.disc-circuit { background: var(--panel-2); border-radius: 12px; padding: 12px 14px; margin-top: 10px; overflow-x: auto; }
+@media (max-width: 640px) { .disc-bar-row { grid-template-columns: 120px 1fr 46px; } .disc-table { display: block; overflow-x: auto; white-space: nowrap; } }

@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -84,6 +84,9 @@ export const api = {
     return call<{ mission_id: string; events_url: string }>('/api/missions', { method: 'POST', body: form })
   },
   mlReport: () => call<MlReport>('/api/mlverify/report'),
+  discoveryGoals: () => call<{ goals: DiscoveryGoal[] }>('/api/discovery/goals'),
+  startDiscovery: (what: { goal?: string; ket?: string }, deep: boolean) =>
+    call<{ discovery_id: string; events_url: string }>('/api/discovery', json({ ...what, deep })),
   chemLab: (r: number, signal?: AbortSignal) => call<ChemLab>(`/api/lab/chem?r=${r.toFixed(2)}`, { signal }),
   qkdLab: (q: { photons: number; eve: number; noise: number; seed: number }, signal?: AbortSignal) =>
     call<QkdLab>(`/api/lab/qkd?photons=${q.photons}&eve=${q.eve}&noise=${q.noise}&seed=${q.seed}`, { signal }),

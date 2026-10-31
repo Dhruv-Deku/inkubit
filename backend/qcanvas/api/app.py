@@ -272,6 +272,72 @@ def ml_verify_report() -> dict[str, Any]:
     return {"metrics": m.metrics, "q90": m.q90, "features": m.features, "scatter": m.scatter, "gallery": m.gallery}
 
 
+class DiscoveryRequest(BaseModel):
+    goal: str = Field(default="w4", max_length=20)
+    ket: str | None = Field(default=None, max_length=400)
+    deep: bool = False
+
+
+@app.get("/api/discovery/goals")
+def discovery_goals() -> dict[str, Any]:
+    from qcanvas.discovery import goal_list
+
+    return {"goals": [g.model_dump() for g in goal_list()]}
+
+
+@app.post("/api/discovery")
+def start_discovery(body: DiscoveryRequest) -> dict[str, Any]:
+    """Autonomous discovery: Muse Spark proposes CNOT layouts, exact fitting and simulation prove and score them."""
+    from qcanvas.discovery import GOALS, Discovery, custom_goal, discoveries, goal_target, launch
+
+    try:
+        if body.ket:
+            goal, target = custom_goal(body.ket)
+        elif body.goal in GOALS:
+            goal, target = GOALS[body.goal], goal_target(GOALS[body.goal])
+        else:
+            raise ValueError(f"unknown goal {body.goal!r}")
+    except ValueError as err:
+        raise HTTPException(422, str(err)) from None
+    d = Discovery(goal)
+    discoveries.add(d)
+    launch(d, target, get_models(), body.deep)
+    return {"discovery_id": d.id, "events_url": f"/api/discovery/{d.id}/events"}
+
+
+@app.get("/api/discovery/{discovery_id}/events")
+async def discovery_events(discovery_id: str) -> EventSourceResponse:
+    from qcanvas.discovery import discoveries
+
+    d = discoveries.get(discovery_id)
+    if d is None:
+        raise HTTPException(404, "no such discovery run")
+
+    async def stream():
+        cursor = 0
+        while True:
+            events = d.bus.events(cursor)
+            for event in events:
+                yield {"event": "discovery", "id": str(event.seq), "data": json.dumps(event.details, default=str)}
+            cursor += len(events)
+            if d.bus.closed and not d.bus.events(cursor):
+                yield {"event": "end", "data": json.dumps({"status": d.status, "error": d.error})}
+                return
+            await asyncio.sleep(0.15)
+
+    return EventSourceResponse(stream(), ping=10)
+
+
+@app.get("/api/discovery/{discovery_id}")
+def discovery_status(discovery_id: str) -> dict[str, Any]:
+    from qcanvas.discovery import discoveries
+
+    d = discoveries.get(discovery_id)
+    if d is None:
+        raise HTTPException(404, "no such discovery run")
+    return {"id": d.id, "status": d.status, "error": d.error, "result": d.result}
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""

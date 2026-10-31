@@ -742,3 +742,14 @@ export interface MlReport {
   scatter: [number, number, number][]
   gallery: { circuit: string; scale: number; exact: number; ml: number; half_width: number; baseline: number; depolarizing: number }[]
 }
+
+export interface DiscoveryGoal { id: string; title: string; blurb: string; num_qubits: number; chip: boolean }
+export interface DiscoveryEntry {
+  label: string; source: string; cx: number; one_qubit: number; depth: number; proof: number
+  noisy_fidelity: number; outcome_fidelity: number; ml_fidelity: number | null; why: string; spec: Record<string, unknown>
+}
+export interface DiscoveryResult {
+  goal: DiscoveryGoal; target: string; num_qubits: number; complex: boolean; entries: DiscoveryEntry[]; tried: number
+  fewest_cnots: number | null; baseline_cnots: number; lower_bound: number; ml_agrees: boolean | null
+  ml_rank_correlation: number | null; ml_milliseconds: number; finding: string; calls: ModelCall[]; seconds: number
+}
