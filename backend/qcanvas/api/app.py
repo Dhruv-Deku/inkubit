@@ -438,6 +438,25 @@ async def live_read(file: UploadFile = File(...)) -> dict[str, Any]:
             "total_seconds": round(time.perf_counter() - start, 2)}
 
 
+@app.get("/api/orbits/cities")
+def orbit_cities() -> dict[str, Any]:
+    from qcanvas.orbits import CITIES, PAIRS
+
+    return {"cities": [{"id": k, "name": v[0], "lat": v[1], "lon": v[2]} for k, v in CITIES.items()],
+            "pairs": [{"a": a, "b": b, "label": label} for a, b, label in PAIRS]}
+
+
+@app.get("/api/orbits")
+async def orbits(a: str = "delingha", b: str = "lijiang", night: bool = True) -> dict[str, Any]:
+    """A Micius-like satellite over a real day: every pass over two cities and the key it gives."""
+    from qcanvas.orbits import plan
+
+    try:
+        return (await asyncio.to_thread(plan, a, b, night)).model_dump(mode="json")
+    except ValueError as err:
+        raise HTTPException(422, str(err)) from None
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""

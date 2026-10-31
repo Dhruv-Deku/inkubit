@@ -21,6 +21,7 @@ import { DiscoveryPanel } from './components/Discovery'
 import { DistributedPanel } from './components/Distributed'
 import { EstimatorPanel } from './components/Estimator'
 import { LiveBoardPanel } from './components/LiveBoard'
+import { GlobePanel } from './components/Globe'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -307,6 +308,7 @@ export default function App() {
               <MissionPanel live={health?.mode === 'meta'} examples={examples} onOpen={(s) => onSpec(clone(s))} />
               <LiveBoardPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <DiscoveryPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+              <GlobePanel />
               <DistributedPanel examples={examples} onOpen={(s) => onSpec(clone(s))} />
               <EstimatorPanel live={health?.mode === 'meta'} />
               <CopilotPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />

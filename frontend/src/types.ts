@@ -790,3 +790,11 @@ export interface LiveRead {
   read_seconds: number
   total_seconds: number
 }
+
+export interface OrbitCity { id: string; name: string; lat: number; lon: number }
+export interface OrbitPass { start_utc: string; minutes: number; max_el_a: number; max_el_b: number | null; pairs: number | null; key_bits: number; kind: string }
+export interface OrbitPlan {
+  city_a: OrbitCity; city_b: OrbitCity; distance_km: number; start_utc: string; step_s: number
+  track: [number, number][]; sun: [number, number][]; el_a: number[]; el_b: number[]; night_a: boolean[]; night_b: boolean[]
+  passes: OrbitPass[]; shared_key_bits_per_day: number; entangled_pairs_per_day: number; trusted_key_bits_per_day: number; finding: string
+}
