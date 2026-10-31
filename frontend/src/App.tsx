@@ -14,6 +14,7 @@ import { ArenaPanel } from './components/Arena'
 import { ChemLabPanel, QkdLabPanel } from './components/Science'
 import { UseCases } from './components/UseCases'
 import { CopilotPanel } from './components/Copilot'
+import { RosettaPanel } from './components/Rosetta'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -298,6 +299,7 @@ export default function App() {
             live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
             extra={<>
               <CopilotPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+              <RosettaPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />
               <ArenaPanel />
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />

@@ -20,6 +20,7 @@ import re
 import time
 from typing import Any, Callable
 
+import numpy as np
 from pydantic import BaseModel, Field
 
 from qcanvas.adapters.base import ModelCall
@@ -33,8 +34,9 @@ SYSTEM = (
     "simple one: call the tools, which are exact simulations, and use only the numbers they return. Pick the tool "
     "that fits: circuits and algorithms (simulate_circuit, optimize_circuit), molecules (molecule_h2), secure keys "
     "and eavesdroppers (quantum_key_distribution), splitting people or tasks into two groups, scheduling and routing "
-    "conflicts (max_cut), factoring (factor_with_shor), quantum networks and links (plan_quantum_link), and error "
-    "correction (error_correction). Several tools may be called, also in parallel, for comparisons. Circuits use "
+    "conflicts (max_cut), factoring (factor_with_shor), quantum networks and links (plan_quantum_link), error "
+    "correction (error_correction), and reading or writing quantum notation: a ket such as (|01⟩−|10⟩)/√2, "
+    "OpenQASM, Quil or Qiskit code, or 'what circuit makes this state' (translate_notation). Several tools may be called, also in parallel, for comparisons. Circuits use "
     "Qiskit conventions: qubits start in |0>, angles in radians, bitstrings with qubit 0 on the right. After the "
     "tools return, answer in 2 to 5 plain sentences for a curious student: the result, what it means, and one "
     "honest caveat when there is one. Quote numbers exactly as the tools give them (you may round, and you may say "
@@ -93,6 +95,11 @@ TOOLS = [
         {"gate_quality": {"type": "number", "minimum": 0.05, "maximum": 10,
                           "description": "1 = today's realistic gates, 0.1 = ten times better, 2 = twice as noisy."}},
         ["gate_quality"]),
+    _fn("translate_notation", "Quantum Rosetta: read quantum notation exactly (a Dirac ket like (|01⟩−|10⟩)/√2 or "
+        "cos(π/8)|0⟩+sin(π/8)|1⟩, named states |Φ+⟩ |GHZ⟩ |W⟩, OpenQASM, Quil, or Qiskit calls like qc.h(0)) and "
+        "return the state in Dirac notation, which qubits are entangled, a circuit proven to prepare it, and code in "
+        "eight languages.",
+        {"text": {"type": "string", "description": "The notation, copied exactly."}}, ["text"]),
 ]
 
 
@@ -276,10 +283,32 @@ def t_qec(a: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     return facts, {"type": "qec", "lab": lab.model_dump(mode="json")}
 
 
+def t_translate(a: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    from qcanvas.rosetta import statevector, translate
+    from qcanvas.spec import parse_spec
+
+    res = translate(str(a["text"]), None, with_languages=False)
+    spec = parse_spec(res.spec)
+    sv = statevector(spec)  # type: ignore[arg-type]
+    n = spec.num_qubits
+    probs = np.abs(sv) ** 2
+    top = sorted((i for i in range(len(sv)) if probs[i] > 1e-10), key=lambda i: -probs[i])[:8]
+    ops = [o for o in spec.operations if o.gate not in ("MEASURE", "BARRIER")]  # type: ignore[union-attr]
+    facts = {"read_as": res.source.label, "state_dirac": res.state.text, "entangled_groups": res.state.groups,
+             "product_state": res.state.product, "num_qubits": n, "gates": len(ops),
+             "two_qubit_gates": sum(1 for o in ops if o.controls or o.gate == "SWAP"),
+             "amplitudes": {format(i, f"0{n}b"): {"probability": _r(float(probs[i])), "size": _r(float(abs(sv[i])))}
+                            for i in top},
+             "prepared_exactly_fidelity": res.preparation.fidelity if res.preparation else None,
+             "preparation_method": res.preparation.method if res.preparation else None,
+             "languages": ["Qiskit", "OpenQASM 2", "OpenQASM 3", "Cirq", "PennyLane", "Q#", "Quil", "Amazon Braket"]}
+    return facts, {"type": "rosetta", "result": res.model_dump(mode="json")}
+
+
 RUN: dict[str, Callable[[dict[str, Any]], tuple[dict[str, Any], dict[str, Any]]]] = {
     "simulate_circuit": t_simulate, "optimize_circuit": t_optimize, "molecule_h2": t_molecule,
     "quantum_key_distribution": t_qkd, "max_cut": t_maxcut, "factor_with_shor": t_shor,
-    "plan_quantum_link": t_link, "error_correction": t_qec,
+    "plan_quantum_link": t_link, "error_correction": t_qec, "translate_notation": t_translate,
 }
 
 
@@ -396,7 +425,10 @@ def ask_offline(question: str) -> Reply:
 
     q = question.lower()
     runs: list[ToolRun] = []
-    if re.search(r"\bh2\b|h₂|hydrogen|molecule|bond", q):
+    notation = _notation_in(question)
+    if notation:
+        runs.append(run_tool("translate_notation", {"text": notation}))
+    elif re.search(r"\bh2\b|h₂|hydrogen|molecule|bond", q):
         r = re.search(r"(\d+(?:\.\d+)?)\s*(?:å|angstrom|a\b)", q)
         runs.append(run_tool("molecule_h2", {"bond_length_angstrom": float(r.group(1)) if r else 0.74}))
     elif re.search(r"spy|eve|eavesdrop|bb84|qkd|secret key|intercept|photons?", q):
@@ -432,6 +464,27 @@ def ask_offline(question: str) -> Reply:
     return Reply(answer=answer, tools=runs, trace=trace(answer, question, runs), calls=[call], router="offline")
 
 
+_EDGE = set("()√0123456789./*+-−^{}πi ")
+
+
+def _notation_in(text: str) -> str | None:
+    """The quantum notation inside a question, for the offline router: OpenQASM, or a ket expression."""
+    from qcanvas.notation import looks_like_ket
+
+    if "OPENQASM" in text.upper():
+        return text[text.upper().index("OPENQASM"):]
+    if not looks_like_ket(text):
+        return None
+    i = text.index("|")
+    j = max(text.rfind("⟩"), text.rfind(">"))
+    while i > 0 and text[i - 1] in _EDGE:
+        i -= 1
+    j += 1
+    while j < len(text) and (text[j] in _EDGE - {" "} or text[j:j + 4] == "sqrt"):
+        j += 4 if text[j:j + 4] == "sqrt" else 1
+    return text[i:j].strip() or None
+
+
 def _template(run: ToolRun) -> str:
     f = run.facts
     if run.error:
@@ -454,6 +507,12 @@ def _template(run: ToolRun) -> str:
         return f["summary"]
     if run.name == "plan_quantum_link":
         return f["summary"]
+    if run.name == "translate_notation":
+        kind = ("entangled: no qubit can be described on its own" if f["entangled_groups"] and not f["product_state"]
+                else "a product state: each qubit is on its own")
+        made = (f" A circuit of {f['gates']} gates ({f['two_qubit_gates']} two-qubit) prepares it exactly, fidelity "
+                f"{f['prepared_exactly_fidelity']}." if f.get("prepared_exactly_fidelity") is not None else "")
+        return f"Read as {f['read_as']}: the state is {f['state_dirac']}, {kind}.{made}"
     if run.name == "simulate_circuit":
         top = ", ".join(f"{k} with probability {v}" for k, v in list(f["outcomes_perfect"].items())[:4])
         return f"With perfect qubits it reads {top}." + (

@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, CopilotReply, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -67,6 +67,13 @@ export const api = {
     call<RepetitionLab>(`/api/lab/repetition?scale=${scale.toPrecision(3)}`, { signal }),
   copilot: (message: string, history: { role: string; content: string }[], deep = false) =>
     call<CopilotReply>('/api/copilot', json({ message, history, deep })),
+  rosetta: (text: string) => call<RosettaResult>('/api/rosetta', json({ text })),
+  rosettaDictionary: () => call<{ entries: RosettaEntry[] }>('/api/rosetta/dictionary'),
+  rosettaPhoto: (file: Blob) => {
+    const form = new FormData()
+    form.append('file', file, 'notation.jpg')
+    return call<NotationRead>('/api/rosetta/photo', { method: 'POST', body: form })
+  },
   chemLab: (r: number, signal?: AbortSignal) => call<ChemLab>(`/api/lab/chem?r=${r.toFixed(2)}`, { signal }),
   qkdLab: (q: { photons: number; eve: number; noise: number; seed: number }, signal?: AbortSignal) =>
     call<QkdLab>(`/api/lab/qkd?photons=${q.photons}&eve=${q.eve}&noise=${q.noise}&seed=${q.seed}`, { signal }),

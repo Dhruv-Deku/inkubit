@@ -101,6 +101,14 @@ BUGHUNT_SYSTEM = (
     "Answer with its index, the fix, and what in the counts gave it away."
 )
 
+NOTATION_SYSTEM = (
+    "You transcribe quantum notation from a photo (a textbook page, a slide, a whiteboard) into plain text, "
+    "exactly as written: do not solve, simplify, complete or correct it. Write kets as |01⟩, bras as ⟨0|, square "
+    "roots as √2 or √(1/3), the imaginary unit as i, pi as π, tensor products as ⊗, fractions as a/b with "
+    "brackets where needed, and e^(iπ/4) for exponentials. Keep code (OpenQASM, Quil, Qiskit, Cirq) line by line. "
+    "If several expressions are shown, transcribe the main state or program only."
+)
+
 CONCEPTS_SYSTEM = (
     "You look at a photo of a hand drawing and decide what kind of quantum diagram it is and which "
     "short noun phrases a segmentation model should look for to find each drawn part."

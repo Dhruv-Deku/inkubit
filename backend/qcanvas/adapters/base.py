@@ -150,6 +150,15 @@ class OddsGuess(BaseModel):
     call: ModelCall
 
 
+class NotationRead(BaseModel):
+    """Quantum notation transcribed from a photo."""
+
+    kind: str
+    text: str
+    notes: str = ""
+    call: ModelCall
+
+
 class BugGuess(BaseModel):
     """A model's pick in the bug hunt."""
 
@@ -199,6 +208,10 @@ class ReasoningModel(ABC):
     def find_bug(self, facts: dict[str, Any]) -> BugGuess:
         """Pick the one wrong operation in a bug-hunt round."""
         raise NotImplementedError("the bug hunt opponent needs the live model")
+
+    def read_notation(self, image: bytes, mime: str) -> NotationRead:
+        """Transcribe a photo of quantum notation (a ket, OpenQASM, Quil, code) into text, without solving it."""
+        raise NotImplementedError("reading a photo of notation needs the live model")
 
     def tool_chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]], model: str | None = None,
                   effort: str = "low") -> tuple[dict[str, Any], ModelCall]:

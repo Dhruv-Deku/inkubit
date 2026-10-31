@@ -22,6 +22,7 @@ def test_every_tool_is_declared_and_runs():
         "quantum_key_distribution": {"eavesdrop_share": 0.5}, "factor_with_shor": {"a": 7},
         "max_cut": {"names": ["Ana", "Ben", "Cai"], "conflicts": [["Ana", "Ben"], ["ben", "Cai"]]},
         "plan_quantum_link": {"distance_km": 200, "medium": "fiber", "repeaters": 1}, "error_correction": {"gate_quality": 1},
+        "translate_notation": {"text": "(|01⟩ − |10⟩)/√2"},
     }
     assert names == set(cases)
     for name, args in cases.items():

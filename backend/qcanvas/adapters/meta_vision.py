@@ -25,6 +25,7 @@ from qcanvas.adapters.base import (
     Explanation,
     ImageModel,
     ModelCall,
+    NotationRead,
     Proposal,
     ReasoningModel,
     SCRIPTS,
@@ -44,12 +45,13 @@ from qcanvas.adapters.prompts import (
     DRAFT_SYSTEM,
     EXPLAIN_SYSTEM,
     HINT_SYSTEM,
+    NOTATION_SYSTEM,
     OPTIMIZE_SYSTEM,
     TEXT_SYSTEM,
 )
 from qcanvas.adapters.sam_parse import parse_sam_output
 from qcanvas.sim.noise import get_preset
-from qcanvas.spec.draft import BUG_SCHEMA, CONCEPTS_SCHEMA, ODDS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
+from qcanvas.spec.draft import BUG_SCHEMA, CONCEPTS_SCHEMA, NOTATION_SCHEMA, ODDS_SCHEMA, REWRITE_SCHEMA, draft_schema, draft_to_spec
 from qcanvas.spec.models import CircuitSpec, NetworkSpec
 from qcanvas.spec.validation import SpecError, parse_spec
 
@@ -280,6 +282,21 @@ class MetaReasoningModel(ReasoningModel):
         return BugGuess(index=index, fix=str(data.get("fix", ""))[:200], reason=str(data.get("reason", ""))[:500],
                         call=ModelCall(provider="meta", model=self.model, role="find bug", cached=cached,
                                        latency_s=time.perf_counter() - start))
+
+    def read_notation(self, image: bytes, mime: str) -> NotationRead:
+        start = time.perf_counter()
+        messages = [
+            {"role": "system", "content": NOTATION_SYSTEM},
+            {"role": "user", "content": [{"type": "text", "text": "Transcribe the quantum notation in this photo."},
+                                         _image_part(image, mime)]},
+        ]
+        data, cached, _ = self._json(messages, NOTATION_SCHEMA, "notation", "low", max_tokens=4000)
+        text = str(data.get("text", "")).strip()
+        if not text or data.get("kind") == "none":
+            raise MetaAPIError(f"{self.model} found no quantum notation in the photo")
+        return NotationRead(kind=str(data.get("kind", "")), text=text[:4000], notes=str(data.get("notes", ""))[:300],
+                            call=ModelCall(provider="meta", model=self.model, role="read notation", cached=cached,
+                                           latency_s=time.perf_counter() - start))
 
     def hint(self, facts: dict[str, Any]) -> Explanation:
         start = time.perf_counter()

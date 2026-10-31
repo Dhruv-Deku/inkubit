@@ -3,3 +3,5 @@
 playwright==1.58.0
 # demo video encoding (bundles a static ffmpeg; scripts/record_demo.py)
 imageio-ffmpeg==0.7.0
+# runs the Rosetta's Cirq output in tests (and in the app when installed)
+cirq-core==1.7.0

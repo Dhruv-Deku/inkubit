@@ -282,6 +282,58 @@ async def copilot(body: CopilotRequest) -> dict[str, Any]:
     return reply.model_dump(mode="json")
 
 
+class RosettaRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
+
+
+@app.post("/api/rosetta")
+async def rosetta(body: RosettaRequest) -> dict[str, Any]:
+    """Quantum Rosetta: Dirac notation, OpenQASM, Quil, Qiskit, other code or words in; math, a proven circuit,
+    words and eight languages out."""
+    from qcanvas.notation import NotationError
+    from qcanvas.rosetta import ReadError, translate
+    from qcanvas.spec import SpecError
+
+    try:
+        res = await asyncio.to_thread(translate, body.text, get_models())
+    except (ReadError, NotationError, SpecError) as err:
+        raise HTTPException(422, str(err)) from None
+    except ModelUnavailable as err:
+        raise HTTPException(502, f"A Meta model call failed and fallback is off: {err}") from None
+    return res.model_dump(mode="json")
+
+
+@app.get("/api/rosetta/dictionary")
+async def rosetta_dictionary() -> dict[str, Any]:
+    """The words of quantum computing, each with an example state computed exactly."""
+    from qcanvas.rosetta import dictionary
+
+    return {"entries": await asyncio.to_thread(dictionary)}
+
+
+@app.post("/api/rosetta/photo")
+async def rosetta_photo(file: UploadFile = File(...)) -> dict[str, Any]:
+    """A photo of notation (textbook, slide, whiteboard) -> text, by Muse Spark; live only, never guessed offline."""
+    from qcanvas.adapters.imaging import normalise_upload
+
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(400, "the upload is empty")
+    if len(raw) > MAX_UPLOAD:
+        raise HTTPException(413, "the image is larger than 15 MB")
+    models = get_models()
+    if not (models.settings.provider == "meta" and models.settings.has_key):
+        raise HTTPException(409, "Reading a photo of notation needs the live model (Muse Spark). Type or paste it instead.")
+    try:
+        data, mime, _, _ = normalise_upload(raw)
+        read = await asyncio.to_thread(models.reasoning.read_notation, data, mime)
+    except OSError as err:
+        raise HTTPException(400, f"could not read the image: {err}") from None
+    except Exception as err:  # noqa: BLE001 - reported, never replaced by a guess
+        raise HTTPException(502, f"Muse Spark could not read the photo: {err}") from None
+    return read.model_dump(mode="json")
+
+
 class ArenaRequest(BaseModel):
     spec: dict[str, Any]
 

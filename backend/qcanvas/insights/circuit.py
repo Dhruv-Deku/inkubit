@@ -67,6 +67,7 @@ class StepState(BaseModel):
     entangled: list[bool]
     entropy: list[float] = Field(default_factory=list)  # bits of entanglement of each qubit with the rest
     links: list[list[float]] = Field(default_factory=list)  # [a, b, concurrence] for entangled pairs
+    dirac: str = ""  # the state in Dirac notation, factored where qubits are independent
 
 
 class PairEntanglement(BaseModel):
@@ -167,7 +168,10 @@ class CircuitInsights(BaseModel):
 # ---------------------------------------------------------------- step by step
 
 def _angle(theta: float) -> str:
-    return format_angle(theta).replace(" * ", "").replace(" / ", "/").replace("pi", "π")
+    text = format_angle(theta)
+    if "pi" not in text:
+        return f"{theta:.4g}"
+    return text.replace(" * ", "").replace(" / ", "/").replace("pi", "π")
 
 
 def op_label(op: Operation) -> str:
@@ -221,6 +225,9 @@ def _concurrence(rho: np.ndarray) -> float:
 
 
 def _state(psi: np.ndarray, n: int, step: int, op_index: int | None, label: str) -> StepState:
+    from qcanvas.notation import dirac
+
+    ket = dirac(psi, n).text
     probs = np.abs(psi) ** 2
     order = np.argsort(-probs, kind="stable")
     psi = psi * np.exp(-1j * np.angle(psi[order[0]]))  # global phase is unobservable: largest amplitude real
@@ -245,7 +252,7 @@ def _state(psi: np.ndarray, n: int, step: int, op_index: int | None, label: str)
     hidden = max(0.0, 1.0 - sum(a.probability for a in amps))
     return StepState(step=step, op_index=op_index, label=label, amplitudes=amps,
                      hidden_probability=round(hidden, 6), bloch=bloch, entangled=entangled,
-                     entropy=entropy, links=links)
+                     entropy=entropy, links=links, dirac=ket)
 
 
 def step_states(spec: CircuitSpec) -> list[StepState]:

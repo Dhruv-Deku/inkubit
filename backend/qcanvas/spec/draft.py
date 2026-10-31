@@ -91,6 +91,14 @@ BUG_SCHEMA = _obj({
     "reason": {"type": "string", "description": "One or two sentences: what in the counts points to this operation."},
 })
 
+NOTATION_SCHEMA = _obj({
+    "kind": {"type": "string", "enum": ["dirac", "qasm", "quil", "qiskit", "code", "words", "none"],
+             "description": "What the photo shows: a Dirac-notation state, OpenQASM, Quil, Qiskit code, other code, "
+                            "a description in words, or no quantum notation."},
+    "text": {"type": "string", "description": "The notation transcribed exactly, as plain text."},
+    "notes": {"type": "string", "description": "Anything unclear in the photo, in one sentence; empty if nothing."},
+})
+
 CONCEPTS_SCHEMA = _obj({
     "kind": {"type": "string", "enum": ["circuit", "network"]},
     "concepts": {"type": "array", "items": {"type": "string"},

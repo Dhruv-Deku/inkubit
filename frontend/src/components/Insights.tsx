@@ -46,7 +46,8 @@ export function StepInspector({ spec, steps }: { spec: CircuitSpec; steps: StepS
           aria-label="Step" style={{ flex: 1, minWidth: 140 }} />
         <span className="sub mono">step {s.step} of {steps.length - 1}</span>
       </div>
-      <div className="step-title"><strong>{s.label}</strong><span className="sub">{stepNote(s, steps[i - 1])}</span></div>
+      <div className="step-title"><strong>{s.label}</strong><span className="sub">{stepNote(s, steps[i - 1])}</span>
+        {s.dirac && <span className="ket" title="The state in Dirac notation (qubit 0 is the rightmost digit)">{s.dirac}</span>}</div>
       <CircuitPreview spec={spec} highlight={s.op_index === null ? null : `operations[${s.op_index}]`} onPick={() => {}} />
       <div className="inspector-grid">
         <div>

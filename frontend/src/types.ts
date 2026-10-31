@@ -244,6 +244,22 @@ export interface QaoaLab {
   summary: string
 }
 
+export interface DiracForm { text: string; latex: string; terms: number; groups: number[][]; product: boolean; expanded: string | null }
+export interface RosettaStep { label: string; meaning: string; effect: string; dirac: string }
+export interface RosettaLang { id: string; name: string; code: string; checked: boolean; note: string }
+export interface RosettaResult {
+  source: { kind: string; label: string; exact: boolean; normalized_from: number | null; note: string }
+  spec: Spec
+  target: DiracForm | null
+  state: DiracForm
+  preparation: { method: string; fidelity: number; gates: number; two_qubit: number } | null
+  steps: RosettaStep[]
+  languages: RosettaLang[]
+  calls: ModelCall[]
+}
+export interface RosettaEntry { term: string; plain: string; example: string; dirac: string; entangled: boolean; see: string | null }
+export interface NotationRead { kind: string; text: string; notes: string; call: ModelCall }
+
 export interface CopilotTool { name: string; args: Record<string, unknown>; facts: Record<string, unknown>; card: Record<string, unknown> | null; error: string | null; seconds: number }
 
 export interface CopilotReply {
@@ -384,6 +400,7 @@ export interface StepState {
   entangled: boolean[]
   entropy?: number[]
   links?: [number, number, number][]  // [a, b, concurrence]
+  dirac?: string  // the state in Dirac notation
 }
 export interface PairEntanglement { a: number; b: number; ideal: number; noisy: number | null }
 export interface Entanglement { pairs: PairEntanglement[]; qubit_entropy: number[]; summary: string }

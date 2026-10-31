@@ -14,7 +14,7 @@ const CASES: { who: string; title: string; text: string; action: Action; cta: st
   { who: 'Skeptic', title: 'Can the AI be trusted?', text: 'We measured where the model alone goes wrong. Here, nothing reaches you unchecked.', action: { kind: 'panel', title: 'AI alone vs Q-Canvas' }, cta: 'See the evidence' },
 ]
 
-function scrollToPanel(title: string) {
+export function scrollToPanel(title: string) {
   const h = [...document.querySelectorAll('.panel h2')].find((el) => el.textContent?.startsWith(title))
   const panel = h?.closest('.panel') as HTMLElement | null
   if (!panel) return

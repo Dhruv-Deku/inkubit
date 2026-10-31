@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { api, ApiError } from '../api'
-import type { ChemLab, CircuitSpec, CopilotReply, CopilotTool, QaoaLab, QkdLab, ShorLab } from '../types'
+import type { ChemLab, CircuitSpec, CopilotReply, CopilotTool, QaoaLab, QkdLab, RosettaResult, ShorLab } from '../types'
 import { CallBadge } from './CallBadge'
 import { CircuitPreview } from './CircuitPreview'
 import { Histogram } from './Histogram'
@@ -17,6 +17,7 @@ const IDEAS = [
   'When does error correction start to help?',
   'Compare H₂ at 0.74 Å and 2.5 Å.',
   'Plan a 1,200 km satellite key link, then check whether a spy on 20% of the photons would be caught.',
+  'What circuit makes the state (|01⟩ − |10⟩)/√2, and is it entangled?',
 ]
 
 const LABEL: Record<string, string> = {
@@ -92,6 +93,21 @@ function Card({ run, first, onOpen }: { run: CopilotTool; first: boolean; onOpen
           <span><b>{best.cut} / {lab.edges.length}</b> conflicts separated{best.optimal ? ' (best possible)' : ''}</span>
           <span><b>{(d.p_best * 100).toFixed(0)}%</b> chance QAOA reads a best split ({d.p} layers)</span>
           <span><b>{((d.p_best_noisy ?? 0) * 100).toFixed(0)}%</b> with realistic noise</span>
+        </div>
+      </>
+    )
+  } else if (c.type === 'rosetta') {
+    const r = c.result as RosettaResult
+    action = open(r.spec)
+    body = (
+      <>
+        <div className="ket big">{r.state.text}</div>
+        <CircuitPreview spec={r.spec as CircuitSpec} highlight={null} onPick={() => {}} />
+        <div className="mini-tiles">
+          <span><b>{r.state.groups.length ? 'Entangled' : 'Product state'}</b></span>
+          {r.preparation && <span><b className="good">fidelity {r.preparation.fidelity.toFixed(6)}</b> circuit proven by exact simulation</span>}
+          {r.preparation && <span><b>{r.preparation.gates}</b> gates, {r.preparation.two_qubit} two-qubit</span>}
+          <span>read as {r.source.label}</span>
         </div>
       </>
     )
