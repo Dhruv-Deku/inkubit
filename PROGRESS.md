@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (233 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-10-30)
+## Done (317 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-10-31)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -52,6 +52,8 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/q-canvas-demo.mp4`; optionally add a voice-over.
 4. Repo is pushed to https://github.com/Dhruv-Deku/q-canvas (**private**): make it public before submitting (`gh repo edit Dhruv-Deku/q-canvas --visibility public --accept-visibility-change-consequences`), then fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
+
+- Oct 31: Muse Wonder deep mode for Ask Q-Canvas (D44). Hackathon rules applied (D45): MIT license, "Built during the hackathon" and third-party sections in the README, submission text updated, repo public.
 
 ## Top 5 next steps
 1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, `optimize`, and explanations in other languages).

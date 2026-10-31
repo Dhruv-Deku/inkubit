@@ -8,8 +8,11 @@ and **proves the result is right** by checking it against an independent
 simulation of the spec. When the code is wrong, a self-repair agent diagnoses the
 failure in plain language, fixes it, and runs it again, live on screen.
 
-Built for the **Meta Global AI Developer Hackathon 2026**, theme **Push the
-Frontier** ("accelerate a scientific experiment").
+Built for the **Meta Global AI Developer Hackathon 2026**, problem statement
+**Push the Frontier** ("accelerate a scientific experiment, or unlock a better way
+to understand and control a physical system"). Everything here was built during
+the hackathon, from the first commit on Oct 27, 2026; see
+[Built during the hackathon](#built-during-the-hackathon).
 
 ![The agent catches a planted bug, repairs it and verifies the result](docs/screenshots/agent-repair.gif)
 
@@ -186,6 +189,11 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   11. runs **Ask Q-Canvas** with tool calling (`tools` on Chat Completions): it chooses among eight
       function tools, each a wrapper over an exact engine, gets their results back as `tool` messages and
       answers; every number in the answer is then traced to a tool result.
+- **Muse Wonder 1.0** (`muse-wonder-1.0`, `POST /v1/chat/completions` with `tools`,
+  `reasoning_effort: "medium"`): the deep mode of Ask Q-Canvas, for questions that
+  take several steps ("plan a 1200 km satellite key link, then check whether a spy
+  would be caught"). Same eight tools, same tracing, up to six rounds of tool calls.
+  Muse Wonder is in preview; Muse Spark stays the fast default.
 - **Muse Voice Transcribe 1.0** (`muse-voice-transcribe-1.0`, `POST /v1/asr/transcribe`,
   multipart, `PUSH_TO_TALK`): "Say it" records the microphone in the browser,
   encodes a mono 16 kHz WAV and sends it with a keyword list (qubit, Hadamard,
@@ -249,7 +257,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (233 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (317 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -441,6 +449,44 @@ results caught. Regenerate with `scripts/benchmark.py`.
   exercised end to end against the Meta Model API with fallback off (D34);
   `pytest -m live` repeats a cheap check of each model.
 - The Muse Code CLI backend is opt-in and untested here (the CLI was not installed).
+
+## Built during the hackathon
+
+Everything in this repository, and everything the demo video shows, was built
+during the hackathon's building period (Oct 27 to Nov 4, 2026). Nothing was
+carried over from an earlier project. The git history is the record: the first
+commit (`a892217`, the spec format) is from Oct 27, 2026 at 14:57 ET.
+
+| Day (ET) | What was built |
+| --- | --- |
+| Oct 27 | Spec format, code generation, noise-aware verification, the self-repair agent, sketch reading with SAM 3.1 and Muse Spark, the API, the React app, explanations and diagrams, the quantum network model |
+| Oct 28 | Algorithm gallery, gate-by-gate inspector and circuit analyses, entanglement purification, describe in words, ask about a run, chip routing, 12 languages, HTML reports, the planted-fault benchmark |
+| Oct 29 | Challenge mode, 3D Bloch spheres, the optimizer with exact proofs, zero-noise extrapolation, Bell tests, tomography, the error-correction lab, voice input |
+| Oct 30 | First live run against the Meta Model API, Shor's algorithm, Muse Voice Transcribe, the QAOA party lab, the bug hunt |
+| Oct 31 | AI alone vs Q-Canvas, the molecule lab, the BB84 spy lab, use cases with Muse Image photos, Ask Q-Canvas (tool calling) with a Muse Wonder deep mode, the demo video |
+
+## Third-party code and assets
+
+- **Libraries**, installed from PyPI and npm and never copied into the repo:
+  Qiskit and Qiskit Aer (Apache-2.0), NumPy (BSD), Matplotlib (PSF-based),
+  pylatexenc (MIT), Pillow (MIT-CMU), pydantic (MIT), FastAPI (MIT), Uvicorn
+  (BSD), sse-starlette (BSD), python-multipart (Apache-2.0), python-dotenv
+  (BSD), httpx (BSD), pytest (MIT); React (MIT), Vite (MIT), TypeScript
+  (Apache-2.0). Playwright (Apache-2.0) and imageio-ffmpeg (BSD) are used only
+  by the screenshot and video scripts.
+- **Fonts:** Inter and JetBrains Mono from Google Fonts (SIL Open Font License).
+- **Images:** the use-case photos were generated for this project with Muse
+  Image 1.0 (`scripts/make_usecase_art.py`); the sample sketches are drawn by
+  `scripts/make_sketches.py`; the screenshots and the video are of this app.
+- **Science:** physical constants and textbook values (STO-3G basis parameters,
+  the H₂ reference energies, the Micius satellite geometry, the BB84 abort
+  threshold) are facts from the cited literature, implemented from scratch.
+- **Meta docs:** the Meta Model API pages were read while building
+  (`docs/meta-api/SOURCES.md` lists them); they are not redistributed here.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
 
 ## Repository guide
 
