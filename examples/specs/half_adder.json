@@ -1,0 +1,14 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 4,
+  "num_clbits": 4,
+  "operations": [
+    {"gate": "H", "targets": [0, 1]},
+    {"gate": "CCX", "targets": [3], "controls": [0, 1]},
+    {"gate": "CX", "targets": [2], "controls": [0]},
+    {"gate": "CX", "targets": [2], "controls": [1]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}, {"qubit": 2, "clbit": 2}, {"qubit": 3, "clbit": 3}],
+  "metadata": {"title": "Quantum half adder", "notes": "Adds two bits held in superposition, all four sums at once: q2 = a xor b (the sum) and q3 = a and b (the carry). Each outcome reads carry, sum, b, a: 0000, 0101, 0110, 1011.", "origin": "manual"}
+}

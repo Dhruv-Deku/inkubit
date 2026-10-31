@@ -249,6 +249,21 @@ class MetaReasoningModel(ReasoningModel):
         return msg, ModelCall(provider="meta", model=model, role="assistant", cached=cached,
                               latency_s=time.perf_counter() - start)
 
+    def structured(self, system: str, user: str, schema: dict[str, Any], name: str, effort: str = "low",
+                   max_tokens: int = 8000, model: str | None = None) -> tuple[dict[str, Any], ModelCall]:
+        start = time.perf_counter()
+        model = model or self.model
+        content, cached = self.client.chat(model, [{"role": "system", "content": system},
+                                                   {"role": "user", "content": user}],
+                                           schema=schema, schema_name=name, reasoning_effort=effort,
+                                           max_tokens=max_tokens)
+        try:
+            data = json.loads(content)
+        except json.JSONDecodeError:
+            raise MetaAPIError(f"{model} returned text that is not JSON") from None
+        return data, ModelCall(provider="meta", model=model, role=name.replace("_", " "), cached=cached,
+                               latency_s=time.perf_counter() - start)
+
     def predict_odds(self, facts: dict[str, Any]) -> OddsGuess:
         start = time.perf_counter()
         messages = [

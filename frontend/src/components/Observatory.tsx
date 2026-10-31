@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../api'
 import type { ObsChart, ObsReference, Observatory } from '../types'
+import { MlVerifierView } from './MlVerifier'
 
 type Pt = [number, number | null]
 type Line = { id: string; label: string; points: Pt[]; color: string; dash?: string; markers?: boolean; labelAt?: 'start' | 'end' }
@@ -310,6 +311,7 @@ const TABS = [
   { id: 'walk', label: 'Quantum walk' },
   { id: 'entanglement', label: 'Entanglement growth' },
   { id: 'wall', label: 'The exponential wall' },
+  { id: 'ml', label: 'ML verifier' },
 ] as const
 
 /** Five exact simulations of where quantum technology stands, each with the number that matters spelled out. */
@@ -320,7 +322,7 @@ export function ObservatoryPanel() {
   useEffect(() => { api.observatory().then(setData).catch((e: Error) => setError(e.message)) }, [])
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Simulation observatory</h2><span className="sub">five exact simulations of where quantum technology stands today</span></div>
+      <div className="panel-head"><h2>Simulation observatory</h2><span className="sub">five exact simulations of where quantum technology stands today, and the ML verifier</span></div>
       <div className="obs-tabs" role="tablist">
         {TABS.map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id} className={`chip-btn${tab === t.id ? ' on' : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>
@@ -335,6 +337,7 @@ export function ObservatoryPanel() {
           {tab === 'walk' && <WalkView c={data.walk} frames={data.walk_frames} />}
           {tab === 'entanglement' && <EntanglementView c={data.entanglement} />}
           {tab === 'wall' && <WallView c={data.wall} />}
+          {tab === 'ml' && <MlVerifierView />}
         </div>
       )}
     </div>

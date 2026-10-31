@@ -705,3 +705,40 @@ export interface Observatory {
   entanglement: ObsChart
   wall: ObsChart
 }
+
+export interface MissionCheck { name: string; ok: boolean; detail: string; affects: boolean }
+export interface MissionNode {
+  id: string
+  lane: 'perceive' | 'plan' | 'step' | 'report'
+  label: string
+  tool: string | null
+  purpose: string
+  after: string[]
+  status: 'waiting' | 'running' | 'verifying' | 'done' | 'repaired' | 'flagged' | 'failed' | 'skipped'
+  detail: string
+  seconds: number
+  model: string | null
+  args: Record<string, unknown>
+  facts: Record<string, unknown>
+  card: Record<string, unknown> | null
+  checks: MissionCheck[]
+}
+export interface MissionReport {
+  headline: string
+  findings: string[]
+  next: string
+  trace: { checked: number; traced: number; given: number; untraced: string[] }
+  router: 'muse' | 'offline'
+  calls: ModelCall[]
+  seconds: number
+  verified: number
+  flagged: number
+}
+
+export interface MlReport {
+  metrics: Record<string, number | string>
+  q90: number
+  features: string[]
+  scatter: [number, number, number][]
+  gallery: { circuit: string; scale: number; exact: number; ml: number; half_width: number; baseline: number; depolarizing: number }[]
+}

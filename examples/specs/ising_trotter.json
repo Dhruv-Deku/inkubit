@@ -1,0 +1,24 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "RZ", "targets": [1], "params": [1.0]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "CX", "targets": [2], "controls": [1]},
+    {"gate": "RZ", "targets": [2], "params": [1.0]},
+    {"gate": "CX", "targets": [2], "controls": [1]},
+    {"gate": "RX", "targets": [0, 1, 2], "params": [1.0]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "RZ", "targets": [1], "params": [1.0]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "CX", "targets": [2], "controls": [1]},
+    {"gate": "RZ", "targets": [2], "params": [1.0]},
+    {"gate": "CX", "targets": [2], "controls": [1]},
+    {"gate": "RX", "targets": [0, 1, 2], "params": [1.0]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}, {"qubit": 2, "clbit": 2}],
+  "metadata": {"title": "Simulating a quantum magnet (Trotter)", "notes": "Three spins with H = J(Z0Z1 + Z1Z2) + h(X0 + X1 + X2), J = h = 1, evolved for t = 1 in two Trotter steps: each ZZ term is CNOT, RZ(2J dt), CNOT and the field is RX(2h dt). This is Hamiltonian simulation, the application Feynman proposed quantum computers for.", "origin": "manual"}
+}

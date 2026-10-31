@@ -23,6 +23,12 @@ GALLERY = {
     "teleportation": {"0": 0.25, "1": 0.75},
     "w_state": {"001": 1 / 3, "010": 1 / 3, "100": 1 / 3},
     "bit_flip_code": {"0": 0.25, "1": 0.75},  # the error on q1 is corrected
+    "qft_period": {"000": 0.5, "100": 0.5},
+    "simon": {"00": 0.5, "11": 0.5},
+    "swap_test": {"0": 0.75, "1": 0.25},
+    "entanglement_swapping": {"00": 1.0},
+    "grover3": {**{format(i, "03b"): 1 / 128 for i in range(8)}, "101": 121 / 128},
+    "half_adder": {"0000": 0.25, "0101": 0.25, "0110": 0.25, "1011": 0.25},
 }
 
 
@@ -81,3 +87,27 @@ def test_toffoli_noise_is_six_cnots_worth():
     p2 = get_preset("realistic").p2
     assert toffoli_error(get_preset("realistic")) == pytest.approx(1 - (1 - p2) ** 6)
     assert math.isclose(toffoli_error(get_preset("ideal")), 0.0)
+
+
+def test_trotter_circuit_is_the_product_formula(example):
+    """Two Trotter steps of H = Z0Z1 + Z1Z2 + X0 + X1 + X2 at dt = 0.5, built from the matrices directly."""
+    import numpy as np
+    from scipy.linalg import expm
+
+    from qcanvas.verify.expected import build_reference_circuit
+    from qiskit.quantum_info import Statevector
+
+    i2, x, z = np.eye(2), np.array([[0, 1], [1, 0]]), np.diag([1, -1])
+
+    def on(ops):  # qubit 0 is the rightmost factor (Qiskit order)
+        out = np.eye(1)
+        for q in (2, 1, 0):
+            out = np.kron(out, ops.get(q, i2))
+        return out
+
+    zz = on({0: z, 1: z}) + on({1: z, 2: z})
+    field = on({0: x}) + on({1: x}) + on({2: x})
+    step = expm(-1j * 0.5 * field) @ expm(-1j * 0.5 * zz)
+    psi = step @ step @ np.eye(8)[:, 0]
+    sv = Statevector.from_instruction(build_reference_circuit(parse_spec(example("ising_trotter"))).remove_final_measurements(inplace=False))
+    assert abs(np.vdot(psi, sv.data)) == pytest.approx(1.0, abs=1e-9)

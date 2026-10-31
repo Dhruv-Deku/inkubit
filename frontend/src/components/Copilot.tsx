@@ -23,14 +23,14 @@ const IDEAS = [
 const LABEL: Record<string, string> = {
   simulate_circuit: 'Circuit, simulated exactly', optimize_circuit: 'Shorter circuit, proven equal', molecule_h2: 'H₂ from first principles',
   quantum_key_distribution: 'BB84 key exchange', max_cut: 'QAOA split', factor_with_shor: "Shor's algorithm",
-  plan_quantum_link: 'Quantum network link', error_correction: 'Error correction',
+  plan_quantum_link: 'Quantum network link', error_correction: 'Error correction', translate_notation: 'Quantum Rosetta',
+  run_algorithm: 'Algorithm library', ml_verify: 'ML verifier', analyze_network: 'Network from the photo',
 }
 const TEAM = ['#3987e5', '#d0702c']
 
 interface Turn { q: string; deep?: boolean; reply?: CopilotReply; error?: string; seconds?: number }
 
-function TraceBadge({ reply }: { reply: CopilotReply }) {
-  const t = reply.trace
+export function TraceBadge({ trace: t }: { trace: CopilotReply['trace'] }) {
   if (!t.checked) return <span className="trace-badge muted">no numbers to trace</span>
   if (!t.untraced.length) {
     return <span className="trace-badge ok" title="Every number in the answer matches a tool result (or your question)">
@@ -40,7 +40,7 @@ function TraceBadge({ reply }: { reply: CopilotReply }) {
     ⚠ {t.untraced.length} of {t.checked} not traced: {t.untraced.slice(0, 4).join(', ')}</span>
 }
 
-function Card({ run, first, onOpen }: { run: CopilotTool; first: boolean; onOpen?: (s: CircuitSpec) => void }) {
+export function ToolCard({ run, first, onOpen }: { run: CopilotTool; first: boolean; onOpen?: (s: CircuitSpec) => void }) {
   const c = run.card as Record<string, unknown> | null
   const open = (s: unknown) => onOpen && s ? <button className="btn small" onClick={() => onOpen(s as CircuitSpec)}>Open in the editor</button> : null
   let body: React.ReactNode = null
@@ -161,6 +161,20 @@ function Card({ run, first, onOpen }: { run: CopilotTool; first: boolean; onOpen
   } else if (c.type === 'qec') {
     const lab = c.lab as { summary: string }
     body = <p className="sub" style={{ margin: 0 }}>{lab.summary}</p>
+  } else if (c.type === 'mlverify') {
+    const k = c.check as { prediction: { fidelity: number; low: number; high: number; baseline: number; microseconds: number }; exact: number | null; exact_ms: number | null; inside: boolean | null; verdict: string }
+    action = open(c.spec)
+    body = (
+      <>
+        <div className="mini-tiles">
+          <span><b>{k.prediction.fidelity.toFixed(3)}</b> ML prediction, {k.prediction.microseconds.toFixed(0)} µs</span>
+          <span><b>{k.prediction.low.toFixed(3)} to {k.prediction.high.toFixed(3)}</b> 90% interval</span>
+          {k.exact !== null && <span><b>{k.exact.toFixed(3)}</b> exact, {k.exact_ms?.toFixed(0)} ms</span>}
+          <span><b>{k.prediction.baseline.toFixed(3)}</b> rule of thumb</span>
+        </div>
+        <div className={`sub ${k.inside === false ? 'warn-text' : ''}`} style={{ marginTop: 6 }}>{k.inside === false ? '⚠ ' : k.inside ? '✓ ' : ''}{k.verdict}</div>
+      </>
+    )
   }
   return (
     <div className="copilot-card">
@@ -238,11 +252,11 @@ export function CopilotPanel({ live, onOpen }: { live: boolean; onOpen?: (s: Cir
               <>
                 <p className="copilot-a">{t.reply.answer}</p>
                 <div className="row wrap" style={{ gap: 8, marginBottom: 10 }}>
-                  <TraceBadge reply={t.reply} />
+                  <TraceBadge trace={t.reply.trace} />
                   {t.reply.calls[0] && <CallBadge call={t.reply.calls[0]} />}
                   <span className="sub">{t.reply.tools.length} tool call{t.reply.tools.length === 1 ? '' : 's'} · {t.reply.calls.length} model turn{t.reply.calls.length === 1 ? '' : 's'}{t.seconds ? ` · ${t.seconds.toFixed(1)} s` : ''}</span>
                 </div>
-                {t.reply.tools.map((r, k) => <Card key={k} run={r} first={r.name !== 'molecule_h2' || k === chem} onOpen={onOpen} />)}
+                {t.reply.tools.map((r, k) => <ToolCard key={k} run={r} first={r.name !== 'molecule_h2' || k === chem} onOpen={onOpen} />)}
               </>
             )}
           </div>

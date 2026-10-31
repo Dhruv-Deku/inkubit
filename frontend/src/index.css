@@ -623,3 +623,51 @@ details summary { cursor: pointer; }
 .obs-table th, .obs-table td { padding: 3px 12px 3px 0; text-align: right; white-space: nowrap; }
 .obs-table th { color: var(--muted); font-weight: 500; position: sticky; top: 0; background: var(--panel); }
 @media (max-width: 900px) { .obs-pair { grid-template-columns: minmax(0, 1fr); } }
+
+/* mission control */
+.mission-goal { width: 100%; resize: vertical; min-height: 64px; background: var(--panel-2); color: var(--text); border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm); padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.45; box-sizing: border-box; }
+.mission-goal:focus { outline: none; border-color: var(--primary); }
+.mission-photo { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.mission-photo img { height: 56px; width: auto; border-radius: 8px; border: 1px solid var(--line-2); background: #fff; }
+.mission-lanes { gap: 0; margin: 14px 0 4px; }
+.mission-lanes .label { flex: 0 0 228px; }
+.mission-graph-scroll { overflow-x: auto; padding-bottom: 4px; }
+.mission-graph { position: relative; }
+.mission-graph svg { position: absolute; inset: 0; pointer-events: none; }
+.mnode { position: absolute; display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 8px 10px; box-sizing: border-box;
+  background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 10px; color: var(--text-2); font: inherit; cursor: pointer; overflow: hidden; }
+.mnode:hover { background: var(--panel-3); }
+.mnode.sel { border-color: var(--text); }
+.mnode-top { display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+.mnode-label { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mnode-icon { font-size: 12px; width: 12px; flex: 0 0 12px; }
+.mnode-sub { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mnode.s-waiting { border-style: dashed; color: var(--muted); }
+.mnode.s-running, .mnode.s-verifying { border-color: var(--primary); }
+.mnode.s-running .mnode-icon, .mnode.s-verifying .mnode-icon { color: var(--primary); }
+.mnode.s-done .mnode-icon, .mnode.s-repaired .mnode-icon { color: var(--pass); }
+.mnode.s-repaired { border-color: rgba(227, 160, 8, .55); }
+.mnode.s-flagged { border-color: var(--warn); }
+.mnode.s-flagged .mnode-icon { color: var(--warn); }
+.mnode.s-failed { border-color: var(--fail); }
+.mnode.s-failed .mnode-icon { color: var(--fail); }
+.mnode.s-skipped { opacity: .55; }
+.mstatus { font-size: 12px; color: var(--text-2); }
+.mstatus.s-done, .mstatus.s-repaired { color: var(--pass); }
+.mstatus.s-flagged { color: var(--warn); }
+.mstatus.s-failed { color: var(--fail); }
+.mission-detail { background: var(--panel-2); border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+.mission-detail .copilot-card { background: var(--panel-3); }
+.mission-checks { list-style: none; padding: 0; margin: 8px 0 0; font-size: 12.5px; color: var(--text-2); display: grid; gap: 3px; }
+.mission-checks li.ok span { color: var(--pass); }
+.mission-checks li.bad span, .mission-checks li.bad { color: var(--warn); }
+.mission-report { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+.mission-headline { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 6px; line-height: 1.45; }
+.mission-report ul { margin: 0 0 8px; padding-left: 18px; color: var(--text); font-size: 13.5px; line-height: 1.55; }
+.warn-text { color: var(--warn); }
+@media (prefers-reduced-motion: no-preference) {
+  .mnode.s-running { animation: mnode-breathe 1.4s ease-in-out infinite; }
+}
+@keyframes mnode-breathe { 50% { border-color: var(--line-2); } }
+.mission-checks li.note > span:first-child { color: var(--warn); }

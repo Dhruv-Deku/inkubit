@@ -1,0 +1,18 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "H", "targets": [1, 2]},
+    {"gate": "H", "targets": [2]},
+    {"gate": "CP", "targets": [2], "controls": [1], "params": [1.5707963267948966]},
+    {"gate": "CP", "targets": [2], "controls": [0], "params": [0.7853981633974483]},
+    {"gate": "H", "targets": [1]},
+    {"gate": "CP", "targets": [1], "controls": [0], "params": [1.5707963267948966]},
+    {"gate": "H", "targets": [0]},
+    {"gate": "SWAP", "targets": [0, 2]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}, {"qubit": 2, "clbit": 2}],
+  "metadata": {"title": "Quantum Fourier transform finds a period", "notes": "The input (|0⟩+|2⟩+|4⟩+|6⟩)/2 repeats every 2 steps out of 8. The QFT turns that repetition into peaks at 0 and 8/2 = 4 (000 and 100): the step at the heart of Shor's algorithm.", "origin": "manual"}
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 1,
+  "operations": [
+    {"gate": "H", "targets": [2]},
+    {"gate": "H", "targets": [0]},
+    {"gate": "CX", "targets": [1], "controls": [2]},
+    {"gate": "CCX", "targets": [2], "controls": [0, 1]},
+    {"gate": "CX", "targets": [1], "controls": [2]},
+    {"gate": "H", "targets": [0]}
+  ],
+  "measurements": [{"qubit": 0, "clbit": 0}],
+  "metadata": {"title": "Swap test: how alike are two states?", "notes": "q1 holds |0⟩ and q2 holds |+⟩. A controlled swap between two Hadamards on q0 gives P(0) = (1 + |⟨ψ|φ⟩|²)/2 = 0.75: the overlap is read without looking at either state. The controlled swap is built from two CNOTs and a Toffoli.", "origin": "manual"}
+}

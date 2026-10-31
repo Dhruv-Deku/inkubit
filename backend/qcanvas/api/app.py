@@ -10,7 +10,7 @@ import json
 import logging
 from typing import Any
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -62,7 +62,8 @@ def health() -> dict[str, Any]:
 
 
 ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and",
-              "teleportation", "w_state", "bit_flip_code", "shor15"}
+              "teleportation", "w_state", "bit_flip_code", "shor15", "qft_period", "simon", "swap_test",
+              "entanglement_swapping", "ising_trotter", "grover3", "half_adder"}
 
 
 @app.get("/api/examples")
@@ -192,6 +193,83 @@ async def optimize_circuit(body: OptimizeRequest) -> dict[str, Any]:
     propose = models.reasoning.optimize if (live and body.ai) else None
     result = await asyncio.to_thread(optimize, spec, propose, note)
     return result.model_dump(mode="json")
+
+
+@app.post("/api/missions")
+async def start_mission(goal: str = Form(..., min_length=3, max_length=4000), transcript: str = Form(""),
+                        deep: bool = Form(False), image: UploadFile | None = File(None)) -> dict[str, Any]:
+    """Mission control: words, an optional photo and speech in; a plan of exact tools runs live (see qcanvas.mission)."""
+    from qcanvas.mission import Mission, launch, missions
+
+    raw = await image.read() if image is not None else b""
+    if len(raw) > MAX_UPLOAD:
+        raise HTTPException(413, "the image is larger than 15 MB")
+    m = Mission(goal.strip())
+    missions.add(m)
+    launch(m, get_models(), raw or None, transcript[:2000], deep)
+    return {"mission_id": m.id, "events_url": f"/api/missions/{m.id}/events"}
+
+
+@app.get("/api/missions/{mission_id}")
+def mission_status(mission_id: str) -> dict[str, Any]:
+    from qcanvas.mission import missions
+
+    m = missions.get(mission_id)
+    if m is None:
+        raise HTTPException(404, "no such mission")
+    return m.summary()
+
+
+@app.get("/api/missions/{mission_id}/events")
+async def mission_events(mission_id: str) -> EventSourceResponse:
+    """Server-sent events: every node change, replayed from the start, then live."""
+    from qcanvas.mission import missions
+
+    m = missions.get(mission_id)
+    if m is None:
+        raise HTTPException(404, "no such mission")
+
+    async def stream():
+        cursor = 0
+        while True:
+            events = m.bus.events(cursor)
+            for event in events:
+                yield {"event": "mission", "id": str(event.seq), "data": json.dumps(event.details, default=str)}
+            cursor += len(events)
+            if m.bus.closed and not m.bus.events(cursor):
+                yield {"event": "end", "data": json.dumps({"status": m.status, "error": m.error})}
+                return
+            await asyncio.sleep(0.1)
+
+    return EventSourceResponse(stream(), ping=10)
+
+
+class MlVerifyRequest(BaseModel):
+    spec: dict[str, Any]
+    scale: float = Field(default=1.0, ge=0.05, le=5)
+
+
+@app.post("/api/mlverify")
+async def ml_verify(body: MlVerifyRequest) -> dict[str, Any]:
+    """The ML verifier's prediction for a circuit, then the exact answer (up to 10 qubits)."""
+    from qcanvas.mlverify import check
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(422, {"message": str(err), "issues": _issues(err)}) from None
+    if spec.kind != "circuit":
+        raise HTTPException(422, "the ML verifier reads circuits")
+    return (await asyncio.to_thread(check, spec, body.scale)).model_dump(mode="json")
+
+
+@app.get("/api/mlverify/report")
+def ml_verify_report() -> dict[str, Any]:
+    """How the ML verifier was trained and how well it does on held-out and textbook circuits."""
+    from qcanvas.mlverify import load_model
+
+    m = load_model()
+    return {"metrics": m.metrics, "q90": m.q90, "features": m.features, "scatter": m.scatter, "gallery": m.gallery}
 
 
 @app.get("/api/observatory")
