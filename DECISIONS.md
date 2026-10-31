@@ -657,3 +657,60 @@ before saving; tests pin the answers (Grover 121/128 exactly) and check the Trot
 circuit against the product of matrix exponentials. They join the gallery,
 Mission control's run_algorithm tool and the ML verifier's textbook evaluation.
 
+## D51. Discovery lab
+Target: prepare a state with as few CNOTs as possible on the chip's wiring (two-qubit gates carry 15x the error).
+Layouts from Muse Spark (JSON schema, invalid pairs dropped, credited when they win), spanning trees and random
+pairs, tried from the fewest CNOTs up; rotations fitted by L-BFGS with restarts on a NumPy statevector (checked
+against Qiskit in a test), then pruned (rotations under 1e-3 zeroed and the rest re-fitted). A winner must reach
+overlap 1 - 1e-8 in Qiskit's Statevector of the rebuilt spec. Baselines: the textbook circuit and Qiskit's
+StatePreparation, both compiled at level 3 onto the same coupling map. "Fewest found" is not a minimality proof.
+
+## D52. Distributed quantum computer
+Remote CNOT by gate teleportation (Eisert et al. 2000). With a Werner pair of fidelity F the ideal CNOT is followed
+by X on the target, Z on the control, or both, each (1 - F)/3 (derived from where Pauli errors on the pair
+propagate; a test checks it); ancilla readout flips add X_t or Z_c; the two local CNOTs are charged as 2 x p2
+depolarizing; every data qubit idles under T1/T2 for a round trip of messages. Score: process fidelity, by running
+the circuit on half of n Bell pairs (so at most 5 qubits); state or outcome fidelity were rejected because a
+relaxed qubit can be steered back to the right answer by later gates. Split: exhaustive over placements.
+
+## D53. When does quantum win?
+Surface-code model in the style of Beverland et al. 2022 (P_L = 0.03 (p/0.01)^((d+1)/2), 2d^2 per patch, routing
+2Q + sqrt(8Q) + 1, one logical step per d cycles, 1% budget; factories of 25 patches per T every 10 d cycles, two
+15-to-1 rounds). Algorithms: Gidney & Ekera 2021 formulas for factoring; Grover with a stated oracle cost for search;
+first-order Trotter with the rigorous ||[A,B]|| <= 8n bound and Ross-Selinger rotation costs for a 2D Ising magnet
+(a worst case, said on the page). Classical: GNFS scaled from RSA-250 by the L-function, N/2 checks, the memory wall.
+Every factoring result shows the model against the published RSA-2048 figure (26.6M qubits, 18.5 h vs 20M, 8 h).
+
+## D54. Live board
+Change detection in the browser (80 x 60 grey frames every 0.5 s; a read when the frame differs from the last read
+by more than 10 grey levels and has been still for 1.5 s), so the slow model pass runs only when needed. Wires are
+placed from overlay boxes: one-qubit gates directly, multi-qubit gates' boxes matched top to bottom to their qubits,
+duplicate detections (one symbol under two concepts, IoU > 0.7) merged, a lone box given to the target.
+
+## D55. Satellite planner
+Circular 500 km orbit at 97.4 degrees with J2 nodal drift (sun-synchronous, tested to 0.02 degrees a day), GMST
+rotation, NOAA solar position (tested at the solstice), spherical Earth. Passes need 15 degrees and the Sun below
+-12 degrees. Atmosphere 4 dB x air mass relative to 45 degrees. Entanglement windows use the network model on the
+two real slant ranges; trusted-node downlinks use decoy BB84 with mu = 0.5 at 100 MHz and a night background of
+2e-6 per gate (the network model's 1e-5 includes stray light and gave zero key at 1,200 km, unlike Micius).
+Coastlines: Natural Earth via the world-atlas package (land-110m), drawn on a canvas orthographic projection.
+
+## D56. Reproduce a paper
+Muse Spark transcribes, never computes: OpenQASM for the circuit (exact parser; the sketch pipeline if it fails)
+and the claimed odds, shots, hardware and bit order. Error bars: 3 sigma of shot noise (at least 0.01) with a
+known shot count, else 0.03 for hardware and 0.005 for ideal claims; hardware claims may also sit between our ideal
+and realistic values. Unknown bit order: both are tried and the better fit is used, labelled as inferred.
+
+## D57. ML error-correction decoder
+Rotated d = 3 code, Z-basis memory, 3 rounds, phenomenological depolarizing noise (stim is not installed; sampling
+is exact in NumPy). MWPM: exact minimum-weight perfect matching by DP over Z-check events on the space-time graph
+with log-likelihood weights. Network: 25-128-128-1 ReLU, inputs every event of both check types and log p, trained
+on 1.8M shots at six noise levels, tested on 200,000 new shots per level. Result at p = 1%: 0.00722 against
+0.00917 (21% fewer); the gain holds at every tested p and exceeds both 95% intervals.
+
+## D58. Pulse lab
+Three-level transmon, RWA, alpha = -2 pi 300 MHz; truncated Gaussian pi pulse (sigma = T/4, area pi); DRAG
+quadrature -beta dOmega/dt / alpha with beta from a golden-section search (it lands near 0.5, the first-order
+optimum for phase errors); Lindblad T1/T2 from the realistic preset; 400 exact steps of the 9 x 9 superoperator;
+average gate fidelity of the qubit-subspace channel with leakage as error. The sweep takes about 30 s and is cached.
+

@@ -117,6 +117,22 @@ histogram, against the clock and against Muse Spark playing the same round. An
 exact search of every one-gate edit grades it, so any gate whose fix restores
 the odds counts.
 
+**Discovery lab: AI proposes, physics proves.** Muse Spark proposes CNOT layouts, an exact optimiser fits
+them, Qiskit proves every winner, the ML verifier screens and exact noisy simulation decides. It found a GHZ state on
+all 7 qubits of an IBM heavy-hex chip in 6 CNOTs (the textbook circuit compiled onto the chip needs 10) and W and
+Dicke(4,2) states in 5 CNOTs where Qiskit's compiler uses 11.
+
+**Down to the hardware and out to orbit.** A distributed quantum computer splits a circuit over two chips joined by
+a link from our network model and shows what every remote CNOT costs from 10 m to 100 km. A pulse lab simulates the
+X gate as the microwave pulse on a three-level transmon (DRAG: 1.1e-4 error at 15 ns). A satellite planner flies a
+Micius-like orbit over a real day on a globe and computes every night pass and its key. A neural surface-code
+decoder makes 21% fewer logical errors than minimum-weight matching at 1% noise, beyond its error bars.
+
+**Honest about where quantum wins.** Describe a problem; Muse Spark maps it to an algorithm and a surface-code
+resource estimate meets the best classical route, checked against Gidney and Ekerå's RSA-2048 figure. Brute-force
+search on 2^64 keys: classical wins. Upload a figure from a paper: Muse Spark transcribes circuit and claims, an
+exact re-run judges every number against its error bar. Point a camera at a whiteboard: the odds appear on the wires.
+
 **Mission control: whole problems, planned, run live and verified.** Type, say or
 photograph a whole problem ("connect two cities 1,200 km apart with quantum-secure
 keys, compare satellite and fiber, and check whether a spy on 25% of the photons is
@@ -236,7 +252,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 385 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 430 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and
