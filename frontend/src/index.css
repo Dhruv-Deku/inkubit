@@ -688,3 +688,7 @@ details summary { cursor: pointer; }
 .disc-table tr.sel td { background: var(--panel-3); }
 .disc-circuit { background: var(--panel-2); border-radius: 12px; padding: 12px 14px; margin-top: 10px; overflow-x: auto; }
 @media (max-width: 640px) { .disc-bar-row { grid-template-columns: 120px 1fr 46px; } .disc-table { display: block; overflow-x: auto; white-space: nowrap; } }
+
+/* distributed computer */
+.dist-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
+@media (max-width: 960px) { .dist-grid { grid-template-columns: minmax(0, 1fr); } }

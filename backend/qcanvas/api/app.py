@@ -338,6 +338,30 @@ def discovery_status(discovery_id: str) -> dict[str, Any]:
     return {"id": d.id, "status": d.status, "error": d.error, "result": d.result}
 
 
+class DistributedRequest(BaseModel):
+    spec: dict[str, Any]
+    capacity: int | None = Field(default=None, ge=1, le=4)
+    medium: str = Field(default="fiber", pattern="^(fiber|satellite)$")
+    km: float = Field(default=1.0, gt=0, le=3000)
+
+
+@app.post("/api/distributed")
+async def distributed(body: DistributedRequest) -> dict[str, Any]:
+    """One circuit on two chips joined by a quantum link: best split, remote CNOTs by teleportation, exact fidelity."""
+    from qcanvas.distributed import distribute
+
+    try:
+        spec = parse_spec(body.spec)
+        if spec.kind != "circuit":
+            raise ValueError("the distributed computer takes circuits")
+        res = await asyncio.to_thread(distribute, spec, body.capacity, body.medium, body.km)
+    except SpecError as err:
+        raise HTTPException(422, {"message": str(err), "issues": _issues(err)}) from None
+    except ValueError as err:
+        raise HTTPException(422, str(err)) from None
+    return res.model_dump(mode="json")
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""

@@ -36,7 +36,7 @@ function niceLinTicks(lo: number, hi: number, maxTicks = 5): number[] {
 }
 
 /** One line chart: log or linear axes, gaps where a value does not exist, crosshair readout, direct labels, a table. */
-function LineChart({ lines, band, refs = [], xLog, yLog, yLogStep, xLabel, yLabel, xDomain, yDomain, fmtX = num, fmtY = num, aria, height = 290, labels = true, table = true }: {
+export function LineChart({ lines, band, refs = [], xLog, yLog, yLogStep, xLabel, yLabel, xDomain, yDomain, fmtX = num, fmtY = num, aria, height = 290, labels = true, table = true }: {
   lines: Line[]; band?: Band; refs?: ObsReference[]; xLog?: boolean; yLog?: boolean; yLogStep?: number; xLabel: string; yLabel: string
   xDomain?: [number, number]; yDomain?: [number, number]; fmtX?: (v: number) => string; fmtY?: (v: number) => string
   aria: string; height?: number; labels?: boolean; table?: boolean

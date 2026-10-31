@@ -18,6 +18,7 @@ import { RosettaPanel } from './components/Rosetta'
 import { ObservatoryPanel } from './components/Observatory'
 import { MissionPanel } from './components/Mission'
 import { DiscoveryPanel } from './components/Discovery'
+import { DistributedPanel } from './components/Distributed'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -303,6 +304,7 @@ export default function App() {
             extra={<>
               <MissionPanel live={health?.mode === 'meta'} examples={examples} onOpen={(s) => onSpec(clone(s))} />
               <DiscoveryPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+              <DistributedPanel examples={examples} onOpen={(s) => onSpec(clone(s))} />
               <CopilotPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <RosettaPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />

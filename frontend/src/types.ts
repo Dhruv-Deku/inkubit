@@ -753,3 +753,12 @@ export interface DiscoveryResult {
   fewest_cnots: number | null; baseline_cnots: number; lower_bound: number; ml_agrees: boolean | null
   ml_rank_correlation: number | null; ml_milliseconds: number; finding: string; calls: ModelCall[]; seconds: number
 }
+
+export interface DistLink { label: string; medium: string; distance_km: number; pair_rate_hz: number; fidelity: number; latency_us: number }
+export interface DistOption { link: DistLink; fidelity: number | null; fidelity_memory: number | null; seconds_per_run: number | null; note: string }
+export interface DistSplit { chip_a: number[]; chip_b: number[]; remote: number; remote_ops: number[] }
+export interface DistributedResult {
+  title: string; num_qubits: number; capacity: number; compiled_ops: Record<string, unknown>[]; local_cx: number
+  best: DistSplit; naive: DistSplit; monolithic_fidelity: number; floor: number; options: DistOption[]
+  sweep: [number, number | null, number | null][]; finding: string
+}
