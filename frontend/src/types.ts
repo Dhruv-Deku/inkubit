@@ -774,3 +774,19 @@ export interface EstimateResult {
   curve_x: string; check: string; assumptions: string[]; sources: string[]; read_by: string; call: ModelCall | null
   mapped: Record<string, unknown>
 }
+
+export interface LiveRead {
+  analysis: {
+    width: number; height: number; kind: string; valid: boolean; issues: string[]; spec: Record<string, unknown>
+    overlay: { segment_id: string; concept: string; bbox: [number, number, number, number]; confidence: number; linked_to: string | null; label: string }[]
+    calls: ModelCall[]
+  }
+  result: {
+    kind: string; wires: { qubit: number; y: number; x_end: number; x_right: number }[]; error?: string
+    ideal?: Record<string, number>; noisy?: Record<string, number> | null
+    p1_ideal?: Record<number, number>; p1_noisy?: Record<number, number> | null; gates?: number; qubits?: number
+    network?: { pairs_per_second: number; fidelity: number; key_bits_per_second: number }
+  }
+  read_seconds: number
+  total_seconds: number
+}

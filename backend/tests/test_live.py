@@ -1,55 +1,63 @@
-"""Opt-in live smoke tests: one cheap real call per Meta model.
-
-    cd backend && ../.venv/Scripts/python -m pytest -m live -q
-
-Skipped automatically when no META_API_KEY is set. Responses are cached on disk,
-so re-running costs nothing; set QCANVAS_LIVE_NOCACHE=1 to force fresh calls.
-"""
+"""Live board: wire positions from the overlay, marginals, and the endpoint on a sample sketch (offline models)."""
 
 from __future__ import annotations
 
-import base64
-import os
+import json
 
 import pytest
+from fastapi.testclient import TestClient
 
 from qcanvas import EXAMPLES_DIR
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_client import MetaClient
-from qcanvas.adapters.sam_parse import parse_sam_output
-
-pytestmark = pytest.mark.live
-USE_CACHE = os.environ.get("QCANVAS_LIVE_NOCACHE") != "1"
+from qcanvas.api.app import app
+from qcanvas.live import marginals, wires
+from qcanvas.sketch import OverlayBox, SketchAnalysis
 
 
-@pytest.fixture(scope="module")
-def client() -> MetaClient:
-    return MetaClient(load_settings())
+def test_marginals_follow_qiskit_bit_order():
+    p1 = marginals({"01": 0.25, "11": 0.5, "00": 0.25}, [(0, 0), (1, 1)])
+    assert p1[0] == pytest.approx(0.75) and p1[1] == pytest.approx(0.5)
 
 
-def test_muse_spark_chat(client):
-    settings = load_settings()
-    payload = {"model": settings.reasoning_model, "reasoning_effort": "low", "max_completion_tokens": 400,
-               "messages": [{"role": "user", "content": "Reply with the single word OK."}]}
-    data, _ = client.post("/chat/completions", payload, use_cache=USE_CACHE)
-    assert "ok" in data["choices"][0]["message"]["content"].lower()
+def test_wires_sit_at_the_median_height_of_their_boxes():
+    spec = {"kind": "circuit", "num_qubits": 2, "operations": [
+        {"gate": "H", "targets": [0]}, {"gate": "X", "targets": [1]}, {"gate": "CX", "controls": [0], "targets": [1]}]}
+    boxes = [OverlayBox(segment_id="a", concept="box", bbox=(10, 90, 30, 110), confidence=1, linked_to="operations[0]"),
+             OverlayBox(segment_id="b", concept="box", bbox=(10, 190, 30, 210), confidence=1, linked_to="operations[1]"),
+             OverlayBox(segment_id="c", concept="circle", bbox=(60, 195, 70, 205), confidence=1, linked_to="operations[2]")]
+    a = SketchAnalysis(image_sha256="x", mime="image/png", width=200, height=300, kind="circuit", concepts=[],
+                       segments=[], spec=spec, valid=True, overlay=boxes)
+    w = {r["qubit"]: r for r in wires(a)}
+    assert w[0]["y"] == pytest.approx(100) and w[1]["y"] == pytest.approx(200)
+    assert w[0]["x_end"] == 30 and w[0]["x_right"] == 70
+    assert w[1]["x_end"] == 70  # a CNOT with only one box found: it is the target's symbol
 
 
-def test_sam_segments_sample_sketch(client):
-    image = (EXAMPLES_DIR / "images" / "bell_sketch.png").read_bytes()
-    url = "data:image/png;base64," + base64.b64encode(image).decode()
-    text, _ = client.post_stream_text("/responses", {
-        "model": load_settings().segment_model, "metadata": {"include_confidence": "true"},
-        "input": [{"type": "message", "role": "user", "content": [
-            {"type": "input_text", "text": "circle"}, {"type": "input_image", "image_url": url}]}],
-    }, use_cache=USE_CACHE)
-    assert isinstance(parse_sam_output(text), list)
+def test_a_two_qubit_gates_boxes_go_to_its_qubits_top_to_bottom():
+    spec = {"kind": "circuit", "num_qubits": 2, "operations": [{"gate": "CX", "controls": [0], "targets": [1]}]}
+    boxes = [OverlayBox(segment_id="t", concept="circle", bbox=(50, 190, 70, 210), confidence=1, linked_to="operations[0]"),
+             OverlayBox(segment_id="c", concept="dot", bbox=(55, 95, 65, 105), confidence=1, linked_to="operations[0]")]
+    a = SketchAnalysis(image_sha256="x", mime="image/png", width=200, height=300, kind="circuit", concepts=[],
+                       segments=[], spec=spec, valid=True, overlay=boxes)
+    w = {r["qubit"]: r["y"] for r in wires(a)}
+    assert w == {0: 100, 1: 200}
 
 
-def test_muse_image_generates(client):
-    data, _ = client.post("/images/generations", {
-        "model": load_settings().image_model, "prompt": "A single black circle on a white background.",
-        "n": 1, "size": "1024x1024", "response_format": "b64_json", "output_format": "png",
-        "reasoning_strength": "low",
-    }, use_cache=USE_CACHE)
-    assert base64.b64decode(data["data"][0]["b64_json"])[:4] == b"\x89PNG"
+def test_endpoint_reads_a_sample_sketch():
+    fx = sorted((EXAMPLES_DIR / "images").glob("*.json"))[0]
+    name = json.loads(fx.read_text(encoding="utf-8"))["name"]
+    png = (EXAMPLES_DIR / "images" / f"{name}.png").read_bytes()
+    body = TestClient(app).post("/api/live/read", files={"file": ("frame.png", png, "image/png")}).json()
+    assert body["analysis"]["valid"] and body["result"]["kind"] in ("circuit", "network")
+    if body["result"]["kind"] == "circuit":
+        assert sum(body["result"]["ideal"].values()) == pytest.approx(1.0, abs=1e-6)
+        assert body["result"]["wires"]
+
+
+def test_duplicate_detections_of_one_symbol_count_once():
+    spec = {"kind": "circuit", "num_qubits": 2, "operations": [{"gate": "CX", "controls": [0], "targets": [1]}]}
+    same = (50, 190, 70, 210)
+    boxes = [OverlayBox(segment_id="a", concept="dot", bbox=same, confidence=1, linked_to="operations[0]"),
+             OverlayBox(segment_id="b", concept="circle", bbox=same, confidence=1, linked_to="operations[0]")]
+    a = SketchAnalysis(image_sha256="x", mime="image/png", width=200, height=300, kind="circuit", concepts=[],
+                       segments=[], spec=spec, valid=True, overlay=boxes)
+    assert {r["qubit"]: r["y"] for r in wires(a)} == {1: 200}

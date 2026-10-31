@@ -411,6 +411,33 @@ async def estimate(body: EstimateRequest) -> dict[str, Any]:
     return out
 
 
+@app.post("/api/live/read")
+async def live_read(file: UploadFile = File(...)) -> dict[str, Any]:
+    """Live board: one camera frame read by SAM 3.1 + Muse Spark, simulated exactly, odds pinned to the wires."""
+    import time
+
+    from qcanvas.live import read_frame
+
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(400, "the frame is empty")
+    if len(raw) > MAX_UPLOAD:
+        raise HTTPException(413, "the frame is larger than 15 MB")
+    start = time.perf_counter()
+    try:
+        analysis, _ = await asyncio.to_thread(analyze_image, raw, get_models())
+    except UnknownImageError:
+        raise HTTPException(422, "Offline, only the sample sketches can be read; the live board needs the Meta key.") from None
+    except ModelUnavailable as err:
+        raise HTTPException(502, f"A Meta model call failed: {err}") from None
+    except OSError as err:
+        raise HTTPException(400, f"could not read the frame: {err}") from None
+    read_s = time.perf_counter() - start
+    result = await asyncio.to_thread(read_frame, analysis)
+    return {"analysis": analysis.model_dump(mode="json"), "result": result, "read_seconds": round(read_s, 2),
+            "total_seconds": round(time.perf_counter() - start, 2)}
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""

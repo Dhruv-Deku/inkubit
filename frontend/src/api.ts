@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -86,6 +86,11 @@ export const api = {
   mlReport: () => call<MlReport>('/api/mlverify/report'),
   discoveryGoals: () => call<{ goals: DiscoveryGoal[] }>('/api/discovery/goals'),
   distributed: (spec: Spec, medium: string, km: number) => call<DistributedResult>('/api/distributed', json({ spec, medium, km })),
+  liveRead: (frame: Blob) => {
+    const form = new FormData()
+    form.append('file', frame, 'frame.jpg')
+    return call<LiveRead>('/api/live/read', { method: 'POST', body: form })
+  },
   estimatePresets: () => call<{ presets: { id: string; label: string }[]; hardware: { id: string; label: string }[] }>('/api/estimate/presets'),
   estimate: (q: { preset?: string; text?: string; hardware: string }) => call<EstimateResult>('/api/estimate', json(q)),
   startDiscovery: (what: { goal?: string; ket?: string }, deep: boolean) =>
