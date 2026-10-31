@@ -574,3 +574,32 @@ Live checks: Muse Spark transcribed a printed singlet equation exactly and read 
 three-qubit Cirq program gate by gate; the assistant chose the new tool on its
 own, 3 of 3 numbers traced.
 
+## D47. The simulation observatory, and diagram-style card art
+The start page gained five exact simulations, each with its key number written
+into one sentence from the data (backend/qcanvas/observatory.py, /api/observatory,
+computed once per process in about 1 s):
+- Satellites vs fiber: secret-key rate between two cities from 25 to 3,000 km,
+  using the network planner's own model (D12) on generated specs. The satellite
+  sits 500 km over the midpoint; slant range and elevation come from spherical
+  geometry, and the curve stops where either station would see it below 15
+  degrees. Micius's 1,203 km (2017) is marked for scale; the finding says the
+  number is the model's, since Micius's real geometry was less favourable. A
+  repeater chain was tried and left out: with this model's memories it never
+  beats direct fiber at these distances, so it added a line without a message.
+- Grover vs noise: 2 to 5 qubits, one marked item, transpiled to CX/RZ/SX/X and
+  evolved as a density matrix with the verifier's gate channels (realistic
+  preset), then readout error; a test checks the noiseless circuit against
+  sin^2((2k+1)θ). Classical comparison: check k items, then guess.
+- Quantum walk: Hadamard walk vs binomial walk, all frames sent so the page can
+  play it; spread checked against the known t·sqrt(1 - 1/sqrt2).
+- Entanglement growth: 10-qubit brickwork of Haar-random two-qubit gates (8
+  seeds), half-chain entropy against Page's formula (tested for two qubits).
+- The exponential wall: 16·2^n bytes, with laptop and supercomputer lines.
+Charts follow the existing palette (blue/orange validated for colour-blind
+separation; the ideal curve is a dashed neutral reference; gold only for
+entanglement), measure their real width so text stays 11 px, and each has a
+crosshair readout, a legend and a "Show the numbers" table.
+The nine use-case cards are now named by topic, not by persona, and their art
+was regenerated with Muse Image in the flat technical style of the pipeline's
+own diagrams (dark charcoal, off-white lines, one gold accent, no text).
+
