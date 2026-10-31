@@ -117,6 +117,25 @@ histogram, against the clock and against Muse Spark playing the same round. An
 exact search of every one-gate edit grades it, so any gate whose fix restores
 the odds counts.
 
+**Mission control: whole problems, planned, run live and verified.** Type, say or
+photograph a whole problem ("connect two cities 1,200 km apart with quantum-secure
+keys, compare satellite and fiber, and check whether a spy on 25% of the photons is
+caught"). SAM 3.1 and Muse Spark read the photo; Muse Spark plans a dependency graph
+of exact tools under a JSON schema; independent steps run in parallel and light up
+a live graph; a failed step is repaired once by the model; every result is checked
+by physics invariants and, for circuits, by two independent noisy simulators and the
+ML verifier; Muse Spark writes the report and every number in it is traced. Live
+missions take 12 to 23 seconds end to end.
+
+**ML verifier.** A neural-network ensemble trained on 6000 circuits labelled by
+exact simulation predicts in about 151 µs how much of an answer survives
+today's noise: on 900 held-out circuits its average error is 0.010, 9 times smaller than the product-of-gate-fidelities rule of thumb (0.087) and below a global-depolarizing physics model (0.013); its 90% interval held for 90% of them and for 78% of 60 textbook cases it never saw (error 0.020). Every prediction up to 10 qubits is checked exactly, and a
+miss is shown as a note about the model, never a change to the result.
+
+**More algorithms.** The QFT finding a period, Simon's algorithm, the swap test,
+entanglement swapping, a Trotterized quantum magnet, 3-qubit Grover and a quantum
+half adder, each checked against its known answer.
+
 **What it can do.** Nine cards on the start page (sketch to code, debugging,
 chemistry, quantum security, optimization, satellite networks, cryptography,
 real hardware, trust), each illustrated by Muse Image in the same flat technical
@@ -200,7 +219,7 @@ repeatable and cheap.
 | Model | Job |
 | --- | --- |
 | **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo |
-| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over nine exact tools; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
+| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
 | **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Q-Canvas: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing; the nine use-case photos |
 | **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser |
@@ -217,7 +236,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 366 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 385 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and

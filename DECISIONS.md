@@ -603,3 +603,57 @@ The nine use-case cards are now named by topic, not by persona, and their art
 was regenerated with Muse Image in the flat technical style of the pipeline's
 own diagrams (dark charcoal, off-white lines, one gold accent, no text).
 
+## D48. Mission control: plan, run in parallel, repair, verify, trace
+One request can carry words, a photo and speech (already transcribed by Muse Voice).
+The photo goes through the sketch pipeline (SAM 3.1 + Muse Spark into a validated
+spec), or, if it is not a drawing, through the Rosetta's notation reader. Muse Spark
+(Muse Wonder in deep mode) then plans up to 8 steps under a JSON schema: tool,
+arguments as a JSON string (each tool has its own schema), dependencies, purpose.
+Circuits pass between steps by reference (`circuit_from`: a step id or "photo"),
+so a proven shorter circuit from the optimizer can feed the ML verifier without the
+model copying gates. Before anything runs, unknown tools are dropped and
+dependencies must point to earlier steps, which rules out cycles. A thread pool runs
+every step whose dependencies are done; each change is an event on the existing
+EventBus and streams as server-sent events to a live graph. A failed step gets one
+repair: Muse Spark sees the error and the tool's schema and returns new arguments.
+Verification does not trust the tools: physics invariants per tool (variational
+principle for H2, QAOA never above brute force, Shor's factors multiply to 15,
+link fidelity in [1/4, 1], the 11% rule) and, for circuits, two independent noisy
+simulators (closed-form channels vs Qiskit Aer's density matrix, to 1e-6). The ML
+verifier also runs on every circuit, but a miss grades the model, not the result,
+so it is a note and never flags the step. The report is written by Muse Spark from
+the facts and the check texts, which also join the tracer's pool. Offline, a
+keyword planner covers the sample missions, labelled. Live runs in the UI took 12 to
+23 s (two cities, photo to hardware, a molecule at three bond lengths, RSA, exams).
+
+## D49. The ML verifier
+Target: the Hellinger fidelity of the realistic preset (times a scale from 0.05 to 5)
+against the ideal distribution, the number the verifier and hardware sweep report.
+Inputs (16): structure (qubits, measured, gates by size, depth, two-qubit depth,
+busiest qubit), the ideal distribution (entropy, largest outcome, outcomes above
+1e-3), log scale, the rule of thumb (product of gate and readout success) and two
+physics-informed inputs computed on the ideal distribution alone: exact readout
+errors, and a global depolarizing model (ideal mixed with uniform by one minus the
+gates' product, then readout). Those two were added after the first model was
+systematically optimistic on textbook circuits: structure alone cannot see that a
+Bell pair's outcomes are two flips apart, so every readout error leaves the answer.
+Data: 6000 random circuits of 1 to 7 qubits in five styles (gate soup,
+layered, few gates, mirror circuits with certain answers, reversible logic), labelled
+by exact density-matrix simulation (19 ms each on average). Model: five tanh MLPs
+(16-48-48-1, sigmoid output) trained full-batch with Adam in NumPy; the mean is the
+prediction. Interval: adaptive split conformal, |error| / (ensemble spread + 0.01)
+on 900 calibration circuits, 90th percentile. Results on 900 held-out circuits:
+error 0.0099 (physics model 0.0127, rule of thumb 0.0867), coverage
+0.903, mean half-width 0.021; on 60 textbook cases never seen: error
+0.0201 (physics 0.0216, rule 0.0839), coverage 0.78. The
+guarantee is for circuits like the training set, which is why every prediction up
+to 10 qubits is checked exactly. About 151 µs per prediction, 128 times faster than the
+exact label. No new dependency: scikit-learn is not installed and NumPy suffices.
+
+## D50. Seven more algorithms
+qft_period, simon, swap_test, entanglement_swapping, ising_trotter, grover3 and
+half_adder, written by a script that checks each against its textbook answer
+before saving; tests pin the answers (Grover 121/128 exactly) and check the Trotter
+circuit against the product of matrix exponentials. They join the gallery,
+Mission control's run_algorithm tool and the ML verifier's textbook evaluation.
+

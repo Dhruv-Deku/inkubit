@@ -37,6 +37,9 @@ Q-Canvas closes that gap and refuses to fake success:
 
 | Step | What happens | Model |
 | --- | --- | --- |
+| Mission control | A whole problem in words, a photo and your voice ("connect two cities 1,200 km apart with quantum-secure keys, compare satellite and fiber, check whether a spy on 25% of photons is caught"). The photo is read by SAM 3.1 and Muse Spark; Muse Spark (or Muse Wonder) plans a dependency graph of up to 8 exact tools under a JSON schema, with circuits passed between steps by reference; independent steps run in parallel and stream to a live graph; a failed step is repaired once by the model; every result is verified by physics invariants and, for circuits, by two independent noisy simulators (our channels and Qiskit Aer, agreeing to 1e-6) plus the ML verifier; Muse Spark writes the report and every number in it is traced | **Muse Spark 1.3** plans, repairs and reports, **Muse Wonder 1.0** in deep mode, **SAM 3.1** and **Muse Voice Transcribe 1.0** perceive |
+| ML verifier | A neural-network ensemble (NumPy, `scripts/train_ml_verifier.py`) predicts in about 151 µs how much of a circuit's answer survives realistic noise, with an adaptive split-conformal interval, then exact simulation checks it: on 900 held-out circuits its average error is 0.010, 9 times smaller than the product-of-gate-fidelities rule of thumb (0.087) and below a global-depolarizing physics model (0.013); its 90% interval held for 90% of them and for 78% of 60 textbook cases it never saw (error 0.020). A miss grades the model, never the result | – |
+| Algorithm library | Seven more textbook algorithms, each checked against its known answer: the QFT finding a period, Simon's algorithm, the swap test, entanglement swapping, a Trotterized quantum magnet (checked against the product formula), 3-qubit Grover (121/128) and a quantum half adder; Mission control runs any of them | – |
 | Ask Q-Canvas | One assistant for the whole lab. Ask in words or by voice ("compare H₂ at 0.74 and 2.5 Å", "Eve listens to 30% of photons", "split these six people into two teams", "make a GHZ state and run it on noisy hardware"): the model calls nine exact tools (circuit simulation, optimizer, H₂, BB84, QAOA, Shor, network links, error correction, the Rosetta), in parallel when it needs several, and answers with live result cards. **Every number in the answer is traced to a tool result**; untraced numbers are flagged | **Muse Spark 1.3** with tool calling, **Muse Voice Transcribe 1.0** for voice |
 | 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words or say it out loud**, or paste JSON | **Muse Voice Transcribe 1.0** hears it, **Muse Spark 1.3** turns the description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
@@ -111,6 +114,10 @@ Q-Canvas closes that gap and refuses to fake success:
 <tr>
 <td><img src="docs/screenshots/27-observatory-satellites.png" alt="Simulation observatory: fiber gives no key beyond 500 km, the satellite still works at 2,400 km"></td>
 <td><img src="docs/screenshots/28-observatory-grover.png" alt="Grover vs noise: at 5 qubits today's noise erases the speedup"></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/29-mission-control.png" alt="Mission control: Muse Spark planned three parallel steps, all verified, and a report with every number traced"></td>
+<td><img src="docs/screenshots/30-ml-verifier.png" alt="ML verifier: predictions hug the diagonal, the rule of thumb falls far below it"></td>
 </tr>
 </table>
 
@@ -199,6 +206,10 @@ using only endpoints and fields documented in Meta's docs (list of pages in
       Braket (into the circuit spec, labelled as a model's reading) and photos of notation from a textbook,
       slide or whiteboard (`read_notation`: transcribed as text under a JSON schema, with an instruction not to
       solve or simplify; the exact parser then reads the text).
+  13. runs **Mission control**: plans a whole problem as a dependency graph of exact tool steps under a
+      JSON schema (`mission_plan`), fixes the arguments of a step that failed given the error and the tool's
+      schema (`step_repair`), and writes the mission report from the step facts and their checks
+      (`mission_report`); every number in the report is traced.
 - **Muse Wonder 1.0** (`muse-wonder-1.0`, `POST /v1/chat/completions` with `tools`,
   `reasoning_effort: "medium"`): the deep mode of Ask Q-Canvas, for questions that
   take several steps ("plan a 1200 km satellite key link, then check whether a spy
@@ -267,7 +278,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (366 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (385 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
@@ -474,7 +485,7 @@ commit (`a892217`, the spec format) is from Oct 27, 2026 at 14:57 ET.
 | Oct 29 | Challenge mode, 3D Bloch spheres, the optimizer with exact proofs, zero-noise extrapolation, Bell tests, tomography, the error-correction lab, voice input |
 | Oct 30 | First live run against the Meta Model API, Shor's algorithm, Muse Voice Transcribe, the QAOA party lab, the bug hunt |
 | Oct 31 | AI alone vs Q-Canvas, the molecule lab, the BB84 spy lab, use cases with Muse Image photos, Ask Q-Canvas (tool calling) with a Muse Wonder deep mode, the demo video |
-| Nov 1 | The Quantum Rosetta: Dirac notation both ways, exact OpenQASM, Quil and Qiskit readers, proven state preparation, eight output languages, the quantum dictionary, photos of notation; the simulation observatory; Muse Image illustrations for the use-case cards |
+| Nov 1 | The Quantum Rosetta: Dirac notation both ways, exact OpenQASM, Quil and Qiskit readers, proven state preparation, eight output languages, the quantum dictionary, photos of notation; the simulation observatory; Muse Image illustrations for the use-case cards; mission control (multimodal planning, parallel execution, repair, verification, traced reports); the ML verifier; seven more algorithms |
 
 ## Third-party code and assets
 

@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (366 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
+## Done (385 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -57,6 +57,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 
 - Nov 1: the Quantum Rosetta (D46): Dirac notation both ways, exact OpenQASM/Quil/Qiskit readers, proven state preparation, eight output languages, the dictionary, photos of notation via Muse Spark; Dirac notation in the step inspector; translate_notation as the assistant's ninth tool.
 - Nov 1: the simulation observatory (D47): satellites vs fiber, Grover vs noise, quantum walk, entanglement growth, the exponential wall, all exact (backend/qcanvas/observatory.py, /api/observatory, Observatory.tsx); use-case cards renamed by topic and redrawn by Muse Image in the pipeline's diagram style.
+- Nov 1: mission control (D48: backend/qcanvas/mission.py, /api/missions + SSE, Mission.tsx), the ML verifier (D49: backend/qcanvas/mlverify.py, scripts/train_ml_verifier.py, data/ml_verifier.json, ML tab), seven more algorithms (D50). Live missions verified in the UI: two cities, photo to hardware, molecule, RSA, exams.
 
 ## Top 5 next steps
 1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, `optimize`, and explanations in other languages).
