@@ -762,3 +762,15 @@ export interface DistributedResult {
   best: DistSplit; naive: DistSplit; monolithic_fidelity: number; floor: number; options: DistOption[]
   sweep: [number, number | null, number | null][]; finding: string
 }
+
+export interface EstimateQuantum {
+  code_distance: number; logical_qubits: number; patches: number; physical_qubits: number; data_qubits: number
+  factory_qubits: number; factories: number; t_count: number; runtime_s: number; feasible: boolean; note: string
+}
+export interface EstimateResult {
+  family: string; title: string; hardware: { id: string; label: string; p: number; cycle_s: number }; verdict: string
+  headline: string; quantum: EstimateQuantum | null; classical_s: number | null; classical_note: string
+  details: Record<string, unknown>; curve: { x: number; quantum_s: number | null; classical_s: number | null; physical_qubits: number | null }[]
+  curve_x: string; check: string; assumptions: string[]; sources: string[]; read_by: string; call: ModelCall | null
+  mapped: Record<string, unknown>
+}

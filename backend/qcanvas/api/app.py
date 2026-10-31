@@ -362,6 +362,55 @@ async def distributed(body: DistributedRequest) -> dict[str, Any]:
     return res.model_dump(mode="json")
 
 
+class EstimateRequest(BaseModel):
+    text: str | None = Field(default=None, max_length=2000)
+    preset: str | None = Field(default=None, max_length=20)
+    params: dict[str, Any] | None = None
+    hardware: str = Field(default="superconducting", max_length=20)
+
+
+@app.get("/api/estimate/presets")
+def estimate_presets() -> dict[str, Any]:
+    from qcanvas.estimator import HARDWARE, PRESETS
+
+    return {"presets": [{"id": k, "label": v["label"]} for k, v in PRESETS.items()],
+            "hardware": [h.model_dump() for h in HARDWARE.values()]}
+
+
+@app.post("/api/estimate")
+async def estimate(body: EstimateRequest) -> dict[str, Any]:
+    """When does quantum win? Muse Spark maps the problem; error-corrected estimates against the classical route."""
+    from qcanvas.estimator import MAP_SCHEMA, MAP_SYSTEM, PRESETS, estimate as run, offline_map
+
+    call = None
+    read_by = "preset"
+    if body.preset:
+        if body.preset not in PRESETS:
+            raise HTTPException(422, f"unknown preset {body.preset!r}")
+        params = PRESETS[body.preset]
+    elif body.params:
+        params, read_by = body.params, "params"
+    elif body.text and body.text.strip():
+        models = get_models()
+        if models.settings.provider == "meta" and models.settings.has_key:
+            try:
+                params, call = await asyncio.to_thread(models.reasoning.structured, MAP_SYSTEM, body.text.strip(),
+                                                       MAP_SCHEMA, "problem_map", "low", 4000)
+                read_by = "muse"
+            except Exception as err:  # noqa: BLE001 - the keyword reader stands in, labelled
+                params, read_by = offline_map(body.text), f"offline (the model failed: {str(err)[:80]})"
+        else:
+            params, read_by = offline_map(body.text), "offline"
+    else:
+        raise HTTPException(422, "give a problem, a preset or parameters")
+    res = run(params, body.hardware)
+    res.read_by = read_by
+    out = res.model_dump(mode="json")
+    out["call"] = call.model_dump(mode="json") if call else None
+    out["mapped"] = params
+    return out
+
+
 @app.get("/api/observatory")
 async def observatory_charts() -> dict[str, Any]:
     """Five exact sweeps: satellites vs fiber, quantum walk, Grover vs noise, entanglement growth, the memory wall."""

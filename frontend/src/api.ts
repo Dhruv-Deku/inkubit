@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -86,6 +86,8 @@ export const api = {
   mlReport: () => call<MlReport>('/api/mlverify/report'),
   discoveryGoals: () => call<{ goals: DiscoveryGoal[] }>('/api/discovery/goals'),
   distributed: (spec: Spec, medium: string, km: number) => call<DistributedResult>('/api/distributed', json({ spec, medium, km })),
+  estimatePresets: () => call<{ presets: { id: string; label: string }[]; hardware: { id: string; label: string }[] }>('/api/estimate/presets'),
+  estimate: (q: { preset?: string; text?: string; hardware: string }) => call<EstimateResult>('/api/estimate', json(q)),
   startDiscovery: (what: { goal?: string; ket?: string }, deep: boolean) =>
     call<{ discovery_id: string; events_url: string }>('/api/discovery', json({ ...what, deep })),
   chemLab: (r: number, signal?: AbortSignal) => call<ChemLab>(`/api/lab/chem?r=${r.toFixed(2)}`, { signal }),
