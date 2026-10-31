@@ -35,6 +35,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
   - Bug hunt (D37): find the one wrong gate from the histogram, graded by an exact search of every one-gate edit; Muse Spark plays the same round live; three levels, score and streak in the browser.
   - AI alone vs Q-Canvas (D38, docs/ARENA.md): Muse Spark predicting outcome odds with no simulator, scored against exact simulation. Exact on 23 of 24 small circuits; on bigger ones (6-8 qubits) exact on 3 of 6, one confidently 43% wrong, one no answer. "Ask the AI alone" in the editor; "How it was checked" column in the models table.
   - Molecule lab (D39): H₂ from first principles, Hartree-Fock vs exact vs VQE raw and mitigated across bond lengths. Catch the spy (D40): BB84 with an eavesdropper. Who it is for (D41): nine use-case cards.
+  - Ask Q-Canvas (D42): Muse Spark with tool calling over eight exact tools, every number traced; voice input; result cards with "Open in the editor". Use-case photos from Muse Image (D43). Demo video beats rewritten around the assistant and the new labs.
 
 ## In progress
 - Nothing. Fresh-clone check passed on 2026-10-28; features since then are covered by the offline tests and a headless-browser check of every new screen (desktop and 390 px phone width).

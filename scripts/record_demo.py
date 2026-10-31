@@ -478,12 +478,137 @@ async def network_story(d: Director) -> None:
     await d.caption(None)
 
 
+def panel(page: Page, title: str) -> Locator:
+    return page.locator(".panel", has=page.locator("h2", has_text=title))
+
+
+async def copilot_story(d: Director) -> None:
+    page, live = d.page, d.live
+    box = panel(page, "Ask Q-Canvas")
+    await d.scroll_to(box, block="start", pause=0.6)
+    await d.caption(models_or(live, "Ask anything. **Muse Spark** picks the right exact tools, runs them, and answers.",
+                              "Ask anything: the question is routed to the right exact tool."), hold=3.4)
+    questions = [
+        ("Ana fights with Ben and Cai, Ben fights with Dev, Cai fights with Dev and Eli. Split them into two teams.",
+         "A people problem becomes a graph, and **QAOA** on a simulated quantum computer splits it."),
+        ("Make a 3-qubit GHZ state. How well does it survive real hardware?",
+         "It writes the circuit itself, simulates it exactly, then again under realistic noise."),
+        ("Compare the energy of H2 at 0.74 and 2.5 angstrom. Why does Hartree-Fock fail when it is stretched?",
+         "Chemistry from first principles: two tool calls in parallel, one per bond length."),
+    ]
+    for i, (q, cap) in enumerate(questions):
+        await d.type_into(page.locator(".copilot-input"), q)
+        await d.click(page.locator(".copilot button[type=submit]"))
+        await d.caption(cap)
+        await d.fast(4, "the model and the tools at work")
+        await page.wait_for_function(f"document.querySelectorAll('.copilot-turn .copilot-a, .copilot-turn .notice').length > {i}",
+                                     timeout=240_000)
+        await d.normal()
+        turn = page.locator(".copilot-turn").nth(i)
+        await d.scroll_to(turn, block="start", pause=0.8)
+        await d.move(turn.locator(".trace-badge"))
+        await d.caption("Every number in the answer is traced back to an exact tool result. "
+                        "A number the model made up would be flagged here.", hold=4.6 if i == 0 else 3.2)
+        card = turn.locator(".copilot-card").first
+        await d.scroll_to(card, block="center", pause=2.6)
+    await d.caption(None)
+
+
+async def trust_story(d: Director) -> None:
+    page = d.page
+    arena = panel(page, "AI alone vs Q-Canvas")
+    await d.scroll_to(arena, block="start", pause=0.8)
+    await d.caption("Why check at all? We asked the same model to predict circuits alone, like a chatbot with no simulator.", hold=4.2)
+    await d.caption("Famous circuits: perfect. Bigger new ones: right only half the time, once **confidently 43% wrong**.", hold=4.6)
+    await d.scroll_to(arena.locator(".arena-rows").first, block="center", pause=3.2)
+    await d.caption(None)
+
+
+async def usecases_story(d: Director) -> None:
+    page = d.page
+    hub = panel(page, "Who it is for")
+    await d.scroll_to(hub, block="start", pause=0.8)
+    await d.caption("One app for teachers, students, chemists, security, logistics, network planners and researchers.", hold=3.0)
+    for who in ("Chemist", "Security", "Logistics"):
+        await d.move(hub.locator(".uc-card", has_text=who), steps=24)
+        await d.wait(0.6)
+    await d.caption("Photos generated with **Muse Image**. Every card opens the real thing.", hold=2.6)
+    await d.caption(None)
+
+
+async def bughunt_story(d: Director) -> None:
+    page, live = d.page, d.live
+    found: dict[str, int] = {}
+
+    def on_response(resp) -> None:
+        if "/api/bughunt/round" in resp.url and "level=" in resp.url and "level" not in found:
+            q = dict(kv.split("=") for kv in resp.url.split("?", 1)[1].split("&"))
+            found.update(level=int(q["level"]), seed=int(q["seed"]))
+
+    page.on("response", on_response)
+    hunt = panel(page, "Bug hunt")
+    await d.click(hunt.locator(".seg button", has_text="Tricky"))
+    await page.wait_for_selector(".bug-circuit.live .op", timeout=120_000)
+    await d.scroll_to(hunt, block="start", pause=0.6)
+    await d.caption(models_or(live, "**Bug hunt**: one gate is wrong. You race the clock, and **Muse Spark** plays the same round.",
+                              "**Bug hunt**: one gate is wrong. Find it from the histogram."), hold=3.6)
+    await d.scroll_to(hunt.locator(".bug-circuit"), block="center", pause=1.0)
+    if live:
+        await d.fast(4, "Muse Spark thinking")
+        try:
+            await page.wait_for_selector("text=Muse Spark has answered", timeout=120_000)
+        except Exception:  # noqa: BLE001 - the round still plays without it
+            pass
+        await d.normal()
+    import sys
+    sys.path.insert(0, str(ROOT / "backend"))
+    from qcanvas.bughunt import search  # noqa: E402
+    culprit = search(found.get("level", 2), found.get("seed", 0)).culprits[0] if found else 0
+    await d.caption("Click the gate you think is broken.")
+    await d.click(hunt.locator(".bug-circuit .op").nth(culprit))
+    await page.wait_for_selector(".bug-reveal", timeout=120_000)
+    await d.scroll_to(hunt.locator(".bug-reveal"), block="center", pause=0.6)
+    await d.caption("An exact search tried every one-gate edit, so any gate whose fix restores the odds counts.", hold=4.4)
+    page.remove_listener("response", on_response)
+    await d.caption(None)
+
+
+async def labs_story(d: Director) -> None:
+    page = d.page
+    chem = panel(page, "Molecule lab")
+    await d.scroll_to(chem, block="start", pause=0.8)
+    await d.caption("**Chemistry**: the hydrogen molecule from first principles, integrals checked against the textbook.", hold=3.4)
+    await d.click(chem.locator("button", has_text="pull apart"))
+    await d.wait(1.2)
+    await d.caption("Pull it apart and the classical shortcut fails by 233 mHa. Raw VQE suffers from noise; "
+                    "undoing the calibrated noise lands within chemical accuracy.", hold=5.4)
+    spy = panel(page, "Catch the spy")
+    await d.scroll_to(spy, block="start", pause=0.8)
+    await d.caption("**Security**: BB84 quantum key distribution. Slide in an eavesdropper…", hold=2.2)
+    slider = spy.locator("input[aria-label='Share of photons Eve measures']")
+    for v in ("0.2", "0.4", "0.6"):
+        await d.move(slider, fx=float(v), steps=14)
+        await slider.fill(v)
+        await d.wait(0.7)
+    await d.caption("…and the errors she causes give her away: above 11% the key is thrown out. Physics, not a password.", hold=4.4)
+    party = panel(page, "Split the party")
+    await d.scroll_to(party, block="start", pause=0.8)
+    await d.caption("**Optimization**: QAOA seats feuding guests at two tables, the shape of scheduling and routing problems.", hold=3.4)
+    land = party.locator("svg[aria-label^='Expected cut']")
+    await d.click(land, pause=0.3)
+    await d.wait(1.0)
+    await d.caption("Click the landscape to try your own angles against the optimizer.", hold=3.2)
+    await d.click(party.locator(".seg button", has_text="3 layers"))
+    await d.caption("Three layers find a best seating 95% of the time with perfect qubits, about half with realistic noise.", hold=4.0)
+    await d.caption(None)
+
+
 async def record(base: str, out: Path) -> None:
     with urllib.request.urlopen(f"{base}/api/health", timeout=10) as r:
         health = json.load(r)
     live = health.get("mode") == "meta"
     print(f"backend mode: {health.get('mode_label')}")
-    chips = ["SAM 3.1", "Muse Spark", "Muse Image", "Qiskit + Aer"]
+    chips = ["SAM 3.1", "Muse Spark", "Muse Image", "Muse Voice", "Qiskit + Aer"]
     note = "" if live else "Offline recording: model answers are recorded mock responses, labelled Mock in the app."
 
     async with async_playwright() as p:
@@ -496,6 +621,7 @@ async def record(base: str, out: Path) -> None:
         page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
         await page.goto(base)
         await page.wait_for_selector(".sample img")
+        await page.wait_for_selector(".copilot-input")
         await page.evaluate("document.fonts.ready")
         d = Director(page, live)
         await page.evaluate("a => window.__demo.card(...a)", ["Q-Canvas", "", [], "", False])
@@ -505,20 +631,28 @@ async def record(base: str, out: Path) -> None:
             rec = Recorder(page, Path(tmp))
             d.rec = rec
             await rec.start()
-            await d.card("Q-Canvas", "Draw a quantum circuit or a satellite link on paper. Get a verified simulation.",
+            await d.card("Q-Canvas", "A quantum lab you can draw on and talk to. Every answer checked by exact simulation.",
                          chips, note, hold=4.6)
             await page.screenshot(path=str(out.with_suffix(".png")))
-            await d.card("A wrong quantum program still runs.",
-                         "It just prints the wrong histogram. Q-Canvas checks every result against an exact "
-                         "prediction, and repairs the code when it is wrong.", small=True, hold=5.2)
             await d.hide_card()
+            await copilot_story(d)
+            await d.card("A wrong quantum program still runs.",
+                         "It just prints the wrong histogram. Draw a circuit on paper: Q-Canvas reads it, writes the code, "
+                         "checks the result against an exact prediction, and repairs the code when it is wrong.",
+                         small=True, hold=5.0)
+            await d.hide_card()
+            await d.scroll_to(page.locator(".sample", has_text="Bell pair"), block="center", pause=0.9)
             await circuit_story(d)
-            await words_story(d)
             await optimizer_story(d)
-            await challenge_story(d)
-            await network_story(d)
-            await d.card("Q-Canvas", "From a pencil sketch to a verified quantum simulation.", chips,
-                         "Every result checked. Every model answer labelled.", hold=4.5)
+            await d.scroll_top()
+            await d.click(page.locator("nav.steps button >> nth=0"))
+            await d.wait(0.8)
+            await trust_story(d)
+            await usecases_story(d)
+            await bughunt_story(d)
+            await labs_story(d)
+            await d.card("Q-Canvas", "Sketch it, say it, or ask it. Chemistry, security, optimization, networks, algorithms.",
+                         chips, "Every number checked by exact simulation. Every model answer labelled.", hold=5.0)
             await rec.stop()
             print(f"captured {len(rec.frames)} frames over {rec.t_end - rec.frames[0][0]:.1f} s "
                   f"({rec._video_time(rec.t_end):.1f} s after speed-ups); encoding…")

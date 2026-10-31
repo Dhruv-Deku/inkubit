@@ -40,10 +40,13 @@ export function UseCases({ examples, onImage, onSpec, busy }: {
   }
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Who it is for</h2><span className="sub">one click into each use</span></div>
+      <div className="panel-head"><h2>Who it is for</h2><span className="sub">one click into each use</span><span className="spacer" />
+        <span className="sub">photos: Muse Image 1.0</span></div>
       <div className="uc-grid">
         {CASES.map((c) => (
           <button key={c.who} className="uc-card" onClick={() => { void run(c.action) }} disabled={busy && c.action.kind !== 'panel'}>
+            <img className="uc-img" src={`/usecases/${c.who.split(' ')[0].toLowerCase()}.webp`} alt="" loading="lazy" width={720} height={405}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
             <span className="uc-who">{c.who}</span>
             <span className="uc-title">{c.title}</span>
             <span className="uc-text">{c.text}</span>
