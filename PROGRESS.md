@@ -53,7 +53,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 4. Repo is pushed to https://github.com/Dhruv-Deku/q-canvas (**private**): make it public before submitting (`gh repo edit Dhruv-Deku/q-canvas --visibility public --accept-visibility-change-consequences`), then fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
-- Oct 31: Muse Wonder deep mode for Ask Q-Canvas (D44). Hackathon rules applied (D45): MIT license, "Built during the hackathon" and third-party sections in the README, submission text updated, repo public.
+- Oct 31: Muse Wonder deep mode for Ask Q-Canvas (D44). Hackathon rules applied (D45): MIT license, "Built during the hackathon" and third-party sections in the README, submission text updated; secret scan of the full history clean, repo ready to make public.
 
 ## Top 5 next steps
 1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, `optimize`, and explanations in other languages).
