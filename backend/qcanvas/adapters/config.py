@@ -15,6 +15,7 @@ DEFAULT_REASONING_MODEL = "muse-spark-1.3"
 DEFAULT_CODE_MODEL = "muse-spark-1.3"
 DEFAULT_IMAGE_MODEL = "muse-image-1.0"
 DEFAULT_SEGMENT_MODEL = "sam-3.1"
+DEFAULT_DEEP_MODEL = "muse-wonder-1.0"  # docs/meta-api/models.md (Muse Wonder, preview)
 DEFAULT_VOICE_MODEL = "muse-voice-transcribe-1.0"  # docs/meta-api/api-reference_voice_transcribe.md
 META_BASE_URL = "https://api.meta.ai/v1"
 
@@ -36,6 +37,7 @@ class Settings:
     cache_dir: str
     code_backend: str
     api_key: str | None = None
+    deep_model: str = DEFAULT_DEEP_MODEL
 
     @property
     def has_key(self) -> bool:
@@ -53,6 +55,7 @@ class Settings:
                 "image": self.image_model,
                 "segmentation": self.segment_model,
                 "voice": self.voice_model,
+                "deep": self.deep_model,
             },
             "code_backend": self.code_backend,
         }
@@ -82,4 +85,5 @@ def load_settings() -> Settings:
         cache_dir=os.environ.get("QCANVAS_CACHE_DIR", str(BACKEND_DIR / ".qcanvas_cache")),
         code_backend=os.environ.get("QCANVAS_CODE_BACKEND", "api"),
         api_key=(os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY") or None),
+        deep_model=os.environ.get("QCANVAS_DEEP_MODEL", DEFAULT_DEEP_MODEL),
     )

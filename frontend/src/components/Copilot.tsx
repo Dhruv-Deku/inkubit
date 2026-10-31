@@ -16,6 +16,7 @@ const IDEAS = [
   'Plan a 600 km fiber link with 2 repeaters.',
   'When does error correction start to help?',
   'Compare H₂ at 0.74 Å and 2.5 Å.',
+  'Plan a 1,200 km satellite key link, then check whether a spy on 20% of the photons would be caught.',
 ]
 
 const LABEL: Record<string, string> = {
@@ -25,7 +26,7 @@ const LABEL: Record<string, string> = {
 }
 const TEAM = ['#3987e5', '#d0702c']
 
-interface Turn { q: string; reply?: CopilotReply; error?: string; seconds?: number }
+interface Turn { q: string; deep?: boolean; reply?: CopilotReply; error?: string; seconds?: number }
 
 function TraceBadge({ reply }: { reply: CopilotReply }) {
   const t = reply.trace
@@ -128,10 +129,11 @@ function Card({ run, first, onOpen }: { run: CopilotTool; first: boolean; onOpen
   } else if (c.type === 'network') {
     const r = c.result as { before: { end_to_end: Record<string, number> }; after: { end_to_end: Record<string, number> } | null; fix: { description: string } | null }
     const row = (label: string, k: string, f: (v: number) => string) => (
-      <tr><td>{label}</td><td className="mono">{f(r.before.end_to_end[k])}</td><td className="mono">{r.after ? f(r.after.end_to_end[k]) : '–'}</td></tr>)
+      <tr><td>{label}</td><td className="mono num">{f(r.before.end_to_end[k])}</td><td className="mono num">{r.after ? f(r.after.end_to_end[k]) : '–'}</td></tr>)
     body = (
       <>
-        <table className="calls"><thead><tr><th>{String(c.title)}</th><th>Before</th><th>After the fix</th></tr></thead>
+        <div className="sub" style={{ marginTop: 4 }}>{String(c.title)}</div>
+        <table className="calls net"><thead><tr><th>End to end</th><th className="num">Before</th><th className="num">After the fix</th></tr></thead>
           <tbody>
             {row('Entangled pairs per second', 'pair_rate_hz', (v) => v.toPrecision(3))}
             {row('Fidelity', 'fidelity', (v) => v.toFixed(3))}
@@ -157,11 +159,12 @@ function Card({ run, first, onOpen }: { run: CopilotTool; first: boolean; onOpen
   )
 }
 
-/** One assistant for the whole lab: Muse Spark picks the exact tools, and every number it says is traced. */
+/** One assistant for the whole lab: Muse Spark (or Muse Wonder, deep mode) picks the exact tools, and every number it says is traced. */
 export function CopilotPanel({ live, onOpen }: { live: boolean; onOpen?: (s: CircuitSpec) => void }) {
   const [text, setText] = useState('')
   const [turns, setTurns] = useState<Turn[]>([])
   const [busy, setBusy] = useState(false)
+  const [deep, setDeep] = useState(false)
   const endRef = useRef<HTMLDivElement | null>(null)
   const ask = async (q: string) => {
     const question = q.trim()
@@ -169,10 +172,11 @@ export function CopilotPanel({ live, onOpen }: { live: boolean; onOpen?: (s: Cir
     setText('')
     setBusy(true)
     const history = turns.flatMap((t) => (t.reply ? [{ role: 'user', content: t.q }, { role: 'assistant', content: t.reply.answer }] : []))
-    setTurns((ts) => [...ts, { q: question }])
+    const wonder = live && deep
+    setTurns((ts) => [...ts, { q: question, deep: wonder }])
     const t0 = performance.now()
     try {
-      const reply = await api.copilot(question, history)
+      const reply = await api.copilot(question, history, wonder)
       setTurns((ts) => ts.map((t, i) => (i === ts.length - 1 ? { ...t, reply, seconds: (performance.now() - t0) / 1000 } : t)))
     } catch (e) {
       setTurns((ts) => ts.map((t, i) => (i === ts.length - 1 ? { ...t, error: e instanceof ApiError ? e.message : 'The request failed.' } : t)))
@@ -185,13 +189,21 @@ export function CopilotPanel({ live, onOpen }: { live: boolean; onOpen?: (s: Cir
     <div className="panel copilot">
       <div className="panel-head">
         <h2>Ask Q-Canvas</h2>
-        <span className="sub">{live ? 'one assistant for the whole lab: Muse Spark calls exact tools, and every number it says is traced'
+        <span className="sub">{live ? 'one assistant for the whole lab: Muse Spark, or Muse Wonder for harder questions, calls exact tools, and every number it says is traced'
           : 'offline: a keyword router reaches the same exact tools; the live model answers anything'}</span>
       </div>
       <form className="row wrap" style={{ gap: 10, alignItems: 'stretch' }} onSubmit={(e) => { e.preventDefault(); void ask(text) }}>
         <input type="text" value={text} onChange={(e) => setText(e.target.value)} style={{ flex: '1 1 260px', minWidth: 0 }} className="copilot-input"
           placeholder="Ask about a molecule, a spy, a schedule, a circuit, a network…" aria-label="Ask Q-Canvas" disabled={busy} />
         <VoiceButton onText={setText} onDone={(t) => { void ask(t) }} disabled={busy} live={live} />
+        {live && (
+          <div className="seg" role="group" aria-label="Assistant model">
+            <button type="button" className={deep ? '' : 'on'} aria-pressed={!deep} onClick={() => setDeep(false)} disabled={busy}
+              title="Muse Spark 1.3: fast">Muse Spark</button>
+            <button type="button" className={deep ? 'on' : ''} aria-pressed={deep} onClick={() => setDeep(true)} disabled={busy}
+              title="Muse Wonder 1.0: Meta's most capable model, for questions that need several steps (slower)">Muse Wonder</button>
+          </div>
+        )}
         <button className="btn primary" type="submit" disabled={busy || !text.trim()}>{busy ? 'Working…' : 'Ask'}</button>
       </form>
       {!turns.length && (
@@ -204,7 +216,7 @@ export function CopilotPanel({ live, onOpen }: { live: boolean; onOpen?: (s: Cir
         return (
           <div key={i} className="copilot-turn">
             <div className="copilot-q">{t.q}</div>
-            {!t.reply && !t.error && <div className="copilot-wait">{live ? 'Muse Spark is choosing tools and running them…' : 'Routing to a tool…'}</div>}
+            {!t.reply && !t.error && <div className="copilot-wait">{!live ? 'Routing to a tool…' : t.deep ? 'Muse Wonder is planning, calling tools and checking the results…' : 'Muse Spark is choosing tools and running them…'}</div>}
             {t.error && <div className="notice error">{t.error}</div>}
             {t.reply && (
               <>

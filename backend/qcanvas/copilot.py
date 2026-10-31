@@ -25,6 +25,7 @@ from pydantic import BaseModel, Field
 from qcanvas.adapters.base import ModelCall
 
 MAX_ROUNDS = 4
+DEEP_ROUNDS = 6  # Muse Wonder plans longer chains of tool calls
 GATES = ["H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX", "RX", "RY", "RZ", "CX", "CZ", "CP", "SWAP", "CCX"]
 
 SYSTEM = (
@@ -352,7 +353,8 @@ def trace(answer: str, question: str, runs: list[ToolRun]) -> Trace:
 
 # ---------------------------------------------------------------- the live loop and the offline router
 
-def ask_live(question: str, history: list[dict[str, str]], tool_chat: Callable[..., tuple[dict[str, Any], ModelCall]]) -> Reply:
+def ask_live(question: str, history: list[dict[str, str]], tool_chat: Callable[..., tuple[dict[str, Any], ModelCall]],
+             rounds: int = MAX_ROUNDS) -> Reply:
     messages: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM}]
     messages += [{"role": h["role"], "content": h["content"][:2000]} for h in history[-6:]
                  if h.get("role") in ("user", "assistant") and h.get("content")]
@@ -360,7 +362,7 @@ def ask_live(question: str, history: list[dict[str, str]], tool_chat: Callable[.
     runs: list[ToolRun] = []
     calls: list[ModelCall] = []
     answer = ""
-    for _ in range(MAX_ROUNDS + 1):
+    for _ in range(rounds + 1):
         msg, call = tool_chat(messages, TOOLS)
         calls.append(call)
         tcs = msg.get("tool_calls") or []

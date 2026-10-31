@@ -200,8 +200,11 @@ class ReasoningModel(ABC):
         """Pick the one wrong operation in a bug-hunt round."""
         raise NotImplementedError("the bug hunt opponent needs the live model")
 
-    def tool_chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> tuple[dict[str, Any], ModelCall]:
-        """One assistant turn with tools: the full message (text or tool calls) and the call record."""
+    def tool_chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]], model: str | None = None,
+                  effort: str = "low") -> tuple[dict[str, Any], ModelCall]:
+        """One assistant turn with tools: the full message (text or tool calls) and the call record.
+
+        ``model`` overrides the reasoning model (Ask Q-Canvas deep mode uses Muse Wonder)."""
         raise NotImplementedError("the assistant needs the live model")
 
     def predict_odds(self, facts: dict[str, Any]) -> OddsGuess:

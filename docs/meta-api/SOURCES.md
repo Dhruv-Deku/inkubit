@@ -20,6 +20,7 @@ comes from these files:
 | SAM output grammar `<0f>id<|box;x1=..;...;c=..|><|mask;...|>` | `sam_reading-segmentation.md` |
 | `POST /v1/images/generations`, model `muse-image-1.0`, `response_format: "b64_json"`, `output_format: "png"` | `image-generation.md`, `api-reference_images_schemas.md` |
 | `POST /v1/asr/transcribe`, model `muse-voice-transcribe-1.0`, multipart `request` (`audioEncoding: "WAV"`, `mode: "PUSH_TO_TALK"`, `keywords`) + `audio` (mono 16-bit PCM WAV, 16 or 24 kHz); response `transcript`, `audioDurationMs` | `speech-to-text.md`, `api-reference_voice_transcribe.md`, `api-reference_voice_schemas.md` (downloaded 2026-10-30) |
+| Muse Wonder (`muse-wonder-1.0`) on Chat Completions with tools and `reasoning_effort`; Standard mode only, $4 / $20 per 1M input / output tokens | `models.md`, `reasoning.md`, `pricing-rate-limits.md`, `tool-calling.md` |
 | Error envelope and retry guidance | `error-handling.md` |
 
 The docs name the env var `MODEL_API_KEY`; Q-Canvas reads `META_API_KEY` first

@@ -81,3 +81,38 @@ def test_offline_router(q, tool):
 def test_endpoint_offline_is_labelled():
     d = TestClient(app).post("/api/copilot", json={"message": "Eve listens to 80% of photons"}).json()
     assert d["router"] == "offline" and d["calls"][0]["provider"] == "mock" and d["tools"][0]["facts"]["eavesdropper_caught"]
+
+
+class ToolClient:
+    def __init__(self):
+        self.calls = []
+
+    def chat_message(self, model, messages, tools, **kw):
+        self.calls.append((model, kw))
+        return {"role": "assistant", "content": "done"}, False
+
+
+def test_deep_mode_asks_muse_wonder_with_more_effort():
+    from qcanvas.adapters.config import load_settings
+    from qcanvas.adapters.meta_vision import MetaReasoningModel
+
+    fake = ToolClient()
+    m = MetaReasoningModel(load_settings(), fake)  # type: ignore[arg-type]
+    _, fast = m.tool_chat([], [])
+    _, deep = m.tool_chat([], [], model="muse-wonder-1.0", effort="medium")
+    assert fast.model == "muse-spark-1.3" and deep.model == "muse-wonder-1.0"
+    assert fake.calls[0] == ("muse-spark-1.3", {"reasoning_effort": "low", "max_tokens": 6000})
+    assert fake.calls[1] == ("muse-wonder-1.0", {"reasoning_effort": "medium", "max_tokens": 16000})
+
+
+def test_round_limit_is_respected():
+    calls = []
+
+    def loop(messages, tools):
+        calls.append(1)
+        return ({"role": "assistant", "content": None, "tool_calls": [
+            {"id": f"c{len(calls)}", "type": "function", "function": {"name": "factor_with_shor", "arguments": "{\"a\": 7}"}}]},
+            ModelCall(provider="meta", model="muse-wonder-1.0", role="assistant"))
+
+    reply = ask_live("keep going", [], loop, rounds=6)
+    assert len(calls) == 7 and len(reply.tools) == 7 and "did not finish" in reply.answer

@@ -238,10 +238,13 @@ class MetaReasoningModel(ReasoningModel):
                         call=ModelCall(provider="meta", model=self.model, role="optimize", cached=cached,
                                        latency_s=time.perf_counter() - start))
 
-    def tool_chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> tuple[dict[str, Any], ModelCall]:
+    def tool_chat(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]], model: str | None = None,
+                  effort: str = "low") -> tuple[dict[str, Any], ModelCall]:
         start = time.perf_counter()
-        msg, cached = self.client.chat_message(self.model, messages, tools, reasoning_effort="low", max_tokens=6000)
-        return msg, ModelCall(provider="meta", model=self.model, role="assistant", cached=cached,
+        model = model or self.model
+        msg, cached = self.client.chat_message(model, messages, tools, reasoning_effort=effort,
+                                               max_tokens=6000 if effort == "low" else 16000)
+        return msg, ModelCall(provider="meta", model=model, role="assistant", cached=cached,
                               latency_s=time.perf_counter() - start)
 
     def predict_odds(self, facts: dict[str, Any]) -> OddsGuess:

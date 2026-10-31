@@ -257,17 +257,24 @@ async def lab_qaoa(body: QaoaRequest) -> dict[str, Any]:
 class CopilotRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     history: list[dict[str, str]] = Field(default_factory=list, max_length=12)
+    deep: bool = False  # Muse Wonder instead of Muse Spark
 
 
 @app.post("/api/copilot")
 async def copilot(body: CopilotRequest) -> dict[str, Any]:
-    """Ask Q-Canvas: Muse Spark calls the exact tools; every number in the answer is traced to a tool result."""
-    from qcanvas.copilot import ask_live, ask_offline
+    """Ask Q-Canvas: Muse Spark (or Muse Wonder in deep mode) calls the exact tools; every number is traced."""
+    from functools import partial
+
+    from qcanvas.copilot import DEEP_ROUNDS, MAX_ROUNDS, ask_live, ask_offline
 
     models = get_models()
     if models.settings.provider == "meta" and models.settings.has_key:
         try:
-            reply = await asyncio.to_thread(ask_live, body.message, body.history, models.reasoning.tool_chat)
+            chat = models.reasoning.tool_chat
+            if body.deep:
+                chat = partial(chat, model=models.settings.deep_model, effort="medium")
+            reply = await asyncio.to_thread(ask_live, body.message, body.history, chat,
+                                            DEEP_ROUNDS if body.deep else MAX_ROUNDS)
         except Exception as err:  # noqa: BLE001 - reported, never replaced by a made-up answer
             raise HTTPException(502, f"The assistant failed: {err}") from None
     else:

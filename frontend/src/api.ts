@@ -65,8 +65,8 @@ export const api = {
     call<LiveState>('/api/state', { ...json({ spec, noise, scale }), signal }),
   repetitionLab: (scale: number, signal?: AbortSignal) =>
     call<RepetitionLab>(`/api/lab/repetition?scale=${scale.toPrecision(3)}`, { signal }),
-  copilot: (message: string, history: { role: string; content: string }[]) =>
-    call<CopilotReply>('/api/copilot', json({ message, history })),
+  copilot: (message: string, history: { role: string; content: string }[], deep = false) =>
+    call<CopilotReply>('/api/copilot', json({ message, history, deep })),
   chemLab: (r: number, signal?: AbortSignal) => call<ChemLab>(`/api/lab/chem?r=${r.toFixed(2)}`, { signal }),
   qkdLab: (q: { photons: number; eve: number; noise: number; seed: number }, signal?: AbortSignal) =>
     call<QkdLab>(`/api/lab/qkd?photons=${q.photons}&eve=${q.eve}&noise=${q.noise}&seed=${q.seed}`, { signal }),
