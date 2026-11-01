@@ -792,11 +792,29 @@ export interface LiveRead {
 }
 
 export interface OrbitCity { id: string; name: string; lat: number; lon: number }
-export interface OrbitPass { start_utc: string; minutes: number; max_el_a: number; max_el_b: number | null; pairs: number | null; key_bits: number; kind: string }
+export interface OrbitPass {
+  start_utc: string; minutes: number; max_el_a: number; max_el_b: number | null; pairs: number | null; key_bits: number; kind: string
+  cloud_a: number | null; cloud_b: number | null; expected_key_bits: number | null
+}
+export interface OrbitSatellite {
+  id: string; name: string; norad: number; real: boolean; aperture_mm: number; dual: boolean; status: string; launched: string; note: string
+  elements?: { source: string; epoch_utc: string; fetched_utc: string; age_hours: number; line1: string; line2: string }
+  height_km?: [number, number]; speed_kms?: number; period_min?: number; inclination_deg?: number
+}
+export interface OrbitDay {
+  from_utc: string; passes_a: number; passes_b: number; key_a: number; key_b: number; trusted: number; expected_trusted: number | null
+  cloud_a: number | null; cloud_b: number | null
+}
 export interface OrbitPlan {
   city_a: OrbitCity; city_b: OrbitCity; distance_km: number; start_utc: string; step_s: number
   track: [number, number][]; sun: [number, number][]; el_a: number[]; el_b: number[]; night_a: boolean[]; night_b: boolean[]
   passes: OrbitPass[]; shared_key_bits_per_day: number; entangled_pairs_per_day: number; trusted_key_bits_per_day: number; finding: string
+  satellite: OrbitSatellite; alt_km: number[]; now_index: number | null; expected_trusted_key_bits: number | null; clouds: string | null
+  outlook: OrbitDay[]
+}
+export interface OrbitMeta {
+  cities: { id: string; name: string }[]; pairs: { a: string; b: string; label: string; sat: string | null }[]
+  satellites: { id: string; name: string; norad: number; real: boolean; status: string }[]
 }
 
 export interface ReproClaim { outcome: string; ours: string; claimed: number; ideal: number; noisy: number | null; tolerance: number; verdict: string; ok: boolean }

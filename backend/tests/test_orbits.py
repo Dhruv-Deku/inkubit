@@ -10,7 +10,8 @@ from fastapi.testclient import TestClient
 
 from qcanvas.api.app import app
 from qcanvas.orbits import (
-    ALT_KM, INC_DEG, J2, MU, R_E, START, bb84_key_rate, elevation, julian, orbit_ecef, plan, station, sun_eci,
+    ALT_KM, INC_DEG, J2, MU, R_E, START, bb84_key_rate, elevation, julian, orbit_ecef, plan, station, subpoint, sun_eci,
+    up_vector,
 )
 
 
@@ -37,9 +38,20 @@ def test_sun_is_near_the_tropic_of_capricorn_in_late_december():
 
 
 def test_elevation_is_ninety_degrees_straight_overhead():
-    sta = station(10.0, 20.0)
-    el, rng = elevation(sta * (1 + ALT_KM / R_E), sta)
+    sta, up = station(10.0, 20.0), up_vector(10.0, 20.0)
+    el, rng = elevation(sta + ALT_KM * up, sta, up)
     assert el == pytest.approx(90.0) and rng == pytest.approx(ALT_KM)
+
+
+def test_stations_sit_on_the_wgs84_ellipsoid():
+    assert np.linalg.norm(station(0.0, 0.0)) == pytest.approx(6378.137)
+    assert np.linalg.norm(station(90.0, 0.0)) == pytest.approx(6356.752, abs=1e-3)  # polar radius
+    lat, lon, h = subpoint(station(51.1445, -1.437, 0.5)[None, :])
+    assert (lat[0], lon[0], h[0]) == pytest.approx((51.1445, -1.437, 0.5), abs=1e-6)
+
+
+def test_a_smaller_telescope_spreads_the_beam_and_costs_key():
+    assert bb84_key_rate(800, 45, 0.08) < bb84_key_rate(800, 45, 0.30)
 
 
 def test_downlink_key_falls_with_slant_range():
@@ -52,6 +64,7 @@ def test_micius_pair_shares_a_pass_and_far_cities_need_a_trusted_satellite():
     far = plan("xinglong", "graz")
     assert not any(p.kind == "both" for p in far.passes) and far.trusted_key_bits_per_day > 0
     assert len(near.track) == len(near.el_a) == 24 * 3600 // near.step_s
+    assert near.satellite["id"] == "micius" and not near.satellite["real"] and "re-entered" in near.satellite["status"]
 
 
 def test_endpoint():

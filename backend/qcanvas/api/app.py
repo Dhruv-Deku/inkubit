@@ -37,20 +37,25 @@ app = FastAPI(title="Q-Canvas", version=__version__)
 
 @app.on_event("startup")
 def _warm_up() -> None:
-    """Compute the slow, input-free results (pulse sweep, observatory) in the background so no visitor waits."""
+    """Compute the slow, input-free results (pulse sweep, observatory, the satellite planner's default view) in the
+    background so no visitor waits."""
     import threading
 
     def work() -> None:
         try:
             from qcanvas.observatory import observatory
+            from qcanvas.orbits import plan
             from qcanvas.pulse import sweep
 
             observatory()
+            plan("chilbolton", "singapore", True, "speqtre")
             sweep()
         except Exception as err:  # noqa: BLE001 - a failed warm-up only means the first visitor computes it
             log.warning("warm-up failed: %s", err)
 
     threading.Thread(target=work, name="warm-up", daemon=True).start()
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173"],
@@ -465,19 +470,23 @@ async def live_read(file: UploadFile = File(...)) -> dict[str, Any]:
 
 @app.get("/api/orbits/cities")
 def orbit_cities() -> dict[str, Any]:
-    from qcanvas.orbits import CITIES, PAIRS
+    from qcanvas.orbits import CITIES, MICIUS, PAIRS
+    from qcanvas.satellites import SATELLITES
 
+    sats = [{"id": k, "name": v["name"], "norad": v["norad"], "real": True, "status": "in orbit"} for k, v in SATELLITES.items()]
+    sats.append({"id": "micius", "name": MICIUS["name"], "norad": MICIUS["norad"], "real": False, "status": MICIUS["status"]})
     return {"cities": [{"id": k, "name": v[0], "lat": v[1], "lon": v[2]} for k, v in CITIES.items()],
-            "pairs": [{"a": a, "b": b, "label": label} for a, b, label in PAIRS]}
+            "pairs": [{"a": a, "b": b, "label": label, "sat": sat} for a, b, label, sat in PAIRS], "satellites": sats}
 
 
 @app.get("/api/orbits")
-async def orbits(a: str = "delingha", b: str = "lijiang", night: bool = True) -> dict[str, Any]:
-    """A Micius-like satellite over a real day: every pass over two cities and the key it gives."""
+async def orbits(a: str = "delingha", b: str = "lijiang", night: bool = True, sat: str = "micius") -> dict[str, Any]:
+    """A quantum satellite over two cities: SpeQtre or QUBE-II on today's real orbit (CelesTrak, SGP4) under the
+    cloud forecast, or Micius (re-entered January 2026) on a modelled orbit; every pass and the key it gives."""
     from qcanvas.orbits import plan
 
     try:
-        return (await asyncio.to_thread(plan, a, b, night)).model_dump(mode="json")
+        return (await asyncio.to_thread(plan, a, b, night, sat)).model_dump(mode="json")
     except ValueError as err:
         raise HTTPException(422, str(err)) from None
 

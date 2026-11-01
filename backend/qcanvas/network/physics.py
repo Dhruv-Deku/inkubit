@@ -60,10 +60,11 @@ def fiber_loss(length_km: float) -> LinkLoss:
     return LinkLoss(FIBER_DB_PER_KM * length_km, {"attenuation": FIBER_DB_PER_KM * length_km})
 
 
-def free_space_loss(length_km: float, satellite: bool, rx_aperture_m: float | None = None) -> LinkLoss:
+def free_space_loss(length_km: float, satellite: bool, rx_aperture_m: float | None = None,
+                    tx_aperture_m: float | None = None) -> LinkLoss:
     """Diffraction + turbulence spot vs receiver aperture, plus atmosphere and optics."""
     d_rx = rx_aperture_m or RX_APERTURE_M
-    theta_d = 1.22 * WAVELENGTH_M / TX_APERTURE_M
+    theta_d = 1.22 * WAVELENGTH_M / (tx_aperture_m or TX_APERTURE_M)
     theta = math.hypot(theta_d, TURBULENCE_DIVERGENCE_RAD)
     spot_m = theta * length_km * 1e3
     geometric = min(1.0, (d_rx / spot_m) ** 2) if spot_m > 0 else 1.0

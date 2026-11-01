@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitMeta, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -91,8 +91,8 @@ export const api = {
     form.append('file', frame, 'frame.jpg')
     return call<LiveRead>('/api/live/read', { method: 'POST', body: form })
   },
-  orbitCities: () => call<{ cities: { id: string; name: string }[]; pairs: { a: string; b: string; label: string }[] }>('/api/orbits/cities'),
-  orbits: (a: string, b: string, night: boolean) => call<OrbitPlan>(`/api/orbits?a=${a}&b=${b}&night=${night}`),
+  orbitCities: () => call<OrbitMeta>('/api/orbits/cities'),
+  orbits: (a: string, b: string, night: boolean, sat: string) => call<OrbitPlan>(`/api/orbits?a=${a}&b=${b}&night=${night}&sat=${sat}`),
   reproduce: (text: string, image: Blob | null) => {
     const form = new FormData()
     form.append('text', text)
