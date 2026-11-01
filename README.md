@@ -32,7 +32,7 @@ traced back to a tool that computed it.
 | Top of the page | **Mission control** (a whole problem, planned and verified) or a **quick question** to the same exact tools |
 | Sketch to code | Photo or camera, words or voice, the **live board** (point a camera at a whiteboard), the **Quantum Rosetta** (Dirac, OpenQASM, Quil, Qiskit, Cirq and more, both ways) |
 | Discover | **Discovery lab**, **when does quantum win**, **reproduce a paper** |
-| Hardware & networks | **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, error-correction lab, **distributed quantum computer**, **satellite planner** (a Micius-like orbit on a globe) |
+| Hardware & networks | **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, error-correction lab, **distributed quantum computer**, **satellite planner** (SpeQtre and QUBE-II live on today's real orbits, under the cloud forecast) |
 | Labs & games | Challenges, bug hunt (against Muse Spark), Shor, QAOA, H₂ from first principles, BB84 with a spy |
 | Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Q-Canvas |
 
@@ -47,7 +47,7 @@ cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a 95-second walk through the highlights. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 434 backend tests run offline (`cd backend && python -m pytest -q`). Every design decision is in
+live. 444 backend tests run offline (`cd backend && python -m pytest -q`). Every design decision is in
 [DECISIONS.md](DECISIONS.md) (D1 to D59); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
@@ -96,7 +96,7 @@ Q-Canvas closes that gap and refuses to fake success:
 | Distributed quantum computer | One circuit on two small chips joined by a link from the network planner: exhaustive search for the split with the fewest remote CNOTs; each remote CNOT by gate teleportation with the link's Bell pairs (exact Pauli channel from pair fidelity, readout and local gates, idling while messages travel); process fidelity over all inputs against one chip and against long-lived memory qubits, from 10 m to 100 km | – |
 | When does quantum win? | Describe a problem in words or by voice; Muse Spark maps it to factoring, search, simulation or no known speedup; a surface-code estimate (code distance, physical qubits, magic-state factories, runtime) meets the best classical route. Checked on every factoring result against Gidney & Ekerå's RSA-2048 figure (model: 26.6 million qubits, 18.5 hours; published: 20 million, 8 hours) | **Muse Spark 1.3** maps the problem |
 | Live board | Point a camera at a whiteboard: the browser sends a frame only when the drawing has changed and holds still; SAM 3.1 and Muse Spark read it (about 35 s live for a new frame), exact simulation runs, and each qubit's odds are pinned to its wire in the photo | **SAM 3.1**, **Muse Spark 1.3** |
-| Satellite planner | A Micius-like sun-synchronous satellite (500 km, 97.4°, J2 drift) over a real day on a canvas globe with Natural Earth coastlines and the real night side: passes above 15° at night, entangled pairs when both cities see it at once (network model on the real slant ranges) or a trusted-node BB84 downlink; the model gives about 2 kbit/s at 1,200 km, the order Micius measured | – |
+| Satellite planner | The quantum-key satellites in orbit today, **SpeQtre** (UK–Singapore, 80 mm telescope) and **QUBE-II** (Germany, 85 mm), fly their real orbits: today's CelesTrak elements (checksummed, refreshed every two hours, with a labelled fallback) propagated by SGP4 from now, live on a canvas globe with Natural Earth coastlines, the real night side and the 15° footprint. Stations on the WGS84 ellipsoid; the frame chain matches Skyfield, an independent implementation, to 0.003° and 34 m. Every night pass over two ground stations in the next 24 hours, the key each gives through the satellite's own telescope, the **Open-Meteo cloud forecast** at each station and the key to expect, and a 7-day outlook. Micius re-entered on 25 January 2026, so its 2017 experiments replay on a modelled orbit (entangled pairs when both cities see it at once, or a trusted-node BB84 downlink; about 2 kbit/s at 1,200 km, the order Micius measured) | – |
 | Reproduce a paper | Upload a figure from a paper: Muse Spark transcribes the circuit as OpenQASM (read by the exact parser, sketch pipeline as fallback) and the claimed odds, shots and bit order; the circuit is re-run exactly and every claim judged against shot-noise error bars, bit order inferred when unstated | **Muse Spark 1.3** reads the figure |
 | ML error-correction decoder | Distance-3 rotated surface code, 3 rounds of phenomenological noise: exact minimum-weight matching against a NumPy network that also reads the X checks (Y errors correlate them). At 1% noise: 0.72% logical errors against 0.92% for matching (21% fewer, beyond the error bars at every noise level) | – |
 | Pulse lab | An X gate as the microwave pulse on a three-level transmon (anharmonicity −300 MHz, T1/T2 as Lindblad terms): Gaussian against calibrated DRAG; short Gaussians leak into |2⟩, DRAG reaches 1.1e-4 error at 15 ns where only T1/T2 is left, its calibrated β ≈ 0.5 matching first-order theory | – |
@@ -181,7 +181,7 @@ Q-Canvas closes that gap and refuses to fake success:
 </tr>
 <tr><td><img src="docs/screenshots/31-discovery.png" alt="Discovery lab: GHZ-7 on heavy-hex in 6 CNOTs"></td><td><img src="docs/screenshots/32-distributed.png" alt="Distributed computer: two chips and the fidelity against distance"></td></tr>
 <tr><td><img src="docs/screenshots/33-when-quantum-wins.png" alt="When does quantum win: Grover search loses to a classical cluster at 64 bits"></td><td><img src="docs/screenshots/34-live-board.png" alt="Live board: odds pinned to the wires of a camera frame"></td></tr>
-<tr><td><img src="docs/screenshots/35-satellite-planner.png" alt="Satellite planner: a pass over Delingha and Lijiang at night"></td><td><img src="docs/screenshots/36-reproduce-a-paper.png" alt="Reproduce a paper: every claim within its error bar"></td></tr>
+<tr><td><img src="docs/screenshots/35-satellite-planner.png" alt="Satellite planner: SpeQtre live on its real orbit, every pass over Chilbolton and Singapore under the cloud forecast"></td><td><img src="docs/screenshots/36-reproduce-a-paper.png" alt="Reproduce a paper: every claim within its error bar"></td></tr>
 <tr><td><img src="docs/screenshots/37-ml-decoder.png" alt="ML decoder below matching at every noise level"></td><td><img src="docs/screenshots/38-pulse-lab.png" alt="Pulse lab: DRAG against Gaussian"></td></tr>
 </table>
 
@@ -342,7 +342,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (434 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (444 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 

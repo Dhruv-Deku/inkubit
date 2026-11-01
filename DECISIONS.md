@@ -748,3 +748,20 @@ the tracer refuses to guess about (docs/MISSIONS.md). scripts/hardware_check.py 
 ideal odds, the generic preset and a digital twin from the device's calibration; a --fake rehearsal on
 FakeSherbrooke checks the pipeline and is never shown as hardware data.
 
+## D63. Real satellites instead of a modelled one
+Asked to swap the modelled orbit for Micius's real elements, CelesTrak's catalogue showed Micius re-entered on
+25 January 2026 (and Jinan-1 on 15 April 2025), so there are none to fetch. The quantum-key satellites in orbit now
+are SpeQtre (NORAD 66769, RAL Space and SpeQtral, 12U, entangled-photon source, 80 mm telescope, one photon measured
+on board so the satellite is a trusted node) and QUBE-II (NORAD 69023, German 8U CubeSat, 85 mm telescope,
+prepare-and-measure); both fly on their real orbits and Micius stays as the labelled 2017 replay. Elements come from
+CelesTrak GP as TLEs, checked against checksums and catalogue number, cached two hours (CelesTrak's update rate),
+then the last good copy, then a snapshot shipped in the repo, each labelled. SGP4 (the sgp4 package, Vallado's
+code) gives TEME; IAU-82 GMST takes it Earth-fixed (polar motion and UT1-UTC left out). Stations moved from a sphere
+to WGS84 with the geodetic vertical, for Micius too. Against Skyfield on a day of SpeQtre passes: elevation and
+azimuth within 0.0035°, range within 34 m (a test asserts 0.01° and 0.1 km). The downlink model now takes the
+satellite's transmit aperture (8 cm spreads the beam about 1.7x wider than Micius's 30 cm). Open-Meteo's hourly total
+cloud cover at each station scales each pass's key by the clear fraction, a first approximation (a low pass looks
+through more sky than the zenith the forecast describes). The window starts at now (to 10 minutes) for 24 hours,
+with a 7-day outlook per 24 hours; the globe follows the real clock and draws the 15° footprint. Key bits remain
+estimates (the real payloads' source rates and protocols differ); pass times, elevations and clouds are real data.
+Tests never touch the network: CelesTrak and Open-Meteo are stubbed and the snapshot flies.
