@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (430 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
+## Done (434 tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -60,6 +60,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - Nov 1: mission control (D48: backend/qcanvas/mission.py, /api/missions + SSE, Mission.tsx), the ML verifier (D49: backend/qcanvas/mlverify.py, scripts/train_ml_verifier.py, data/ml_verifier.json, ML tab), seven more algorithms (D50). Live missions verified in the UI: two cities, photo to hardware, molecule, RSA, exams.
 - Nov 1-2: discovery lab (D51), distributed computer (D52), when does quantum win (D53), live board (D54), satellite planner (D55), reproduce a paper (D56), ML decoder (D57), pulse lab (D58); each verified in the UI, live where a model is involved.
 - Nov 2: focus pass (D59): Mission control leads, five sections below, cards jump across sections.
+- Nov 2: guided tour and CI (D60), public mode + Dockerfile + Space deploy script (D61), 30-mission benchmark and the IBM hardware check script (D62). Waiting on: repo public, Hugging Face login, IBM key.
 
 ## Top 5 next steps
 1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, `optimize`, and explanations in other languages).

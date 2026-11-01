@@ -17,7 +17,7 @@ traced back to a tool that computed it.
 
 | | Measured result |
 | --- | --- |
-| **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; live missions took 12 to 23 s, every step verified by physics invariants and two independent simulators, every number in the report traced |
+| **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; in a 30-mission live benchmark every mission finished, all 68 steps were verified (one repaired by the model), 204 of 209 report numbers were traced to a tool result, median 15 s: [docs/MISSIONS.md](docs/MISSIONS.md) |
 | **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
 | **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise (beyond the error bars at every noise level), as learned decoders like AlphaQubit do |
 | **ML verifier** | Predicts how much of a circuit survives noise in about 150 µs with a conformal error bar: **9x more accurate** than the usual rule of thumb, and checked exactly every time |
@@ -45,10 +45,19 @@ pip install -r backend/requirements.txt
 cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open http://127.0.0.1:8000
 ```
 
-Without a key everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 430 backend tests run offline (`cd backend && python -m pytest -q`). Every design decision is in
+Press **Guided tour** in the header (or open `/#tour`) for a 95-second walk through the highlights. Without a key
+everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
+live. 434 backend tests run offline (`cd backend && python -m pytest -q`). Every design decision is in
 [DECISIONS.md](DECISIONS.md) (D1 to D59); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
+
+### Host it, and check it on real hardware
+
+`scripts/deploy_space.py <user>/q-canvas [--with-key]` publishes a Hugging Face Space from the `Dockerfile` in public
+mode: code written by a model is never executed (the agent runs Q-Canvas's own template code) and billed model calls
+stop at 300 a day, after which the labelled offline models answer. `scripts/hardware_check.py` runs four circuits on
+the least busy IBM quantum computer (with `IBM_QUANTUM_TOKEN` in `.env`) and compares the counts with the ideal odds,
+Q-Canvas's generic preset and a digital twin built from the device's calibration; `--fake` rehearses it offline.
 
 ## The original pipeline: sketch to verified code
 
@@ -333,7 +342,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (430 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (434 tests,
 about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 

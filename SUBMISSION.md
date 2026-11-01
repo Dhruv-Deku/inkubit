@@ -140,8 +140,9 @@ caught"). SAM 3.1 and Muse Spark read the photo; Muse Spark plans a dependency g
 of exact tools under a JSON schema; independent steps run in parallel and light up
 a live graph; a failed step is repaired once by the model; every result is checked
 by physics invariants and, for circuits, by two independent noisy simulators and the
-ML verifier; Muse Spark writes the report and every number in it is traced. Live
-missions take 12 to 23 seconds end to end.
+ML verifier; Muse Spark writes the report and every number in it is traced. In a
+30-mission live benchmark every mission finished, all 68 steps were verified and 204 of
+209 report numbers were traced to a tool result (docs/MISSIONS.md); median 15 seconds.
 
 **ML verifier.** A neural-network ensemble trained on 6000 circuits labelled by
 exact simulation predicts in about 151 µs how much of an answer survives
@@ -252,7 +253,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 430 offline tests (spec
+live agent log; React 19 + TypeScript + Vite. 434 offline tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, the live adapters
 against recorded request shapes, API). Every model sits behind an adapter with a real and

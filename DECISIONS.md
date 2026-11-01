@@ -727,3 +727,24 @@ switches section and scrolls twice (again after the panels above have loaded); s
 the last panel can reach the top. The pulse sweep was made 3x faster (200 steps, 12 calibration iterations; same
 results to four digits) and, with the observatory, is computed in a background thread at server start.
 
+## D60. Guided tour and CI
+A 95-second tour (header button or /#tour) steps through ten panels across the sections, each with one sentence
+and a number the page itself computes; it starts a real mission and a real discovery run early and returns to their
+results, which is why opened sections now stay mounted (hidden) instead of unmounting. GitHub Actions runs the
+offline test suite (mock models, no key) and the frontend type-check and build on every push.
+
+## D61. Public mode and the hosted copy
+QCANVAS_PUBLIC=1 switches the agent to Q-Canvas's own template code generator (model-written code is never executed
+on a shared host; the planted-fault repair demo still works because the faults go into our own code) and caps
+billed model calls at QCANVAS_DAILY_CALLS (300) per UTC day, counted only on cache misses, after which the labelled
+offline fallback answers. The Dockerfile builds the frontend with Node and serves everything from Python 3.13 as a
+non-root user on port 7860; scripts/deploy_space.py stages the files (never .env), seeds the cache with the small
+cached answers and uploads to a Hugging Face Space, optionally storing the key as an encrypted Space secret.
+
+## D62. Mission benchmark and the hardware check
+scripts/mission_bench.py ran 30 varied missions live (three hard on purpose): 30 of 30 finished with Muse Spark's
+own plan, 68 of 68 steps verified (one repaired), 204 of 209 report numbers traced; the untraced ones are rounding
+the tracer refuses to guess about (docs/MISSIONS.md). scripts/hardware_check.py compares real IBM counts with the
+ideal odds, the generic preset and a digital twin from the device's calibration; a --fake rehearsal on
+FakeSherbrooke checks the pipeline and is never shown as hardware data.
+
