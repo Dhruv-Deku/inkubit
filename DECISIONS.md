@@ -883,3 +883,13 @@ was right on 17 of 24 answers as first stated and 19 after the debate; Muse Wond
 raised 5 false alarms and talked it out of 2 right answers. Debate between models helps on balance and adds errors of
 its own; only the simulator can tell which challenge was right, which is why Q-Canvas checks instead of debating.
 
+## D75. A real IBM quantum computer
+scripts/hardware_check.py ran the Bell pair, GHZ-3, Bernstein-Vazirani and 2-qubit Grover on ibm_fez (IBM Quantum
+Platform, Open plan, the least busy device; job dbjkc0pkdqps7390opdg, 4096 shots each, done 10 s after submission),
+transpiled at optimisation level 3 (one or two two-qubit gates each). Against what the chip measured, by total
+variation distance: the digital twin (Qiskit Aer with NoiseModel.from_backend, the device's own calibration, on the
+same transpiled circuit) was closest on 4 of 4 (0.021 to 0.038); Q-Canvas's generic
+realistic preset was 0.046 to 0.079, further off than the noiseless prediction on every circuit: it is
+calibrated to an older, noisier class of chip, and this one is better. The app keeps the generic preset as its default
+(it is a fair middle for a sketch) and says, on the Evidence page, that a calibrated twin is what predicts a given chip.
+

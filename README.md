@@ -17,6 +17,7 @@ traced back to a tool that computed it.
 
 | | Measured result |
 | --- | --- |
+| **A real IBM quantum computer** | Four circuits ran on IBM's ibm_fez in 10 s: a digital twin built from the chip's own calibration predicted what it measured best on 4 of 4 (distance 0.021 to 0.038), while Q-Canvas's generic noise preset proved too pessimistic for this modern chip: [docs/HARDWARE.md](docs/HARDWARE.md) |
 | **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; in a 30-mission live benchmark every mission finished, all 68 steps were verified (one repaired by the model), 204 of 209 report numbers were traced to a tool result, median 15 s: [docs/MISSIONS.md](docs/MISSIONS.md) |
 | **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
 | **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise, as learned decoders like AlphaQubit do. At **distance 5** the bigger code suppresses errors **5.9x** per round (Λ; Google's Willow measured 2.14), and a network on top of matching that sees both matchings' corrections makes 10% fewer errors again (paired test z = 7.8) |
@@ -51,8 +52,8 @@ cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 492 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
-(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D74); what was built on which day is in
+live. 495 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D75); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
@@ -350,7 +351,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (492 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (495 tests,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per

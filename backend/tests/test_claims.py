@@ -50,8 +50,15 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     surface = next(r for r in codes["references"] if r["name"].startswith("Rotated surface"))
     paper = _load(ROOT / "examples" / "paper_examples.json")["papers"][0]
     ref = _load(ROOT / "examples" / "referee_benchmark.json")
+    hw = _load(ROOT / "examples" / "hardware_runs.json")
+    hw_best = sum(r["tvd_twin"] < min(r["tvd_ideal"], r["tvd_generic"]) for r in hw["runs"])
+    hw_tw = [r["tvd_twin"] for r in hw["runs"]]
     rs = ref["summary"]
+    assert not hw["rehearsal"], "the quoted hardware result must come from a real device"
     return [
+        ("real hardware: the twin predicts best", f"best on {hw_best} of {len(hw['runs'])}", BOTH),
+        ("real hardware: the twin's distance", f"distance {min(hw_tw):.3f} to {max(hw_tw):.3f}", (README,)),
+        ("real hardware: the device", hw["device"], BOTH),
         ("referee: before and after the debate", f"from {rs['spark_first']} to {rs['final_right']} of {ref['claims']}", (README,)),
         ("referee: before and after the debate", f"from {rs['spark_first']} to {rs['final_right']} right", (SUBMISSION,)),
         ("referee: false alarms and concessions", f"{rs['false_alarms']} false alarms and talked Spark out of {rs['talked_out']} right answers", (README,)),
