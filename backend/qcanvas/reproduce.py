@@ -105,6 +105,7 @@ _STMT = re.compile(r"^(OPENQASM\s+[\d.]+|include\s+\"[^\"]+\"|(qreg|creg)\s+\w+\
 
 def extract_qasm(text: str) -> str | None:
     """The OpenQASM statements in a pasted text, without the caption around them."""
+    text = re.sub(r"//[^\n]*", "", text)  # comments
     start = text.find("OPENQASM")
     if start < 0:
         m = re.search(r"\bqreg\s", text)
@@ -127,9 +128,19 @@ def extract_qasm(text: str) -> str | None:
 
 
 def spec_from_qasm(qasm: str) -> dict[str, Any]:
+    """A spec from model-written OpenQASM. Any statement that acts on qubits but cannot be read (an opaque or custom
+    gate, a classical condition) is an error, never silently dropped: a shorter circuit would be judged instead."""
     from qcanvas.rosetta import translate
 
-    res = translate(extract_qasm(qasm) or qasm, None, with_languages=False)
+    body = extract_qasm(qasm) or qasm
+    kept = {" ".join(st.split()) for st in body.split(";") if st.strip()}
+    clean = re.sub(r"//[^\n]*", "", qasm)
+    start = clean.find("OPENQASM")
+    dropped = [" ".join(st.split()) for st in clean[max(start, 0):].split(";") if st.strip()]
+    dropped = [st for st in dropped if st not in kept and re.search(r"\w+\s*\[\s*\d+\s*\]|\b(opaque|gate|if)\b", st)]
+    if dropped:
+        raise ValueError(f"unsupported OpenQASM statement: {dropped[0][:80]}")
+    res = translate(body, None, with_languages=False)
     return res.spec
 
 

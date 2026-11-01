@@ -17,6 +17,10 @@ import { CopilotPanel } from './components/Copilot'
 import { RosettaPanel } from './components/Rosetta'
 import { ObservatoryPanel } from './components/Observatory'
 import { MissionPanel } from './components/Mission'
+import { RefereePanel } from './components/Referee'
+import { PaperPanel } from './components/Paper'
+import { CodesPanel } from './components/Codes'
+import { LearningPanel } from './components/Learning'
 import { DiscoveryPanel } from './components/Discovery'
 import { DistributedPanel } from './components/Distributed'
 import { EstimatorPanel } from './components/Estimator'
@@ -39,10 +43,10 @@ import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
 const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
   { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
-  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', panels: ['Discovery lab', 'When does quantum win?', 'Reproduce a paper'] },
-  { id: 'hardware', label: 'Hardware & networks', hint: 'pulses, decoders, links, satellites', panels: ['Pulse lab', 'ML error-correction decoder', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
+  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
+  { id: 'hardware', label: 'Hardware & networks', hint: 'pulses, decoders, links, satellites', panels: ['Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
   { id: 'labs', label: 'Labs & games', hint: 'challenges, bug hunt, Shor, QAOA, H₂, BB84', panels: ['Challenges', 'Bug hunt', "Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy'] },
-  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', panels: ['Simulation observatory', 'AI alone vs Q-Canvas'] },
+  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', panels: ['Simulation observatory', 'AI alone vs Q-Canvas', 'The AI referee'] },
 ]
 
 type Stage = 'start' | 'edit' | 'run'
@@ -319,7 +323,7 @@ export default function App() {
           <button className={`step ${stage === 'run' ? 'active' : job?.result ? 'done' : ''}`} disabled={!job} onClick={() => setStage('run')}><span className="n">3</span>Run &amp; verify</button>
         </nav>
         <span className="spacer" />
-        <button className="btn small primary" onClick={() => { setStage('start'); setTouring(true) }} title="About 95 seconds: the best of Q-Canvas, step by step">Guided tour</button>
+        <button className="btn small primary" onClick={() => { setStage('start'); setTouring(true) }} title="Under two minutes: the best of Q-Canvas, step by step">Guided tour</button>
         <label className={`toggle ${options.demo_mode ? 'on' : ''}`} title="Break the first attempt on purpose so the repair loop is visible">
           <input type="checkbox" hidden checked={options.demo_mode} onChange={(e) => setOptions({ ...options, demo_mode: e.target.checked })} />
           <span className="track" />Demo mode
@@ -386,8 +390,10 @@ export default function App() {
             <div hidden={tab !== 'discover'}>
             <div className="stack section-body">
               <DiscoveryPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+              <LearningPanel live={health?.mode === 'meta'} />
               <EstimatorPanel live={health?.mode === 'meta'} />
               <ReproducePanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+              <PaperPanel live={health?.mode === 'meta'} />
             </div>
             </div>
           )}
@@ -396,6 +402,7 @@ export default function App() {
             <div className="stack section-body">
               <PulsePanel />
               <DecoderPanel />
+              <CodesPanel />
               <RepetitionLabPanel onTry={tryCode} />
               <DistributedPanel examples={examples} onOpen={(s) => onSpec(clone(s))} />
               <GlobePanel />
@@ -420,6 +427,7 @@ export default function App() {
               <HardwarePanel />
               <ObservatoryPanel />
               <ArenaPanel />
+              <RefereePanel live={health?.mode === 'meta'} />
             </div>
             </div>
           )}

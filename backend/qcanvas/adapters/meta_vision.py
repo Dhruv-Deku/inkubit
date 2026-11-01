@@ -251,10 +251,13 @@ class MetaReasoningModel(ReasoningModel):
 
     def structured(self, system: str, user: str, schema: dict[str, Any], name: str, effort: str = "low",
                    max_tokens: int = 8000, model: str | None = None, image: bytes | None = None,
-                   mime: str = "image/png") -> tuple[dict[str, Any], ModelCall]:
+                   mime: str = "image/png", document: tuple[bytes, str] | None = None) -> tuple[dict[str, Any], ModelCall]:
         start = time.perf_counter()
         model = model or self.model
         body: Any = user if image is None else [{"type": "text", "text": user}, _image_part(image, mime)]
+        if document is not None:  # a PDF inline: the API converts it to text plus an image of each page
+            data_url = "data:application/pdf;base64," + base64.b64encode(document[0]).decode()
+            body = [{"type": "text", "text": user}, {"type": "file", "file": {"filename": document[1], "file_data": data_url}}]
         content, cached = self.client.chat(model, [{"role": "system", "content": system},
                                                    {"role": "user", "content": body}],
                                            schema=schema, schema_name=name, reasoning_effort=effort,

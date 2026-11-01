@@ -1,3 +1,7 @@
+import type { LBench } from './components/Learning'
+import type { RBench } from './components/Referee'
+import type { PResult } from './components/Paper'
+import type { CodesLab } from './components/Codes'
 import type {
   AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitMeta, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
@@ -110,6 +114,21 @@ export const api = {
   qkdLab: (q: { photons: number; eve: number; noise: number; seed: number }, signal?: AbortSignal) =>
     call<QkdLab>(`/api/lab/qkd?photons=${q.photons}&eve=${q.eve}&noise=${q.noise}&seed=${q.seed}`, { signal }),
   arena: (spec: Spec) => call<ArenaResult>('/api/arena', json({ spec })),
+  learningBenchmark: () => call<LBench>('/api/learning/benchmark'),
+  refereeBenchmark: () => call<RBench>('/api/referee/benchmark'),
+  startReferee: (index: number) => call<{ referee_id: string }>('/api/referee', json({ index })),
+  referee: (id: string) => call<{ status: string; error: string | null; result: unknown }>(`/api/referee/${id}`),
+  paperExamples: () => call<{ papers: PResult[] }>('/api/paper/examples'),
+  startPaper: (arxiv: string, pdf: File | null) => {
+    const form = new FormData()
+    form.append('arxiv', arxiv)
+    if (pdf) form.append('pdf', pdf, pdf.name)
+    return call<{ paper_id: string }>('/api/paper', { method: 'POST', body: form })
+  },
+  paper: (id: string) => call<{ status: string; error: string | null; result: unknown }>(`/api/paper/${id}`),
+  codesLab: () => call<CodesLab>('/api/codes'),
+  analyseCode: (generators: string[]) => call<{ generators: string[]; valid: boolean; note: string; n: number; k: number; d: number | null; dx: number | null; dz: number | null; css: boolean; logical: string | null }>('/api/codes/analyse', json({ generators })),
+  startLearning: (goal: string) => call<{ learning_id: string; events_url: string }>('/api/learning', json({ goal })),
   arenaBenchmark: (model = 'spark') => call<ArenaBenchmark>(`/api/arena/benchmark?model=${model}`),
   bugRound: (level: number, seed: number, signal?: AbortSignal) =>
     call<BugRound>(`/api/bughunt/round?level=${level}&seed=${seed}`, { signal }),

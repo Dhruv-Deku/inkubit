@@ -23,6 +23,8 @@ const STEPS: Step[] = [
     text: 'Muse Spark proposes circuit layouts for a GHZ state on all 7 qubits of an IBM heavy-hex chip; an exact optimiser fits them and Qiskit proves each winner. The search is running; we come back for the result.' },
   { section: 'hardware', panel: 'ML error-correction decoder', title: 'A learned decoder', seconds: 9,
     text: 'On the distance-3 surface code, a network that reads both kinds of checks makes about a fifth fewer logical errors than minimum-weight matching, beyond the error bars at every noise level.' },
+  { section: 'hardware', panel: 'Code lab', title: 'Codes designed by AI, proven exactly', seconds: 9,
+    text: 'Muse Spark designs error-correcting codes and an exact checker proves each one. For hardware where phase flips dominate, it found a 9-qubit code that needs 9 phase-flip errors to fail, three times the surface code, while still correcting any single error.' },
   { section: 'hardware', panel: 'Pulse lab', title: 'Down to the microwave pulse', seconds: 9,
     text: 'The X gate as the pulse that drives a three-level transmon: plain Gaussians leak into |2⟩ when fast; DRAG reaches about 1e-4 error at 15 ns, limited only by T1 and T2.' },
   { section: 'hardware', panel: 'Satellite planner', title: 'Out to orbit, live', seconds: 10,

@@ -43,7 +43,24 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     from qcanvas.estimator import HARDWARE, factoring_algorithm, surface_code
 
     rsa = surface_code(factoring_algorithm(2048), HARDWARE["superconducting"])
+    learn = _load(ROOT / "examples" / "learning_benchmark.json")["targets"]
+    steps_fb = [f"{next(v for v in t['curves']['feedback'] if v is not None)} to {t['curves']['feedback'][-1]}" for t in learn]
+    codes = _load(ROOT / "examples" / "codes_benchmark.json")
+    biased = next(t for t in codes["targets"] if t["target"]["objective"] == "dz")["best"]
+    surface = next(r for r in codes["references"] if r["name"].startswith("Rotated surface"))
+    paper = _load(ROOT / "examples" / "paper_examples.json")["papers"][0]
+    ref = _load(ROOT / "examples" / "referee_benchmark.json")
+    rs = ref["summary"]
     return [
+        ("referee: before and after the debate", f"from {rs['spark_first']} to {rs['final_right']} of {ref['claims']}", (README,)),
+        ("referee: before and after the debate", f"from {rs['spark_first']} to {rs['final_right']} right", (SUBMISSION,)),
+        ("referee: false alarms and concessions", f"{rs['false_alarms']} false alarms and talked Spark out of {rs['talked_out']} right answers", (README,)),
+        ("learning curves with feedback", f"({steps_fb[0]}, {steps_fb[1]} and {steps_fb[2]} CNOTs)", (SUBMISSION,)),
+        ("whole paper, submission", f"reproduced {paper['reproduced']} of the {paper['checked']} it could check, {paper['claims_ok']} of {paper['claims_total']} numbers", (SUBMISSION,)),
+        ("learning curves with feedback", f"({steps_fb[0]}, {steps_fb[1]} and {steps_fb[2]} CNOTs)", (README,)),
+        ("tailored code against Z noise", f"needs **{biased['dz']} Z errors** to fail", (README,)),
+        ("surface code against Z noise", f"the surface code's {surface['dz']}", (README,)),
+        ("whole paper", f"reproduced {paper['reproduced']} of the {paper['checked']} it could check ({paper['claims_ok']} of {paper['claims_total']} stated probabilities)", (README,)),
         ("distance-3 decoder vs matching", f"{round((1 - d3['neural'] / d3['mwpm']) * 100)}% fewer logical errors", BOTH),
         ("distance-5 suppression", f"{d5['lam']:.1f}x", BOTH),
         ("distance-5 suppression (Lambda)", f"Λ = {d5['lam']:.1f}", (README,)),

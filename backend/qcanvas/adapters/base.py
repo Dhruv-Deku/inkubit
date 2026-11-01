@@ -226,8 +226,9 @@ class ReasoningModel(ABC):
 
     def structured(self, system: str, user: str, schema: dict[str, Any], name: str, effort: str = "low",
                    max_tokens: int = 8000, model: str | None = None, image: bytes | None = None,
-                   mime: str = "image/png") -> tuple[dict[str, Any], ModelCall]:
-        """One JSON-schema answer (mission plans, step repairs, reports, figure reading) and the call record."""
+                   mime: str = "image/png", document: tuple[bytes, str] | None = None) -> tuple[dict[str, Any], ModelCall]:
+        """One JSON-schema answer (mission plans, step repairs, reports, figure reading) and the call record.
+        ``document`` is a PDF as (bytes, filename): the API reads its text and an image of each page."""
         raise NotImplementedError("mission control's planner needs the live model")
 
 

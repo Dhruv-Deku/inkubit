@@ -383,6 +383,174 @@ def discovery_status(discovery_id: str) -> dict[str, Any]:
     return {"id": d.id, "status": d.status, "error": d.error, "result": d.result}
 
 
+class LearningRequest(BaseModel):
+    goal: str = Field(default="w4", max_length=20)
+
+
+@app.get("/api/learning/benchmark")
+def learning_benchmark() -> dict[str, Any]:
+    """The recorded learning benchmark (scripts/learning_bench.py): with feedback, without, and random wiring."""
+    path = EXAMPLES_DIR / "learning_benchmark.json"
+    if not path.exists():
+        raise HTTPException(404, "no recorded learning benchmark yet")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+@app.post("/api/learning")
+def start_learning(body: LearningRequest) -> dict[str, Any]:
+    """Run the three conditions live: Muse Spark proposes in rounds, exact physics judges every layout."""
+    from qcanvas.learning import TARGETS, Session, launch, sessions
+
+    if body.goal not in TARGETS:
+        raise HTTPException(422, f"unknown goal {body.goal!r}")
+    s = Session(TARGETS[body.goal])
+    try:
+        launch(s, get_models())
+    except ValueError as err:
+        raise HTTPException(409, str(err)) from None
+    sessions.add(s)
+    return {"learning_id": s.id, "events_url": f"/api/learning/{s.id}/events"}
+
+
+@app.get("/api/learning/{learning_id}/events")
+async def learning_events(learning_id: str) -> EventSourceResponse:
+    from qcanvas.learning import sessions
+
+    s = sessions.get(learning_id)
+    if s is None:
+        raise HTTPException(404, "no such learning run")
+
+    async def stream():
+        cursor = 0
+        while True:
+            events = s.bus.events(cursor)
+            for event in events:
+                yield {"event": "learning", "id": str(event.seq), "data": json.dumps(event.details, default=str)}
+            cursor += len(events)
+            if s.bus.closed and not s.bus.events(cursor):
+                yield {"event": "end", "data": json.dumps({"status": s.status, "error": s.error})}
+                return
+            await asyncio.sleep(0.2)
+
+    return EventSourceResponse(stream(), ping=10)
+
+
+def _recorded(name: str) -> dict[str, Any]:
+    path = EXAMPLES_DIR / name
+    if not path.exists():
+        raise HTTPException(404, f"no recorded {name} yet")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+class RefereeRequest(BaseModel):
+    index: int | None = Field(default=None, ge=0, le=20)
+    spec: dict[str, Any] | None = None
+
+
+@app.get("/api/referee/benchmark")
+def referee_benchmark() -> dict[str, Any]:
+    """The recorded AI referee benchmark (scripts/referee_bench.py)."""
+    return _recorded("referee_benchmark.json")
+
+
+@app.post("/api/referee")
+def start_referee(body: RefereeRequest) -> dict[str, Any]:
+    """A live debate on one circuit: Muse Spark claims, Muse Wonder challenges, exact simulation decides."""
+    from qcanvas import referee
+    from qcanvas.spec import parse_spec
+
+    try:
+        if body.spec is not None:
+            spec, title = parse_spec(body.spec), "your circuit"
+        else:
+            import importlib.util
+
+            path = PROJECT_DIR / "scripts" / "referee_bench.py"
+            mod = importlib.util.module_from_spec(importlib.util.spec_from_file_location("referee_bench", path))
+            mod.__spec__.loader.exec_module(mod)  # type: ignore[union-attr]
+            title, raw = mod.circuits()[body.index or 0]
+            spec = parse_spec(raw)
+    except (ValueError, IndexError) as err:
+        raise HTTPException(422, str(err)) from None
+    if spec.kind != "circuit" or spec.num_qubits > 10:
+        raise HTTPException(422, "a circuit of at most 10 qubits")
+    s = referee.Session(spec, title)
+    try:
+        referee.launch(s, get_models())
+    except ValueError as err:
+        raise HTTPException(409, str(err)) from None
+    referee.add(s)
+    return {"referee_id": s.id}
+
+
+@app.get("/api/referee/{referee_id}")
+def referee_status(referee_id: str) -> dict[str, Any]:
+    from qcanvas import referee
+
+    s = referee.get(referee_id)
+    if s is None:
+        raise HTTPException(404, "no such debate")
+    return {"id": s.id, "status": s.status, "error": s.error, "steps": s.steps, "result": s.result}
+
+
+@app.get("/api/paper/examples")
+def paper_examples() -> dict[str, Any]:
+    """Recorded whole-paper reproductions."""
+    return _recorded("paper_examples.json")
+
+
+@app.post("/api/paper")
+async def start_paper(arxiv: str = Form(""), pdf: UploadFile | None = File(None)) -> dict[str, Any]:
+    """Reproduce a whole paper: an arXiv id or a PDF; Muse Wonder finds the experiments, Muse Spark transcribes each,
+    exact simulation judges every stated probability."""
+    from qcanvas import paper
+
+    raw = await pdf.read() if pdf is not None else b""
+    if raw and (len(raw) > paper.MAX_PDF or not raw.startswith(b"%PDF")):
+        raise HTTPException(413, "a PDF of at most 20 MB")
+    if not raw and not paper.ARXIV.match(arxiv.strip()):
+        raise HTTPException(422, "give an arXiv id such as 1804.03719, or upload the PDF")
+    s = paper.Session(pdf.filename if raw and pdf is not None else arxiv.strip())
+    try:
+        paper.launch(s, raw or None, arxiv, get_models())
+    except ValueError as err:
+        raise HTTPException(409, str(err)) from None
+    paper.add(s)
+    return {"paper_id": s.id}
+
+
+@app.get("/api/paper/{paper_id}")
+def paper_status(paper_id: str) -> dict[str, Any]:
+    from qcanvas import paper
+
+    s = paper.get(paper_id)
+    if s is None:
+        raise HTTPException(404, "no such paper run")
+    return {"id": s.id, "status": s.status, "error": s.error, "source": s.source, "result": s.result}
+
+
+class CodeRequest(BaseModel):
+    generators: list[str] = Field(min_length=1, max_length=12)
+
+
+@app.get("/api/codes")
+def codes_lab() -> dict[str, Any]:
+    """Code lab: known codes scored by the exact checker, and the recorded design runs (scripts/codes_bench.py)."""
+    from qcanvas.codes import TARGETS, references
+
+    path = EXAMPLES_DIR / "codes_benchmark.json"
+    bench = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+    return {"references": references(), "targets": [t.model_dump() for t in TARGETS.values()], "benchmark": bench}
+
+
+@app.post("/api/codes/analyse")
+async def codes_analyse(body: CodeRequest) -> dict[str, Any]:
+    """Check any stabilizer code exactly: commutation, independence, k, and the distances d, dX, dZ."""
+    from qcanvas.codes import analyse
+
+    return (await asyncio.to_thread(analyse, body.generators)).model_dump()
+
+
 class DistributedRequest(BaseModel):
     spec: dict[str, Any]
     capacity: int | None = Field(default=None, ge=1, le=4)

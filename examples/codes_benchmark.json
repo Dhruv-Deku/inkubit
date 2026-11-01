@@ -1,0 +1,1454 @@
+{
+ "model": "muse-spark-1.3",
+ "rounds": 4,
+ "references": [
+  {
+   "name": "Five-qubit perfect code",
+   "generators": [
+    "XZZXI",
+    "IXZZX",
+    "XIXZZ",
+    "ZXIXZ"
+   ],
+   "valid": true,
+   "note": "",
+   "n": 5,
+   "k": 1,
+   "d": 3,
+   "dx": 5,
+   "dz": 5,
+   "css": false,
+   "logical": "XYXII"
+  },
+  {
+   "name": "Steane code",
+   "generators": [
+    "IIIXXXX",
+    "IXXIIXX",
+    "XIXIXIX",
+    "IIIZZZZ",
+    "IZZIIZZ",
+    "ZIZIZIZ"
+   ],
+   "valid": true,
+   "note": "",
+   "n": 7,
+   "k": 1,
+   "d": 3,
+   "dx": 3,
+   "dz": 3,
+   "css": true,
+   "logical": "XXXIIII"
+  },
+  {
+   "name": "Shor code",
+   "generators": [
+    "ZZIIIIIII",
+    "IZZIIIIII",
+    "IIIZZIIII",
+    "IIIIZZIII",
+    "IIIIIIZZI",
+    "IIIIIIIZZ",
+    "XXXXXXIII",
+    "IIIXXXXXX"
+   ],
+   "valid": true,
+   "note": "",
+   "n": 9,
+   "k": 1,
+   "d": 3,
+   "dx": 3,
+   "dz": 3,
+   "css": true,
+   "logical": "XXXIIIIII"
+  },
+  {
+   "name": "Rotated surface code, d = 3",
+   "generators": [
+    "XXIXXIIII",
+    "IIIIXXIXX",
+    "IXXIIIIII",
+    "IIIIIIXXI",
+    "IZZIZZIII",
+    "IIIZZIZZI",
+    "ZIIZIIIII",
+    "IIIIIZIIZ"
+   ],
+   "valid": true,
+   "note": "",
+   "n": 9,
+   "k": 1,
+   "d": 3,
+   "dx": 3,
+   "dz": 3,
+   "css": true,
+   "logical": "ZYYIIIIII"
+  },
+  {
+   "name": "XZZX surface code, d = 3",
+   "generators": [
+    "XZIZXIIII",
+    "IIIIXZIZX",
+    "IZXIIIIII",
+    "IIIIIIXZI",
+    "IXZIZXIII",
+    "IIIXZIZXI",
+    "ZIIXIIIII",
+    "IIIIIXIIZ"
+   ],
+   "valid": true,
+   "note": "",
+   "n": 9,
+   "k": 1,
+   "d": 3,
+   "dx": 3,
+   "dz": 3,
+   "css": false,
+   "logical": "ZXZIIIIII"
+  }
+ ],
+ "targets": [
+  {
+   "target": {
+    "id": "five",
+    "title": "One logical qubit in 5 physical qubits",
+    "n": 5,
+    "k": 1,
+    "goal": "maximise the distance d (the code should correct any error on one qubit)",
+    "css": false,
+    "objective": "d"
+   },
+   "rounds": [
+    {
+     "round": 1,
+     "codes": [
+      {
+       "generators": [
+        "XZZXI",
+        "IXZZX",
+        "XIXZZ",
+        "ZXIXZ"
+       ],
+       "why": "Cyclic XZZX pattern yields the perfect five-qubit code.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XYXII"
+      },
+      {
+       "generators": [
+        "ZXXZI",
+        "IZXXZ",
+        "ZIZXX",
+        "XZIZX"
+       ],
+       "why": "Hadamard-transformed cyclic code swaps X and Z while preserving distance.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XZXII"
+      },
+      {
+       "generators": [
+        "XYYXI",
+        "IXYYX",
+        "XIXYY",
+        "YXIXY"
+       ],
+       "why": "Cyclic XYYX variant uses Y operators to obtain an equivalent perfect code.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XZXII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XZZXI",
+       "IXZZX",
+       "XIXZZ",
+       "ZXIXZ"
+      ],
+      "why": "Cyclic XZZX pattern yields the perfect five-qubit code.",
+      "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 5,
+      "k": 1,
+      "d": 3,
+      "dx": 5,
+      "dz": 5,
+      "css": false,
+      "logical": "XYXII"
+     }
+    },
+    {
+     "round": 2,
+     "codes": [
+      {
+       "generators": [
+        "YZZYI",
+        "IYZZY",
+        "YIYZZ",
+        "ZYIYZ"
+       ],
+       "why": "Global phase gate turns every X of the 5-qubit cyclic code into Y while preserving commutation and distance.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XZXII"
+      },
+      {
+       "generators": [
+        "ZZZXI",
+        "IXZZX",
+        "ZIXZZ",
+        "XXIXZ"
+       ],
+       "why": "Hadamard on qubit 0 only preserves commutation and gives a locally inequivalent optimal 5-qubit code.",
+       "verdict": "valid [[5,1,3]], dX = 3, dZ = 3",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": false,
+       "logical": "XXZII"
+      },
+      {
+       "generators": [
+        "YZZXI",
+        "IXZZX",
+        "YIXZZ",
+        "ZXIXZ"
+       ],
+       "why": "Phase gate on qubit 0 only turns X to Y there, preserving the [[5,1,3]] structure with a new stabilizer set.",
+       "verdict": "valid [[5,1,3]], dX = 3, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 5,
+       "css": false,
+       "logical": "XZYII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XZZXI",
+       "IXZZX",
+       "XIXZZ",
+       "ZXIXZ"
+      ],
+      "why": "Cyclic XZZX pattern yields the perfect five-qubit code.",
+      "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 5,
+      "k": 1,
+      "d": 3,
+      "dx": 5,
+      "dz": 5,
+      "css": false,
+      "logical": "XYXII"
+     }
+    },
+    {
+     "round": 3,
+     "codes": [
+      {
+       "generators": [
+        "XZZXI",
+        "IYZZX",
+        "XIXZZ",
+        "ZYIXZ"
+       ],
+       "why": "Apply a single-qubit S gate on qubit 1 to the standard 5-qubit cyclic code to preserve commutation and distance with a new stabilizer set.",
+       "verdict": "valid [[5,1,3]], dX = 3, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 5,
+       "css": false,
+       "logical": "XXXII"
+      },
+      {
+       "generators": [
+        "XZZXI",
+        "IXZZX",
+        "XIYZZ",
+        "ZXIXZ"
+       ],
+       "why": "Apply a single-qubit S gate on qubit 2 to the standard 5-qubit cyclic code to preserve commutation and distance with a new stabilizer set.",
+       "verdict": "valid [[5,1,3]], dX = 3, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 5,
+       "css": false,
+       "logical": "XYYII"
+      },
+      {
+       "generators": [
+        "XZZYI",
+        "IXZZX",
+        "XIXZZ",
+        "ZXIYZ"
+       ],
+       "why": "Apply a single-qubit S gate on qubit 3 to the standard 5-qubit cyclic code to preserve commutation and distance with a new stabilizer set.",
+       "verdict": "valid [[5,1,3]], dX = 3, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 5,
+       "css": false,
+       "logical": "XYXII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XZZXI",
+       "IXZZX",
+       "XIXZZ",
+       "ZXIXZ"
+      ],
+      "why": "Cyclic XZZX pattern yields the perfect five-qubit code.",
+      "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 5,
+      "k": 1,
+      "d": 3,
+      "dx": 5,
+      "dz": 5,
+      "css": false,
+      "logical": "XYXII"
+     }
+    },
+    {
+     "round": 4,
+     "codes": [
+      {
+       "generators": [
+        "YXXYI",
+        "IYXXY",
+        "YIYXX",
+        "XYIYX"
+       ],
+       "why": "Cyclic Y-X-X-Y pattern completes the A-B-B-A family while preserving even-overlap commutation for optimal distance.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XYXII"
+      },
+      {
+       "generators": [
+        "ZYYZI",
+        "IZYYZ",
+        "ZIZYY",
+        "YZIZY"
+       ],
+       "why": "Cyclic Z-Y-Y-Z pattern completes the A-B-B-A family while preserving even-overlap commutation for optimal distance.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XYXII"
+      },
+      {
+       "generators": [
+        "XZZXI",
+        "IXZZX",
+        "XIXZZ",
+        "YXXYI"
+       ],
+       "why": "Hybrid mixing XZZX generators with a YXXY generator keeps pairwise commutation while exploring a new stabilizer group.",
+       "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 5,
+       "k": 1,
+       "d": 3,
+       "dx": 5,
+       "dz": 5,
+       "css": false,
+       "logical": "XYXII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XZZXI",
+       "IXZZX",
+       "XIXZZ",
+       "ZXIXZ"
+      ],
+      "why": "Cyclic XZZX pattern yields the perfect five-qubit code.",
+      "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 5,
+      "k": 1,
+      "d": 3,
+      "dx": 5,
+      "dz": 5,
+      "css": false,
+      "logical": "XYXII"
+     }
+    }
+   ],
+   "curve": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "best": {
+    "generators": [
+     "XZZXI",
+     "IXZZX",
+     "XIXZZ",
+     "ZXIXZ"
+    ],
+    "why": "Cyclic XZZX pattern yields the perfect five-qubit code.",
+    "verdict": "valid [[5,1,3]], dX = 5, dZ = 5",
+    "score": 3.0,
+    "valid": true,
+    "note": "",
+    "n": 5,
+    "k": 1,
+    "d": 3,
+    "dx": 5,
+    "dz": 5,
+    "css": false,
+    "logical": "XYXII"
+   },
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 9.267928399989614,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 13.035465199995087,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 15.898220700008096,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 25.07290880000801,
+     "error": null
+    }
+   ]
+  },
+  {
+   "target": {
+    "id": "seven_css",
+    "title": "A CSS code: 1 logical qubit in 7",
+    "n": 7,
+    "k": 1,
+    "goal": "maximise the distance d using only all-X and all-Z generators (a CSS code)",
+    "css": true,
+    "objective": "d"
+   },
+   "rounds": [
+    {
+     "round": 1,
+     "codes": [
+      {
+       "generators": [
+        "XXXXIII",
+        "XXIIXXI",
+        "XIXIXIX",
+        "ZZZZIII",
+        "ZZIIZZI",
+        "ZIZIZIZ"
+       ],
+       "why": "Steane CSS construction from the Hamming parity check gives balanced X and Z protection for distance 3.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIIIX"
+      },
+      {
+       "generators": [
+        "IXXXIIX",
+        "IXIIXXX",
+        "XIXIXIX",
+        "IZZZIIZ",
+        "IZIIZZZ",
+        "ZIZIZIZ"
+       ],
+       "why": "Qubit-permuted Steane code preserving CSS orthogonality and distance.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIIIX"
+      },
+      {
+       "generators": [
+        "XXXIXII",
+        "XXIXIXI",
+        "XIXXIIX",
+        "ZZZIZII",
+        "ZZIZIZI",
+        "ZIZZIIZ"
+       ],
+       "why": "Another qubit-permuted Steane variant with balanced X and Z checks.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIIIX"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XXXXIII",
+       "XXIIXXI",
+       "XIXIXIX",
+       "ZZZZIII",
+       "ZZIIZZI",
+       "ZIZIZIZ"
+      ],
+      "why": "Steane CSS construction from the Hamming parity check gives balanced X and Z protection for distance 3.",
+      "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 7,
+      "k": 1,
+      "d": 3,
+      "dx": 3,
+      "dz": 3,
+      "css": true,
+      "logical": "XXIIIIX"
+     }
+    },
+    {
+     "round": 2,
+     "codes": [
+      {
+       "generators": [
+        "IIIXXXX",
+        "IXXIIXX",
+        "XIXIXIX",
+        "IIIZZZZ",
+        "IZZIIZZ",
+        "ZIZIZIZ"
+       ],
+       "why": "Standard Steane Hamming orientation gives symmetric X and Z distance 3.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXXIIII"
+      },
+      {
+       "generators": [
+        "XIIXXXI",
+        "XXXIIXI",
+        "XIXIXIX",
+        "ZIIZZZI",
+        "ZZZIIZI",
+        "ZIZIZIZ"
+       ],
+       "why": "End-qubits swapped Steane permutation preserves dual-containing Hamming structure and distance 3.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIXII"
+      },
+      {
+       "generators": [
+        "IXXXXII",
+        "XIIXXIX",
+        "XIXIXXI",
+        "IZZZZII",
+        "ZIIZZIZ",
+        "ZIZIZZI"
+       ],
+       "why": "Cyclically shifted Steane permutation explores another equivalent optimal CSS code.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIXII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XXXXIII",
+       "XXIIXXI",
+       "XIXIXIX",
+       "ZZZZIII",
+       "ZZIIZZI",
+       "ZIZIZIZ"
+      ],
+      "why": "Steane CSS construction from the Hamming parity check gives balanced X and Z protection for distance 3.",
+      "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 7,
+      "k": 1,
+      "d": 3,
+      "dx": 3,
+      "dz": 3,
+      "css": true,
+      "logical": "XXIIIIX"
+     }
+    },
+    {
+     "round": 3,
+     "codes": [
+      {
+       "generators": [
+        "IIIXXXX",
+        "XIXIIXX",
+        "IXXIXIX",
+        "IIIZZZZ",
+        "ZIZIIZZ",
+        "IZZIZIZ"
+       ],
+       "why": "Steane Hamming code with qubits 0 and 1 swapped to get a new permutation with the same distance.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXXIIII"
+      },
+      {
+       "generators": [
+        "XXXXIII",
+        "IIXXIXX",
+        "IXIXXIX",
+        "ZZZZIII",
+        "ZZIIZIZZ",
+        "ZIZIZZIZ"
+       ],
+       "why": "Steane Hamming code with the two 4-qubit blocks swapped to preserve even overlaps while changing the stabilizers.",
+       "verdict": "invalid: every generator must be 7 characters of I, X, Y, Z",
+       "score": null,
+       "valid": false,
+       "note": "every generator must be 7 characters of I, X, Y, Z",
+       "n": 7,
+       "k": 0,
+       "d": null,
+       "dx": null,
+       "dz": null,
+       "css": false,
+       "logical": null
+      },
+      {
+       "generators": [
+        "IXIXIXX",
+        "IIXIXXX",
+        "XIIXXIX",
+        "ZIZIZIZZ",
+        "ZZZIZZZZ",
+        "ZIIZZIZ"
+       ],
+       "why": "Steane Hamming code under an interleaving column permutation giving a distinct but equivalent Hamming check matrix.",
+       "verdict": "invalid: every generator must be 7 characters of I, X, Y, Z",
+       "score": null,
+       "valid": false,
+       "note": "every generator must be 7 characters of I, X, Y, Z",
+       "n": 7,
+       "k": 0,
+       "d": null,
+       "dx": null,
+       "dz": null,
+       "css": false,
+       "logical": null
+      }
+     ],
+     "best": {
+      "generators": [
+       "XXXXIII",
+       "XXIIXXI",
+       "XIXIXIX",
+       "ZZZZIII",
+       "ZZIIZZI",
+       "ZIZIZIZ"
+      ],
+      "why": "Steane CSS construction from the Hamming parity check gives balanced X and Z protection for distance 3.",
+      "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 7,
+      "k": 1,
+      "d": 3,
+      "dx": 3,
+      "dz": 3,
+      "css": true,
+      "logical": "XXIIIIX"
+     }
+    },
+    {
+     "round": 4,
+     "codes": [
+      {
+       "generators": [
+        "XXXXIII",
+        "XXIIXIX",
+        "XIXIXXI",
+        "ZZZZIII",
+        "ZZIIZIZ",
+        "ZIZIZZI"
+       ],
+       "why": "Column-permuted Steane Hamming code swapping the last two qubits to keep CSS orthogonality while exploring a new layout.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIIXI"
+      },
+      {
+       "generators": [
+        "XXIXXII",
+        "XXXIIXI",
+        "XIXIXIX",
+        "ZZIZZII",
+        "ZZZIIZI",
+        "ZIZIZIZ"
+       ],
+       "why": "Column-permuted Steane Hamming code mixing weight-4 supports to retain distance 3 with different stabilizer weights.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIIIIX"
+      },
+      {
+       "generators": [
+        "XIXXXII",
+        "XXIIXXI",
+        "XXXIIIX",
+        "ZIZZZII",
+        "ZZIIZZI",
+        "ZZZIIIZ"
+       ],
+       "why": "Column-permuted Steane Hamming code using a different qubit ordering to preserve self-orthogonality and CSS distance.",
+       "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.0,
+       "valid": true,
+       "note": "",
+       "n": 7,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXIXIII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "XXXXIII",
+       "XXIIXXI",
+       "XIXIXIX",
+       "ZZZZIII",
+       "ZZIIZZI",
+       "ZIZIZIZ"
+      ],
+      "why": "Steane CSS construction from the Hamming parity check gives balanced X and Z protection for distance 3.",
+      "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+      "score": 3.0,
+      "valid": true,
+      "note": "",
+      "n": 7,
+      "k": 1,
+      "d": 3,
+      "dx": 3,
+      "dz": 3,
+      "css": true,
+      "logical": "XXIIIIX"
+     }
+    }
+   ],
+   "curve": [
+    3,
+    3,
+    3,
+    3
+   ],
+   "best": {
+    "generators": [
+     "XXXXIII",
+     "XXIIXXI",
+     "XIXIXIX",
+     "ZZZZIII",
+     "ZZIIZZI",
+     "ZIZIZIZ"
+    ],
+    "why": "Steane CSS construction from the Hamming parity check gives balanced X and Z protection for distance 3.",
+    "verdict": "valid [[7,1,3]], dX = 3, dZ = 3, CSS",
+    "score": 3.0,
+    "valid": true,
+    "note": "",
+    "n": 7,
+    "k": 1,
+    "d": 3,
+    "dx": 3,
+    "dz": 3,
+    "css": true,
+    "logical": "XXIIIIX"
+   },
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 13.124138699989999,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 19.013845799985575,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 16.508897799998522,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 28.783892299979925,
+     "error": null
+    }
+   ]
+  },
+  {
+   "target": {
+    "id": "biased",
+    "title": "Biased noise: 1 logical qubit in 9",
+    "n": 9,
+    "k": 1,
+    "goal": "keep the distance d at least 3 and maximise dZ, the distance against Z errors alone (for hardware where phase flips are far more common than bit flips)",
+    "css": false,
+    "objective": "dz"
+   },
+   "rounds": [
+    {
+     "round": 1,
+     "codes": [
+      {
+       "generators": [
+        "ZZIIIIIII",
+        "IZZIIIIII",
+        "IIIZZIIII",
+        "IIIIZZIII",
+        "IIIIIIZZI",
+        "IIIIIIIZZ",
+        "XXXXXXIII",
+        "IIIXXXXXX"
+       ],
+       "why": "Standard Shor concatenation gives symmetric distance 3 baseline with strong bit-flip repetition.",
+       "verdict": "valid [[9,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXXIIIIII"
+      },
+      {
+       "generators": [
+        "IIIXXXXII",
+        "IXXIIXXII",
+        "XIXIXIXII",
+        "IIIZZZZII",
+        "IZZIIZZII",
+        "ZIZIZIZII",
+        "IIIIIIIXX",
+        "IIIIIIIZZ"
+       ],
+       "why": "Steane block plus a Bell pair preserves distance 3 while balancing X and Z checks.",
+       "verdict": "valid [[9,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "XXXIIIIII"
+      },
+      {
+       "generators": [
+        "XXIIIIIII",
+        "IXXIIIIII",
+        "IIIXXIIII",
+        "IIIIXXIII",
+        "IIIIIIXXI",
+        "IIIIIIIXX",
+        "ZZZZZZIII",
+        "IIIZZZZZZ"
+       ],
+       "why": "Six weight-two X checks enforce three triple blocks for Z protection using only two heavy Z checks.",
+       "verdict": "valid [[9,1,3]], dX = 3, dZ = 3, CSS",
+       "score": 3.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 3,
+       "dz": 3,
+       "css": true,
+       "logical": "YYZIIIIII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "ZZIIIIIII",
+       "IZZIIIIII",
+       "IIIZZIIII",
+       "IIIIZZIII",
+       "IIIIIIZZI",
+       "IIIIIIIZZ",
+       "XXXXXXIII",
+       "IIIXXXXXX"
+      ],
+      "why": "Standard Shor concatenation gives symmetric distance 3 baseline with strong bit-flip repetition.",
+      "verdict": "valid [[9,1,3]], dX = 3, dZ = 3, CSS",
+      "score": 3.003,
+      "valid": true,
+      "note": "",
+      "n": 9,
+      "k": 1,
+      "d": 3,
+      "dx": 3,
+      "dz": 3,
+      "css": true,
+      "logical": "XXXIIIIII"
+     }
+    },
+    {
+     "round": 2,
+     "codes": [
+      {
+       "generators": [
+        "YXIIIIIII",
+        "IXYZZZZZZ",
+        "ZZYXIIIII",
+        "IIIXYZZZZ",
+        "ZZZZYXIII",
+        "IIIIIXYZZ",
+        "ZZZZZZYXI",
+        "IIIIIIIXY"
+       ],
+       "why": "Adjacent-pair X parts form a repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct for overall distance 3.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "XZXIIIIII"
+      },
+      {
+       "generators": [
+        "XYZZZZZZZ",
+        "ZYXIIIIII",
+        "IIXYZZZZZ",
+        "ZZZYXIIII",
+        "IIIIXYZZZ",
+        "ZZZZZYXII",
+        "IIIIIIXYZ",
+        "ZZZZZZZYX"
+       ],
+       "why": "Same repetition X chain for Z distance 9 with complementary step-pattern Z parts to preserve X and Y distance 3.",
+       "verdict": "valid [[9,1,2]], dX = 9, dZ = 9",
+       "score": null,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 2,
+       "dx": 9,
+       "dz": 9,
+       "css": false,
+       "logical": "YXIIIIIII"
+      },
+      {
+       "generators": [
+        "YXIIIIIII",
+        "ZYXIIIIII",
+        "IIXYZZZZZ",
+        "IIIXYZZZZ",
+        "ZZZZYXIII",
+        "ZZZZZYXII",
+        "IIIIIIXYZ",
+        "IIIIIIIXY"
+       ],
+       "why": "Mixed step-pattern variant of the repetition-X construction trading weight distribution to keep overall distance 3 with Z distance 9.",
+       "verdict": "valid [[9,1,2]], dX = 3, dZ = 9",
+       "score": null,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 2,
+       "dx": 3,
+       "dz": 9,
+       "css": false,
+       "logical": "IIXIIZIII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "YXIIIIIII",
+       "IXYZZZZZZ",
+       "ZZYXIIIII",
+       "IIIXYZZZZ",
+       "ZZZZYXIII",
+       "IIIIIXYZZ",
+       "ZZZZZZYXI",
+       "IIIIIIIXY"
+      ],
+      "why": "Adjacent-pair X parts form a repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct for overall distance 3.",
+      "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+      "score": 9.003,
+      "valid": true,
+      "note": "",
+      "n": 9,
+      "k": 1,
+      "d": 3,
+      "dx": 7,
+      "dz": 9,
+      "css": false,
+      "logical": "XZXIIIIII"
+     }
+    },
+    {
+     "round": 3,
+     "codes": [
+      {
+       "generators": [
+        "IYXIIIIII",
+        "ZIXYZZZZZ",
+        "IZZYXIIII",
+        "ZIIIXYZZZ",
+        "IZZZZYXII",
+        "ZIIIIIXYZ",
+        "IZZZZZZYX",
+        "YIIIIIIIX"
+       ],
+       "why": "Cyclic right-rotation by one qubit of the best code preserves commutation and distances while giving a distinct set.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "YIIYIIYII"
+      },
+      {
+       "generators": [
+        "IIYXIIIII",
+        "ZZIXYZZZZ",
+        "IIZZYXIII",
+        "ZZIIIXYZZ",
+        "IIZZZZYXI",
+        "ZZIIIIIXY",
+        "XIZZZZZZY",
+        "XYIIIIIII"
+       ],
+       "why": "Cyclic right-rotation by two qubits of the best code keeps dZ maximal with a different generator set.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "YZIIIIIIX"
+      },
+      {
+       "generators": [
+        "IIIYXIIII",
+        "ZZZIXYZZZ",
+        "IIIZZYXII",
+        "ZZZIIIXYZ",
+        "IIIZZZZYX",
+        "YZZIIIIIX",
+        "YXIZZZZZZ",
+        "IXYIIIIII"
+       ],
+       "why": "Cyclic right-rotation by three qubits of the best code retains the high Z-distance structure in new positions.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "XYZIIIIII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "YXIIIIIII",
+       "IXYZZZZZZ",
+       "ZZYXIIIII",
+       "IIIXYZZZZ",
+       "ZZZZYXIII",
+       "IIIIIXYZZ",
+       "ZZZZZZYXI",
+       "IIIIIIIXY"
+      ],
+      "why": "Adjacent-pair X parts form a repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct for overall distance 3.",
+      "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+      "score": 9.003,
+      "valid": true,
+      "note": "",
+      "n": 9,
+      "k": 1,
+      "d": 3,
+      "dx": 7,
+      "dz": 9,
+      "css": false,
+      "logical": "XZXIIIIII"
+     }
+    },
+    {
+     "round": 4,
+     "codes": [
+      {
+       "generators": [
+        "XIIIIIIIY",
+        "XYZZZZZZI",
+        "ZYXIIIIIZ",
+        "IIXYZZZZI",
+        "ZZZYXIIIZ",
+        "IIIIXYZZI",
+        "ZZZZZYXIZ",
+        "IIIIIIXYI"
+       ],
+       "why": "Cyclic qubit rotation of the best chain code preserves maximal Z protection under a new labeling.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "XZXIIIIII"
+      },
+      {
+       "generators": [
+        "IIIIIIIYX",
+        "YZZZZZZIX",
+        "YXIIIIIZZ",
+        "IXYZZZZII",
+        "ZZYXIIIZZ",
+        "IIIXYZZII",
+        "ZZZZYXIZZ",
+        "IIIIIXYII"
+       ],
+       "why": "Double-step cyclic rotation of the best code keeps the X chain for Z distance 9 with distinct stabilizers.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "XZXIIIIII"
+      },
+      {
+       "generators": [
+        "IIIIIYXII",
+        "ZZZZZIXYZ",
+        "IIIIIZZYX",
+        "YZZZZIIIX",
+        "YXIIIZZZZ",
+        "IXYZZIIII",
+        "ZZYXIZZZZ",
+        "IIIXYIIII"
+       ],
+       "why": "Four-step cyclic rotation of the best construction maintains overall distance 3 and Z distance 9 in a new layout.",
+       "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+       "score": 9.003,
+       "valid": true,
+       "note": "",
+       "n": 9,
+       "k": 1,
+       "d": 3,
+       "dx": 7,
+       "dz": 9,
+       "css": false,
+       "logical": "XZXIIIIII"
+      }
+     ],
+     "best": {
+      "generators": [
+       "YXIIIIIII",
+       "IXYZZZZZZ",
+       "ZZYXIIIII",
+       "IIIXYZZZZ",
+       "ZZZZYXIII",
+       "IIIIIXYZZ",
+       "ZZZZZZYXI",
+       "IIIIIIIXY"
+      ],
+      "why": "Adjacent-pair X parts form a repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct for overall distance 3.",
+      "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+      "score": 9.003,
+      "valid": true,
+      "note": "",
+      "n": 9,
+      "k": 1,
+      "d": 3,
+      "dx": 7,
+      "dz": 9,
+      "css": false,
+      "logical": "XZXIIIIII"
+     }
+    }
+   ],
+   "curve": [
+    3,
+    9,
+    9,
+    9
+   ],
+   "best": {
+    "generators": [
+     "YXIIIIIII",
+     "IXYZZZZZZ",
+     "ZZYXIIIII",
+     "IIIXYZZZZ",
+     "ZZZZYXIII",
+     "IIIIIXYZZ",
+     "ZZZZZZYXI",
+     "IIIIIIIXY"
+    ],
+    "why": "Adjacent-pair X parts form a repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct for overall distance 3.",
+    "verdict": "valid [[9,1,3]], dX = 7, dZ = 9",
+    "score": 9.003,
+    "valid": true,
+    "note": "",
+    "n": 9,
+    "k": 1,
+    "d": 3,
+    "dx": 7,
+    "dz": 9,
+    "css": false,
+    "logical": "XZXIIIIII"
+   },
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 88.49063870002283,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 103.59064720000606,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 20.442886399978306,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "codes",
+     "cached": false,
+     "latency_s": 31.278796800004784,
+     "error": null
+    }
+   ]
+  }
+ ],
+ "seconds": 513.6
+}

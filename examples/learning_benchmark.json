@@ -1,0 +1,6056 @@
+{
+ "model": "muse-spark-1.3",
+ "rounds": 5,
+ "seconds": 574.5,
+ "targets": [
+  {
+   "goal": {
+    "id": "w4",
+    "title": "W state on 4 qubits",
+    "blurb": "One excitation shared equally by four qubits: the state that keeps its entanglement when a qubit is lost, used in quantum networks.",
+    "num_qubits": 4,
+    "coupling": null,
+    "textbook": null
+   },
+   "lower_bound": 3,
+   "curves": {
+    "feedback": [
+     6,
+     5,
+     5,
+     5,
+     5
+    ],
+    "fresh": [
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "random": [
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   "reach_rate": {
+    "feedback": 0.1,
+    "fresh": 0.1,
+    "random": 0.0
+   },
+   "first_proven": 6,
+   "final_proven": 5,
+   "runs": {
+    "feedback": {
+     "condition": "feedback",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star fan-out from qubit 0 can distribute a single excitation equally to all qubits as in standard W-state constructions.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.20000000001052542,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Linear chain sequentially splits excitation amplitude to build the equal one-hot superposition across four qubits.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.27144660941102594,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Chain plus closing edge adds symmetric entanglement to balance amplitudes beyond a minimal tree.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000633863,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Pairwise entangling blocks with full connectivity provide enough expressivity to guarantee W-state preparation if minimal circuits fail.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 2.8687474618038777e-10,
+         "proof": 0.9999999999397413,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 3.6
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "This is the 4-gate prefix of the proven 6-gate solution and may already span the entanglement needed for the symmetric W state.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.25000000010823675,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "This drops only the final gate of the proven 6-gate solution to test whether that last entangler was redundant.",
+         "count": 5,
+         "verdict": "reached",
+         "infidelity": 2.7375302025234305e-10,
+         "proof": 0.9999999999214537,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "This K4-minus-one simple graph gives maximally symmetric pairwise connectivity suited to the permutation-symmetric W state.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.0954915028335721,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "This uses the same symmetric 5-pair set in chain-first order to distribute the single excitation sequentially around all qubits.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.09549150282484054,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 7.4
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Keeps the proven cross-pairing and final reuse while testing if the first [0,1] is redundant.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000365258,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Preserves the double [0,1] balancing pair from the proven 5-CNOT circuit while dropping the [2,3] seed.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.06698729812711157,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Retains both initial pairs and the repeated [0,1] while testing if [0,2] can be removed.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.14644660946599708,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Retains both initial pairs and the repeated [0,1] while testing if [1,3] can be removed.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1464466094173773,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 6.0
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Middle-first chain spreads entanglement outward symmetrically which should distribute the single excitation to all four qubits.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.27144660955483935,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Repairs the closest 4-CNOT near miss by interleaving the repeated 0-1 pair earlier to adjust interference before coupling to qubit 3.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.146446609414014,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Linear chain with a central repeat adds the missing degree of freedom to balance the W-state amplitudes across the ends.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.06698729813089088,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Symmetric star fan-out from qubit 0 with one extra entangler should create equal single-excitation superposition.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.06698729818327598,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 5.8
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Reorders the star-like near miss to entangle qubits 1 and 2 first with a repeated bridge before fanning out to qubit 3.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.14644660942436283,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Swaps the middle cross-links of the closest 4-CNOT near miss to balance entanglement creation across both qubit pairs.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.06698729839403472,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Clusters the repeated chain bridge together to build the delocalized excitation locally before spreading it to the end qubit.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1464466095630994,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "Forms the alternate 4-cycle covering all qubits exactly once to symmetrically delocalize the single excitation for the W state.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000188066,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 5.5
+      }
+     ],
+     "calls": [
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.039495799981523305,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.024405900010606274,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.028938999981619418,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.023332699987804517,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.027242799988016486,
+       "error": null
+      }
+     ]
+    },
+    "fresh": {
+     "condition": "fresh",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "A linear spanning path links all four qubits with the minimal three entanglers and matches sequential single-excitation spreading for the W state.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.27144660942663235,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "A star centered on qubit 0 distributes entanglement symmetrically to the three leaves, matching the permutation symmetry of the W state.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.2000000000667469,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "A four-qubit ring adds one cyclic entangler beyond a tree to boost expressibility while keeping pairwise connectivity.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000407888,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Doubling each chain edge provides two CNOTs per particle-conserving split, realizing the known deterministic three-split construction of W4.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 7.470535301479231e-11,
+         "proof": 0.9999999999252935,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 4.6
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "W4 has Schmidt rank 2 across every cut so a star centered on qubit 0 gives three rank-2 links enough bond dimension to build it with three CNOTs.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "The symmetric W4 state has bipartite rank 2 everywhere so a star centered on qubit 1 can concentrate and distribute the single excitation with one CNOT per leaf.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.20000000002968443,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "W4 admits an exact matrix-product form with bond dimension 2 so a linear chain propagating the excitation needs only one CNOT per bond.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.27144660941545984,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Sequential Schmidt decomposition from qubit 0 outward has rank 2 at each step so the ordered path builds the single-excitation superposition with three single-CNOT isometries.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 2.2
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star centered on qubit 0 fans out one excitation to all 4 qubits with the minimal 3 links needed for symmetric W entanglement.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Linear chain sequentially splits the single excitation to accumulate four equal one-hot terms with only 3 CNOTs.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Middle-out tree starts entanglement in the center then spreads outward to balance the four W amplitudes symmetrically.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.20000000000245355,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Chain plus closing link adds one extra entangler to guarantee exact fitting of the W4 amplitudes if 3 CNOTs are marginal.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.25000000003426426,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 2.3
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Linear chain incrementally adds one new qubit per CNOT with Schmidt rank two across each cut which matches the W state entanglement.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Alternate chain spans all four qubits so sequential single-excitation splitting can distribute equal weight to each computational basis term.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.2714466094153437,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star centered on qubit zero fans out from a single source so central rotations plus three CNOTs can create the symmetric single-excitation superposition.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Star centered on qubit one connects every qubit in a spanning tree so each CNOT introduces a new qubit while preserving rank-two bipartitions needed for W4.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 1.3
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Middle-out chain seeds entanglement in the center then expands symmetrically to distribute a single excitation over all four qubits with a minimal spanning tree.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.2714466094871517,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Paired entanglers followed by cross-links capture the 2-versus-2 rank-2 structure of the W state with one extra degree for exact amplitudes.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000169875,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Hub-centered fan-out from qubit 0 plus one leaf-leaf entangler breaks star symmetry just enough to balance the four single-excitation terms.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.146446609423438,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Six-CNOT complete pairwise sequence guarantees enough expressivity to realize the symmetric single-excitation Dicke state exactly.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 4.426912170174546e-10,
+         "proof": 0.9999999995573103,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 4.8
+      }
+     ],
+     "calls": [
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.02409370001987554,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.03881479997653514,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.024486500013154,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.024439900007564574,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.019300499989185482,
+       "error": null
+      }
+     ]
+    },
+    "random": {
+     "condition": "random",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           2,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.2714466095374354,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.27144660943129917,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.14644660954728805,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.2500000000365694,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 7.7
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000135174,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.06698729813565207,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           1
+          ],
+          [
+           3,
+           1
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.25000000001833933,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           0
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.06698729816943827,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 7.8
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000940058,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.25000000004859946,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1464466095996939,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000068078,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 5.7
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           3,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.25000000000056855,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.2500000000033272,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.25000000001047296,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.14644660941752186,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 7.6
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           2,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1464466094286172,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.14644661055031838,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.14644660942845478,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.250000000006086,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 8.1
+      }
+     ],
+     "calls": []
+    }
+   }
+  },
+  {
+   "goal": {
+    "id": "dicke42",
+    "title": "Dicke state |D(4,2)⟩",
+    "blurb": "Every way of having exactly two of four qubits at 1, in equal superposition: a resource for quantum sensing beyond the standard limit.",
+    "num_qubits": 4,
+    "coupling": null,
+    "textbook": null
+   },
+   "lower_bound": 3,
+   "curves": {
+    "feedback": [
+     6,
+     6,
+     5,
+     5,
+     5
+    ],
+    "fresh": [
+     6,
+     6,
+     6,
+     6,
+     6
+    ],
+    "random": [
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   "reach_rate": {
+    "feedback": 0.1,
+    "fresh": 0.25,
+    "random": 0.0
+   },
+   "first_proven": 6,
+   "final_proven": 5,
+   "runs": {
+    "feedback": {
+     "condition": "feedback",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star fan-out from qubit 0 meets the two-crossing per 2-2 cut needed for Schmidt rank 3 with the minimum 3 CNOTs.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.2500000000016731,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "Four-cycle ring preserves cyclic symmetry natural for the permutation-symmetric Dicke state while adding one entangler beyond the lower bound.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200377306457,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Five entanglers combine a Schmidt-satisfying star with leaf-leaf interactions to generate the weight-2 symmetrization.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.12732200389609116,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Six CNOTs covering every qubit pair once give full connectivity and ample parameters known to suffice for D4^2-type circuits.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 2.667643883569326e-11,
+         "proof": 0.9999999999759508,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 7.1
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Drops only the last pair from the proven 6-CNOT complete graph while keeping disjoint initial entanglers and full cross connectivity.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1666666668018626,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Keeps the proven disjoint start and cross middle but closes with the final proven pair to build symmetric weight-2 interference with 5 CNOTs.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1666666668777349,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Uses a different ordering of K4-minus-one that interleaves cross pairs early to generate rank-3 Schmidt components on every 2-2 split.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.16666666672409525,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Minimal balanced 4-CNOT layout with exactly two crossing CNOTs on each 2-2 bipartition starting from disjoint pairs.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200375549485,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 13.0
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Uses two disjoint initial pairs then three crosses missing only (0,2), the one 5-distinct set not yet tried.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.16666666681789377,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Reorders the 5-distinct set missing (2,3) to interleave the crosses differently for better optimizer reach.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1666666666819423,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "Repeats the central (0,2) cross to add extra Schmidt rank across the 01|23 partition with only 5 CNOTs.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.12732200393400728,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Forms a 4-qubit ring then reuses (0,1) to build symmetric Dicke entanglement with repeated-pair expressivity.",
+         "count": 5,
+         "verdict": "reached",
+         "infidelity": 5.383675727443915e-10,
+         "proof": 0.9999999998271856,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 8.3
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Mimics the proven 5-CNOT chain with a closing repeat of the first pair to symmetrize amplitudes into the equal weight-2 superposition.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.16666666669255092,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Uses two complementary pair groups to give two crossing CNOTs for every 2-2 bipartition that needs Schmidt rank 3.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200378652225,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Builds full symmetric entanglement on qubits 0-1-2 as a triangle then spreads it to qubit 3 for Dicke symmetrization.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.16666666668436314,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Tests the minimal linear spanning-tree alternative to the failed star, as any 3-CNOT solution must be connected.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.16666666668505936,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 7.2
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Sandwiching the outer arms around a doubled central 1-2 link keeps two crossings on every 2-vs-2 cut needed for the rank-3 Dicke state.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.16666666669005126,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Centering on qubit 0 with a doubled 0-1 arm sandwiched around the star distributes the symmetric weight-2 entanglement while meeting all bipartition ranks.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1666666669104927,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Building a star from 0 then closing the 0-1-2 triangle with 1-2 forms a diamond that preserves at least two crossings on each balanced cut.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.16666666678811815,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Doubling the middle 1-2 link consecutively at the end of the path tests a different ordering of the viable path-double-middle graph.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.16666666669925068,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 5,
+       "seconds": 7.1
+      }
+     ],
+     "calls": [
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.021400899975560606,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.026032800000393763,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.04095019999658689,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.033404900023015216,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.028007499990053475,
+       "error": null
+      }
+     ]
+    },
+    "fresh": {
+     "condition": "fresh",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "A star centered on qubit 0 is the only 3-edge connected graph giving two crossing CNOTs on every 2-versus-2 bipartition as required by the rank-3 Schmidt spectrum of the weight-2 Dicke state.",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.2500000000016731,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "A four-qubit ring adds a fourth entangling gate to the minimal star while preserving two crossings on every bipartition to provide extra freedom for balancing the six weight-2 amplitudes.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200377306457,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "Adding a diagonal to the ring creates denser all-to-all entanglement to tune the symmetric superposition with five CNOTs while keeping every qubit connected.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.12732200383043402,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Using all six distinct pairs once gives a fully connected all-to-all circuit with ample parameters to realize the symmetric Dicke-4-2 state exactly if fewer CNOTs prove insufficient.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 4.978129020116739e-10,
+         "proof": 0.9999999997736588,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 7.7
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star centered on qubit 0 links every qubit and puts two CNOTs across each 2-versus-2 cut to allow Schmidt rank three for the Dicke state.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Four-CNOT ring alternates halves so every 2-versus-2 bipartition sees at least two crossing CNOTs while keeping the circuit symmetric under qubit permutation.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1273220037613777,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "Five-CNOT ring plus a diagonal adds extra entanglement across the middle cut to realize the three Schmidt coefficients with margin for the optimizer.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.12732200389032755,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Six-CNOT all-to-all sequence touches every qubit pair to guarantee enough expressivity to build the six weight-two amplitudes exactly.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 1.5837464673040813e-10,
+         "proof": 0.9999999998109805,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 5.4
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star with center 0 connects all 4 qubits with 3 CNOTs and gives exactly 2 crossings of every 2-2 bipartition required for the Schmidt rank-3 of the weight-2 Dicke state.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "4-qubit ring adds a cycle to the spanning tree to symmetrize entanglement across all 2-2 cuts while keeping CNOT count minimal.",
+         "count": 4,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Near-complete graph gives at least 3 CNOTs across every 2-2 bipartition, allowing tunable rank-3 Schmidt coefficients for the symmetric weight distribution.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1666666666688953,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Complete K4 pairwise entangling mirrors the permutation symmetry of all 6 weight-2 basis states and guarantees full rank across all bipartitions.",
+         "count": 6,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 2.1
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Uses each unordered pair once to respect full permutation symmetry of the Dicke D4^2 state and give every 2-2 bipartition crossing entanglers for Schmidt rank 3.",
+         "count": 6,
+         "verdict": "reached",
+         "infidelity": 1.2046541542076739e-10,
+         "proof": 0.9999999998795341,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Double linear staircase mirrors the standard SCS Dicke preparation that builds weight-2 excitations sequentially along the chain.",
+         "count": 7,
+         "verdict": "reached",
+         "infidelity": 2.413622635089041e-10,
+         "proof": 0.9999999996512208,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "Repeated star centered on qubit 0 first distributes one excitation as in W-state preparation then adds the second excitation symmetrically.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.06698729822601324,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Ring plus cross-links creates balanced entanglement across all 1-3 and 2-2 cuts needed for uniform weight-2 superposition.",
+         "count": 8,
+         "verdict": "reached",
+         "infidelity": 4.175313428333993e-10,
+         "proof": 0.9999999995824695,
+         "note": ""
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 16.2
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ]
+         ],
+         "why": "Two disjoint CNOTs can form (|01>+|10>) pairs giving the four middle terms while two cross CNOTs mix in |0011> and |1100>.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200380138747,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Star centered on qubit 0 is the minimal tree meeting Schmidt rank 3 on all 2-2 cuts and rank 2 on all 1-3 cuts.",
+         "count": 3,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           3
+          ]
+         ],
+         "why": "Two Bell-pair CNOTs plus three inter-pair CNOTs provide enough mixing to balance all six weight-2 amplitudes equally.",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1666666667287775,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "Covering all six pairs gives a fully connected entangler that can symmetrize two Bell pairs into the Dicke D4_2 state.",
+         "count": 6,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 6,
+       "seconds": 4.7
+      }
+     ],
+     "calls": [
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.043942099990090355,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.03871580000850372,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.036032100004376844,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.0227113000000827,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.018415900005493313,
+       "error": null
+      }
+     ]
+    },
+    "random": {
+     "condition": "random",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           2,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.16666666671188957,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200377698333,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.12732200397926952,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.5000000000101857,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 7.8
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.028595479280127956,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           1
+          ],
+          [
+           3,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.12732200379947034,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           2,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.16666666676730735,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3333333333430626,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 7.1
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           0
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.16666666670899666,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1273220040142944,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           3,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1666666667403135,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 5,
+         "verdict": "missed",
+         "infidelity": 0.1273220040177041,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 9.2
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.16666666667077734,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200376739367,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           0
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.12732200376395808,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           1,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 3,
+         "verdict": "missed",
+         "infidelity": 0.5000000000055322,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 5.1
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1666666668314749,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           2
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.1666666668101715,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.5000000000170131,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           3,
+           0
+          ],
+          [
+           0,
+           2
+          ],
+          [
+           0,
+           2
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.33333333336456494,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 6.2
+      }
+     ],
+     "calls": []
+    }
+   }
+  },
+  {
+   "goal": {
+    "id": "w5_line",
+    "title": "W state on 5 qubits in a line",
+    "blurb": "One excitation shared by five qubits, each wired only to its neighbours: no textbook circuit fits, so the layout has to be found.",
+    "num_qubits": 5,
+    "coupling": [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      2
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      4
+     ]
+    ],
+    "textbook": null
+   },
+   "lower_bound": 4,
+   "curves": {
+    "feedback": [
+     8,
+     7,
+     7,
+     7,
+     7
+    ],
+    "fresh": [
+     7,
+     7,
+     7,
+     7,
+     7
+    ],
+    "random": [
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   "reach_rate": {
+    "feedback": 0.15,
+    "fresh": 0.35,
+    "random": 0.0
+   },
+   "first_proven": 8,
+   "final_proven": 7,
+   "runs": {
+    "feedback": {
+     "condition": "feedback",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Sequential cascade from the top distributes the single excitation with one CNOT per new qubit matching the spanning-tree lower bound",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477337600048,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Mirror sweep from the bottom provides the same n-minus-1 entangling steps in opposite order for the symmetric W state",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477338122991,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Center-out branching creates both sides of the chain from the middle to fit the symmetric Schmidt structure",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477337493762,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Doubled cascade implements each controlled splitting exactly to guarantee reachability if minimal layouts fail",
+         "count": 8,
+         "verdict": "reached",
+         "infidelity": 3.326297015604496e-10,
+         "proof": 0.9999999996673712,
+         "note": ""
+        }
+       ],
+       "best_so_far": 8,
+       "seconds": 9.4
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Bottom-up cascade needs only one CNOT for the initial product-state split and two CNOTs per later excitation-preserving split, giving 7 CNOTs.",
+         "count": 7,
+         "verdict": "reached",
+         "infidelity": 1.415494388368188e-10,
+         "proof": 0.9999999998619804,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Top-down cascade mirrors the proven 8-CNOT circuit but saves one CNOT on the first edge where bipartite entanglement needs only one CNOT.",
+         "count": 7,
+         "verdict": "reached",
+         "infidelity": 7.834115578475576e-10,
+         "proof": 0.9999999992165873,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Tests whether the two least-entangled end cuts can use single CNOTs while keeping doubled CNOTs on the more entangled middle cuts.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.13944487249285964,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           4
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Flipped-control version of the 6-CNOT cascade explores the opposite CNOT direction for spreading the excitation from the top end.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.13944487249693294,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 11.4
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Doubling the two outer links instead of the inner links balances the distribution of the single excitation to the ends of the line.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.2978339128600963,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Shifting the doubled pairs to edges 0-1 and 2-3 tests the asymmetric 2-1-2-1 distribution not yet tried for 6 CNOTs.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.26190672348592314,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "A triple on the central-adjacent edge gives a universal two-qubit block that can create the initial tripartite W-type split.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.39574773402698826,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Keeping 1-2-2-1 counts but spreading center-out from qubit 2 repairs the failed linear cascade ordering with a branching order.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.26190672345975574,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 17.5
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ]
+         ],
+         "why": "Keeps the promising 1-2-2-1 edge counts but builds the spanning tree first then reinforces the middle splits.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.08768943759563741,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Tests asymmetric 1-2-1-2 distribution with sequential order to weight the q4 end more heavily.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.20000000025634468,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Tests opposite asymmetric 2-2-1-1 distribution concentrating two-CNOT splits near the q0 end.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.29783391257076397,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Starts from central qubit 2 for symmetric W-state fan-out then reapplies central splits to balance amplitudes.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.08768943768066617,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 18.4
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Trims one CNOT on edge 1-2 from the proven 7-CNOT top-down chain while preserving order and all-cut entanglement.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.2000000001270288,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Trims one CNOT on edge 1-2 from the proven 7-CNOT bottom-up chain while preserving order and all-cut entanglement.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.13944487249489723,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ]
+         ],
+         "why": "Repairs the closest 0.088 sweep miss by returning symmetrically inward to better balance the outer W amplitudes.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.08768943766028914,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "Repairs the central-hub 0.088 miss by preparing outer leaves first then reusing the middle hub twice to spread one excitation.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.2000000000730503,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 18.0
+      }
+     ],
+     "calls": [
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.0212253000063356,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.029373800003668293,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.04228610001155175,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.03296730000874959,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": true,
+       "latency_s": 0.027560300019104034,
+       "error": null
+      }
+     ]
+    },
+    "fresh": {
+     "condition": "fresh",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "A linear cascade from qubit 0 uses one CNOT for the initial two-qubit W pair and two CNOTs for each further particle-conserving split to spread the single excitation across all five qubits.",
+         "count": 7,
+         "verdict": "reached",
+         "infidelity": 2.6712210221546684e-10,
+         "proof": 0.9999999997328777,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "The mirror cascade from qubit 4 uses one CNOT for the initial pair and two CNOTs per subsequent controlled split to distribute the excitation over the whole chain.",
+         "count": 7,
+         "verdict": "reached",
+         "infidelity": 8.339915424926403e-10,
+         "proof": 0.9999999991660085,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Starting from the central link keeps depth low while providing one CNOT for the seed entanglement and two CNOTs per added branch to reach all five qubits symmetrically.",
+         "count": 7,
+         "verdict": "reached",
+         "infidelity": 1.5163514888172358e-10,
+         "proof": 0.9999999998489,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Doubling every chain link supplies two CNOTs per edge which suffices to realize every required controlled rotation for exact W-state preparation.",
+         "count": 8,
+         "verdict": "reached",
+         "infidelity": 5.362554844623446e-10,
+         "proof": 0.999999999463745,
+         "note": ""
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 75.8
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Cascades a single excitation from qubit 4 down the line using two CNOTs per edge to realize each particle-conserving split for the W5 state.",
+         "count": 8,
+         "verdict": "reached",
+         "infidelity": 4.5684767080445e-10,
+         "proof": 0.9999999995431537,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Cascades a single excitation from qubit 0 up the line using two CNOTs per edge to realize each particle-conserving split for the W5 state.",
+         "count": 8,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Starts from the middle qubit and fans out both ways with two CNOTs per edge to distribute one excitation uniformly with balanced depth.",
+         "count": 8,
+         "verdict": "reached",
+         "infidelity": 7.246825362017262e-11,
+         "proof": 0.999999999927532,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "Covers every line edge twice with alternating CNOT directions to provide full two-qubit entangling power for sequential W5 splitting steps.",
+         "count": 8,
+         "verdict": "reached",
+         "infidelity": 3.4782243751863007e-10,
+         "proof": 0.9999999996392668,
+         "note": ""
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 26.8
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Sequential cascade from qubit 4 distributes the single excitation across all four linear cuts with one entangling gate per cut, matching the Schmidt rank 2 required for the W state.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477338400922,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Reverse cascade propagates the excitation from qubit 0 outward covering each bipartition once, giving full rank-2 entanglement with minimal depth.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477339014591,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Starting from the central qubit balances the Schmidt coefficients on both sides and uses each chain edge exactly once to generate symmetric W entanglement.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.39574773396440255,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Doubling each edge implements the standard deterministic W-state splitter sequence where each pair synthesizes an arbitrary excitation-preserving controlled rotation.",
+         "count": 8,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 51.0
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Linear sweep crosses each of the four chain bipartitions exactly once, giving the required Schmidt rank 2 everywhere with the minimal four entanglers.",
+         "count": 4,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           2
+          ]
+         ],
+         "why": "Chain sweep plus two extra central CNOTs boosts the middle cut where W5 entanglement is largest while keeping count near minimal.",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.087689437487112,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Doubling every chain edge allows each sequential excitation-splitting controlled rotation to be realized, implementing the standard deterministic W-state cascade.",
+         "count": 8,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Center-out doubled pairs form a balanced excitation-distribution tree from qubit 2 that realizes all beam-splitter angles with low depth.",
+         "count": 8,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 36.1
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Forward sequential MPS staircase from qubit 0 crosses each linear cut once giving Schmidt rank 2 matching all W-state bipartitions.",
+         "count": 4,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ]
+         ],
+         "why": "Reverse sequential build from qubit 4 crosses each cut once and realizes the recursive single-excitation peeling decomposition of W5.",
+         "count": 4,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        },
+        {
+         "cnots": [
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "Middle-seeded growth expands an entangled pair outward to both ends while keeping bond dimension 2 across every cut.",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477337817352,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "Doubled staircase provides a full excitation-preserving Givens rotation per edge guaranteeing exact sequential distribution of one excitation.",
+         "count": 8,
+         "verdict": "repeat",
+         "infidelity": null,
+         "proof": null,
+         "note": "already tried"
+        }
+       ],
+       "best_so_far": 7,
+       "seconds": 30.9
+      }
+     ],
+     "calls": [
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": false,
+       "latency_s": 70.68799659999786,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": false,
+       "latency_s": 22.784947500011185,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": false,
+       "latency_s": 42.45713710002019,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": false,
+       "latency_s": 30.556794200005243,
+       "error": null
+      },
+      {
+       "provider": "meta",
+       "model": "muse-spark-1.3",
+       "role": "circuit ideas",
+       "cached": false,
+       "latency_s": 27.5501660000009,
+       "error": null
+      }
+     ]
+    },
+    "random": {
+     "condition": "random",
+     "rounds": [
+      {
+       "round": 1,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.3957477337993469,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.542857142858483,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 4,
+         "verdict": "missed",
+         "infidelity": 0.4000000000606695,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           4
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 8,
+         "verdict": "missed",
+         "infidelity": 0.4000000000596241,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 11.2
+      },
+      {
+       "round": 2,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           0,
+           1
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 7,
+         "verdict": "missed",
+         "infidelity": 0.3171572877022538,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           4
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 7,
+         "verdict": "missed",
+         "infidelity": 0.13944487392530203,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.4171572877414592,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.4000000000084065,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 24.5
+      },
+      {
+       "round": 3,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.39574773396067386,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.4000000000620797,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.13944487261812455,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           4,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.4000000000261944,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 16.0
+      },
+      {
+       "round": 4,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.4763932023680779,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           3
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.4000000000040471,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           0,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.20000000034383325,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           1
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.2000000000227653,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 15.6
+      },
+      {
+       "round": 5,
+       "proposals": [
+        {
+         "cnots": [
+          [
+           4,
+           3
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.41715728756305126,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           1,
+           2
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           3,
+           4
+          ],
+          [
+           3,
+           2
+          ],
+          [
+           3,
+           4
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.20000000018469166,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           0
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           1
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.40000000002491964,
+         "proof": null,
+         "note": ""
+        },
+        {
+         "cnots": [
+          [
+           2,
+           1
+          ],
+          [
+           0,
+           1
+          ],
+          [
+           4,
+           3
+          ],
+          [
+           1,
+           2
+          ],
+          [
+           2,
+           3
+          ],
+          [
+           2,
+           3
+          ]
+         ],
+         "why": "random allowed pairs",
+         "count": 6,
+         "verdict": "missed",
+         "infidelity": 0.20000000010310048,
+         "proof": null,
+         "note": ""
+        }
+       ],
+       "best_so_far": null,
+       "seconds": 17.5
+      }
+     ],
+     "calls": []
+    }
+   }
+  }
+ ]
+}

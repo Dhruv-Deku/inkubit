@@ -1,0 +1,1241 @@
+{
+ "papers": [
+  {
+   "source": "arXiv:1804.03719",
+   "title": "Quantum Algorithm Implementations for Beginners (arXiv:1804.03719)",
+   "experiments": [
+    {
+     "name": "Bell state preparation",
+     "page": 15,
+     "quote": "The final output was {'11': 493, '00': 507}.",
+     "verdict": "reproduced",
+     "circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg c[2];\nh q[0];\ncx q[0],q[1];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];",
+     "spec": {
+      "kind": "circuit",
+      "version": "1.0",
+      "num_qubits": 2,
+      "num_clbits": 2,
+      "operations": [
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         0
+        ]
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         1
+        ]
+       }
+      ],
+      "measurements": [],
+      "metadata": {
+       "title": "From OpenQASM",
+       "origin": "text"
+      }
+     },
+     "claims": [
+      {
+       "outcome": "11",
+       "ours": "11",
+       "claimed": 0.493,
+       "ideal": 0.5,
+       "noisy": 0.453893,
+       "tolerance": 0.0474,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      },
+      {
+       "outcome": "00",
+       "ours": "00",
+       "claimed": 0.507,
+       "ideal": 0.5,
+       "noisy": 0.478106,
+       "tolerance": 0.0474,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      }
+     ],
+     "bit_order": "q0_rightmost",
+     "bit_order_inferred": false,
+     "shots": 1000,
+     "hardware": "qasm_simulator",
+     "tvd_to_ideal": 0.007,
+     "note": ""
+    },
+    {
+     "name": "Grover search for x*=(1,1)",
+     "page": 19,
+     "quote": "We executed 1,024 shots using the ibmqx4 and x = (1, 1) was obtained 662 times with (0, 0), (0, 1), and (1, 0) occurring 119, 101, and 142 times respectively.",
+     "verdict": "no circuit",
+     "circuit_qasm": "",
+     "spec": null,
+     "claims": [],
+     "bit_order": "unknown",
+     "bit_order_inferred": false,
+     "shots": 1024,
+     "hardware": "ibmqx4",
+     "tvd_to_ideal": null,
+     "note": "the paper does not specify this circuit completely"
+    },
+    {
+     "name": "Bernstein-Vazirani, secret 01",
+     "page": 23,
+     "quote": "Fig. 10. Results from running the BV algorithm for 8192 shots on 2-bit hidden-strings “01”, “10” and “11” respectively (left to right) on ibmqx4. The y-axis here is the probability of obtaining the hidden string, which theoretically should be 1.",
+     "verdict": "no circuit",
+     "circuit_qasm": "",
+     "spec": null,
+     "claims": [],
+     "bit_order": "unknown",
+     "bit_order_inferred": false,
+     "shots": 8192,
+     "hardware": "ibmqx4",
+     "tvd_to_ideal": null,
+     "note": "the paper does not specify this circuit completely"
+    },
+    {
+     "name": "HHL, |b>=|0>, Z measurement",
+     "page": 29,
+     "quote": "Fig. 16. Results of the circuit with Z measurement (computational basis measurement) from the actual run and the simulator on a ibmqx4. 4096 shots were used for both the cases.",
+     "verdict": "no circuit",
+     "circuit_qasm": "",
+     "spec": null,
+     "claims": [],
+     "bit_order": "unknown",
+     "bit_order_inferred": false,
+     "shots": 4096,
+     "hardware": "IBM QX Simulator",
+     "tvd_to_ideal": null,
+     "note": "the paper does not specify this circuit completely"
+    },
+    {
+     "name": "Shor's algorithm for N=15 and x=11",
+     "page": 33,
+     "quote": "Fig. 19. Output from the circuit from Figure 18 implemented on the simulator (left) and ibmqx4 (right).",
+     "verdict": "not reproduced",
+     "circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[5];\ncreg c[3];\nh q[0];\nh q[1];\nh q[2];\ncx q[2],q[3];\ncx q[2],q[4];\nh q[1];\ncu1(pi/2) q[1],q[0];\nh q[0];\ncu1(pi/4) q[1],q[2];\ncu1(pi/2) q[0],q[2];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];\nmeasure q[2] -> c[2];",
+     "spec": {
+      "kind": "circuit",
+      "version": "1.0",
+      "num_qubits": 5,
+      "num_clbits": 3,
+      "operations": [
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [
+         0.7853981633974483
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         0
+        ],
+        "controls": [
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [
+         -0.7853981633974483
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         0
+        ],
+        "controls": [
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [
+         0.7853981633974483
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [
+         0.7853981633974483
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [
+         0.39269908169872414
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         3
+        ],
+        "controls": [
+         2
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         4
+        ],
+        "controls": [
+         2
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [
+         -0.39269908169872414
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [
+         0.39269908169872414
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [
+         -0.7853981633974483
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "RZ",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [
+         0.7853981633974483
+        ],
+        "clbits": []
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         0
+        ]
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         1
+        ]
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         2
+        ]
+       }
+      ],
+      "measurements": [],
+      "metadata": {
+       "title": "From OpenQASM",
+       "origin": "text"
+      }
+     },
+     "claims": [
+      {
+       "outcome": "00000",
+       "ours": "000",
+       "claimed": 0.254,
+       "ideal": 0.5,
+       "noisy": 0.472077,
+       "tolerance": 0.03,
+       "verdict": "off by 0.246 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "00100",
+       "ours": "001",
+       "claimed": 0.263,
+       "ideal": 0.0,
+       "noisy": 0.023969,
+       "tolerance": 0.03,
+       "verdict": "off by 0.263 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "01000",
+       "ours": "000",
+       "claimed": 0.114,
+       "ideal": 0.5,
+       "noisy": 0.472077,
+       "tolerance": 0.03,
+       "verdict": "off by 0.386 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "01100",
+       "ours": "001",
+       "claimed": 0.105,
+       "ideal": 0.0,
+       "noisy": 0.023969,
+       "tolerance": 0.03,
+       "verdict": "off by 0.105 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "10000",
+       "ours": "000",
+       "claimed": 0.069,
+       "ideal": 0.5,
+       "noisy": 0.472077,
+       "tolerance": 0.03,
+       "verdict": "off by 0.431 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "10100",
+       "ours": "001",
+       "claimed": 0.063,
+       "ideal": 0.0,
+       "noisy": 0.023969,
+       "tolerance": 0.03,
+       "verdict": "off by 0.063 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "11000",
+       "ours": "000",
+       "claimed": 0.078,
+       "ideal": 0.5,
+       "noisy": 0.472077,
+       "tolerance": 0.03,
+       "verdict": "off by 0.422 from the ideal value",
+       "ok": false
+      },
+      {
+       "outcome": "11100",
+       "ours": "001",
+       "claimed": 0.053,
+       "ideal": 0.0,
+       "noisy": 0.023969,
+       "tolerance": 0.03,
+       "verdict": "between the ideal and the realistic-noise value",
+       "ok": true
+      }
+     ],
+     "bit_order": "q0_leftmost",
+     "bit_order_inferred": false,
+     "shots": 0,
+     "hardware": "ibmqx4",
+     "tvd_to_ideal": null,
+     "note": ""
+    },
+    {
+     "name": "Hadamard test: regular representation of second element of S2/A2, state |0>",
+     "page": 38,
+     "quote": "Fig. 21. Actual circuit implemented on IBM’s 5-qubit computer for calculating matrix elements of the regular representation for the second element of the group S₂ and A₂ in respect to the state |0⟩ on the left and (|0⟩+|1⟩)/√2 on the right. The expected probabilities to find a final state in the ground state are (1 + 0)/2 = 0.5 and (1 + 1)/2 = 1 respectively. The results of the 1024 runs on the actual chip (on the top) and the simulator (on the bottom) are presented on the right side of each cir",
+     "verdict": "reproduced",
+     "circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[5];\ncreg c[5];\nh q[1];\ncx q[1],q[0];\nh q[1];\nmeasure q[1] -> c[1];",
+     "spec": {
+      "kind": "circuit",
+      "version": "1.0",
+      "num_qubits": 5,
+      "num_clbits": 5,
+      "operations": [
+       {
+        "gate": "H",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         0
+        ],
+        "controls": [
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         1
+        ]
+       }
+      ],
+      "measurements": [],
+      "metadata": {
+       "title": "From OpenQASM",
+       "origin": "text"
+      }
+     },
+     "claims": [
+      {
+       "outcome": "00000",
+       "ours": "00000",
+       "claimed": 0.493,
+       "ideal": 0.5,
+       "noisy": 0.510235,
+       "tolerance": 0.0469,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      },
+      {
+       "outcome": "00010",
+       "ours": "00010",
+       "claimed": 0.507,
+       "ideal": 0.5,
+       "noisy": 0.489765,
+       "tolerance": 0.0469,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      },
+      {
+       "outcome": "00000",
+       "ours": "00000",
+       "claimed": 0.497,
+       "ideal": 0.5,
+       "noisy": 0.510235,
+       "tolerance": 0.0469,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      },
+      {
+       "outcome": "00010",
+       "ours": "00010",
+       "claimed": 0.503,
+       "ideal": 0.5,
+       "noisy": 0.489765,
+       "tolerance": 0.0469,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      }
+     ],
+     "bit_order": "q0_rightmost",
+     "bit_order_inferred": false,
+     "shots": 1024,
+     "hardware": "IBM's 5-qubit computer",
+     "tvd_to_ideal": 0.003,
+     "note": ""
+    },
+    {
+     "name": "Hadamard test irreducible rep second element S2/A2 state |1>",
+     "page": 38,
+     "quote": "Fig. 22. Actual circuit implemented on IBM's 5-qubit computer for calculating matrix elements of the direct sum of the irreducible representations for the second element of the group S2 and A2 with respect to the state |0> on the left and |1> on the right. The expected probabilities to find a final state in the ground state are (1 + 1)/2 = 1 and (1 − 1)/2 = 0 respectively. The results of the 1024 runs on the actual chip (on the top) and the simulator (on the bottom) are presented on the right si",
+     "verdict": "reproduced",
+     "circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[5];\ncreg c[5];\nx q[0];\nh q[0];\nh q[1];\ncx q[1],q[0];\nh q[0];\nh q[1];\nmeasure q[1] -> c[1];",
+     "spec": {
+      "kind": "circuit",
+      "version": "1.0",
+      "num_qubits": 5,
+      "num_clbits": 5,
+      "operations": [
+       {
+        "gate": "X",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         0
+        ],
+        "controls": [
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         1
+        ]
+       }
+      ],
+      "measurements": [],
+      "metadata": {
+       "title": "From OpenQASM",
+       "origin": "text"
+      }
+     },
+     "claims": [
+      {
+       "outcome": "00000",
+       "ours": "00000",
+       "claimed": 0.059,
+       "ideal": 0.0,
+       "noisy": 0.052694,
+       "tolerance": 0.0221,
+       "verdict": "between the ideal and the realistic-noise value",
+       "ok": true
+      },
+      {
+       "outcome": "00010",
+       "ours": "00010",
+       "claimed": 0.941,
+       "ideal": 1.0,
+       "noisy": 0.947306,
+       "tolerance": 0.0221,
+       "verdict": "between the ideal and the realistic-noise value",
+       "ok": true
+      },
+      {
+       "outcome": "00000",
+       "ours": "00000",
+       "claimed": 0.0,
+       "ideal": 0.0,
+       "noisy": 0.052694,
+       "tolerance": 0.01,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      },
+      {
+       "outcome": "00010",
+       "ours": "00010",
+       "claimed": 1.0,
+       "ideal": 1.0,
+       "noisy": 0.947306,
+       "tolerance": 0.01,
+       "verdict": "within error of the ideal value",
+       "ok": true
+      }
+     ],
+     "bit_order": "q0_rightmost",
+     "bit_order_inferred": false,
+     "shots": 1024,
+     "hardware": "IBM's 5-qubit computer",
+     "tvd_to_ideal": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Discrete-time quantum random walk, 4 steps on 4-vertex cycle",
+     "page": 46,
+     "quote": "But running the same code on ibm_vigo gave |100⟩ with only 21.7% probability.",
+     "verdict": "not reproduced",
+     "circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[3];\ncreg c[3];\nh q[0];\nccx q[0],q[1],q[2];\ncx q[0],q[1];\nx q[0];\nx q[1];\nccx q[0],q[1],q[2];\nx q[1];\ncx q[0],q[1];\nh q[0];\nccx q[0],q[1],q[2];\ncx q[0],q[1];\nx q[0];\nx q[1];\nccx q[0],q[1],q[2];\nx q[1];\ncx q[0],q[1];\nh q[0];\nccx q[0],q[1],q[2];\ncx q[0],q[1];\nx q[0];\nx q[1];\nccx q[0],q[1],q[2];\nx q[1];\ncx q[0],q[1];\nh q[0];\nccx q[0],q[1],q[2];\ncx q[0],q[1];\nx q[0];\nx q[1];\nccx q[0],q[1],q[2];\nx q[1];\ncx q[0],q[1];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];\nmeasure q[2] -> c[2];",
+     "spec": {
+      "kind": "circuit",
+      "version": "1.0",
+      "num_qubits": 3,
+      "num_clbits": 3,
+      "operations": [
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "H",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CCX",
+        "targets": [
+         2
+        ],
+        "controls": [
+         0,
+         1
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "X",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "CX",
+        "targets": [
+         1
+        ],
+        "controls": [
+         0
+        ],
+        "params": [],
+        "clbits": []
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         0
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         0
+        ]
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         1
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         1
+        ]
+       },
+       {
+        "gate": "MEASURE",
+        "targets": [
+         2
+        ],
+        "controls": [],
+        "params": [],
+        "clbits": [
+         2
+        ]
+       }
+      ],
+      "measurements": [],
+      "metadata": {
+       "title": "From OpenQASM",
+       "origin": "text"
+      }
+     },
+     "claims": [
+      {
+       "outcome": "100",
+       "ours": "001",
+       "claimed": 0.217,
+       "ideal": 0.0,
+       "noisy": 0.103045,
+       "tolerance": 0.03,
+       "verdict": "off by 0.217 from the ideal value",
+       "ok": false
+      }
+     ],
+     "bit_order": "q0_leftmost",
+     "bit_order_inferred": true,
+     "shots": 0,
+     "hardware": "ibm_vigo",
+     "tvd_to_ideal": null,
+     "note": ""
+    }
+   ],
+   "reproduced": 3,
+   "checked": 5,
+   "claims_ok": 11,
+   "claims_total": 19,
+   "headline": "3 of 5 experiments reproduced exactly within their error bars; 11 of 19 stated probabilities check out.",
+   "notes": "Page numbers are the printed paper pages shown in the arXiv version. Each entry has a circuit given by a figure and/or Qiskit/OpenQASM code and reported outcome probabilities in text, a table, or a histogram.",
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "paper experiments",
+     "cached": true,
+     "latency_s": 0.13602250002440996,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.23840740000014193,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.2454171999997925,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.1872342000133358,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.24698050000006333,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.24115049999090843,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.9462409999978263,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.0394562000001315,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "paper experiment",
+     "cached": true,
+     "latency_s": 0.08262879998073913,
+     "error": null
+    }
+   ],
+   "seconds": 107.4
+  }
+ ]
+}

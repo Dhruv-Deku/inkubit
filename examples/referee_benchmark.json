@@ -1,0 +1,2600 @@
+{
+ "spark": "muse-spark-1.3",
+ "wonder": "muse-wonder-1.0",
+ "claims": 24,
+ "debates": 8,
+ "summary": {
+  "spark_first": 17,
+  "final_right": 19,
+  "caught": 4,
+  "false_alarms": 5,
+  "talked_out": 2
+ },
+ "wrong_at_first": 7,
+ "seconds": 1722.8,
+ "rows": [
+  {
+   "circuit": {
+    "num_qubits": 6,
+    "operations": [
+     {
+      "gate": "H",
+      "targets": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       3
+      ],
+      "params": [
+       1.223
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       3
+      ],
+      "params": [
+       0.265
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       4
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       1
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       0
+      ],
+      "params": [
+       0.663
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       4
+      ],
+      "params": [
+       2.005
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       0
+      ],
+      "params": [
+       2.664
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.595
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       4
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.13
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       2
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       1
+      ],
+      "params": [
+       2.659
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       5
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       5
+      ],
+      "params": [
+       2.749
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       2
+      ],
+      "params": [
+       2.128
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       4
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       2,
+       1
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "0100",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 0100."
+     },
+     "claim_text": "most likely: 0100",
+     "truth": "most likely: 0001, 0011, 0100, 0110, 1001, 1011, 1100, 1110 (0.0669)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "Outcome 0100 attains the maximum marginal probability. It is tied with the other outcomes whose second and fourth bits differ.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge agrees 0100 is maximal; no evidence against it, so keep original most-likely claim."
+     },
+     "final": "most likely: 0100",
+     "final_right": true
+    },
+    {
+     "question": "What is the probability of outcome 0100?",
+     "claim": {
+      "bits": "0100",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.098,
+      "qubits": [],
+      "statement": "The probability of outcome 0100 is 0.098."
+     },
+     "claim_text": "P(0100) = 0.098",
+     "truth": "P(0100) = 0.0669",
+     "claim_right": false,
+     "challenge": {
+      "agree": false,
+      "reason": "Propagating the measured projector backwards through the final CX/CCX/RY layer and evaluating the remaining amplitudes gives P(0100) approximately 0.0669, not 0.098.",
+      "counter": "P(0100) = 0.067",
+      "right": true
+     },
+     "reply": {
+      "stand": false,
+      "reason": "Challenge gives specific Heisenberg back-propagation yielding ~0.0669, more credible than 0.098 with no derivation; concede original probability was wrong."
+     },
+     "final": "P(0100) = 0.067",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 1 and 2 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": true,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       1,
+       2
+      ],
+      "statement": "Qubits 1 and 2 are entangled just before measurement."
+     },
+     "claim_text": "qubits 1, 2 entangled",
+     "truth": "qubits 1 and 2 are not entangled (negativity 0.0000)",
+     "claim_right": false,
+     "challenge": {
+      "agree": true,
+      "reason": "I have no derivation showing the two-qubit reduced state is separable, so I do not dispute this claim.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge does not dispute entanglement of 1 and 2; undisputed claims stand."
+     },
+     "final": "qubits 1, 2 entangled",
+     "final_right": false
+    }
+   ],
+   "spark_first": 1,
+   "final_right": 2,
+   "caught": 1,
+   "false_alarms": 0,
+   "talked_out": 0,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 61.3755397000059,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 242.99230880002142,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 50.40988909997395,
+     "error": null
+    }
+   ],
+   "seconds": 444.0,
+   "title": "Bigger circuit 1",
+   "qubits": 6,
+   "gates": 25
+  },
+  {
+   "circuit": {
+    "num_qubits": 6,
+    "operations": [
+     {
+      "gate": "H",
+      "targets": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       0
+      ],
+      "params": [
+       1.592
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       2
+      ],
+      "params": [
+       1.198
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.443
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       4,
+       0
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       1,
+       2
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       1
+      ],
+      "params": [
+       0.406
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       0
+      ],
+      "params": [
+       2.223
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       2,
+       3
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       5
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       0,
+       5
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       2,
+       4
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       4
+      ],
+      "params": [
+       1.282
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       1,
+       2
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       1,
+       5
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       4
+      ],
+      "controls": [
+       2
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "0111",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 0111."
+     },
+     "claim_text": "most likely: 0111",
+     "truth": "most likely: 1000 (0.1942)",
+     "claim_right": false,
+     "challenge": {
+      "agree": false,
+      "reason": "Pushing the state through the RY rotations and the subsequent permutation gates gives outcome 1000 with probability about 0.194, larger than any other measured outcome. Thus 0111 is not the most likely outcome.",
+      "counter": "most likely: 1000",
+      "right": true
+     },
+     "reply": {
+      "stand": true,
+      "reason": "No simulator available to verify; challenger's reason incorrectly treats post-RY gates as pure permutations while ignoring later RY on 1,0 and RX on 4, so 0.194 for 1000 is unproven. Early RYs bias qubits 0,1,2 toward 1, supporting 0111."
+     },
+     "final": "most likely: 0111",
+     "final_right": false
+    },
+    {
+     "question": "What is the probability of outcome 0111?",
+     "claim": {
+      "bits": "0111",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.132,
+      "qubits": [],
+      "statement": "The probability of outcome 0111 is 0.132."
+     },
+     "claim_text": "P(0111) = 0.132",
+     "truth": "P(0111) = 0.1154",
+     "claim_right": true,
+     "challenge": {
+      "agree": false,
+      "reason": "The calculated probability of q3q2q1q0 = 0111 is approximately 0.119, not 0.132.",
+      "counter": "P(0111) = 0.119",
+      "right": true
+     },
+     "reply": {
+      "stand": true,
+      "reason": "No simulator available; 0.119 vs 0.132 is small and within manual approximation error. Challenger provides no verifiable derivation, so retain original estimate."
+     },
+     "final": "P(0111) = 0.132",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 2 and 3 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": true,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       2,
+       3
+      ],
+      "statement": "Qubits 2 and 3 are entangled just before measurement."
+     },
+     "claim_text": "qubits 2, 3 entangled",
+     "truth": "qubits 2 and 3 are not entangled (negativity 0.0000)",
+     "claim_right": false,
+     "challenge": {
+      "agree": true,
+      "reason": "The reduced state of qubits 2 and 3 just before measurement is entangled.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge agrees that qubits 2 and 3 are entangled; claim undisputed."
+     },
+     "final": "qubits 2, 3 entangled",
+     "final_right": false
+    }
+   ],
+   "spark_first": 1,
+   "final_right": 1,
+   "caught": 1,
+   "false_alarms": 1,
+   "talked_out": 0,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 13.309477700007847,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 111.5536724999838,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 13.129682700004196,
+     "error": null
+    }
+   ],
+   "seconds": 233.9,
+   "title": "Bigger circuit 2",
+   "qubits": 6,
+   "gates": 25
+  },
+  {
+   "circuit": {
+    "num_qubits": 7,
+    "operations": [
+     {
+      "gate": "H",
+      "targets": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       1,
+       5
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       4
+      ],
+      "params": [
+       2.567
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       6
+      ],
+      "params": [
+       1.762
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       2.004
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       6
+      ],
+      "controls": [
+       4,
+       2
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       5
+      ],
+      "params": [
+       1.574
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       0,
+       1
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       2
+      ],
+      "params": [
+       0.752
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       2
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       5
+      ],
+      "params": [
+       0.527
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       6
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       2
+      ],
+      "params": [
+       0.928
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       0
+      ],
+      "params": [
+       1.052
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       6
+      ],
+      "params": [
+       0.574
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       0,
+       5
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       2
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       2
+      ],
+      "controls": [
+       0
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "0000",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 0000."
+     },
+     "claim_text": "most likely: 0000",
+     "truth": "most likely: 0000, 0001, 0010, 0011, 0100, 0101, 0110, 0111, 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111 (0.0625)",
+     "claim_right": true,
+     "challenge": {
+      "agree": false,
+      "reason": "Dispute: all 16 measured outcomes have probability 1/16, so 0000 is not uniquely most likely; it is only tied with every other outcome. Initially the CX/CCX network acts on |+>^{⊗7}: a controlled X leaves a |+> target unchanged, so the state is still |+>^{⊗7} and no early entanglement is created. Qubit 1 is then only RX-rotated while in |+> (a phase, since X|+>=|+>) and subsequently appears only i",
+      "counter": "most likely: 0000",
+      "right": true
+     },
+     "reply": {
+      "stand": false,
+      "reason": "Concede: the challenge's uniform-distribution analysis is correct. Early CX/CCX on |+>^7 are no-ops, qubits 0,1,3,5 stay |+> factors until the late gates, Pr(q2=0)=1/2 is preserved, and the late CCX 0,5->2 plus diagonal CZ give uniform 1/4 on (q0,q2). With independent uniform q1,q3 all 16 outcomes are 1/16, so 0000 is not uniquely most likely."
+     },
+     "final": "most likely: 0000",
+     "final_right": true
+    },
+    {
+     "question": "What is the probability of outcome 0010?",
+     "claim": {
+      "bits": "0010",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.0625,
+      "qubits": [],
+      "statement": "The probability of outcome 0010 is 0.0625."
+     },
+     "claim_text": "P(0010) = 0.0625",
+     "truth": "P(0010) = 0.0625",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "Agree: in Qiskit order 0010 means q3=0, q2=0, q1=1, q0=0. As shown above, the measured distribution is uniform over all 16 outcomes, so this probability is exactly 1/16 = 0.0625.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Stand: challenge agrees and the uniform 1/16 distribution gives P(0010)=1/16=0.0625. Qiskit order q3=0,q2=0,q1=1,q0=0 is one of the 16 equally likely outcomes."
+     },
+     "final": "P(0010) = 0.0625",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 0 and 3 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": false,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       0,
+       3
+      ],
+      "statement": "Qubits 0 and 3 are not entangled just before measurement."
+     },
+     "claim_text": "qubits 0, 3 not entangled",
+     "truth": "qubits 0 and 3 are not entangled (negativity 0.0000)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "Agree: qubit 3 is never entangled. Every gate touching qubit 3 has it as an X-target (CX 0→3, CCX 0,1→3, CX 6→3, CX 2→3), and at each such time qubit 3 is still a separable |+> factor (true initially and preserved because such a gate is a no-op on it). Since X|+>=|+>, each of those gates acts as the identity on the whole state and creates no entanglement. Thus just before measurement the state fac",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Stand: challenge agrees and is correct. Every gate with qubit 3 as target has control state acting on |+>_3 as identity (X|+>=|+>), so qubit 3 stays a separable |+> factor to the end and cannot be entangled with qubit 0."
+     },
+     "final": "qubits 0, 3 not entangled",
+     "final_right": true
+    }
+   ],
+   "spark_first": 3,
+   "final_right": 3,
+   "caught": 0,
+   "false_alarms": 1,
+   "talked_out": 1,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 56.99699720001081,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 60.159974399983184,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 29.464821800007485,
+     "error": null
+    }
+   ],
+   "seconds": 146.7,
+   "title": "Bigger circuit 3",
+   "qubits": 7,
+   "gates": 22
+  },
+  {
+   "circuit": {
+    "num_qubits": 7,
+    "operations": [
+     {
+      "gate": "H",
+      "targets": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.737
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       1
+      ],
+      "params": [
+       0.934
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       5
+      ],
+      "params": [
+       2.396
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       6
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       2.543
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       6
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       4
+      ],
+      "params": [
+       0.737
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.186
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       4,
+       2
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       5
+      ],
+      "params": [
+       0.664
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       6,
+       2
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       4,
+       0
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       0
+      ],
+      "params": [
+       1.831
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       4
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       6
+      ],
+      "params": [
+       2.546
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       3
+      ],
+      "params": [
+       2.33
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "1011",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 1011."
+     },
+     "claim_text": "most likely: 1011",
+     "truth": "most likely: 0010, 1010 (0.1709)",
+     "claim_right": false,
+     "challenge": {
+      "agree": false,
+      "reason": "Several gates are no-ops because their target is still in |+>: the CX gates onto 0,6,4,3 and 2 before those targets are rotated, CX 1->3, and the CCXs onto 0 and 3. The remaining relevant states are |f>=RY(0.737)|+> on q4, |a> on q1 and |b>=RY(1.831)|+> on q0. Here P(q4=0)=(1-sin0.737)/2=0.1640 and P(q4=1)=0.8360; P(q0(b)=0)=(1-sin1.831)/2=0.0168, P=1 is 0.9832. For q1, RZ(1.737), RY(0.934), RX(3.",
+      "counter": "most likely: 0010,1010",
+      "right": false
+     },
+     "reply": {
+      "stand": false,
+      "reason": "Challenge is right. CX with target |+> are identities, so q3 stays independent 1/2 and q4,q2,q1,q0 analysis gives P(1011)=0.25*[w0*B1*p1+w1*B0*p0]~0.036, while P(1010)=0.25*p1*[w0*B0+w1*B1]~0.171 which is maximal tied with 0010."
+     },
+     "final": "most likely: 0010,1010",
+     "final_right": false
+    },
+    {
+     "question": "What is the probability of outcome 1010?",
+     "claim": {
+      "bits": "1010",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.045,
+      "qubits": [],
+      "statement": "The probability of measuring outcome 1010 is 0.045."
+     },
+     "claim_text": "P(1010) = 0.045",
+     "truth": "P(1010) = 0.1709",
+     "claim_right": false,
+     "challenge": {
+      "agree": false,
+      "reason": "Using the same simplification, for q2=0,q1=1,q0=0 the probability before including q3 is 0.5*P(q1=1)*[w0*B0+w1*B1] = 0.5*0.8287*[(0.1640*0.0168)+(0.8360*0.9832)] = 0.3417. Qubit 3 contributes an independent factor 1/2. Hence P(1010)=0.5*0.3417=0.1709, not 0.045.",
+      "counter": "P(1010) = 0.1709",
+      "right": true
+     },
+     "reply": {
+      "stand": false,
+      "reason": "Challenge is right. For j=q2=0 the Toffoli does nothing, so S=0.5*p1*[w0*B0+w1*B1] with p1~0.8287, w0~0.164, B0~0.0168, w1~0.836, B1~0.9832 gives 0.3417 before q3, times 1/2 for q3 gives ~0.1709, not 0.045."
+     },
+     "final": "P(1010) = 0.1709",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 1 and 2 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": true,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       1,
+       2
+      ],
+      "statement": "Qubits 1 and 2 are entangled just before measurement."
+     },
+     "claim_text": "qubits 1, 2 entangled",
+     "truth": "qubits 1 and 2 are entangled (negativity 0.3770)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "After tracing out q4 and q0, rho12 = w0|+><+|_2 tensor |a><a|_1 + w1|Phi1><Phi1|, where w1=(1+sin0.737)/2=0.8360 and Phi1=(|0>|a>+|1>X|a>)/sqrt(2). The Bloch x-component of |a> is s=<a|X|a>=-cos(1.737)cos(0.934) with the sign from RZ, numerically -0.0984, so in the local basis {|a>,|a-perp>} X|a>=s|a>+t|a-perp> with t=sqrt(1-s^2)=0.9952. Partial transposition of rho12 has PT_{01,01}=0 and PT_{01,1",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge agrees and is correct. After tracing q4,q0, rho12=w0|+><+|x|a><a|+w1|Phi1><Phi1| with Phi1=(|0>|a>+|1>X|a>)/sqrt2, t=sqrt(1-s^2)~0.995 !=0, so partial transpose has 2x2 block [[0,w1*t/2],[*,*]] with negative eigenvalue, hence NPT => entangled."
+     },
+     "final": "qubits 1, 2 entangled",
+     "final_right": true
+    }
+   ],
+   "spark_first": 1,
+   "final_right": 2,
+   "caught": 1,
+   "false_alarms": 0,
+   "talked_out": 0,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": true,
+     "latency_s": 0.046661000000312924,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": true,
+     "latency_s": 0.028212399978656322,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 41.84930890001124,
+     "error": null
+    }
+   ],
+   "seconds": 41.9,
+   "title": "Bigger circuit 4",
+   "qubits": 7,
+   "gates": 20
+  },
+  {
+   "circuit": {
+    "num_qubits": 8,
+    "operations": [
+     {
+      "gate": "H",
+      "targets": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       7
+      ],
+      "params": [
+       2.536
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       6
+      ],
+      "params": [
+       1.427
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       7,
+       3
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       4,
+       7
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       2
+      ],
+      "params": [
+       1.189
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       6
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       6
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       5
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       6
+      ],
+      "params": [
+       2.832
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       6
+      ],
+      "controls": [
+       4,
+       5
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       7
+      ],
+      "params": [
+       2.416
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       6
+      ],
+      "controls": [
+       7
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       6
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       1
+      ],
+      "params": [
+       2.133
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       3
+      ],
+      "params": [
+       2.576
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       0.871
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       6
+      ],
+      "params": [
+       0.906
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       2
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       0
+      ],
+      "params": [
+       2.873
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       5
+      ],
+      "params": [
+       1.136
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       1
+      ],
+      "params": [
+       0.299
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       6
+      ],
+      "params": [
+       0.635
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       6
+      ],
+      "controls": [
+       1
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "0101",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 0101."
+     },
+     "claim_text": "most likely: 0101",
+     "truth": "most likely: 0010, 0011, 0100, 0101, 1010, 1011, 1100, 1101 (0.1205)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "0101 attains the maximum probability, 0.1205, although eight outcomes are tied for that maximum.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge agrees 0101 attains maximum 0.1205, so it is a most-likely outcome even if tied."
+     },
+     "final": "most likely: 0101",
+     "final_right": true
+    },
+    {
+     "question": "What is the probability of outcome 0101?",
+     "claim": {
+      "bits": "0101",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.12,
+      "qubits": [],
+      "statement": "The probability of outcome 0101 is about 0.12."
+     },
+     "claim_text": "P(0101) = 0.12",
+     "truth": "P(0101) = 0.1205",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "P(0101)=0.5*0.25*0.964=0.1205, which rounds to about 0.12.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge agrees P(0101)=0.1205 which rounds to about 0.12."
+     },
+     "final": "P(0101) = 0.12",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 0 and 2 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": false,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       0,
+       2
+      ],
+      "statement": "Qubits 0 and 2 are not entangled just before measurement."
+     },
+     "claim_text": "qubits 0, 2 not entangled",
+     "truth": "qubits 0 and 2 are not entangled (negativity 0.0000)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "Qubit 0 remains in a product state with the rest of the circuit, so its two-qubit state with qubit 2 is a product state.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Challenge agrees qubit 0 is in product state, so 0 and 2 are not entangled."
+     },
+     "final": "qubits 0, 2 not entangled",
+     "final_right": true
+    }
+   ],
+   "spark_first": 3,
+   "final_right": 3,
+   "caught": 0,
+   "false_alarms": 0,
+   "talked_out": 0,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 55.76953419999336,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 460.8023657000158,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 4.431230299989693,
+     "error": null
+    }
+   ],
+   "seconds": 637.9,
+   "title": "Bigger circuit 5",
+   "qubits": 8,
+   "gates": 26
+  },
+  {
+   "circuit": {
+    "num_qubits": 8,
+    "operations": [
+     {
+      "gate": "H",
+      "targets": [
+       0,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       5
+      ],
+      "controls": [
+       3
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       0
+      ],
+      "params": [
+       2.64
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       6
+      ],
+      "controls": [
+       1
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       6
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       0
+      ],
+      "controls": [
+       6
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       0,
+       3
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       4
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       4
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       0
+      ],
+      "controls": [
+       6,
+       7
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       4
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       0
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       0
+      ],
+      "params": [
+       0.931
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.323
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       1
+      ],
+      "params": [
+       1.382
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       6,
+       2
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       3
+      ],
+      "params": [
+       1.207
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       3,
+       1
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       7
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       4
+      ],
+      "controls": [
+       5
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       0.481
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       2
+      ],
+      "params": [
+       1.384
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "0000",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 0000."
+     },
+     "claim_text": "most likely: 0000",
+     "truth": "most likely: 0000, 0001, 0010, 0011, 0100, 0101, 0110, 0111, 1000, 1001, 1010, 1011, 1100, 1101, 1110, 1111 (0.0625)",
+     "claim_right": true,
+     "challenge": {
+      "agree": false,
+      "reason": "The distribution is uniform, so 0000 has no unique maximum. Every measured outcome has probability 1/16, as shown below.",
+      "counter": "most likely: 0000",
+      "right": true
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Stand: exact uniform 1/16 for all 16 outcomes is measure-zero with arbitrary angles RX 2.64, RY 0.931/1.323, RZ 1.382/1.207, RX 0.481/1.384 on measured qubits. Classical permutations preserve uniformity but local rotations break it. No symmetry forces uniform marginal, so unique maximum at 0000 remains."
+     },
+     "final": "most likely: 0000",
+     "final_right": true
+    },
+    {
+     "question": "What is the probability of outcome 0100?",
+     "claim": {
+      "bits": "0100",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.065,
+      "qubits": [],
+      "statement": "The probability of outcome 0100 is 0.065."
+     },
+     "claim_text": "P(0100) = 0.065",
+     "truth": "P(0100) = 0.0625",
+     "claim_right": true,
+     "challenge": {
+      "agree": false,
+      "reason": "0100 has probability 0.0625, not 0.065.",
+      "counter": "P(0100) = 0.0625",
+      "right": true
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Stand: 0.0625 is just 1/16 from the false uniformity assumption. With the above non-Clifford rotations the 4-qubit marginal depends continuously on angles and is not exactly uniform; direct calculation gives ~0.065 for 0100, not 0.0625."
+     },
+     "final": "P(0100) = 0.065",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 1 and 3 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": true,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       1,
+       3
+      ],
+      "statement": "Qubits 1 and 3 are entangled just before measurement."
+     },
+     "claim_text": "qubits 1, 3 entangled",
+     "truth": "qubits 1 and 3 are not entangled (negativity 0.0000)",
+     "claim_right": false,
+     "challenge": {
+      "agree": false,
+      "reason": "The reduced state of qubits 1 and 3 is separable, so they are not pairwise entangled.",
+      "counter": "qubits 1, 3 not entangled",
+      "right": true
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Stand: qubits 1 and 3 interact via CZ/CCX network, in particular CCX 3,1->4 plus prior entanglement to 4,5,6,7, and final RX1 is local. Generic reduced rho_13 is entangled with non-zero negativity. Challenge offers no PPT/negativity calculation, only assertion of separability."
+     },
+     "final": "qubits 1, 3 entangled",
+     "final_right": false
+    }
+   ],
+   "spark_first": 2,
+   "final_right": 2,
+   "caught": 1,
+   "false_alarms": 2,
+   "talked_out": 0,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 12.5648882999958,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 89.39113060000818,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 21.319615999993403,
+     "error": null
+    }
+   ],
+   "seconds": 123.3,
+   "title": "Bigger circuit 6",
+   "qubits": 8,
+   "gates": 22
+  },
+  {
+   "circuit": {
+    "num_qubits": 3,
+    "operations": [
+     {
+      "gate": "RY",
+      "targets": [
+       0
+      ],
+      "params": [
+       1.947
+      ]
+     },
+     {
+      "gate": "CZ",
+      "targets": [
+       1
+      ],
+      "controls": [
+       2
+      ]
+     },
+     {
+      "gate": "RZ",
+      "targets": [
+       1
+      ],
+      "params": [
+       2.274
+      ]
+     },
+     {
+      "gate": "H",
+      "targets": [
+       0
+      ]
+     },
+     {
+      "gate": "H",
+      "targets": [
+       1
+      ]
+     },
+     {
+      "gate": "T",
+      "targets": [
+       2
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       1
+      ],
+      "params": [
+       0.785398
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       2,
+       0
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     }
+    ],
+    "num_clbits": 3
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "000",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 000."
+     },
+     "claim_text": "most likely: 000",
+     "truth": "most likely: 000, 010 (0.4825)",
+     "claim_right": true,
+     "challenge": {
+      "agree": false,
+      "reason": "q2 remains |0>, so CZ, T, and the CCX (which has q2 as a control) never act nontrivially; RZ on q1 is only a global phase while q1=|0>. After H and RY(1.947), q0 has P(0)=((cos0.9735+sin0.9735)/sqrt2)^2 approx 0.9651. H on q1 gives |+>, and RX(pi/4) about X only changes its phase, so q1 stays 50/50. Thus P(000)=P(010)=0.5*0.9651 approx 0.4825. 000 is only tied for most likely, not uniquely the mos",
+      "counter": "most likely: 000",
+      "right": true
+     },
+     "reply": {
+      "stand": false,
+      "reason": "Challenge is correct: q2 stays |0| so CZ/T/CCX do nothing, q1 stays 50/50, q0 P(0)~0.9651. Thus P(000)=P(010)~0.4825 tied, so 000 is not uniquely the most likely."
+     },
+     "final": "most likely: 000",
+     "final_right": true
+    },
+    {
+     "question": "What is the probability of outcome 010?",
+     "claim": {
+      "bits": "010",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.4825,
+      "qubits": [],
+      "statement": "The probability of outcome 010 is about 0.483."
+     },
+     "claim_text": "P(010) = 0.4825",
+     "truth": "P(010) = 0.4825",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "010 means q2=0,q1=1,q0=0. P(q2=0)=1, P(q1=1)=0.5, P(q0=0) approx 0.9651, giving 0.4825 approx 0.483.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "P(010)=1*0.5*((cos0.9735+sin0.9735)/sqrt2)^2 ~0.4825, matches claim ~0.483."
+     },
+     "final": "P(010) = 0.4825",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 1 and 2 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": false,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       1,
+       2
+      ],
+      "statement": "Qubits 1 and 2 are not entangled just before measurement."
+     },
+     "claim_text": "qubits 1, 2 not entangled",
+     "truth": "qubits 1 and 2 are not entangled (negativity 0.0000)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "The final state factorizes: q2 is still |0>, q1 is an equal-amplitude single-qubit state, and q0 is a separate single-qubit state. The CCX cannot fire because control q2=0, so no entanglement between qubits 1 and 2 is created.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Final state is product with q2=|0>, no Toffoli action, so qubits 1 and 2 are separable."
+     },
+     "final": "qubits 1, 2 not entangled",
+     "final_right": true
+    }
+   ],
+   "spark_first": 3,
+   "final_right": 3,
+   "caught": 0,
+   "false_alarms": 1,
+   "talked_out": 1,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 22.940220899996348,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 21.055974699993385,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 13.016499799996382,
+     "error": null
+    }
+   ],
+   "seconds": 57.0,
+   "title": "New circuit 1",
+   "qubits": 3,
+   "gates": 8
+  },
+  {
+   "circuit": {
+    "num_qubits": 4,
+    "operations": [
+     {
+      "gate": "CX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       2
+      ]
+     },
+     {
+      "gate": "S",
+      "targets": [
+       0
+      ]
+     },
+     {
+      "gate": "CX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       2
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       3
+      ],
+      "params": [
+       2.094395
+      ]
+     },
+     {
+      "gate": "RX",
+      "targets": [
+       3
+      ],
+      "params": [
+       1.82
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       3
+      ],
+      "controls": [
+       2,
+       1
+      ]
+     },
+     {
+      "gate": "RY",
+      "targets": [
+       0
+      ],
+      "params": [
+       1.754
+      ]
+     },
+     {
+      "gate": "CCX",
+      "targets": [
+       1
+      ],
+      "controls": [
+       0,
+       2
+      ]
+     }
+    ],
+    "measured": [
+     {
+      "qubit": 0,
+      "clbit": 0
+     },
+     {
+      "qubit": 1,
+      "clbit": 1
+     },
+     {
+      "qubit": 2,
+      "clbit": 2
+     },
+     {
+      "qubit": 3,
+      "clbit": 3
+     }
+    ],
+    "num_clbits": 4
+   },
+   "claims": [
+    {
+     "question": "Which measured outcome is the most likely?",
+     "claim": {
+      "bits": "0001",
+      "entangled": false,
+      "kind": "most_likely",
+      "probability": -1,
+      "qubits": [],
+      "statement": "The most likely measured outcome is 0001."
+     },
+     "claim_text": "most likely: 0001",
+     "truth": "most likely: 0001 (0.3320)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "Qubits 1 and 2 remain |0> throughout: every gate targeting qubit 1 is controlled by qubit 2, and qubit 2 is never excited; likewise the CCX on qubit 3 has controls 2,1 = 0,0. Thus only qubit 3 and qubit 0 vary, independently. Qubit 3 after RY(2.094395) is 0.5|0>+0.8660|1>; after RX(1.82), with cos(0.91)\\u22480.6137 and sin(0.91)\\u22480.7895, P(q3=1)=(0.8660*0.6137)^2+(0.5*0.7895)^2\\u22480.4383, so",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Qubits 1,2 stay |0> so only q3,q0 vary; P(q3=0)~0.5617, P(q0=1)~0.5911 gives P(0001)~0.3320 which exceeds the other three possibilities, so most likely is 0001."
+     },
+     "final": "most likely: 0001",
+     "final_right": true
+    },
+    {
+     "question": "What is the probability of outcome 1001?",
+     "claim": {
+      "bits": "1001",
+      "entangled": false,
+      "kind": "probability",
+      "probability": 0.2591,
+      "qubits": [],
+      "statement": "The probability of outcome 1001 is about 0.259."
+     },
+     "claim_text": "P(1001) = 0.2591",
+     "truth": "P(1001) = 0.2591",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "As computed above, the qubits factorise with P(q3=1)\\u22480.4383 and P(q0=1)\\u22480.5911, while q2=q1=0 deterministically. Therefore P(1001)=0.4383*0.5911\\u22480.2591, matching the claim.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Factorized P(1001)=P(q3=1)*P(q0=1)~0.4383*0.5911~0.2591, matching claim."
+     },
+     "final": "P(1001) = 0.2591",
+     "final_right": true
+    },
+    {
+     "question": "Are qubits 2 and 3 entangled just before measurement?",
+     "claim": {
+      "bits": "",
+      "entangled": false,
+      "kind": "entangled",
+      "probability": -1,
+      "qubits": [
+       2,
+       3
+      ],
+      "statement": "Qubits 2 and 3 are not entangled just before measurement."
+     },
+     "claim_text": "qubits 2, 3 not entangled",
+     "truth": "qubits 2 and 3 are not entangled (negativity 0.0000)",
+     "claim_right": true,
+     "challenge": {
+      "agree": true,
+      "reason": "Qubit 2 starts in |0> and is never targeted by any gate; it is used only as a control and stays |0>. Qubit 3 evolves only by single-qubit RY/RX gates (the CCX onto it never fires since its controls are 0). The pre-measurement state is a product state with qubit 2 in pure |0> tensored with qubit 3's state, so qubits 2 and 3 are not entangled.",
+      "counter": null,
+      "right": null
+     },
+     "reply": {
+      "stand": true,
+      "reason": "Qubit 2 never targeted and stays |0>; qubit 3 sees only single-qubit gates as CCX controls are 0, so state is product and 2,3 unentangled."
+     },
+     "final": "qubits 2, 3 not entangled",
+     "final_right": true
+    }
+   ],
+   "spark_first": 3,
+   "final_right": 3,
+   "caught": 0,
+   "false_alarms": 0,
+   "talked_out": 0,
+   "calls": [
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "claims",
+     "cached": false,
+     "latency_s": 14.808401599992067,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-wonder-1.0",
+     "role": "challenge",
+     "cached": false,
+     "latency_s": 17.868141000013566,
+     "error": null
+    },
+    {
+     "provider": "meta",
+     "model": "muse-spark-1.3",
+     "role": "replies",
+     "cached": false,
+     "latency_s": 5.451805500022601,
+     "error": null
+    }
+   ],
+   "seconds": 38.1,
+   "title": "New circuit 2",
+   "qubits": 4,
+   "gates": 8
+  }
+ ]
+}
