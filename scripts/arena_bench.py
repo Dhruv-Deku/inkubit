@@ -5,6 +5,10 @@ Two sets: the textbook examples (famous circuits a model has seen many times) an
 costs nothing. Writes examples/arena_benchmark.json (shown on the start page) and docs/ARENA.md.
 
     .venv/Scripts/python scripts/arena_bench.py
+    .venv/Scripts/python scripts/arena_bench.py --glimmer   # Muse Glimmer, Meta's open-weight model, on this machine
+
+--glimmer asks Muse Glimmer through Ollama's OpenAI-compatible endpoint on localhost (ollama pull muse-glimmer)
+with the same prompt and schema, and writes examples/arena_benchmark_glimmer.json and docs/ARENA_GLIMMER.md.
 """
 
 from __future__ import annotations
@@ -19,6 +23,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
 os.environ["QCANVAS_ALLOW_FALLBACK"] = "0"
+GLIMMER = "--glimmer" in sys.argv
+if GLIMMER:  # the local model needs no key; the real one is never sent to it
+    os.environ |= {"QCANVAS_MODEL_PROVIDER": "meta", "META_API_KEY": "ollama", "QCANVAS_REASONING_MODEL": "muse-glimmer",
+                   "QCANVAS_META_BASE_URL": "http://127.0.0.1:11434/v1", "QCANVAS_HTTP_TIMEOUT": "1800"}
+SUFFIX = "_glimmer" if GLIMMER else ""
+MODEL_LABEL = ("Muse Glimmer, Meta's open-weight model (30B, 4-bit, run with Ollama on a laptop: RTX 5050 8 GB plus CPU)"
+               if GLIMMER else "Muse Spark")
 
 from qcanvas.adapters.registry import get_models  # noqa: E402
 from qcanvas.arena import BENCH_FILE, BenchRow, ask_alone, bigger_circuits, fresh_circuits, summarise  # noqa: E402
@@ -60,7 +71,8 @@ def main() -> None:
         print(f"{name:20} {c.verdict:8} off by {c.tvd * 100:5.1f}%  {'(cached)' if res.call['cached'] else ''}",
               flush=True)
     bench = summarise(models.settings.reasoning_model, rows, VERIFIER)
-    BENCH_FILE.write_text(json.dumps(bench.model_dump(mode="json"), indent=1) + "\n", encoding="utf-8")
+    out = BENCH_FILE.with_name(BENCH_FILE.stem + SUFFIX + ".json")
+    out.write_text(json.dumps(bench.model_dump(mode="json"), indent=1) + "\n", encoding="utf-8")
 
     def line(label: str, s) -> str:
         return (f"- **{label}**: exact on {s.matched} of {s.count}, close on {s.close}, wrong on {s.wrong}"
@@ -70,7 +82,7 @@ def main() -> None:
     lines = [
         "# AI alone vs Q-Canvas",
         "",
-        f"Muse Spark (`{bench.model}`) was asked to predict each circuit's measured outcome odds on its own, the way "
+        f"{MODEL_LABEL} (`{bench.model}`) was asked to predict each circuit's measured outcome odds on its own, the way "
         "a chat assistant answers: the circuit as data (no title or notes), no simulator, medium reasoning effort. "
         "Answers are scored against exact simulation by total variation distance (the share of probability in the "
         "wrong place): exact below 1%, close below 5%, wrong from 5%. Two sets: the textbook examples, which a "
@@ -90,7 +102,7 @@ def main() -> None:
         off = "–" if r.tvd is None else f"{r.tvd * 100:.1f}%"
         lines.append(f"| {r.set} | {r.title} | {r.qubits} | {r.gates} | {r.verdict} | {off} | {r.impossible} | {r.missed} |")
     lines += ["", bench.verifier, ""]
-    (ROOT / "docs" / "ARENA.md").write_text("\n".join(lines), encoding="utf-8")
+    (ROOT / "docs" / f"ARENA{SUFFIX.upper()}.md").write_text("\n".join(lines), encoding="utf-8")
     for label, s in (("textbook", bench.textbook), ("new", bench.new), ("bigger", bench.bigger)):
         print(f"{label}: exact {s.matched}/{s.count}, close {s.close}, wrong {s.wrong}, no answer {s.no_answer}, "
               f"mean off {s.mean_tvd * 100:.1f}%")

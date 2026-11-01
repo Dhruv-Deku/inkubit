@@ -17,9 +17,11 @@ const live = () => (health ??= api.health()).then((h) => h.mode === 'meta').catc
 /** Start page: the recorded run of Muse Spark answering alone, on famous circuits and on new ones. */
 export function ArenaPanel() {
   const [bench, setBench] = useState<ArenaBenchmark | null>(null)
+  const [model, setModel] = useState('spark')
   const [open, setOpen] = useState<Record<string, boolean>>({ 'Bigger new circuits': true })
-  useEffect(() => { api.arenaBenchmark().then(setBench).catch(() => setBench(null)) }, [])
+  useEffect(() => { api.arenaBenchmark(model).then(setBench).catch(() => setBench(null)) }, [model])
   if (!bench) return null
+  const glimmer = model === 'glimmer'
   const t = bench.textbook, f = bench.new, b = bench.bigger
   const misses = (s: ArenaSet) => s.wrong + s.no_answer
   const fresh = misses(f) + misses(b)
@@ -37,9 +39,16 @@ export function ArenaPanel() {
         <span className="spacer" />
         <span className="sub mono">{bench.model} · {bench.date}</span>
       </div>
+      {(bench.available?.length ?? 0) > 1 && (
+        <div className="seg" role="group" aria-label="Which model answers alone" style={{ marginBottom: 10 }}>
+          <button className={model === 'spark' ? 'on' : ''} aria-pressed={model === 'spark'} onClick={() => setModel('spark')}>Muse Spark, hosted</button>
+          <button className={glimmer ? 'on' : ''} aria-pressed={glimmer} onClick={() => setModel('glimmer')}>Muse Glimmer, open weights on a laptop</button>
+        </div>
+      )}
       <p className="lead">
-        A chat model answers from patterns and has nothing to check itself against. We asked the same model Q-Canvas uses
-        to predict what circuits output on its own, like a chatbot with no simulator, and scored every answer against exact
+        A chat model answers from patterns and has nothing to check itself against. We asked {glimmer
+          ? 'Muse Glimmer, Meta\'s open-weight model, running on this laptop (30B, 4-bit, Ollama),'
+          : 'the same model Q-Canvas uses'} to predict what circuits output on its own, like a chatbot with no simulator, and scored every answer against exact
         simulation: famous textbook circuits, new ones no textbook contains, and bigger new ones.
       </p>
       <div className="tiles" style={{ marginTop: 4 }}>

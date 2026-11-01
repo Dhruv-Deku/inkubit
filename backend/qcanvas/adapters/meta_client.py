@@ -7,6 +7,8 @@ Authorization header and never logged.
 
 from __future__ import annotations
 
+import os
+
 import hashlib
 import json
 import logging
@@ -65,7 +67,7 @@ class MetaClient:
             raise MetaAPIError("META_API_KEY is not set (add it to .env)")
         self._settings = settings
         self._key = settings.api_key
-        self._timeout = timeout_s
+        self._timeout = float(os.environ.get("QCANVAS_HTTP_TIMEOUT") or timeout_s)  # a local model may need longer
         self._retries = max_retries
         self.cache = DiskCache(settings.cache_dir)
 

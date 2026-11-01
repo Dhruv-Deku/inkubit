@@ -333,6 +333,7 @@ export interface ArenaRow { id: string; set: 'textbook' | 'new' | 'bigger'; titl
 export interface ArenaSet { count: number; matched: number; close: number; wrong: number; no_answer: number; mean_tvd: number }
 
 export interface ArenaBenchmark {
+  available?: string[]
   model: string
   date: string
   rows: ArenaRow[]
@@ -825,9 +826,18 @@ export interface Reproduction {
 }
 
 export interface DecoderPoint { p: number; unprotected: number; mwpm: number; mwpm_ci: number; neural: number; neural_ci: number; shots: number }
+export interface DecoderD5Point {
+  p: number; shots: number; d3: number; d3_ci: number; d5: number; d5_ci: number; neural: number; neural_ci: number
+  per_round_d3: number; per_round_d5: number; per_round_neural: number; lam: number | null
+  fixes: number; breaks: number; paired_z: number
+}
 export interface DecoderReport {
   curve: DecoderPoint[]; train_shots: number; train_p: number[]; rounds: number
-  example: { p: number; errors: number[][]; final_flips: number[]; dz: number[][]; dx: number[][]; flip: number; mwpm: number; neural: number }
+  d5: { curve: DecoderD5Point[]; train_shots: number; train_p: number[] } | null
+  example: {
+    p: number; d: number; x_checks: number[][]; z_checks: number[][]; errors: number[][]; final_flips: number[]
+    dz: number[][]; dx: number[][]; flip: number; mwpm: number; neural: number
+  }
 }
 export interface PulseReport {
   run: { duration_ns: number; drag: boolean; beta: number; times: number[]; omega_x_mhz: number[]; omega_y_mhz: number[]

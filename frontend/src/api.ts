@@ -99,7 +99,7 @@ export const api = {
     if (image) form.append('image', image, 'figure.png')
     return call<Reproduction>('/api/reproduce', { method: 'POST', body: form })
   },
-  decoder: (p: number, seed: number) => call<DecoderReport>(`/api/decoder?p=${p}&seed=${seed}`),
+  decoder: (p: number, seed: number, d = 3) => call<DecoderReport>(`/api/decoder?p=${p}&seed=${seed}&d=${d}`),
   pulse: (duration: number, drag: boolean) => call<PulseReport>(`/api/pulse?duration=${duration}&drag=${drag}`),
   hardware: () => call<HardwareRuns>('/api/hardware'),
   estimatePresets: () => call<{ presets: { id: string; label: string }[]; hardware: { id: string; label: string }[] }>('/api/estimate/presets'),
@@ -110,7 +110,7 @@ export const api = {
   qkdLab: (q: { photons: number; eve: number; noise: number; seed: number }, signal?: AbortSignal) =>
     call<QkdLab>(`/api/lab/qkd?photons=${q.photons}&eve=${q.eve}&noise=${q.noise}&seed=${q.seed}`, { signal }),
   arena: (spec: Spec) => call<ArenaResult>('/api/arena', json({ spec })),
-  arenaBenchmark: () => call<ArenaBenchmark>('/api/arena/benchmark'),
+  arenaBenchmark: (model = 'spark') => call<ArenaBenchmark>(`/api/arena/benchmark?model=${model}`),
   bugRound: (level: number, seed: number, signal?: AbortSignal) =>
     call<BugRound>(`/api/bughunt/round?level=${level}&seed=${seed}`, { signal }),
   bugGuess: (level: number, seed: number, index: number) => call<BugVerdict>('/api/bughunt/guess', json({ level, seed, index })),

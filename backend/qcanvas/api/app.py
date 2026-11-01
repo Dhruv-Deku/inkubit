@@ -513,15 +513,20 @@ async def reproduce_paper(text: str = Form(""), image: UploadFile | None = File(
 
 
 @app.get("/api/decoder")
-def decoder_report(p: float = 0.01, seed: int = 1) -> dict[str, Any]:
-    """Surface-code decoders: matching against the neural network (stored evaluation) and one sampled shot."""
-    from qcanvas.decoder import example, model
+def decoder_report(p: float = 0.01, seed: int = 1, d: int = 3) -> dict[str, Any]:
+    """Surface-code decoders: matching against the neural network (stored evaluations at distance 3 and 5) and one
+    sampled shot at the chosen distance."""
+    from qcanvas.decoder import example, model, model_d5
 
     if not 0.001 <= p <= 0.1:
         raise HTTPException(422, "p must be between 0.001 and 0.1")
+    m5 = model_d5()
+    if d not in (3, 5) or (d == 5 and m5 is None):
+        raise HTTPException(422, "distance 3, or 5 once its decoder is trained")
     m = model()
     return {"curve": m["curve"], "train_shots": m["train_shots"], "train_p": m["train_p"], "rounds": m["rounds"],
-            "example": example(round(p, 4), seed)}
+            "d5": None if m5 is None else {"curve": m5["curve"], "train_shots": m5["train_shots"], "train_p": m5["train_p"]},
+            "example": example(round(p, 4), seed, d)}
 
 
 @app.get("/api/pulse")
@@ -718,14 +723,17 @@ async def arena(body: ArenaRequest) -> dict[str, Any]:
 
 
 @app.get("/api/arena/benchmark")
-def arena_benchmark() -> dict[str, Any]:
-    """The recorded AI-alone benchmark (scripts/arena_bench.py)."""
-    from qcanvas.arena import load_benchmark
+def arena_benchmark(model: str = "spark") -> dict[str, Any]:
+    """The recorded AI-alone benchmark (scripts/arena_bench.py): Muse Spark, or Muse Glimmer run locally (--glimmer)."""
+    from qcanvas.arena import BENCH_FILE, load_benchmark
 
-    bench = load_benchmark()
+    files = {"spark": BENCH_FILE, "glimmer": BENCH_FILE.with_name(BENCH_FILE.stem + "_glimmer.json")}
+    if model not in files:
+        raise HTTPException(422, "model is spark or glimmer")
+    bench = load_benchmark(files[model])
     if bench is None:
         raise HTTPException(404, "no recorded benchmark yet")
-    return bench.model_dump(mode="json")
+    return bench.model_dump(mode="json") | {"available": [k for k, f in files.items() if f.exists()]}
 
 
 @app.get("/api/bughunt/round")

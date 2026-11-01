@@ -14,3 +14,4 @@ python-dotenv==1.2.4
 httpx==0.28.1
 pytest==9.1.1
 sgp4==2.27
+pymatching==2.4.0

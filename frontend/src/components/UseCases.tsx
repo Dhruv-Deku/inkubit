@@ -25,6 +25,32 @@ export function scrollToPanel(title: string, retried = false) {
   panel.classList.remove('flash')
   void panel.offsetWidth
   panel.classList.add('flash')
+  holdInView(panel)
+}
+
+let releaseHold: (() => void) | null = null
+
+/** Keep a panel at the top while the panels above it finish loading (they grow and would push it down), for up to
+ *  15 s or until the visitor scrolls, clicks or types themselves. */
+function holdInView(panel: HTMLElement, ms = 15000) {
+  releaseHold?.()
+  const margin = parseFloat(getComputedStyle(panel).scrollMarginTop) || 0
+  const ro = new ResizeObserver(() => {
+    if (panel.offsetParent === null) return release()  // its section was closed
+    const top = panel.getBoundingClientRect().top
+    if (Math.abs(top - margin) > 12) window.scrollBy({ top: top - margin, behavior: 'auto' })
+  })
+  const stop = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const
+  const timer = window.setTimeout(() => release(), ms)
+  function release() {
+    ro.disconnect()
+    window.clearTimeout(timer)
+    stop.forEach((ev) => window.removeEventListener(ev, release, true))
+    if (releaseHold === release) releaseHold = null
+  }
+  ro.observe(document.body)
+  stop.forEach((ev) => window.addEventListener(ev, release, true))
+  releaseHold = release
 }
 
 /** What Q-Canvas does, each with one click into the part of the app that does it. */

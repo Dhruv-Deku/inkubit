@@ -29,3 +29,4 @@ tmp/
 # demo video renders (upload them; scripts/record_demo.py regenerates)
 docs/video/
 backend/seed_cache/
+e2e/server.log
