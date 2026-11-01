@@ -14,10 +14,13 @@ const CASES: { id: string; tag: string; title: string; text: string; action: Act
   { id: 'evidence', tag: 'Trust', title: 'Can the AI be trusted?', text: 'We measured where the model alone goes wrong. Here, nothing reaches you unchecked.', action: { kind: 'panel', title: 'AI alone vs Q-Canvas' }, cta: 'See the evidence' },
 ]
 
-export function scrollToPanel(title: string) {
+export function scrollToPanel(title: string, retried = false) {
   const h = [...document.querySelectorAll('.panel h2')].find((el) => el.textContent?.startsWith(title))
   const panel = h?.closest('.panel') as HTMLElement | null
-  if (!panel) return
+  if (!panel) {  // in another section: ask the page to open it, then come back here
+    if (!retried) window.dispatchEvent(new CustomEvent('qcanvas:goto', { detail: title }))
+    return
+  }
   panel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
   panel.classList.remove('flash')
   void panel.offsetWidth

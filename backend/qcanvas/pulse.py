@@ -64,19 +64,19 @@ def _lindblad(h: np.ndarray, deco: bool) -> np.ndarray:
     return L
 
 
-def propagate(duration: float, beta: float, deco: bool = True, track: bool = False
+def propagate(duration: float, beta: float, deco: bool = True, track: bool = False, steps: int = STEPS
               ) -> tuple[np.ndarray, np.ndarray | None]:
     """Superoperator of the whole pulse (and, if asked, populations over time starting from |0>)."""
-    t, ox, dox = envelope(duration)
+    t, ox, dox = envelope(duration, steps)
     oy = -beta * dox / ALPHA
-    dt = duration / STEPS
+    dt = duration / steps
     S = np.eye(DIM * DIM, dtype=complex)
     rho = np.zeros(DIM * DIM, complex)
     rho[0] = 1.0
-    pops = np.zeros((STEPS + 1, DIM)) if track else None
+    pops = np.zeros((steps + 1, DIM)) if track else None
     if track:
         pops[0] = [1, 0, 0]
-    for k in range(STEPS):
+    for k in range(steps):
         h = ALPHA * _H2 + 0.5 * ox[k] * _HX + 0.5 * oy[k] * _HY
         step = expm(_lindblad(h, deco) * dt)
         S = step @ S
@@ -113,10 +113,10 @@ def best_beta(duration: float) -> float:
     """1-D calibration of the DRAG coefficient (golden-section search on the gate error)."""
     lo, hi = 0.0, 2.0
     g = (math.sqrt(5) - 1) / 2
-    f = lambda b: 1 - qubit_metrics(propagate(duration, b, deco=False)[0])[0]  # noqa: E731
+    f = lambda b: 1 - qubit_metrics(propagate(duration, b, deco=False, steps=200)[0])[0]  # noqa: E731
     c, d = hi - g * (hi - lo), lo + g * (hi - lo)
     fc, fd = f(c), f(d)
-    for _ in range(18):
+    for _ in range(12):  # brackets beta to about 0.01, plenty for a calibration
         if fc < fd:
             hi, d, fd = d, c, fc
             c = hi - g * (hi - lo)
@@ -174,8 +174,8 @@ def sweep() -> Sweep:
     durations = [4, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 70, 100]
     ge, de, gl, dl, deco = [], [], [], [], []
     for d in durations:
-        fg, lg = qubit_metrics(propagate(d, 0.0)[0])
-        fd, ld = qubit_metrics(propagate(d, best_beta(float(d)))[0])
+        fg, lg = qubit_metrics(propagate(d, 0.0, steps=200)[0])
+        fd, ld = qubit_metrics(propagate(d, best_beta(float(d)), steps=200)[0])
         ge.append(1 - fg)
         de.append(1 - fd)
         gl.append(lg)

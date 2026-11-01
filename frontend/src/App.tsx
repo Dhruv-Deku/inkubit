@@ -12,7 +12,7 @@ import { QaoaLabPanel } from './components/Qaoa'
 import { BugHuntPanel } from './components/BugHunt'
 import { ArenaPanel } from './components/Arena'
 import { ChemLabPanel, QkdLabPanel } from './components/Science'
-import { UseCases } from './components/UseCases'
+import { UseCases, scrollToPanel } from './components/UseCases'
 import { CopilotPanel } from './components/Copilot'
 import { RosettaPanel } from './components/Rosetta'
 import { ObservatoryPanel } from './components/Observatory'
@@ -33,6 +33,15 @@ import type {
   NetworkResult, NetworkSpec, RecentRun, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
 } from './types'
 import { clone, decodeSpec, encodeSpec, specTitle } from './util'
+
+type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
+const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
+  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
+  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', panels: ['Discovery lab', 'When does quantum win?', 'Reproduce a paper'] },
+  { id: 'hardware', label: 'Hardware & networks', hint: 'pulses, decoders, links, satellites', panels: ['Pulse lab', 'ML error-correction decoder', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
+  { id: 'labs', label: 'Labs & games', hint: 'challenges, bug hunt, Shor, QAOA, H₂, BB84', panels: ['Challenges', 'Bug hunt', "Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy'] },
+  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', panels: ['Simulation observatory', 'AI alone vs Q-Canvas'] },
+]
 
 type Stage = 'start' | 'edit' | 'run'
 
@@ -80,6 +89,30 @@ export default function App() {
   const [examples, setExamples] = useState<Examples | null>(null)
   const [backendError, setBackendError] = useState<string | null>(null)
   const [stage, setStage] = useState<Stage>('start')
+  const [assistant, setAssistant] = useState<'mission' | 'ask'>('mission')
+  const [tab, setTab] = useState<SectionId>(() => {
+    const h = new URLSearchParams(window.location.hash.slice(1)).get('tab')
+    return (SECTIONS.find((t) => t.id === h)?.id ?? 'build') as SectionId
+  })
+  const goTab = (id: SectionId) => {
+    setTab(id)
+    if (window.location.hash.startsWith('#s=')) return  // a shared circuit link: leave it intact
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    params.set('tab', id)
+    window.history.replaceState(null, '', `#${params.toString()}`)
+  }
+  useEffect(() => {
+    const onGoto = (e: Event) => {
+      const title = (e as CustomEvent<string>).detail
+      const hit = SECTIONS.find((t) => t.panels.some((p) => p.startsWith(title) || title.startsWith(p)))
+      if (!hit) return
+      goTab(hit.id)
+      window.setTimeout(() => scrollToPanel(title, true), 150)
+      window.setTimeout(() => scrollToPanel(title, true), 1100)  // again once the panels above have loaded
+    }
+    window.addEventListener('qcanvas:goto', onGoto)
+    return () => window.removeEventListener('qcanvas:goto', onGoto)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [sketch, setSketch] = useState<{ url: string; analysis: SketchAnalysis } | null>(null)
   const [spec, setSpec] = useState<Spec | null>(null)
   const [issues, setIssues] = useState<SpecIssue[]>([])
@@ -305,31 +338,66 @@ export default function App() {
               <button className="btn small" onClick={() => setStage('edit')} disabled={!spec}>Back to the challenge</button>
             </div>
           )}
-          <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
-            live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
-            extra={<>
-              <MissionPanel live={health?.mode === 'meta'} examples={examples} onOpen={(s) => onSpec(clone(s))} />
-              <LiveBoardPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+          <div className="hero-switch" role="tablist" aria-label="Assistant">
+            <button role="tab" aria-selected={assistant === 'mission'} className={assistant === 'mission' ? 'on' : ''} onClick={() => setAssistant('mission')}>
+              <b>Mission control</b><span>a whole problem: planned, run in parallel, verified</span></button>
+            <button role="tab" aria-selected={assistant === 'ask'} className={assistant === 'ask' ? 'on' : ''} onClick={() => setAssistant('ask')}>
+              <b>Quick question</b><span>one answer from the exact tools</span></button>
+          </div>
+          <div style={{ display: assistant === 'mission' ? 'block' : 'none' }}>
+            <MissionPanel live={health?.mode === 'meta'} examples={examples} onOpen={(s) => onSpec(clone(s))} />
+          </div>
+          <div style={{ display: assistant === 'ask' ? 'block' : 'none' }}>
+            <CopilotPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+          </div>
+          <nav className="section-tabs" role="tablist" aria-label="Sections">
+            {SECTIONS.map((t) => (
+              <button key={t.id} role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={() => goTab(t.id)}>
+                {t.label}<span>{t.hint}</span>
+              </button>
+            ))}
+          </nav>
+          {tab === 'build' && (
+            <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
+              live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
+              extra={<>
+                <LiveBoardPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+                <RosettaPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+                <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />
+              </>} />
+          )}
+          {tab === 'discover' && (
+            <div className="stack section-body">
               <DiscoveryPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
-              <GlobePanel />
-              <ReproducePanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
-              <DistributedPanel examples={examples} onOpen={(s) => onSpec(clone(s))} />
-              <DecoderPanel />
-              <PulsePanel />
               <EstimatorPanel live={health?.mode === 'meta'} />
-              <CopilotPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
-              <RosettaPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
-              <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />
-              <ObservatoryPanel />
-              <ArenaPanel />
+              <ReproducePanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+            </div>
+          )}
+          {tab === 'hardware' && (
+            <div className="stack section-body">
+              <PulsePanel />
+              <DecoderPanel />
+              <RepetitionLabPanel onTry={tryCode} />
+              <DistributedPanel examples={examples} onOpen={(s) => onSpec(clone(s))} />
+              <GlobePanel />
+            </div>
+          )}
+          {tab === 'labs' && (
+            <div className="stack section-body">
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
               <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <ShorLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QaoaLabPanel onOpen={(s) => onSpec(clone(s))} />
               <ChemLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QkdLabPanel onOpen={(s) => onSpec(clone(s))} />
-              <RepetitionLabPanel onTry={tryCode} />
-            </>} />
+            </div>
+          )}
+          {tab === 'evidence' && (
+            <div className="stack section-body">
+              <ObservatoryPanel />
+              <ArenaPanel />
+            </div>
+          )}
         </>
       )}
 

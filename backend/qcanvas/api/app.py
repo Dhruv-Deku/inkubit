@@ -29,9 +29,28 @@ from qcanvas.spec.validation import SpecError, parse_spec
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logging.getLogger("qiskit").setLevel(logging.WARNING)  # the transpiler logs every pass at INFO
+log = logging.getLogger("qcanvas.api")
 MAX_UPLOAD = 15 * 1024 * 1024
 
 app = FastAPI(title="Q-Canvas", version=__version__)
+
+
+@app.on_event("startup")
+def _warm_up() -> None:
+    """Compute the slow, input-free results (pulse sweep, observatory) in the background so no visitor waits."""
+    import threading
+
+    def work() -> None:
+        try:
+            from qcanvas.observatory import observatory
+            from qcanvas.pulse import sweep
+
+            observatory()
+            sweep()
+        except Exception as err:  # noqa: BLE001 - a failed warm-up only means the first visitor computes it
+            log.warning("warm-up failed: %s", err)
+
+    threading.Thread(target=work, name="warm-up", daemon=True).start()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173"],
