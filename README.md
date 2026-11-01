@@ -11,7 +11,7 @@ Muse Voice read sketches, photos, papers and speech, plan multi-step experiments
 simulation, independent re-runs and physics invariants verify every result, and every number in every AI answer is
 traced back to a tool that computed it.
 
-![The start page: Mission control above five sections](docs/screenshots/1-start.png)
+![Mission control, live: one request becomes a plan of exact tools that runs in parallel, every step verified and every number in the report traced](docs/screenshots/mission-control.gif)
 
 ### Seven results you can check in the app
 
@@ -47,8 +47,8 @@ cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a 95-second walk through the highlights. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 448 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
-(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D68); what was built on which day is in
+live. 468 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D69); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
@@ -89,7 +89,7 @@ Q-Canvas closes that gap and refuses to fake success:
 
 | Step | What happens | Model |
 | --- | --- | --- |
-| Mission control | A whole problem in words, a photo and your voice ("connect two cities 1,200 km apart with quantum-secure keys, compare satellite and fiber, check whether a spy on 25% of photons is caught"). The photo is read by SAM 3.1 and Muse Spark; Muse Spark (or Muse Wonder) plans a dependency graph of up to 8 exact tools under a JSON schema, with circuits passed between steps by reference; independent steps run in parallel and stream to a live graph; a failed step is repaired once by the model; every result is verified by physics invariants and, for circuits, by two independent noisy simulators (our channels and Qiskit Aer, agreeing to 1e-6) plus the ML verifier; Muse Spark writes the report and every number in it is traced | **Muse Spark 1.3** plans, repairs and reports, **Muse Wonder 1.0** in deep mode, **SAM 3.1** and **Muse Voice Transcribe 1.0** perceive |
+| Mission control | A whole problem in words, a photo and your voice ("connect two cities 1,200 km apart with quantum-secure keys, compare satellite and fiber, check whether a spy on 25% of photons is caught"). The photo is read by SAM 3.1 and Muse Spark; Muse Spark (or Muse Wonder) plans a dependency graph of up to 8 exact tools under a JSON schema, with circuits passed between steps by reference; independent steps run in parallel and stream to a live graph; a failed step is repaired once by the model; every result is verified by physics invariants and, for circuits, by two independent noisy simulators (our channels and Qiskit Aer, agreeing to 1e-6) plus the ML verifier; Muse Spark writes the report and every number in it is traced **Download report** saves the whole mission as one page: the plan, every step with its checks and arguments, the report with each number marked traced or not, and standalone Qiskit code for every circuit. | **Muse Spark 1.3** plans, repairs and reports, **Muse Wonder 1.0** in deep mode, **SAM 3.1** and **Muse Voice Transcribe 1.0** perceive |
 | ML verifier | A neural-network ensemble (NumPy, `scripts/train_ml_verifier.py`) predicts in about 151 µs how much of a circuit's answer survives realistic noise, with an adaptive split-conformal interval, then exact simulation checks it: on 900 held-out circuits its average error is 0.010, 9 times smaller than the product-of-gate-fidelities rule of thumb (0.087) and below a global-depolarizing physics model (0.013); its 90% interval held for 90% of them and for 78% of 60 textbook cases it never saw (error 0.020). A miss grades the model, never the result | – |
 | Algorithm library | Seven more textbook algorithms, each checked against its known answer: the QFT finding a period, Simon's algorithm, the swap test, entanglement swapping, a Trotterized quantum magnet (checked against the product formula), 3-qubit Grover (121/128) and a quantum half adder; Mission control runs any of them | – |
 | Discovery lab | Muse Spark proposes CNOT layouts, spanning-tree and random layouts add more; every layout's rotations are fitted exactly and pruned, every winner is proven by Qiskit (overlap ≥ 1 − 1e-8), the ML verifier screens and exact noisy simulation decides. Found: GHZ on all 7 qubits of an IBM heavy-hex chip in 6 CNOTs (textbook compiled onto the wiring: 10; Qiskit's state preparation: 197), W and Dicke(4,2) states in 5 (compiler: 11), a random 3-qubit state in 3 (compiler: 4) | **Muse Spark 1.3** / **Muse Wonder 1.0** propose |
@@ -342,11 +342,13 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (448 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (468 tests,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per
-Meta model (skipped without a key; cached after the first run).
+Meta model (skipped without a key; cached after the first run). `tests/test_claims.py` rebuilds every number this README and the
+submission quote from the data file it comes from, so a document cannot drift from a result, and
+`scripts/check_submission.py` checks everything the hackathon form needs.
 
 ## The spec format
 

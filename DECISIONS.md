@@ -812,3 +812,15 @@ only in live mode) with new scenes for the current app: Mission control, sketch 
 the discovery lab (CNOT counts read from the page), when quantum wins, the pulse lab, decoder and live satellites,
 and the AI-alone evidence. DEMO_SCRIPT.md has a voice-over timed to the scenes.
 
+## D69. Presentation, and our own numbers held to the app's rule
+The README opens with a 15-second GIF of mission control cut from the video (960 px, 8 fps, 96 colours, 1.6 MB),
+and docs/thumbnail.png (1280x720) is the video's thumbnail: name, promise, the verified mission graph and the
+models. A finished mission downloads as one self-contained page (qcanvas/mission_report.py): the plan, every step
+with its results, checks and arguments, the report with each number marked green when the tracer found it in a tool
+result and amber when not, the model calls, and standalone Qiskit code for each circuit. tests/test_claims.py
+rebuilds 18 numbers that README and SUBMISSION quote (decoders, benchmarks, the ML verifier, the RSA-2048 check)
+from their data files and fails if a document quotes anything else: the rule the app applies to a model's answer,
+applied to our own. scripts/check_submission.py lists what the form needs (public repo, video and demo links,
+video length, thumbnail, test counts, claims, secrets, CI, deadline); its first run caught the docs quoting 448
+tests after the suite had grown to 468.
+
