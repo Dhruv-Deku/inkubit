@@ -59,6 +59,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - Nov 1: the simulation observatory (D47): satellites vs fiber, Grover vs noise, quantum walk, entanglement growth, the exponential wall, all exact (backend/qcanvas/observatory.py, /api/observatory, Observatory.tsx); use-case cards renamed by topic and redrawn by Muse Image in the pipeline's diagram style.
 - Nov 1: mission control (D48: backend/qcanvas/mission.py, /api/missions + SSE, Mission.tsx), the ML verifier (D49: backend/qcanvas/mlverify.py, scripts/train_ml_verifier.py, data/ml_verifier.json, ML tab), seven more algorithms (D50). Live missions verified in the UI: two cities, photo to hardware, molecule, RSA, exams.
 - Nov 1-2: discovery lab (D51), distributed computer (D52), when does quantum win (D53), live board (D54), satellite planner (D55), reproduce a paper (D56), ML decoder (D57), pulse lab (D58); each verified in the UI, live where a model is involved.
+- Nov 2: focus pass (D59): Mission control leads, five sections below, cards jump across sections.
 
 ## Top 5 next steps
 1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, `optimize`, and explanations in other languages).

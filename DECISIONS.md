@@ -714,3 +714,16 @@ quadrature -beta dOmega/dt / alpha with beta from a golden-section search (it la
 optimum for phase errors); Lindblad T1/T2 from the realistic preset; 400 exact steps of the 9 x 9 superoperator;
 average gate fidelity of the qubit-subspace channel with leakage as error. The sweep takes about 30 s and is cached.
 
+## D59. Focus pass: one hero, five sections
+The start page had grown to more than twenty stacked panels. Mission control now leads, with a switch to a quick
+question (Ask Q-Canvas) in the same place, both kept mounted so a running mission survives the switch. Everything
+else sits in five sections that mount only when opened (so the 11 s pulse sweep and other heavy requests no longer
+start on page load): Sketch to code (photo, words, voice, live board, Rosetta, the use-case cards), Discover
+(discovery lab, when does quantum win, reproduce a paper), Hardware and networks (pulse lab, ML decoder,
+error-correction lab, distributed computer, satellite planner), Labs and games (challenges, bug hunt, Shor, QAOA, H2,
+BB84) and Evidence (observatory with the ML verifier, AI alone vs Q-Canvas). The section is kept in the URL as
+#tab=..., except when a #s= share link is present. A card or a Rosetta "see it" link to a panel in another section
+switches section and scrolls twice (again after the panels above have loaded); sections end with 45vh of space so
+the last panel can reach the top. The pulse sweep was made 3x faster (200 steps, 12 calibration iterations; same
+results to four digits) and, with the observatory, is computed in a background thread at server start.
+
