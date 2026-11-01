@@ -824,3 +824,14 @@ applied to our own. scripts/check_submission.py lists what the form needs (publi
 video length, thumbnail, test counts, claims, secrets, CI, deadline); its first run caught the docs quoting 448
 tests after the suite had grown to 468.
 
+## D70. Hosting on a free container
+Hugging Face now asks for a PRO account to run a Docker Space, so the free route is a container host's free tier
+(Koyeb or Render: 512 MB, a tenth of a CPU, asleep when idle). Measured in public mode: 206 MB after start, 223 MB
+after the labs and a mission, 255 MB during a discovery run, 385 MB for the server plus the sandbox at the peak of a
+sketch run (verified on attempt 2), so it fits. The tenth of a CPU makes heavy actions about ten times slower
+(about a minute or two for a sketch run or a discovery), and the start-up warm-up would have spent minutes of that
+CPU after every wake. The input-free results (the observatory, the pulse sweep and its DRAG calibrations) are
+therefore stored with the app (qcanvas.precomputed, 37 KB, rebuilt by scripts/precompute.py) and a test checks they
+equal a fresh computation. Koyeb is preferred: it wakes in seconds and sleeps after an hour (Render: 30-60 s after
+15 minutes). A deploy link in the README fills in the repository, the Dockerfile, port 7860 and the free instance.
+

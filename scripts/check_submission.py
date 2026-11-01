@@ -45,8 +45,8 @@ def main() -> None:
 
     add("TODO" if "<YouTube / Loom link>" in sub else "OK", "Video link in SUBMISSION.md",
         "upload docs/video/q-canvas-demo-v2.mp4 (unlisted is fine), thumbnail docs/thumbnail.png, paste the link" if "<YouTube" in sub else "")
-    add("TODO" if "<Hugging Face Space link>" in sub else "OK", "Hosted demo link in SUBMISSION.md",
-        "hf auth login, then scripts/deploy_space.py <user>/q-canvas [--with-key]; or delete the 'Try it' part" if "<Hugging" in sub else "")
+    add("TODO" if "<hosted app link>" in sub else "OK", "Hosted demo link in SUBMISSION.md",
+        "deploy with the Koyeb button in the README (free), paste the URL; or delete the 'Try it' part" if "<hosted app" in sub else "")
     hw = ROOT / "examples" / "hardware_runs.json"
     add("OK" if hw.exists() else "TODO", "Real IBM hardware run (optional, the strongest credibility item)",
         "" if hw.exists() else "IBM_QUANTUM_TOKEN=... in .env, then scripts/hardware_check.py")

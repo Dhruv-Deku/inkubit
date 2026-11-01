@@ -389,6 +389,13 @@ def wall_chart(max_qubits: int = WALL_QUBITS) -> Chart:
 
 @lru_cache(maxsize=1)
 def observatory() -> Observatory:
+    """The five simulations: stored with the app when available (qcanvas.precomputed), else computed."""
+    from qcanvas import precomputed
+
+    return precomputed.load("observatory", Observatory) or compute()
+
+
+def compute() -> Observatory:
     frames = walk_frames()
     return Observatory(satellite=satellite_chart(), walk=walk_chart(frames), walk_frames=frames,
                        grover=[grover_case(n) for n in GROVER_QUBITS], entanglement=entanglement_chart(),

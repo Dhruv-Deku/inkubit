@@ -13,7 +13,7 @@ the key absent from git history, CI on the latest commit, the deadline) and prin
 | [ ] | Film your hand drawing a circuit (optional, about 10 s) | Phone, top-down, pen on white paper; put it before the title card |
 | [ ] | Upload the video | YouTube, unlisted is fine; thumbnail `docs/thumbnail.png`; title "Q-Canvas: Meta's models propose, exact physics checks every number" |
 | [ ] | Paste the video link | `SUBMISSION.md`, line "Demo video" |
-| [ ] | Hosted demo (recommended) | `pip install huggingface_hub`, `hf auth login`, then `scripts/deploy_space.py <user>/q-canvas [--with-key]`; paste the Space link into `SUBMISSION.md`, or delete the "Try it" part |
+| [ ] | Hosted demo (recommended) | Make the repo public, then open [the Koyeb deploy link](https://app.koyeb.com/deploy?type=git&builder=dockerfile&repository=github.com/Dhruv-Deku/q-canvas&branch=main&name=q-canvas&ports=7860;http;/&instance_type=free&regions=was), sign in with GitHub and press Deploy (free instance; add `META_API_KEY` as a secret for live models); paste the app URL into `SUBMISSION.md` ("Try it"), or delete that part |
 | [ ] | Real IBM hardware run (optional, strongest proof) | `IBM_QUANTUM_TOKEN=...` in `.env`, then `scripts/hardware_check.py`; it writes `docs/HARDWARE.md` and the Evidence panel appears |
 | [ ] | Run the checker again | `scripts/check_submission.py`: no TODO left except the optional ones you chose to skip |
 
@@ -30,7 +30,7 @@ the key absent from git history, CI on the latest commit, the deadline) and prin
 | Built with | Python 3.13, FastAPI, Qiskit, Qiskit Aer, PyMatching, SGP4, React 19, TypeScript, Vite; Muse Spark, Muse Wonder, SAM 3.1, Muse Image, Muse Voice Transcribe |
 | Code | https://github.com/Dhruv-Deku/q-canvas |
 | Video | your YouTube link |
-| Try it | your Hugging Face Space link (if deployed) |
+| Try it | your Koyeb app URL (if deployed) |
 | Built during the hackathon | `SUBMISSION.md`, "Built during the hackathon"; the day-by-day table is in the README |
 
 ## What judges will see first

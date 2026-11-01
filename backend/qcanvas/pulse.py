@@ -110,6 +110,14 @@ def qubit_metrics(S: np.ndarray, target: np.ndarray = X_IDEAL) -> tuple[float, f
 
 @lru_cache(maxsize=64)
 def best_beta(duration: float) -> float:
+    """The DRAG coefficient for a pulse length: stored with the app for the lab's lengths, else calibrated."""
+    from qcanvas import precomputed
+
+    stored = precomputed.load_raw("pulse_betas") or {}
+    return stored.get(f"{duration:g}") if f"{duration:g}" in stored else calibrate_beta(duration)
+
+
+def calibrate_beta(duration: float) -> float:
     """1-D calibration of the DRAG coefficient (golden-section search on the gate error)."""
     lo, hi = 0.0, 2.0
     g = (math.sqrt(5) - 1) / 2
@@ -169,9 +177,19 @@ def run(duration: float, drag: bool) -> PulseRun:
                     fidelity=fid, leakage=leak, fidelity_no_decoherence=fid0)
 
 
+DURATIONS = [4, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 70, 100]
+
+
 @lru_cache(maxsize=1)
 def sweep() -> Sweep:
-    durations = [4, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 70, 100]
+    """Gaussian against DRAG over the lab's pulse lengths: stored with the app when available, else computed."""
+    from qcanvas import precomputed
+
+    return precomputed.load("pulse_sweep", Sweep) or compute_sweep()
+
+
+def compute_sweep() -> Sweep:
+    durations = DURATIONS
     ge, de, gl, dl, deco = [], [], [], [], []
     for d in durations:
         fg, lg = qubit_metrics(propagate(d, 0.0, steps=200)[0])

@@ -48,14 +48,18 @@ cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open ht
 Press **Guided tour** in the header (or open `/#tour`) for a 95-second walk through the highlights. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
 live. 468 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
-(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D69); what was built on which day is in
+(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D70); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
 
-`scripts/deploy_space.py <user>/q-canvas [--with-key]` publishes a Hugging Face Space from the `Dockerfile` in public
-mode: code written by a model is never executed (the agent runs Q-Canvas's own template code) and billed model calls
-stop at 300 a day, after which the labelled offline models answer. `scripts/hardware_check.py` runs four circuits on
+The `Dockerfile` runs Q-Canvas in public mode: code written by a model is never executed (the agent runs Q-Canvas's
+own template code) and billed model calls stop at 300 a day, after which the labelled offline models answer. It fits
+a free container (512 MB, a tenth of a CPU: about 260 MB in use, 385 MB at the peak of a sketch run with its sandbox),
+and the slow, input-free results (the observatory, the pulse lab) are stored with the app (`scripts/precompute.py`)
+so a cold start does not spend minutes on them. [Deploy it to Koyeb's free tier](https://app.koyeb.com/deploy?type=git&builder=dockerfile&repository=github.com/Dhruv-Deku/q-canvas&branch=main&name=q-canvas&ports=7860;http;/&instance_type=free&regions=was) in one click (add
+`META_API_KEY` as a secret for the live models), or to a Hugging Face Space with `scripts/deploy_space.py` (Docker
+Spaces need a PRO account). `scripts/hardware_check.py` runs four circuits on
 the least busy IBM quantum computer (with `IBM_QUANTUM_TOKEN` in `.env`) and compares the counts with the ideal odds,
 Q-Canvas's generic preset and a digital twin built from the device's calibration; `--fake` rehearses it offline.
 
