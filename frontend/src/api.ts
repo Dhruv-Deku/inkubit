@@ -1,5 +1,5 @@
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitPlan, Reproduction, DecoderReport, PulseReport, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -101,6 +101,7 @@ export const api = {
   },
   decoder: (p: number, seed: number) => call<DecoderReport>(`/api/decoder?p=${p}&seed=${seed}`),
   pulse: (duration: number, drag: boolean) => call<PulseReport>(`/api/pulse?duration=${duration}&drag=${drag}`),
+  hardware: () => call<HardwareRuns>('/api/hardware'),
   estimatePresets: () => call<{ presets: { id: string; label: string }[]; hardware: { id: string; label: string }[] }>('/api/estimate/presets'),
   estimate: (q: { preset?: string; text?: string; hardware: string }) => call<EstimateResult>('/api/estimate', json(q)),
   startDiscovery: (what: { goal?: string; ket?: string }, deep: boolean) =>

@@ -105,6 +105,10 @@ def _metas(settings: Settings) -> dict[str, Any]:
     from qcanvas.adapters.voice import MetaSpeechModel
 
     out: dict[str, Any] = {"code": MetaCodeModel(settings, client), "speech": MetaSpeechModel(settings, client)}
+    if settings.code_backend == "template":  # public mode: never execute code a model wrote
+        from qcanvas.adapters.mock_code import MockCodeModel
+
+        out["code"] = MockCodeModel()
     if settings.code_backend == "muse-cli":
         from qcanvas.adapters.muse_cli import MuseCodeCliModel
 

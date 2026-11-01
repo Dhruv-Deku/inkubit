@@ -77,7 +77,13 @@ def health() -> dict[str, Any]:
     live = s.provider == "meta" and s.has_key
     return {"status": "ok", "version": __version__, "mode": "meta" if live else "mock",
             "mode_label": "Meta live" if live else ("Meta (no key: mock fallback)" if s.provider == "meta" else "Mock"),
-            **s.public()}
+            "live_calls_left": _budget_left(s.daily_calls), **s.public()}
+
+
+def _budget_left(cap: int) -> int | None:
+    from qcanvas.adapters.meta_client import BUDGET
+
+    return BUDGET.left(cap)
 
 
 ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and",
@@ -518,6 +524,15 @@ async def pulse_lab(duration: float = 20.0, drag: bool = True) -> dict[str, Any]
         raise HTTPException(422, "duration must be between 4 and 100 ns")
     r, s = await asyncio.gather(asyncio.to_thread(run, round(duration, 1), drag), asyncio.to_thread(sweep))
     return {"run": r.model_dump(mode="json"), "sweep": s.model_dump(mode="json")}
+
+
+@app.get("/api/hardware")
+def hardware_runs() -> dict[str, Any]:
+    """Counts from a real IBM device next to Q-Canvas's predictions (scripts/hardware_check.py); 404 before a run."""
+    path = EXAMPLES_DIR / "hardware_runs.json"
+    if not path.exists():
+        raise HTTPException(404, "no real hardware run yet")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @app.get("/api/observatory")

@@ -38,6 +38,8 @@ class Settings:
     code_backend: str
     api_key: str | None = None
     deep_model: str = DEFAULT_DEEP_MODEL
+    public_mode: bool = False  # hosted for anyone: model-written code is never executed, live calls are capped
+    daily_calls: int = 0  # cap on billed (uncached) model calls per UTC day; 0 = no cap
 
     @property
     def has_key(self) -> bool:
@@ -58,6 +60,8 @@ class Settings:
                 "deep": self.deep_model,
             },
             "code_backend": self.code_backend,
+            "public": self.public_mode,
+            "daily_calls": self.daily_calls,
         }
 
 
@@ -71,6 +75,7 @@ def load_settings() -> Settings:
         load_dotenv(PROJECT_DIR / ".env", override=False)
         _loaded = True
     provider = os.environ.get("QCANVAS_MODEL_PROVIDER", "mock").strip().lower()
+    public = os.environ.get("QCANVAS_PUBLIC", "0").strip() == "1"
     if provider not in ("meta", "mock"):
         provider = "mock"
     return Settings(
@@ -83,7 +88,9 @@ def load_settings() -> Settings:
         base_url=os.environ.get("QCANVAS_META_BASE_URL", META_BASE_URL).rstrip("/"),
         voice_model=os.environ.get("QCANVAS_VOICE_MODEL", DEFAULT_VOICE_MODEL),
         cache_dir=os.environ.get("QCANVAS_CACHE_DIR", str(BACKEND_DIR / ".qcanvas_cache")),
-        code_backend=os.environ.get("QCANVAS_CODE_BACKEND", "api"),
+        code_backend=os.environ.get("QCANVAS_CODE_BACKEND", "template" if public else "api"),
         api_key=(os.environ.get("META_API_KEY") or os.environ.get("MODEL_API_KEY") or None),
         deep_model=os.environ.get("QCANVAS_DEEP_MODEL", DEFAULT_DEEP_MODEL),
+        public_mode=public,
+        daily_calls=int(os.environ.get("QCANVAS_DAILY_CALLS") or (300 if public else 0)),
     )

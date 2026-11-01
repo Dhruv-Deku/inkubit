@@ -25,6 +25,7 @@ import { GlobePanel } from './components/Globe'
 import { ReproducePanel } from './components/Reproduce'
 import { DecoderPanel } from './components/Decoder'
 import { PulsePanel } from './components/Pulse'
+import { HardwarePanel } from './components/Hardware'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
@@ -416,6 +417,7 @@ export default function App() {
           {seen.has('evidence') && (
             <div hidden={tab !== 'evidence'}>
             <div className="stack section-body">
+              <HardwarePanel />
               <ObservatoryPanel />
               <ArenaPanel />
             </div>

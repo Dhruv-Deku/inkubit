@@ -27,6 +27,36 @@ class MetaAPIError(RuntimeError):
     """A Meta Model API call failed (message is safe to show; no key inside)."""
 
 
+class Budget:
+    """Billed (uncached) calls per UTC day, shared by every client in the process. A hosted copy sets a cap so a
+    burst of visitors cannot run up the bill; past it, calls fail and the labelled offline fallback answers."""
+
+    def __init__(self) -> None:
+        import threading
+
+        self._lock = threading.Lock()
+        self._day = ""
+        self.used = 0
+
+    def take(self, cap: int) -> None:
+        from datetime import datetime, timezone
+
+        with self._lock:
+            day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            if day != self._day:
+                self._day, self.used = day, 0
+            if cap and self.used >= cap:
+                raise MetaAPIError(f"the daily budget of {cap} live model calls is used up; offline answers until "
+                                   "midnight UTC")
+            self.used += 1
+
+    def left(self, cap: int) -> int | None:
+        return None if not cap else max(0, cap - self.used)
+
+
+BUDGET = Budget()
+
+
 class MetaClient:
     """POSTs JSON to Meta Model API with retries and an on-disk response cache."""
 
@@ -52,6 +82,7 @@ class MetaClient:
             hit = self.cache.get(key)
             if hit is not None:
                 return hit, True
+        BUDGET.take(self._settings.daily_calls)
         url = self._settings.base_url + path
         last_error = "no attempt made"
         for attempt in range(self._retries + 1):
@@ -85,6 +116,7 @@ class MetaClient:
             hit = self.cache.get(key)
             if hit is not None:
                 return hit, True
+        BUDGET.take(self._settings.daily_calls)
         url = self._settings.base_url + path
         headers = {"Authorization": f"Bearer {self._key}", "Accept": "application/json"}
         files = {"request": (None, json.dumps(request), "application/json"), "audio": (filename, audio, mime)}
@@ -116,6 +148,7 @@ class MetaClient:
             hit = self.cache.get(key)
             if hit is not None:
                 return hit["text"], True
+        BUDGET.take(self._settings.daily_calls)
         url = self._settings.base_url + path
         last_error = "no attempt made"
         for attempt in range(self._retries + 1):

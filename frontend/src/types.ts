@@ -817,3 +817,6 @@ export interface PulseReport {
   sweep: { durations: number[]; gaussian_error: number[]; drag_error: number[]; gaussian_leak: number[]; drag_leak: number[]
     decoherence_only: number[]; best_gaussian: [number, number]; best_drag: [number, number] }
 }
+
+export interface HardwareRun { circuit: string; id: string; two_qubit_gates: number; depth: number; tvd_ideal: number; tvd_generic: number; tvd_twin: number }
+export interface HardwareRuns { device: string; rehearsal: boolean; job_id: string; shots: number; date_utc: string; runs: HardwareRun[] }
