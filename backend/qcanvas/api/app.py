@@ -250,6 +250,21 @@ def mission_status(mission_id: str) -> dict[str, Any]:
     return m.summary()
 
 
+@app.get("/api/missions/{mission_id}/report")
+def mission_report(mission_id: str) -> Response:
+    """A finished mission as one self-contained HTML page: plan, every step and check, the traced report, code."""
+    from qcanvas.mission import missions
+    from qcanvas.mission_report import render
+
+    m = missions.get(mission_id)
+    if m is None:
+        raise HTTPException(404, "no such mission")
+    if m.status == "running":
+        raise HTTPException(409, "the mission has not finished yet")
+    return Response(render(m), media_type="text/html; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="qcanvas_mission_{m.id}.html"'})
+
+
 @app.get("/api/missions/{mission_id}/events")
 async def mission_events(mission_id: str) -> EventSourceResponse:
     """Server-sent events: every node change, replayed from the start, then live."""

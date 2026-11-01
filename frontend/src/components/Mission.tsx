@@ -121,6 +121,7 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
+  const [missionId, setMissionId] = useState<string | null>(null)
   const [elapsed, setElapsed] = useState(0)
   const source = useRef<EventSource | null>(null)
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -154,6 +155,7 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
     setNodes([]); setReport(null); setError(null); setSelected(null); setBusy(true); setElapsed(0)
     try {
       const { mission_id } = await api.startMission(g, { image: text ? null : photo?.blob, transcript: text ? '' : transcript, deep: live && deep })
+      setMissionId(mission_id)
       const es = new EventSource(`/api/missions/${mission_id}/events`)
       source.current = es
       es.addEventListener('mission', (ev) => {
@@ -249,6 +251,7 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
           <div className="row wrap" style={{ gap: 8 }}>
             <TraceBadge trace={report.trace} />
             <span className="trace-badge">{report.verified} verified{report.flagged ? ` · ${report.flagged} flagged` : ''}</span>
+            {missionId && !busy && <a className="btn small" href={`/api/missions/${missionId}/report`} download>Download report</a>}
             {report.calls.map((c, i) => <CallBadge key={i} call={c} />)}
             <span className="sub">{report.router === 'muse' ? 'planned and written by Muse' : 'offline planner'} · {report.seconds.toFixed(1)} s</span>
           </div>

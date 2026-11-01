@@ -134,6 +134,10 @@ def test_the_guided_tour_lands_on_every_step_and_finishes_its_runs(server, brows
         if k + 1 < len(TOUR_PANELS):
             page.get_by_role("button", name="Next").click()
     page.locator(".mission-report").wait_for(timeout=120_000)  # the mission the tour started
+    link = page.get_by_role("link", name="Download report")
+    link.wait_for(timeout=60_000)
+    page_html = page.request.get(server + link.get_attribute("href"))
+    assert page_html.status == 200 and page_html.text().startswith("<!doctype html>") and "Plan" in page_html.text()
     page.get_by_role("button", name="Done").click()
     page.get_by_role("tab", name=re.compile("^Discover")).click()
     page.locator(".disc-bar-row").first.wait_for(timeout=180_000)  # the discovery run it started

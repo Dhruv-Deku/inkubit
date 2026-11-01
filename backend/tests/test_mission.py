@@ -118,3 +118,32 @@ def test_an_ml_miss_is_a_note_not_a_flag():
     assert all(c.ok for c in checks if c.affects)
     ml = next(c for c in checks if c.name == "ML verifier")
     assert ml.affects is False
+
+
+def test_a_finished_mission_downloads_as_one_page_with_its_numbers_marked():
+    from qcanvas.mission_report import marked, render
+
+    m = Mission("Teleport a qubit and check how it survives noise")
+    run_mission(m, Ctx(live=False), photo=BELL)
+    page = render(m)
+    assert page.startswith("<!doctype html>") and m.goal in page and "Plan" in page and "Checks" in page
+    assert "from qiskit import QuantumCircuit" in page  # standalone code for the photographed circuit
+    assert all(n.id in page for n in m.nodes.values() if n.lane == "step")
+    text = marked("Fidelity 0.912 over 1,200 km; 3 layers; outcome 0110; 47%", untraced=["47%"])
+    assert '<span class="ok"' in text and text.count('class="ok"') == 2  # 0.912 and 1,200
+    assert '<mark class="no"' in text and "47%" in text.split('<mark class="no"')[1]
+    assert "3 layers" in text and "0110" in text  # small counts and bitstrings stay plain
+
+
+def test_report_endpoint_waits_for_the_mission_to_finish():
+    client = TestClient(app)
+    assert client.get("/api/missions/nope/report").status_code == 404
+    mid = client.post("/api/missions", data={"goal": "Run Grover search on 2 qubits"}).json()["mission_id"]
+    for _ in range(120):
+        r = client.get(f"/api/missions/{mid}/report")
+        if r.status_code != 409:
+            break
+        time.sleep(0.25)
+    assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+    assert "attachment" in r.headers["content-disposition"] and "Grover" in r.text
+
