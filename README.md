@@ -13,13 +13,17 @@ traced back to a tool that computed it.
 
 ![Mission control, live: one request becomes a plan of exact tools that runs in parallel, every step verified and every number in the report traced](docs/screenshots/mission-control.gif)
 
-### Seven results you can check in the app
+### Results you can check in the app
 
 | | Measured result |
 | --- | --- |
 | **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; in a 30-mission live benchmark every mission finished, all 68 steps were verified (one repaired by the model), 204 of 209 report numbers were traced to a tool result, median 15 s: [docs/MISSIONS.md](docs/MISSIONS.md) |
 | **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
 | **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise, as learned decoders like AlphaQubit do. At **distance 5** the bigger code suppresses errors **5.9x** per round (Λ; Google's Willow measured 2.14), and a network on top of matching that sees both matchings' corrections makes 10% fewer errors again (paired test z = 7.8) |
+| **An AI scientist that learns** | Muse Spark designs circuits in rounds and sees what exact physics said: with that feedback its best proven circuit improved on all three targets (6 to 5, 6 to 5 and 8 to 7 CNOTs); asked afresh it never improved on its first answer, and random wiring never reached a target: [docs/LEARNING.md](docs/LEARNING.md) |
+| **AI-designed error-correcting codes** | For noise where phase flips dominate, Muse Spark found in its second round a 9-qubit code that needs **9 Z errors** to fail, three times the surface code's 3, while still correcting any single error, proven by an exact checker: [docs/CODES.md](docs/CODES.md) |
+| **The AI referee** | Muse Wonder challenges Muse Spark's answers about a circuit: debate raised them from 17 to 19 of 24 right, but Wonder also raised 5 false alarms and talked Spark out of 2 right answers; only exact simulation knew which challenge was right: [docs/REFEREE.md](docs/REFEREE.md) |
+| **Reproduce a whole paper** | Give it an arXiv id: Muse Wonder found 8 experiments in a 100-page paper, Muse Spark transcribed each, and exact simulation reproduced 3 of the 5 it could check (11 of 19 stated probabilities) in under two minutes |
 | **ML verifier** | Predicts how much of a circuit survives noise in about 150 µs with a conformal error bar: **9x more accurate** than the usual rule of thumb, and checked exactly every time |
 | **When does quantum win?** | Surface-code resource estimates against the best classical route; the model lands within 1.3x (qubits) and 2.3x (time) of Gidney and Ekerå's published RSA-2048 figure, and it says "classical wins" when it does |
 | **Reproduce a paper** | Muse Spark read a printed figure's circuit, all 8 bar heights, the shot count and the bit order in 8 s; an exact re-run judged every claim against its error bar |
@@ -31,10 +35,10 @@ traced back to a tool that computed it.
 | --- | --- |
 | Top of the page | **Mission control** (a whole problem, planned and verified) or a **quick question** to the same exact tools |
 | Sketch to code | Photo or camera, words or voice, the **live board** (point a camera at a whiteboard), the **Quantum Rosetta** (Dirac, OpenQASM, Quil, Qiskit, Cirq and more, both ways) |
-| Discover | **Discovery lab**, **when does quantum win**, **reproduce a paper** |
-| Hardware & networks | **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, error-correction lab, **distributed quantum computer**, **satellite planner** (SpeQtre and QUBE-II live on today's real orbits, under the cloud forecast) |
+| Discover | **Discovery lab**, **an AI scientist that learns**, **when does quantum win**, **reproduce a paper** (a figure, or a **whole paper** from its PDF) |
+| Hardware & networks | **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, **code lab** (AI-designed codes, check your own), error-correction lab, **distributed quantum computer**, **satellite planner** (SpeQtre and QUBE-II live on today's real orbits, under the cloud forecast) |
 | Labs & games | Challenges, bug hunt (against Muse Spark), Shor, QAOA, H₂ from first principles, BB84 with a spy |
-| Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Q-Canvas |
+| Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Q-Canvas, **the AI referee** (Muse Spark against Muse Wonder) |
 
 ### Run it in two minutes
 
@@ -45,10 +49,10 @@ pip install -r backend/requirements.txt
 cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open http://127.0.0.1:8000
 ```
 
-Press **Guided tour** in the header (or open `/#tour`) for a 95-second walk through the highlights. Without a key
+Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 468 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
-(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D70); what was built on which day is in
+live. 492 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D74); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
@@ -346,7 +350,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (468 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (492 tests,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per

@@ -36,4 +36,4 @@ printout of the take you use.
 - If the network is slow or the key is missing, set `QCANVAS_MODEL_PROVIDER=mock`: everything runs offline and
   the title card says the model answers are recorded mocks. Say "offline mode" in the voice-over rather than
   implying live calls.
-- The guided tour (header button, or `/#tour`) is a second way to show the same highlights live, about 95 s.
+- The guided tour (header button, or `/#tour`) is a second way to show the same highlights live, in under two minutes.

@@ -835,3 +835,51 @@ therefore stored with the app (qcanvas.precomputed, 37 KB, rebuilt by scripts/pr
 equal a fresh computation. Koyeb is preferred: it wakes in seconds and sleeps after an hour (Render: 30-60 s after
 15 minutes). A deploy link in the README fills in the repository, the Dockerfile, port 7860 and the free instance.
 
+## D71. An AI scientist that learns under proof
+qcanvas/learning.py: Muse Spark proposes up to four CNOT layouts per round for a target state; the exact optimiser
+fits each and Qiskit proves every one that reaches the target. Three conditions with the same number of proposals:
+with feedback (every earlier layout and its verdict in the next prompt), without (the same model asked afresh,
+numbered so no answer is reused) and random wiring of the feedback run's lengths. Live, five rounds, three targets
+(scripts/learning_bench.py, docs/LEARNING.md): with feedback the best proven layout improved on every target (W on 4
+qubits 6 to 5 CNOTs, Dicke(4,2) 6 to 5, W on 5 qubits in a line 8 to 7); without feedback the model never improved on
+its first round (6, 6, 7; on the line its first answer was already 7), and repeated itself; random wiring never
+reached a target. With feedback fewer of its layouts worked (10-15% against 10-35%): it aimed below its best and
+missed more often, which is how it found the shorter ones. A first run died on a truncated answer; a cut-off answer is
+a successful HTTP response and is cached, so the retry doubles the token budget and marks itself, which changes the
+request, while the first attempt stays identical and keeps its cache.
+
+## D72. Reproducing a whole paper
+qcanvas/paper.py takes a PDF or an arXiv id. One pass over a hundred-page paper (Muse Wonder with the whole PDF) was
+fragile: it listed repeat runs of one Bell circuit, dropped numbers into its notes, and once returned truncated JSON.
+Two passes work: Muse Wonder lists up to eight experiments on different circuits with their pages; pypdf cuts those
+pages (and the next) into a small PDF and Muse Spark transcribes each experiment alone, in parallel. Circuits go
+through the exact parser and claims through the figure checker's judge. A test caught a silent error on the way: the
+QASM extractor stopped at the first statement it did not know, so a circuit with an opaque gate became an empty
+circuit, and P(000) = 1 was then "reproduced". spec_from_qasm now refuses any statement acting on qubits that it
+cannot read, and comments are stripped first. On arXiv:1804.03719 (Quantum Algorithm Implementations for Beginners):
+eight experiments listed, five with a complete circuit and stated odds, three reproduced (a Bell state, two Hadamard
+tests), Shor's algorithm for 15 and a quantum walk not (hardware data the realistic preset does not reach), three
+reported as not completely specified on their pages; 11 of 19 stated probabilities check out; 107 s live.
+
+## D73. Code lab: AI-designed error-correcting codes
+qcanvas/codes.py checks any stabilizer code exactly in the symplectic picture: commuting, independent generators,
+k = n - rank, and the distance d, dX and dZ by brute force over every Pauli error from weight 1 up. The five-qubit,
+Steane, Shor, rotated surface and XZZX surface codes are scored by the same checker (all d = 3). Muse Spark designed
+codes in four rounds per target with every earlier verdict in the prompt (scripts/codes_bench.py, docs/CODES.md): the
+[[5,1,3]] perfect code and a [[7,1,3]] CSS code in round 1 (the best possible, so no curve), and for Z-biased noise
+on 9 qubits standard dZ = 3 codes in round 1, then in round 2 a [[9,1,3]] code with dZ = 9 and dX = 7: a logical
+error from Z noise alone needs all nine qubits, three times the surface code's dZ = 3, while any one-qubit error is
+still corrected. Anyone can check their own code on the page.
+
+## D74. The AI referee
+qcanvas/referee.py: Muse Spark answers three questions about a circuit, Muse Wonder agrees or disputes each with its
+own value, Muse Spark stands or concedes, and exact simulation grades every position (probabilities within 0.02,
+the most likely outcome with ties, entanglement by the negativity of the two-qubit reduced state). When Muse Spark
+chose its own claims it chose safe ones (right on 3 of 3 every time), which tests nothing, so the referee now asks
+the same three questions of every circuit: the most likely outcome, the probability of the second most likely one
+(picked from the exact odds; the models are not told why) and whether a given pair is entangled. On the six bigger
+circuits from the AI-alone benchmark and two smaller new ones (scripts/referee_bench.py, docs/REFEREE.md): Muse Spark
+was right on 17 of 24 answers as first stated and 19 after the debate; Muse Wonder caught 4 of its 7 wrong answers but
+raised 5 false alarms and talked it out of 2 right answers. Debate between models helps on balance and adds errors of
+its own; only the simulator can tell which challenge was right, which is why Q-Canvas checks instead of debating.
+

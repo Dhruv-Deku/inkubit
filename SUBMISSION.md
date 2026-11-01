@@ -10,13 +10,13 @@ Every number below comes from a run of this repo.
 ## At a glance (for judges)
 
 Q-Canvas is a quantum lab where Meta's models read, plan and propose, and exact physics checks every number before
-anyone sees it. Press **Guided tour** in the app for the best of it in 95 seconds.
+anyone sees it. Press **Guided tour** in the app for the best of it in under two minutes.
 
 | Criterion | What to look at |
 | --- | --- |
-| **Creativity** | **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**, a **paper's figure** re-run claim by claim |
+| **Creativity** | An **AI scientist that learns under proof**: Muse Spark designs circuits in rounds, sees what exact physics said, and its best proven circuit improves on every target, where the same model without feedback never does. **AI-designed error-correcting codes**: a 9-qubit code that needs 9 phase-flip errors to fail, three times the surface code. **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**; a **whole paper** from its PDF re-run claim by claim; an **AI referee** where Muse Wonder challenges Muse Spark and exact simulation decides |
 | **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
-| **Does it work** | A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **468 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
+| **Does it work** | A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **492 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
 | **Use of Meta models** | **Five Meta models**, each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
 
 ## Built during the hackathon
@@ -128,6 +128,27 @@ perfect qubits and about half the time with realistic noise.
 histogram, against the clock and against Muse Spark playing the same round. An
 exact search of every one-gate edit grades it, so any gate whose fix restores
 the odds counts.
+
+**An AI scientist that learns under proof.** Muse Spark proposes circuit layouts in rounds; an exact optimiser
+judges each one and Qiskit proves every winner; the verdicts go into the next prompt. With that feedback its best
+proven circuit improved on all three targets (6 to 5, 6 to 5 and 8 to 7 CNOTs); the same model asked afresh never
+improved on its first answer and kept repeating itself; random wiring of the same lengths never reached a target.
+
+**AI-designed error-correcting codes.** An exact checker scores any stabilizer code (commutation, independence, the
+distance by brute force over every error, and the distances against X-only and Z-only noise), the textbook codes
+included. Muse Spark designed the five-qubit perfect code and a [[7,1,3]] CSS code in its first round, and for
+hardware where phase flips dominate it found, in its second round, a 9-qubit code that needs 9 Z errors to fail,
+three times the surface code's 3, while still correcting any single error.
+
+**Reproduce a whole paper.** Give an arXiv id or a PDF: Muse Wonder reads the whole paper and lists its experiments,
+Muse Spark transcribes each from its pages, and exact simulation judges every stated probability. On a 100-page
+paper (arXiv:1804.03719) it found 8 experiments and reproduced 3 of the 5 it could check, 11 of 19 numbers, in
+under two minutes, and said which circuits the paper does not specify completely instead of guessing them.
+
+**The AI referee.** Muse Spark answers three questions about a circuit, Muse Wonder challenges, and exact simulation
+grades every position. Over 24 answers, debate raised Muse Spark from 17 to 19 right, but Muse Wonder also raised 5
+false alarms and talked it out of 2 right answers: models arguing catch mistakes and make new ones, and only the
+simulator knows which. That is why Q-Canvas checks instead of debating.
 
 **Discovery lab: AI proposes, physics proves.** Muse Spark proposes CNOT layouts, an exact optimiser fits
 them, Qiskit proves every winner, the ML verifier screens and exact noisy simulation decides. It found a GHZ state on
@@ -268,7 +289,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, PyMatching, SGP4, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 468 offline backend tests (spec
+live agent log; React 19 + TypeScript + Vite. 492 offline backend tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, orbits against Skyfield, the live adapters
 against recorded request shapes, API) and 6 end-to-end browser tests of the built app, all in CI on every

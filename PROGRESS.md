@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (468 backend tests and 6 browser tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
+## Done (492 backend tests and 6 browser tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -61,6 +61,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - Nov 1-2: discovery lab (D51), distributed computer (D52), when does quantum win (D53), live board (D54), satellite planner (D55), reproduce a paper (D56), ML decoder (D57), pulse lab (D58); each verified in the UI, live where a model is involved.
 - Nov 1: real satellites (D63): SpeQtre and QUBE-II on today's CelesTrak elements with SGP4 (frames match Skyfield to 0.003°), WGS84 stations, each satellite's own telescope, Open-Meteo cloud forecast per pass, a 7-day outlook, live position on the globe; Micius (re-entered 25 Jan 2026) stays as the modelled 2017 replay.
 - Nov 1: fresh-clone check and full-history secret scan (D64); end-to-end browser tests in CI, which caught a tour scrolling bug, fixed (D65); distance-5 decoder with Lambda = 5.9 at 1% and a network on top of matching, 10% fewer errors, paired z = 7.8 (D66); the AI-alone benchmark can run Muse Glimmer locally; a new demo recording of about 2 minutes (D68).
+- Nov 1 (evening): four new labs, each live-benchmarked and judged exactly (D71-D74): an AI scientist that learns under proof (feedback 6 to 5, 6 to 5, 8 to 7 CNOTs; without feedback never improves), whole-paper reproduction from a PDF (two passes; arXiv:1804.03719: 3 of 5 experiments, 11 of 19 numbers), the code lab (a 9-qubit code with dZ = 9, three times the surface code), the AI referee (17 to 19 of 24 right after debate, 5 false alarms); hosting on a free container with stored results (D70); a QASM extractor that silently dropped unknown gates now refuses them.
 - Nov 2: focus pass (D59): Mission control leads, five sections below, cards jump across sections.
 - Nov 2: guided tour and CI (D60), public mode + Dockerfile + Space deploy script (D61), 30-mission benchmark and the IBM hardware check script (D62). Waiting on: repo public, Hugging Face login, IBM key.
 
