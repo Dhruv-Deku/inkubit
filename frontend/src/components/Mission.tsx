@@ -147,12 +147,13 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
       setPhoto(null)
     }
   }
-  const launch = async () => {
-    if (!goal.trim() || busy) return
+  const launch = async (text?: string) => {
+    const g = (text ?? goal).trim()
+    if (!g || busy) return
     source.current?.close()
     setNodes([]); setReport(null); setError(null); setSelected(null); setBusy(true); setElapsed(0)
     try {
-      const { mission_id } = await api.startMission(goal.trim(), { image: photo?.blob, transcript, deep: live && deep })
+      const { mission_id } = await api.startMission(g, { image: text ? null : photo?.blob, transcript: text ? '' : transcript, deep: live && deep })
       const es = new EventSource(`/api/missions/${mission_id}/events`)
       source.current = es
       es.addEventListener('mission', (ev) => {
@@ -175,6 +176,18 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
       setBusy(false)
     }
   }
+  useEffect(() => {  // the guided tour launches a sample mission
+    const onTour = (e: Event) => {
+      const d = (e as CustomEvent<{ action: string; sample?: string }>).detail
+      const s = SAMPLES.find((x) => x.label === d.sample)
+      if (d.action !== 'mission' || !s || s.photo) return
+      setGoal(s.goal)
+      if (photo) { URL.revokeObjectURL(photo.url); setPhoto(null) }
+      void launch(s.goal)
+    }
+    window.addEventListener('qcanvas:tour', onTour)
+    return () => window.removeEventListener('qcanvas:tour', onTour)
+  })
   const steps = nodes.filter((n) => n.lane === 'step')
   const sel = useMemo(() => nodes.find((n) => n.id === selected) ?? null, [nodes, selected])
   return (

@@ -53,12 +53,12 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
     const id = window.setInterval(() => setElapsed((performance.now() - t0) / 1000), 100)
     return () => window.clearInterval(id)
   }, [busy])
-  const start = async (custom = false) => {
+  const start = async (custom = false, goalId?: string) => {
     if (busy) return
     es.current?.close()
     setLog([]); setResult(null); setError(null); setBusy(true); setElapsed(0); setPick(0)
     try {
-      const { discovery_id } = await api.startDiscovery(custom ? { ket } : { goal }, live && deep)
+      const { discovery_id } = await api.startDiscovery(custom ? { ket } : { goal: goalId ?? goal }, live && deep)
       const src = new EventSource(`/api/discovery/${discovery_id}/events`)
       es.current = src
       src.addEventListener('discovery', (ev) => {
@@ -77,6 +77,16 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
       setBusy(false)
     }
   }
+  useEffect(() => {  // the guided tour starts a discovery run
+    const onTour = (e: Event) => {
+      const d = (e as CustomEvent<{ action: string; goal?: string }>).detail
+      if (d.action !== 'discovery' || !d.goal) return
+      setGoal(d.goal)
+      void start(false, d.goal)
+    }
+    window.addEventListener('qcanvas:tour', onTour)
+    return () => window.removeEventListener('qcanvas:tour', onTour)
+  })
   const g = goals.find((x) => x.id === goal)
   const found = result?.entries.filter((e) => e.source !== 'textbook' && e.source !== 'compiler') ?? []
   const shown = result ? result.entries[Math.min(pick, result.entries.length - 1)] : null

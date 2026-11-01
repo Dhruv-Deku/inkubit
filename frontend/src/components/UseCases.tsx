@@ -15,7 +15,7 @@ const CASES: { id: string; tag: string; title: string; text: string; action: Act
 ]
 
 export function scrollToPanel(title: string, retried = false) {
-  const h = [...document.querySelectorAll('.panel h2')].find((el) => el.textContent?.startsWith(title))
+  const h = [...document.querySelectorAll<HTMLElement>('.panel h2')].find((el) => el.offsetParent !== null && el.textContent?.startsWith(title))
   const panel = h?.closest('.panel') as HTMLElement | null
   if (!panel) {  // in another section: ask the page to open it, then come back here
     if (!retried) window.dispatchEvent(new CustomEvent('qcanvas:goto', { detail: title }))

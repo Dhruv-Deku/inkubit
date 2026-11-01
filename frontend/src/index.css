@@ -743,3 +743,12 @@ details summary { cursor: pointer; }
 @media (max-width: 560px) { .hero-switch button span { display: none; } }
 .panel { scroll-margin-top: 92px; }
 .section-body { padding-bottom: 45vh; }
+
+/* guided tour */
+.tour { position: fixed; right: 20px; bottom: 20px; z-index: 50; width: min(400px, calc(100vw - 32px)); background: var(--panel-2);
+  border: 1px solid var(--line-2); border-radius: 14px; padding: 14px 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, .45); display: grid; gap: 8px; }
+.tour-title { font-size: 15px; color: var(--text); }
+.tour-text { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--text-2); }
+.tour-bar { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.tour-bar span { display: block; height: 100%; background: var(--primary); transition: width .9s linear; }
+@media (max-width: 560px) { .tour { right: 16px; left: 16px; bottom: 12px; width: auto; } }

@@ -28,6 +28,7 @@ import { PulsePanel } from './components/Pulse'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
+import { Tour, type TourSection } from './components/Tour'
 import type {
   AgentEvent, ChallengeInfo, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, JobSummary, ModelCall,
   NetworkResult, NetworkSpec, RecentRun, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
@@ -94,8 +95,11 @@ export default function App() {
     const h = new URLSearchParams(window.location.hash.slice(1)).get('tab')
     return (SECTIONS.find((t) => t.id === h)?.id ?? 'build') as SectionId
   })
+  const [touring, setTouring] = useState(() => window.location.hash.includes('tour'))
+  const [seen, setSeen] = useState<Set<SectionId>>(() => new Set([tab]))  // opened sections stay mounted, hidden
   const goTab = (id: SectionId) => {
     setTab(id)
+    setSeen((v) => (v.has(id) ? v : new Set(v).add(id)))
     if (window.location.hash.startsWith('#s=')) return  // a shared circuit link: leave it intact
     const params = new URLSearchParams(window.location.hash.slice(1))
     params.set('tab', id)
@@ -314,6 +318,7 @@ export default function App() {
           <button className={`step ${stage === 'run' ? 'active' : job?.result ? 'done' : ''}`} disabled={!job} onClick={() => setStage('run')}><span className="n">3</span>Run &amp; verify</button>
         </nav>
         <span className="spacer" />
+        <button className="btn small primary" onClick={() => { setStage('start'); setTouring(true) }} title="About 95 seconds: the best of Q-Canvas, step by step">Guided tour</button>
         <label className={`toggle ${options.demo_mode ? 'on' : ''}`} title="Break the first attempt on purpose so the repair loop is visible">
           <input type="checkbox" hidden checked={options.demo_mode} onChange={(e) => setOptions({ ...options, demo_mode: e.target.checked })} />
           <span className="track" />Demo mode
@@ -330,6 +335,14 @@ export default function App() {
 
       {stage === 'start' && (
         <>
+          {touring && (
+            <Tour onClose={() => setTouring(false)} onGo={(section: TourSection, panel: string) => {
+              if (section === null) setAssistant('mission')
+              else goTab(section)
+              window.setTimeout(() => scrollToPanel(panel, true), 250)
+              window.setTimeout(() => scrollToPanel(panel, true), 1300)
+            }} />
+          )}
           {challenge && (
             <div className="notice row wrap" style={{ gap: 10, marginBottom: 16 }}>
               <span>Challenge in progress: <strong>{challenge.title}</strong>. Draw your answer on paper and photograph it,
@@ -357,7 +370,8 @@ export default function App() {
               </button>
             ))}
           </nav>
-          {tab === 'build' && (
+          {seen.has('build') && (
+            <div hidden={tab !== 'build'}>
             <StartPanel examples={examples} busy={busy} error={startError} onImage={onImage} onSpec={onSpec} onText={onText}
               live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
               extra={<>
@@ -365,15 +379,19 @@ export default function App() {
                 <RosettaPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
                 <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />
               </>} />
+            </div>
           )}
-          {tab === 'discover' && (
+          {seen.has('discover') && (
+            <div hidden={tab !== 'discover'}>
             <div className="stack section-body">
               <DiscoveryPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <EstimatorPanel live={health?.mode === 'meta'} />
               <ReproducePanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
             </div>
+            </div>
           )}
-          {tab === 'hardware' && (
+          {seen.has('hardware') && (
+            <div hidden={tab !== 'hardware'}>
             <div className="stack section-body">
               <PulsePanel />
               <DecoderPanel />
@@ -381,8 +399,10 @@ export default function App() {
               <DistributedPanel examples={examples} onOpen={(s) => onSpec(clone(s))} />
               <GlobePanel />
             </div>
+            </div>
           )}
-          {tab === 'labs' && (
+          {seen.has('labs') && (
+            <div hidden={tab !== 'labs'}>
             <div className="stack section-body">
               <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
               <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
@@ -391,11 +411,14 @@ export default function App() {
               <ChemLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QkdLabPanel onOpen={(s) => onSpec(clone(s))} />
             </div>
+            </div>
           )}
-          {tab === 'evidence' && (
+          {seen.has('evidence') && (
+            <div hidden={tab !== 'evidence'}>
             <div className="stack section-body">
               <ObservatoryPanel />
               <ArenaPanel />
+            </div>
             </div>
           )}
         </>
