@@ -765,3 +765,40 @@ through more sky than the zenith the forecast describes). The window starts at n
 with a 7-day outlook per 24 hours; the globe follows the real clock and draws the 15° footprint. Key bits remain
 estimates (the real payloads' source rates and protocols differ); pass times, elevations and clouds are real data.
 Tests never touch the network: CelesTrak and Open-Meteo are stubbed and the snapshot flies.
+
+## D64. Fresh-clone check and a history scan before going public
+A clean clone with a new virtual environment, following the README exactly (requirements.txt only, npm ci, build,
+no .env): the server starts in offline mode, every feature endpoint answers, and 442 backend tests pass (the 2
+skipped need the dev extras, Skyfield and Cirq). Before the repository is made public, all 78 commits were searched
+for key patterns (Meta, Hugging Face, GitHub, AWS, private keys) and for the literal Meta key from .env: no hits
+anywhere in history, tracked files or the built frontend; .env was never committed.
+
+## D65. End-to-end browser tests in CI, and the bug they found
+e2e/test_ui.py starts the server on the offline models and drives the built app in Chromium: every section shows its
+panels, a sample sketch goes all the way to Verified, the guided tour lands on every step and leaves a finished
+mission and discovery run, the satellite planner flies a real satellite, and no section scrolls sideways at 390 px.
+The section list and the tour steps are read from App.tsx and Tour.tsx so the tests follow the app. A third CI job
+runs them. They caught a real bug: on a cold server the tour scrolled to the decoder before the pulse lab above it
+had loaded, which then grew and pushed the decoder 878 px down. scrollToPanel now holds the panel in place for up to
+15 s while the layout above it settles, released the moment the visitor scrolls, clicks or types.
+
+## D66. Distance 5: error suppression, and a network that fixes what matching gets wrong
+layout(d) generates the rotated surface code for any odd distance (it reproduces the distance-3 lists exactly; at
+d = 5, 12 X and 12 Z checks, commuting, rank 24, one logical qubit). Matching at any distance uses PyMatching on the
+same space-time graph and weights; it agreed with the exact bitmask matcher on all 20,000 distance-3 shots tried
+(detectors in time-major order; check-major order gave 80%, which is how the order was pinned down). Memory
+experiments of d rounds, per-round error from 1 - 2P = (1 - 2e)^rounds: distance 5 suppresses errors by Lambda = 5.9
+at 1% noise (11.3 at 0.5%), shrinking to 1.15 at 6%. A first network that saw the events of both kinds and
+matching's verdict learned only to copy matching (+0% at every noise level). The second also sees where matching put
+its X corrections and where a second matching on the X checks put Z corrections: a qubit in both is a Y error, which
+matching on one kind cannot see. It makes 10% fewer logical errors at 1% (16% at 0.75%); since both decoders run on
+the same shots, significance uses a paired (McNemar) test on the shots one gets right and the other wrong: at 1% it
+fixes 123 and breaks 27 (z = 7.8), significant at 8 of 9 noise levels (not at 6%). 12 million fresh training shots,
+none seen twice.
+
+## D68. A new video of under three minutes
+scripts/record_demo.py keeps its recorder (browser screencast, labelled speed-ups, captions that name a Meta model
+only in live mode) with new scenes for the current app: Mission control, sketch to verified code with a planted bug,
+the discovery lab (CNOT counts read from the page), when quantum wins, the pulse lab, decoder and live satellites,
+and the AI-alone evidence. DEMO_SCRIPT.md has a voice-over timed to the scenes.
+
