@@ -9,7 +9,7 @@ the key absent from git history, CI on the latest commit, the deadline) and prin
 | Done | What | How |
 | --- | --- | --- |
 | [ ] | Make the repository public | `gh repo edit Dhruv-Deku/q-canvas --visibility public --accept-visibility-change-consequences` |
-| [ ] | Record the voice-over (optional, recommended) | Clipchamp: import `docs/video/q-canvas-demo-v2.mp4`, read the blocks in `DEMO_SCRIPT.md` over their scenes |
+| [ ] | Record the voice-over (optional, recommended) | Clipchamp: import `docs/video/q-canvas-demo-v3.mp4`, read the blocks in `DEMO_SCRIPT.md` over their scenes |
 | [ ] | Film your hand drawing a circuit (optional, about 10 s) | Phone, top-down, pen on white paper; put it before the title card |
 | [ ] | Upload the video | YouTube, unlisted is fine; thumbnail `docs/thumbnail.png`; title "Q-Canvas: Meta's models propose, exact physics checks every number" |
 | [ ] | Paste the video link | `SUBMISSION.md`, line "Demo video" |
@@ -35,6 +35,6 @@ the key absent from git history, CI on the latest commit, the deadline) and prin
 
 ## What judges will see first
 
-1. The video (1:56) and its thumbnail.
+1. The video (2:48) and its thumbnail.
 2. The README: the GIF, then "Results you can check in the app", each linked to its evidence.
 3. The app: the **Guided tour** button (under two minutes) shows the best of it; every number on screen comes from a run.

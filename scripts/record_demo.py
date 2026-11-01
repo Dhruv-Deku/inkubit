@@ -264,6 +264,28 @@ def models_or(live: bool, meta: str, offline: str) -> str:
     return meta if live else offline
 
 
+def facts() -> dict:
+    """The numbers the captions quote, read from the recorded results (never typed in)."""
+    ex = ROOT / "examples"
+    load = lambda name: json.loads((ex / name).read_text(encoding="utf-8"))  # noqa: E731
+    learn = load("learning_benchmark.json")["targets"]
+    codes = load("codes_benchmark.json")
+    biased = next(t for t in codes["targets"] if t["target"]["objective"] == "dz")["best"]
+    surface = next(r for r in codes["references"] if r["name"].startswith("Rotated surface"))
+    ref = load("referee_benchmark.json")
+    hw = load("hardware_runs.json")
+    return {
+        "learn_steps": [f"{next(v for v in t['curves']['feedback'] if v is not None)} to {t['curves']['feedback'][-1]}" for t in learn],
+        "dz": biased["dz"], "surface_dz": surface["dz"], "ref": ref["summary"], "ref_n": ref["claims"],
+        "hw_device": hw["device"], "hw_best": sum(r["tvd_twin"] < min(r["tvd_ideal"], r["tvd_generic"]) for r in hw["runs"]),
+        "hw_n": len(hw["runs"]), "hw_rehearsal": hw["rehearsal"],
+        "paper": load("paper_examples.json")["papers"][0],
+    }
+
+
+F: dict = {}
+
+
 def panel(page: Page, title: str) -> Locator:
     return page.locator(".panel", has=page.locator("h2", has_text=title))
 
@@ -371,6 +393,21 @@ async def discovery_story(d: Director) -> None:
         await d.caption("Qiskit proves every winner exact, and exact noisy simulation decides which survives best.", hold=4.0)
 
 
+async def learning_story(d: Director) -> None:
+    await show(d, "An AI scientist that learns")
+    a, b, c = F["learn_steps"]
+    await d.caption("**An AI scientist that learns**: Muse Spark designs circuits in rounds and sees what exact physics said about each.", hold=3.4)
+    await d.caption(f"With that feedback its best proven circuit improved on every target ({a}, {b}, {c} CNOTs); "
+                    "asked afresh, it never improved on its first answer.", hold=4.6)
+
+
+async def paper_story(d: Director) -> None:
+    pp = F["paper"]
+    await show(d, "Reproduce a whole paper")
+    await d.caption(f"**A whole paper** from its PDF: Muse Wonder found {len(pp['experiments'])} experiments in 100 pages, Muse Spark transcribed each, "
+                    f"exact simulation checked {pp['claims_total']} stated numbers.", hold=5.0)
+
+
 async def estimator_story(d: Director) -> None:
     page = d.page
     est = await show(d, "When does quantum win?")
@@ -388,27 +425,38 @@ async def hardware_story(d: Director) -> None:
     await section(d, "Hardware & networks")
     pulse = await show(d, "Pulse lab")
     await pulse.locator(".obs-head").first.wait_for(timeout=120_000)
-    await d.caption("Down to the microwave pulse: a three-level transmon, where DRAG keeps a fast X gate near 1e-4 error.", hold=3.8)
+    await d.caption("Down to the microwave pulse: a three-level transmon, where DRAG keeps a fast X gate near 1e-4 error.", hold=3.2)
     dec = await show(d, "ML error-correction decoder")
     await dec.locator(".obs-head").first.wait_for(timeout=60_000)
-    await d.caption("A learned surface-code decoder that reads both kinds of checks beats minimum-weight matching, beyond its error bars.", hold=4.2)
+    await d.caption("A learned surface-code decoder that reads both kinds of checks beats minimum-weight matching, beyond its error bars.", hold=3.6)
     d5 = dec.locator(".d5")
     if await d5.count():
         await d.caption(None)
         await d.scroll_to(d5, block="start", pause=0.6)
-        await d.caption("And at distance 5, below threshold, the bigger code suppresses errors, as Google's Willow chip showed.", hold=4.0)
+        await d.caption("And at distance 5, below threshold, the bigger code suppresses errors, as Google's Willow chip showed.", hold=3.6)
+    await show(d, "Code lab")
+    await d.caption(f"**Codes designed by AI, proven exactly**: for chips where phase flips dominate, Muse Spark found a 9-qubit code that "
+                    f"needs {F['dz']} phase flips to fail, against {F['surface_dz']} for the surface code.", hold=5.2)
     sat = await show(d, "Satellite planner")
     await sat.locator(".sat-card").wait_for(timeout=120_000)
-    await d.caption("Out to orbit, live: SpeQtre on today's real orbit from CelesTrak, every night pass over its ground stations…", hold=3.6)
+    await d.caption("Out to orbit, live: SpeQtre on today's real orbit from CelesTrak, every night pass over its ground stations…", hold=3.2)
     await d.scroll_to(sat.locator(".outlook"), block="center", pause=0.3)
-    await d.caption("…weighed by the cloud forecast at each station. Micius re-entered in January 2026; its 2017 experiments replay on a model.", hold=4.4)
+    await d.caption("…weighed by the cloud forecast at each station.", hold=2.6)
 
 
 async def evidence_story(d: Director) -> None:
     await section(d, "Evidence")
     await show(d, "AI alone vs Q-Canvas")
     await d.caption("Why verify at all? Asked alone, the same model was exact on small circuits but on only 3 of 6 bigger ones, "
-                    "once 43% off with full confidence.", hold=5.0)
+                    "once 43% off with full confidence.", hold=4.6)
+    r = F["ref"]
+    await show(d, "The AI referee")
+    await d.caption(f"**The AI referee**: Muse Wonder challenges Muse Spark. Debate took it from {r['spark_first']} to {r['final_right']} of {F['ref_n']} right, "
+                    f"but also raised {r['false_alarms']} false alarms; only exact simulation knew which.", hold=5.4)
+    if not F["hw_rehearsal"]:
+        await show(d, "Real hardware")
+        await d.caption(f"And on a **real IBM quantum computer** ({F['hw_device']}): a digital twin built from the chip's own calibration "
+                        f"predicted what it measured best on {F['hw_best']} of {F['hw_n']} circuits.", hold=5.4)
 
 
 async def record(base: str, out: Path) -> None:
@@ -442,8 +490,10 @@ async def record(base: str, out: Path) -> None:
                          chips, note, hold=4.6)
             await page.screenshot(path=str(out.with_suffix(".png")))
             await d.hide_card()
+            F.update(facts())
             for name, story in (("mission", mission_story), ("sketch", sketch_story), ("discovery", discovery_story),
-                                ("estimator", estimator_story), ("hardware", hardware_story), ("evidence", evidence_story)):
+                                ("learning", learning_story), ("estimator", estimator_story), ("paper", paper_story),
+                                ("hardware", hardware_story), ("evidence", evidence_story)):
                 print(name, f"{rec._video_time(time.monotonic()):.1f} s", flush=True)
                 await story(d)
             await d.caption(None)
