@@ -1,51 +1,39 @@
-# Q-Canvas demo video: shot list (2:45 target, 3:00 max)
+# Q-Canvas demo video (1:56) and its voice-over
 
-**Fastest route: let the script record it.** With the backend running
-(`scripts/dev.sh`, or uvicorn on :8000):
+The video is recorded by a script that drives the real app, live on Meta's models, and lays captions over it:
 
 ```sh
-.venv/Scripts/python scripts/record_demo.py          # writes docs/video/q-canvas-demo.mp4 (+ .png thumbnail)
+.venv/Scripts/python scripts/record_demo.py --out docs/video/q-canvas-demo-v2.mp4   # backend on :8000 in live mode
 ```
 
-It drives the real app and lays captions over it (about 2:10, 1080p). Run it once
-to warm the cache, then again for the final take. In live Meta mode the captions
-name the models; offline, the title card says the answers are recorded mocks.
-Add your own voice-over and the hand-drawing shot (1) in any editor if you like.
-The shot list below is for recording by hand.
+It writes a 1080p MP4 and a thumbnail. Run it once to warm the response cache, then again for the take (the second
+run is quicker and costs nothing). Speed-ups are labelled on screen ("3x speed · tools and model calls"), and
+captions name a Meta model only when the backend reports live Meta mode.
 
-Record at 1920x1080, browser zoom 100%, dark OS theme. Before recording:
+## Adding your voice
 
-1. `.env` has `META_API_KEY` and `QCANVAS_MODEL_PROVIDER=meta`; the badge reads **Meta live**.
-2. Do one full rehearsal run of each shot so every Meta response is cached
-   (`backend/.qcanvas_cache/`): the takes are then instant and cost nothing.
-3. Have a real phone photo of a hand-drawn Bell circuit ready (pen on white paper,
-   H box, dot + circled plus, two meter boxes). If live reading misses something,
-   that is fine: correcting it is part of the story (shot 3).
-4. Turn on **Demo mode** (top right) before shot 4.
+The captions carry the story on their own, but a voice-over helps. On Windows, Clipchamp (built in) is enough:
+import `docs/video/q-canvas-demo-v2.mp4`, record each block below over its scene (Record & create, then Audio),
+export at 1080p. Speak at an easy pace: each block fits its scene at about 2.5 words per second.
 
-| # | Time | Shot | Say |
-| --- | --- | --- | --- |
-| 1 | 0:00-0:12 | Close-up: a hand drawing a Bell circuit on paper, then taking a phone photo. | "Every quantum program starts like this: a sketch. Turning it into code that is actually *right* is the hard part, because a wrong quantum program still runs. It just gives you the wrong answer." |
-| 2 | 0:12-0:30 | Drag the photo onto Q-Canvas. Boxes appear on the photo with labels like `H q0 · 97%`, `CX q0→q1`. | "Q-Canvas sends the photo to Meta's models. Muse Spark decides what to look for, SAM 3.1 finds every gate, dot and meter, and Muse Spark reads the whole drawing into a structured spec, with every operation linked to the box it came from." |
-| 3 | 0:30-0:45 | Hover a box: its row lights up in the editor. Change one thing (e.g. a target qubit) to show the live circuit preview and the readable validation error, then undo. | "Nothing runs until you agree with the reading. Hover a box to find its line, fix anything by hand, and the spec is checked as you type." |
-| 4 | 0:45-1:25 | Click **Run** with Demo mode on. Keep the live log full screen-height. Let the failure land: red verify line, the attempt-1 histogram with bars at 00 and 01, the diagnosis line. Then the repair diff appears (`+ qc.cx(0, 1)`), attempt 2 passes. | "Demo mode plants a real bug in the first attempt: the CNOT is gone. The agent runs the code in a sandbox and compares it with an exact prediction it computes straight from the spec. Watch: expected 50% 00 and 50% 11, got 00 and 01. The two bits should agree and don't, so the entangling gate is missing. Muse Spark gets the spec, the code and that evidence, and fixes it. Attempt 2: verified." |
-| 5 | 1:25-1:50 | Scroll the results: Verified badge, the four metric tiles, histogram with predicted (outline), measured (solid) and the dashed ideal. Pause on the explanation paragraph. Click the Code tab "Changes from attempt 1". | "The numbers are honest: distance from the prediction 0.004, well inside the shot-noise limit; noise cost about 7% against a perfect machine. Muse Spark explains it for a student, using these exact numbers. And the code is standalone Qiskit you can download and run." |
-| 6 | 1:50-2:00 | Ask panel: click "Why did the first attempt fail?". | "Ask anything about the run. Muse Spark answers only from this run's numbers." |
-| 7 | 2:00-2:15 | "Inside the circuit": press Play; the Bloch arrows shrink to the centre at the CNOT. Then the error budget and the "How good must the hardware be?" chart. | "Step through the exact state. When the CNOT entangles the qubits, their arrows shrink: neither has a state of its own. Readout errors cost the most here, and for a 99% match the hardware needs to get about seven times better." |
-| 8 | 2:15-2:25 | Start page, type "Bernstein-Vazirani with secret 1011", Build it, Step through, Play to the end. | "No sketch? Describe it, and Muse Spark builds the spec. One query to the oracle reveals the secret." |
-| 7a | (optional, +6 s) | Scroll to **Bell test** on the Bell-pair run: the gold dot with its error bar sits right of the classical limit. | "And a Bell test: could any classical explanation fake these correlations? Even with realistic noise, no, by sixteen standard errors." |
-| 7b | (optional, +8 s) | Keep scrolling to **Zero-noise extrapolation**: the three blue points at 1x, 3x, 5x noise and the dashed line back to zero. | "Error mitigation: run the circuit noisier on purpose by folding every gate, then extrapolate back to zero noise. 0.93 becomes 0.998, and it also shows what's left with real shot counts." |
-| 8a | (optional, +12 s) | Start page, **Phase estimation** from the spec list, **Find a shorter circuit**. Click the Rules + Qiskit row to show the numbered reasons. | "Rewrite rules, the Qiskit compiler and Muse Spark race to shorten it, and exact simulation proves each answer or rejects it. Phase estimation of a known phase shrinks to one X gate: its answer was fixed in advance, and Q-Canvas says so." |
-| 8b | (optional, +15 s) | Start page, Challenges, **Bell pair**. Click H then q0; CX then q0, q1. Stars pop, the lesson appears. Drag a Bloch sphere to turn it. | "Or learn by playing: eleven puzzles, scored exactly against a hidden answer, with par like golf. Muse Spark gives hints without ever seeing the solution." |
-| 9 | 2:25-2:40 | Pick **Preset A: satellite link** (or the satellite sketch). Run. Log, then the animated network map (toggle Before / After the fix) and the fix table. | "Q-Canvas also plans quantum networks: it models every link from physics, finds the bottleneck, tries real fixes, including entanglement purification, and keeps the best. The secret-key rate goes up more than a hundredfold." |
-| 10 | 2:40-2:48 | Title card: "Q-Canvas: sketch → verified quantum simulation. SAM 3.1 · Muse Spark · Muse Image." | "From a pencil sketch to verified quantum code, with every answer checked. That's Q-Canvas." |
+| Time | Scene | Say |
+| --- | --- | --- |
+| 0:00-0:06 | Title card | "Q-Canvas. Meta's models turn a quantum idea into a plan, and exact physics checks every number." |
+| 0:06-0:21 | Mission control: "Secure two cities" is launched; the plan graph lights up; the report appears | "One request: connect two cities with quantum-secure keys. Muse Spark plans a graph of exact tools, and independent steps run in parallel. Every step passes physics checks and a second simulator, and every number in the report is traced." |
+| 0:21-0:49 | Sketch to code: the Bell-pair photo is read, demo mode plants a bug, the run fails, is repaired and verified | "It started with a pen sketch. SAM 3.1 finds every drawn part, and Muse Spark reads the photo into a spec, each gate linked to the box it came from. Demo mode plants a real bug. The verifier predicts the answer from the spec, never from the code, so the broken run fails. Muse Spark reads the evidence, repairs the code, and attempt two is verified." |
+| 0:49-1:04 | Discovery lab: GHZ on 7 qubits of an IBM chip | "In the discovery lab, AI proposes and physics proves. Muse Spark suggests layouts for all seven qubits of an IBM chip, an exact optimiser fits them, and Qiskit proves the winner: six CNOTs, where the textbook needs ten." |
+| 1:04-1:14 | When does quantum win: RSA-2048, then a 64-bit key | "When does quantum win? Surface-code estimates against the best classical route, checked against the published RSA-2048 figure. And when classical wins, it says so." |
+| 1:14-1:41 | Pulse lab, the decoder at distance 3 and 5, the live satellite planner | "Down to the hardware: DRAG pulses on a three-level transmon. A learned decoder beats matching, and at distance five the bigger code suppresses errors almost six times per round, the effect Google's Willow chip showed. And out to orbit, live: SpeQtre on today's real orbit, every night pass over its ground stations, weighed by the cloud forecast." |
+| 1:41-1:50 | AI alone vs Q-Canvas | "Why check at all? Alone, the same model was exact on small circuits, but on only three of six bigger ones, once 43% off with full confidence." |
+| 1:50-1:56 | End card | "Q-Canvas. The AI proposes; exact physics has the last word." |
+
+Scene times come from the recorder's own marks (mission 5.6 s, sketch 21.0 s, discovery 49.1 s, estimator 64.0 s,
+hardware 74.3 s, evidence 101.5 s, total 115.9 s); a new take can shift them by a second or two, so check the
+printout of the take you use.
 
 ## Backup plan
 
-- If the network is slow or the key is missing, set `QCANVAS_MODEL_PROVIDER=mock`
-  and use the sample sketches: everything works offline and the badge honestly
-  says **Mock**. Say "offline mode" on camera rather than implying live calls.
-- `scripts/demo.sh` prints the same fail-repair-pass log in a terminal, for a
-  close-up insert shot.
-- The fiber chain preset is a second network story: no secret key at all until
-  the agent adds a relay and upgrades the memories (0 → 0.39 bit/s).
+- If the network is slow or the key is missing, set `QCANVAS_MODEL_PROVIDER=mock`: everything runs offline and
+  the title card says the model answers are recorded mocks. Say "offline mode" in the voice-over rather than
+  implying live calls.
+- The guided tour (header button, or `/#tour`) is a second way to show the same highlights live, about 95 s.

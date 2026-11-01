@@ -19,7 +19,7 @@ traced back to a tool that computed it.
 | --- | --- |
 | **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; in a 30-mission live benchmark every mission finished, all 68 steps were verified (one repaired by the model), 204 of 209 report numbers were traced to a tool result, median 15 s: [docs/MISSIONS.md](docs/MISSIONS.md) |
 | **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
-| **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise (beyond the error bars at every noise level), as learned decoders like AlphaQubit do |
+| **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise, as learned decoders like AlphaQubit do. At **distance 5** the bigger code suppresses errors **5.9x** per round (Λ; Google's Willow measured 2.14), and a network on top of matching that sees both matchings' corrections makes 10% fewer errors again (paired test z = 7.8) |
 | **ML verifier** | Predicts how much of a circuit survives noise in about 150 µs with a conformal error bar: **9x more accurate** than the usual rule of thumb, and checked exactly every time |
 | **When does quantum win?** | Surface-code resource estimates against the best classical route; the model lands within 1.3x (qubits) and 2.3x (time) of Gidney and Ekerå's published RSA-2048 figure, and it says "classical wins" when it does |
 | **Reproduce a paper** | Muse Spark read a printed figure's circuit, all 8 bar heights, the shot count and the bit order in 8 s; an exact re-run judged every claim against its error bar |
@@ -47,8 +47,8 @@ cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a 95-second walk through the highlights. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 444 backend tests run offline (`cd backend && python -m pytest -q`). Every design decision is in
-[DECISIONS.md](DECISIONS.md) (D1 to D59); what was built on which day is in
+live. 448 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D68); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
@@ -98,7 +98,7 @@ Q-Canvas closes that gap and refuses to fake success:
 | Live board | Point a camera at a whiteboard: the browser sends a frame only when the drawing has changed and holds still; SAM 3.1 and Muse Spark read it (about 35 s live for a new frame), exact simulation runs, and each qubit's odds are pinned to its wire in the photo | **SAM 3.1**, **Muse Spark 1.3** |
 | Satellite planner | The quantum-key satellites in orbit today, **SpeQtre** (UK–Singapore, 80 mm telescope) and **QUBE-II** (Germany, 85 mm), fly their real orbits: today's CelesTrak elements (checksummed, refreshed every two hours, with a labelled fallback) propagated by SGP4 from now, live on a canvas globe with Natural Earth coastlines, the real night side and the 15° footprint. Stations on the WGS84 ellipsoid; the frame chain matches Skyfield, an independent implementation, to 0.003° and 34 m. Every night pass over two ground stations in the next 24 hours, the key each gives through the satellite's own telescope, the **Open-Meteo cloud forecast** at each station and the key to expect, and a 7-day outlook. Micius re-entered on 25 January 2026, so its 2017 experiments replay on a modelled orbit (entangled pairs when both cities see it at once, or a trusted-node BB84 downlink; about 2 kbit/s at 1,200 km, the order Micius measured) | – |
 | Reproduce a paper | Upload a figure from a paper: Muse Spark transcribes the circuit as OpenQASM (read by the exact parser, sketch pipeline as fallback) and the claimed odds, shots and bit order; the circuit is re-run exactly and every claim judged against shot-noise error bars, bit order inferred when unstated | **Muse Spark 1.3** reads the figure |
-| ML error-correction decoder | Distance-3 rotated surface code, 3 rounds of phenomenological noise: exact minimum-weight matching against a NumPy network that also reads the X checks (Y errors correlate them). At 1% noise: 0.72% logical errors against 0.92% for matching (21% fewer, beyond the error bars at every noise level) | – |
+| ML error-correction decoder | Distance-3 rotated surface code, 3 rounds of phenomenological noise: exact minimum-weight matching against a NumPy network that also reads the X checks (Y errors correlate them). At 1% noise: 0.72% logical errors against 0.92% for matching (21% fewer, beyond the error bars at every noise level). **Distance 5** (25 qubits, 5 rounds; layout generated for any odd distance, matching by PyMatching, equal to the exact matcher on 20,000 distance-3 shots): per-round logical error 5.0 × 10⁻⁴ against 3.0 × 10⁻³ at distance 3, a suppression Λ = 5.9 at 1% noise (11.3 at 0.5%, 1.15 at 6%). A 172-256-256-1 network on top of matching, fed where each kind of matching put its corrections (a qubit in both is a Y error), makes 10% fewer logical errors at 1%: on the same shots it fixes 123 and breaks 27 (McNemar z = 7.8), significant at 8 of 9 noise levels. A first version without the corrections only learned to copy matching | – |
 | Pulse lab | An X gate as the microwave pulse on a three-level transmon (anharmonicity −300 MHz, T1/T2 as Lindblad terms): Gaussian against calibrated DRAG; short Gaussians leak into |2⟩, DRAG reaches 1.1e-4 error at 15 ns where only T1/T2 is left, its calibrated β ≈ 0.5 matching first-order theory | – |
 | Ask Q-Canvas | One assistant for the whole lab. Ask in words or by voice ("compare H₂ at 0.74 and 2.5 Å", "Eve listens to 30% of photons", "split these six people into two teams", "make a GHZ state and run it on noisy hardware"): the model calls nine exact tools (circuit simulation, optimizer, H₂, BB84, QAOA, Shor, network links, error correction, the Rosetta), in parallel when it needs several, and answers with live result cards. **Every number in the answer is traced to a tool result**; untraced numbers are flagged | **Muse Spark 1.3** with tool calling, **Muse Voice Transcribe 1.0** for voice |
 | 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words or say it out loud**, or paste JSON | **Muse Voice Transcribe 1.0** hears it, **Muse Spark 1.3** turns the description into a spec |
@@ -182,7 +182,7 @@ Q-Canvas closes that gap and refuses to fake success:
 <tr><td><img src="docs/screenshots/31-discovery.png" alt="Discovery lab: GHZ-7 on heavy-hex in 6 CNOTs"></td><td><img src="docs/screenshots/32-distributed.png" alt="Distributed computer: two chips and the fidelity against distance"></td></tr>
 <tr><td><img src="docs/screenshots/33-when-quantum-wins.png" alt="When does quantum win: Grover search loses to a classical cluster at 64 bits"></td><td><img src="docs/screenshots/34-live-board.png" alt="Live board: odds pinned to the wires of a camera frame"></td></tr>
 <tr><td><img src="docs/screenshots/35-satellite-planner.png" alt="Satellite planner: SpeQtre live on its real orbit, every pass over Chilbolton and Singapore under the cloud forecast"></td><td><img src="docs/screenshots/36-reproduce-a-paper.png" alt="Reproduce a paper: every claim within its error bar"></td></tr>
-<tr><td><img src="docs/screenshots/37-ml-decoder.png" alt="ML decoder below matching at every noise level"></td><td><img src="docs/screenshots/38-pulse-lab.png" alt="Pulse lab: DRAG against Gaussian"></td></tr>
+<tr><td><img src="docs/screenshots/37-ml-decoder.png" alt="ML decoder at distance 3 and 5: the bigger code suppresses errors 5.9x per round"></td><td><img src="docs/screenshots/38-pulse-lab.png" alt="Pulse lab: DRAG against Gaussian"></td></tr>
 </table>
 
 ## Architecture
@@ -342,8 +342,10 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (444 tests,
-about 2 minutes, all offline). `pytest -m live` makes one cheap real call per
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (448 tests,
+about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
+and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
+planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per
 Meta model (skipped without a key; cached after the first run).
 
 ## The spec format
