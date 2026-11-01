@@ -796,6 +796,16 @@ the same shots, significance uses a paired (McNemar) test on the shots one gets 
 fixes 123 and breaks 27 (z = 7.8), significant at 8 of 9 noise levels (not at 6%). 12 million fresh training shots,
 none seen twice.
 
+## D67. Meta's open-weight models, tried on this laptop
+Muse Spark Open is an 816B-parameter mixture of experts: out of reach of an 8 GB GPU. Muse Glimmer (27.9B, 4-bit,
+`ollama pull muse-glimmer`, 18 GB with its vision projector) runs through Ollama's OpenAI-compatible endpoint with the
+same Meta client (base URL, model name and a longer timeout are settings), split 71% CPU and 29% GPU, at about 1.6
+tokens a second: a reasoned answer takes about five minutes. It answered the Bell pair exactly, under the JSON schema.
+That is too slow to drive the app, so the hosted models stay. `scripts/arena_bench.py --glimmer` runs the AI-alone
+benchmark on it and writes separate files, and the Arena panel gains a model toggle when they exist; a full run
+takes hours and was stopped after one circuit when the machine ran low on memory, so no Glimmer results are
+claimed.
+
 ## D68. A new video of under three minutes
 scripts/record_demo.py keeps its recorder (browser screencast, labelled speed-ups, captions that name a Meta model
 only in live mode) with new scenes for the current app: Mission control, sketch to verified code with a planted bug,

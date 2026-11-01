@@ -5,7 +5,19 @@ Every number below comes from a run of this repo.
 
 **Track:** Indie developer · **Problem statement:** Push the Frontier (accelerate a scientific experiment; understand and control a physical system)
 
-**Demo video:** `<YouTube / Loom link>` · **Code:** https://github.com/Dhruv-Deku/q-canvas (public, MIT)
+**Demo video:** `<YouTube / Loom link>` · **Code:** https://github.com/Dhruv-Deku/q-canvas (public, MIT) · **Try it:** `<Hugging Face Space link>` (public mode: model-written code is never executed, live calls capped per day)
+
+## At a glance (for judges)
+
+Q-Canvas is a quantum lab where Meta's models read, plan and propose, and exact physics checks every number before
+anyone sees it. Press **Guided tour** in the app for the best of it in 95 seconds.
+
+| Criterion | What to look at |
+| --- | --- |
+| **Creativity** | **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**, a **paper's figure** re-run claim by claim |
+| **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
+| **Does it work** | A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **448 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
+| **Use of Meta models** | **Five Meta models**, each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
 
 ## Built during the hackathon
 
@@ -17,16 +29,16 @@ Q-Canvas
 
 ## Tagline (one line)
 
-A quantum lab you can draw on and talk to: Meta's models drive exact
-simulations, and every number they say is checked.
+Sketch it, say it or photograph it: Meta's models turn a quantum idea into a
+plan, and exact physics checks every number before you see it.
 
 ## Short description (about 50 words)
 
-Q-Canvas is a quantum lab you can draw on, talk to, and read: it translates
-the language of quantum computing both ways. Sketch a circuit or a satellite
-link, write a ket, describe it, or ask by voice: SAM 3.1, Muse Spark, Muse Wonder
-and Muse Voice Transcribe turn it into exact simulations of circuits, molecules,
-secret keys and networks, and every number the AI says is checked against them.
+Q-Canvas is a quantum lab where the AI never gets the last word. Meta's models
+read sketches, photos, papers and speech, plan multi-step experiments and
+propose circuits; exact simulation, independent re-runs and physics checks
+verify every result, from a drawn Bell pair to a distance-5 surface code and
+real satellites in orbit tonight.
 
 ## Full description
 
@@ -127,7 +139,9 @@ a link from our network model and shows what every remote CNOT costs from 10 m t
 X gate as the microwave pulse on a three-level transmon (DRAG: 1.1e-4 error at 15 ns). A satellite planner flies the
 quantum-key satellites in orbit today (SpeQtre, QUBE-II) live on their real orbits, from today's CelesTrak elements
 with SGP4, and weighs every night pass by the cloud forecast; Micius, re-entered in January 2026, replays 2017. A neural surface-code
-decoder makes 21% fewer logical errors than minimum-weight matching at 1% noise, beyond its error bars.
+decoder makes 21% fewer logical errors than minimum-weight matching at 1% noise, beyond its error bars; at
+distance 5 the bigger code suppresses errors 5.9x per round and a network on top of matching, fed where both kinds of
+matching put their corrections, makes 10% fewer logical errors again (paired test z = 7.8).
 
 **Honest about where quantum wins.** Describe a problem; Muse Spark maps it to an algorithm and a surface-code
 resource estimate meets the best classical route, checked against Gidney and Ekerå's RSA-2048 figure. Brute-force
@@ -236,8 +250,8 @@ repeatable and cheap.
 
 | Model | Job |
 | --- | --- |
-| **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo |
-| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
+| **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo; the same for each new frame of the live whiteboard camera |
+| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; proposes circuit layouts in the discovery lab; maps a problem in words to an algorithm and hardware for the resource estimator; transcribes a paper's figure, circuit and claims for the reproducibility checker; reads the whiteboard; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
 | **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Q-Canvas: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing; the nine use-case photos |
 | **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser |
@@ -253,12 +267,13 @@ level-3 transpiler stopped at 7 gates.
 
 ## How it's built
 
-Python 3.13, FastAPI, Qiskit 2.6 + Aer, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 444 offline tests (spec
+Python 3.13, FastAPI, Qiskit 2.6 + Aer, PyMatching, SGP4, pydantic v2, server-sent events for the
+live agent log; React 19 + TypeScript + Vite. 448 offline backend tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
-fault, exact insights checked against Aer, network physics, the live adapters
-against recorded request shapes, API). Every model sits behind an adapter with a real and
-a mock implementation.
+fault, exact insights checked against Aer, network physics, orbits against Skyfield, the live adapters
+against recorded request shapes, API) and 6 end-to-end browser tests of the built app, all in CI on every
+push. Every model sits behind an adapter with a real and a mock implementation; a Dockerfile and a deploy
+script publish the public mode to a Hugging Face Space.
 
 ## Challenges
 
@@ -273,6 +288,6 @@ a mock implementation.
 
 ## What's next
 
-A hosted public demo, running verified circuits on real quantum hardware, mid-circuit measurement
-(teleportation, error-correction codes), nested purification schemes, and
-multi-page lab-notebook sketches.
+Running the hardware check on a real IBM quantum computer (the script and its digital twin are ready), circuit-level
+noise for the decoders, mid-circuit measurement (teleportation, error-correction codes), and multi-page lab-notebook
+sketches.
