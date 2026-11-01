@@ -1,18 +1,61 @@
 # Q-Canvas
 
-**Draw a quantum circuit or a satellite link on paper. Get running, verified code in seconds.**
+[![tests](https://github.com/Dhruv-Deku/q-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/Dhruv-Deku/q-canvas/actions/workflows/ci.yml)
+· MIT · built during the Meta Global AI Developer Hackathon 2026 (Push the Frontier)
 
-Q-Canvas turns a photo of a hand-drawn quantum circuit or quantum network into a
-structured spec, writes Qiskit code for it, runs that code under realistic noise,
-and **proves the result is right** by checking it against an independent
-simulation of the spec. When the code is wrong, a self-repair agent diagnoses the
-failure in plain language, fixes it, and runs it again, live on screen.
+**Sketch it, say it or photograph it: Meta's models turn a quantum idea into a plan, and exact physics checks every
+number before you see it.**
 
-Built for the **Meta Global AI Developer Hackathon 2026**, problem statement
-**Push the Frontier** ("accelerate a scientific experiment, or unlock a better way
-to understand and control a physical system"). Everything here was built during
-the hackathon, from the first commit on Oct 27, 2026; see
+Q-Canvas is a quantum lab where the AI never gets the last word. Muse Spark, Muse Wonder, SAM 3.1, Muse Image and
+Muse Voice read sketches, photos, papers and speech, plan multi-step experiments and propose circuits; exact
+simulation, independent re-runs and physics invariants verify every result, and every number in every AI answer is
+traced back to a tool that computed it.
+
+![The start page: Mission control above five sections](docs/screenshots/1-start.png)
+
+### Seven results you can check in the app
+
+| | Measured result |
+| --- | --- |
+| **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; live missions took 12 to 23 s, every step verified by physics invariants and two independent simulators, every number in the report traced |
+| **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
+| **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise (beyond the error bars at every noise level), as learned decoders like AlphaQubit do |
+| **ML verifier** | Predicts how much of a circuit survives noise in about 150 µs with a conformal error bar: **9x more accurate** than the usual rule of thumb, and checked exactly every time |
+| **When does quantum win?** | Surface-code resource estimates against the best classical route; the model lands within 1.3x (qubits) and 2.3x (time) of Gidney and Ekerå's published RSA-2048 figure, and it says "classical wins" when it does |
+| **Reproduce a paper** | Muse Spark read a printed figure's circuit, all 8 bar heights, the shot count and the bit order in 8 s; an exact re-run judged every claim against its error bar |
+| **AI alone vs Q-Canvas** | The same model alone was exact on small circuits but only 3 of 6 on 6- to 8-qubit ones, once 43% off with full confidence: [docs/ARENA.md](docs/ARENA.md). That is why everything here is verified |
+
+### Where things are
+
+| Section | What is in it |
+| --- | --- |
+| Top of the page | **Mission control** (a whole problem, planned and verified) or a **quick question** to the same exact tools |
+| Sketch to code | Photo or camera, words or voice, the **live board** (point a camera at a whiteboard), the **Quantum Rosetta** (Dirac, OpenQASM, Quil, Qiskit, Cirq and more, both ways) |
+| Discover | **Discovery lab**, **when does quantum win**, **reproduce a paper** |
+| Hardware & networks | **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, error-correction lab, **distributed quantum computer**, **satellite planner** (a Micius-like orbit on a globe) |
+| Labs & games | Challenges, bug hunt (against Muse Spark), Shor, QAOA, H₂ from first principles, BB84 with a spy |
+| Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Q-Canvas |
+
+### Run it in two minutes
+
+```bash
+python3.13 -m venv .venv && source .venv/bin/activate     # Windows: py -3.13 -m venv .venv; .venv\Scripts\activate
+pip install -r backend/requirements.txt
+(cd frontend && npm ci && npm run build)
+cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open http://127.0.0.1:8000
+```
+
+Without a key everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
+live. 430 backend tests run offline (`cd backend && python -m pytest -q`). Every design decision is in
+[DECISIONS.md](DECISIONS.md) (D1 to D59); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
+
+## The original pipeline: sketch to verified code
+
+Draw a quantum circuit or a satellite link on paper and get running, verified code in seconds. Q-Canvas turns the
+photo into a structured spec, writes Qiskit code for it, runs that code under realistic noise, and **proves the
+result is right** by checking it against an independent simulation of the spec. When the code is wrong, a
+self-repair agent diagnoses the failure in plain language, fixes it, and runs it again, live on screen.
 
 ![The agent catches a planted bug, repairs it and verifies the result](docs/screenshots/agent-repair.gif)
 
