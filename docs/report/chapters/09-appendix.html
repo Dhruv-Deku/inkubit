@@ -1,0 +1,129 @@
+<section class="chapter">
+<h1 appendix="1">API reference</h1>
+<p class="lede">The server exposes {{endpoints}} endpoints, grouped here by area. Long-running work (jobs, missions,
+discovery and learning runs) returns an id at once, and its <code>/events</code> endpoint streams every step as
+server-sent events.</p>
+{{table:routes}}
+<p class="small muted">All endpoints are served by <code>backend/qcanvas/api/app.py</code>. The built frontend is served
+from the same origin. <code>/api/health</code> reports the model provider (Meta live, mock, or mock fallback), and the
+recorder and the interface read it before naming a model.</p>
+</section>
+
+<section class="chapter cont">
+<h1 appendix="1">Decision index</h1>
+<p class="lede">Every design decision is recorded in <code>DECISIONS.md</code> with its reason, newest last. This index
+lists all {{n_decisions}}; the chapters above cite the ones that matter most.</p>
+{{table:decisions}}
+</section>
+
+<section class="chapter cont">
+<h1 appendix="1">Reproducing every result</h1>
+<p class="lede">Every result in this report comes from a script in the repository. The offline ones run anywhere; the
+live ones need a Meta key, or an IBM Quantum key for the hardware run, and their answers are cached so a re-run is
+quick.</p>
+<h2>Set up and test</h2>
+<pre><code>py -3.13 -m venv .venv
+.venv/Scripts/python -m pip install -r backend/requirements.txt
+cd frontend &amp;&amp; npm ci &amp;&amp; npm run build &amp;&amp; cd ..
+cd backend &amp;&amp; ../.venv/Scripts/python -m uvicorn qcanvas.api.app:app --port 8000   # http://127.0.0.1:8000
+cd backend &amp;&amp; ../.venv/Scripts/python -m pytest -q                                  # {{backend_tests}} offline tests
+.venv/Scripts/python -m pytest e2e                                                   # browser tests (after the build)</code></pre>
+<p>Put <code>META_API_KEY</code> and <code>QCANVAS_MODEL_PROVIDER=meta</code> in <code>.env</code> for the live models;
+without them everything runs on the labelled offline models.</p>
+
+<h2>Results and the scripts that produce them</h2>
+<table class="compact">
+<thead><tr><th>Result</th><th>Command</th><th>Needs</th></tr></thead>
+<tbody>
+<tr><td>Planted-fault benchmark (55 of 55)</td><td><code>scripts/benchmark.py</code></td><td>offline</td></tr>
+<tr><td>Mission control benchmark ({{m_n}} missions)</td><td><code>scripts/mission_bench.py</code></td><td>Meta key</td></tr>
+<tr><td>AI alone vs Q-Canvas</td><td><code>scripts/arena_bench.py</code> (<code>--glimmer</code> for the open-weight model)</td><td>Meta key</td></tr>
+<tr><td>Learning under proof</td><td><code>scripts/learning_bench.py</code></td><td>Meta key</td></tr>
+<tr><td>AI-designed codes</td><td><code>scripts/codes_bench.py</code></td><td>Meta key</td></tr>
+<tr><td>The AI referee</td><td><code>scripts/referee_bench.py</code></td><td>Meta key</td></tr>
+<tr><td>Distance-3 decoder</td><td><code>scripts/train_decoder.py [shots per level]</code></td><td>offline</td></tr>
+<tr><td>Distance-5 decoder and Λ</td><td><code>scripts/train_decoder_d5.py [million shots]</code> (<code>--eval-only</code> re-scores)</td><td>offline</td></tr>
+<tr><td>ML verifier</td><td><code>scripts/train_ml_verifier.py [samples]</code></td><td>offline</td></tr>
+<tr><td>Observatory and pulse sweep</td><td><code>scripts/precompute.py</code></td><td>offline</td></tr>
+<tr><td>Real hardware run</td><td><code>scripts/hardware_check.py</code> (<code>--fake</code> rehearses, <code>--rescore</code> adds the calibrated preset)</td><td>IBM Quantum key</td></tr>
+<tr><td>Discovered circuits on hardware</td><td><code>scripts/discovery_hardware.py</code> (<code>--fake</code> rehearses, <code>--errors</code> recomputes error bars)</td><td>IBM Quantum key</td></tr>
+<tr><td>New algorithms, checked</td><td><code>scripts/make_algorithms.py</code></td><td>offline</td></tr>
+<tr><td>Proof sheet over the gallery</td><td><code>scripts/proofsheet_bench.py</code></td><td>offline</td></tr>
+<tr><td>IBM chip snapshots (the map and the advisor)</td><td><code>scripts/device_snapshot.py</code></td><td>IBM Quantum key</td></tr>
+<tr><td>Placement and teleportation on IBM</td><td><code>scripts/ibm_experiments.py</code> (<code>--fake</code> rehearses)</td><td>IBM Quantum key</td></tr>
+<tr><td>Calibrated preset</td><td><code>scripts/calibration_snapshot.py [device]</code></td><td>IBM Quantum key</td></tr>
+<tr><td>Demo video</td><td><code>scripts/record_demo.py --out docs/video/…mp4</code></td><td>running server</td></tr>
+<tr><td>Submission check</td><td><code>scripts/check_submission.py</code></td><td>offline, <code>gh</code> for CI status</td></tr>
+<tr><td>This report</td><td><code>scripts/build_report.py</code></td><td>system Edge; web fonts if online</td></tr>
+</tbody>
+</table>
+<p>The whole-paper result is produced from the app (<code>POST /api/paper</code> with an arXiv id) and stored in
+<code>examples/paper_examples.json</code>. The discovery-lab results are reproduced from its panel.</p>
+</section>
+
+<section class="chapter cont">
+<h1 appendix="1">Glossary</h1>
+<dl class="glossary">
+<dt>Bell pair</dt><dd>Two qubits in the state (|00⟩ + |11⟩)/√2: measured, they always agree, yet each alone is a fair coin.</dd>
+<dt>BB84, BBM92</dt><dd>Quantum key distribution protocols: BB84 sends single photons in random bases; BBM92 measures halves of entangled pairs. An eavesdropper raises the error rate (QBER).</dd>
+<dt>Bloch sphere</dt><dd>A picture of one qubit's state as an arrow; an arrow shorter than the radius means the qubit is entangled or noisy.</dd>
+<dt>CHSH, Mermin values</dt><dd>Bell-test numbers: above 2, no classical (local hidden-variable) explanation can produce the correlations.</dd>
+<dt>Concurrence, negativity</dt><dd>Measures of entanglement between two qubits; zero means the pair is not entangled.</dd>
+<dt>Conformal prediction</dt><dd>A way to put an error bar on a model's prediction that holds a stated fraction of the time for data like the calibration set.</dd>
+<dt>CSS code</dt><dd>A stabilizer code whose generators are all-X or all-Z, so bit and phase errors are corrected separately.</dd>
+<dt>Density matrix</dt><dd>The full description of a possibly noisy quantum state; simulating it exactly is what Q-Canvas's verifier does.</dd>
+<dt>Digital twin</dt><dd>A simulation of a specific device, built from its own calibration data.</dd>
+<dt>Distance (d, dX, dZ)</dt><dd>The fewest single-qubit errors (of any kind, X only, or Z only) that defeat a code without being detected.</dd>
+<dt>DRAG</dt><dd>Derivative Removal by Adiabatic Gate: a pulse shape that cancels leakage and phase errors in weakly anharmonic qubits.</dd>
+<dt>GHZ, W and Dicke states</dt><dd>Families of multi-qubit entangled states; GHZ is all-or-nothing, W shares one excitation, Dicke shares several.</dd>
+<dt>Heavy-hex</dt><dd>IBM's chip wiring, in which each qubit has at most three neighbours.</dd>
+<dt>Hellinger fidelity, total variation distance (TVD)</dt><dd>Ways to compare two probability distributions; TVD is the share of probability in the wrong place.</dd>
+<dt>Λ (Lambda)</dt><dd>The factor by which logical errors fall when a surface code grows by two in distance; above 1 means the bigger code helps.</dd>
+<dt>Leakage</dt><dd>Population escaping from the qubit's two levels into a third level of a transmon.</dd>
+<dt>McNemar test</dt><dd>A paired test that compares two methods on the same samples by counting only where they disagree.</dd>
+<dt>Minimum-weight perfect matching (MWPM)</dt><dd>The standard surface-code decoder: it pairs detection events along the most likely error chains.</dd>
+<dt>Page limit</dt><dd>The average entanglement of a random state between two halves; random circuits approach it.</dd>
+<dt>Phenomenological noise</dt><dd>A decoder-testing noise model with errors on data qubits and on check outcomes each round, but not from individual gates.</dd>
+<dt>Process fidelity</dt><dd>How close two operations are for every input: |Tr(U†V)|²/d².</dd>
+<dt>QAOA</dt><dd>The quantum approximate optimisation algorithm: alternating cost and mixing layers with tuned angles.</dd>
+<dt>Richardson extrapolation, ZNE</dt><dd>Running a circuit at amplified noise and extrapolating back to zero noise.</dd>
+<dt>SGP4, TLE</dt><dd>The standard propagator for satellite orbits, and the two-line element sets it reads.</dd>
+<dt>Stabilizer code</dt><dd>A quantum code defined by commuting Pauli generators whose measurements reveal errors.</dd>
+<dt>Surface code</dt><dd>A stabilizer code on a 2D grid with only nearest-neighbour checks; the leading design for large machines.</dd>
+<dt>T1, T2</dt><dd>A qubit's energy-relaxation and dephasing times.</dd>
+<dt>Tomography</dt><dd>Rebuilding a state from measurements in many bases.</dd>
+<dt>Transpile</dt><dd>Compile a circuit onto a chip's native gates and wiring, adding SWAPs where qubits are not neighbours.</dd>
+<dt>VQE</dt><dd>The variational quantum eigensolver: a quantum circuit with tuned angles whose measured energy is minimised.</dd>
+<dt>Werner state</dt><dd>A Bell pair mixed with white noise, described by one fidelity <i>F</i>; the standard model of a noisy link.</dd>
+</dl>
+</section>
+
+<section class="chapter cont">
+<h1 appendix="1">References</h1>
+<ol class="refs">
+<li>Beverland, M. E. et al. Assessing requirements to scale to practical quantum advantage. arXiv:2211.07629 (2022).</li>
+<li>Gidney, C. and Ekerå, M. How to factor 2048 bit RSA integers in 8 hours using 20 million noisy qubits. <i>Quantum</i> 5, 433 (2021).</li>
+<li>Google Quantum AI and collaborators. Quantum error correction below the surface code threshold. <i>Nature</i> 638, 920 (2025).</li>
+<li>Bausch, J. et al. Learning high-accuracy error decoding for quantum processors. <i>Nature</i> 635, 834 (2024).</li>
+<li>Higgott, O. PyMatching: a Python package for decoding quantum codes with minimum-weight perfect matching. <i>ACM Transactions on Quantum Computing</i> 3, 16 (2022).</li>
+<li>McNemar, Q. Note on the sampling error of the difference between correlated proportions or percentages. <i>Psychometrika</i> 12, 153 (1947).</li>
+<li>Motzoi, F., Gambetta, J. M., Rebentrost, P. and Wilhelm, F. K. Simple pulses for elimination of leakage in weakly nonlinear qubits. <i>Physical Review Letters</i> 103, 110501 (2009).</li>
+<li>Eisert, J., Jacobs, K., Papadopoulos, P. and Plenio, M. B. Optimal local implementation of nonlocal quantum gates. <i>Physical Review A</i> 62, 052317 (2000).</li>
+<li>Ross, N. J. and Selinger, P. Optimal ancilla-free Clifford+T approximation of z-rotations. <i>Quantum Information and Computation</i> 16, 901 (2016).</li>
+<li>Bennett, C. H. and Brassard, G. Quantum cryptography: public key distribution and coin tossing. Proceedings of IEEE ICCSSP, 175 (1984).</li>
+<li>Bennett, C. H., Brassard, G. and Mermin, N. D. Quantum cryptography without Bell's theorem. <i>Physical Review Letters</i> 68, 557 (1992).</li>
+<li>Bennett, C. H. et al. Purification of noisy entanglement and faithful teleportation via noisy channels. <i>Physical Review Letters</i> 76, 722 (1996).</li>
+<li>Yin, J. et al. Satellite-based entanglement distribution over 1200 kilometers. <i>Science</i> 356, 1140 (2017).</li>
+<li>Vallado, D. A., Crawford, P., Hujsak, R. and Kelso, T. S. Revisiting Spacetrack Report #3. AIAA 2006-6753 (2006).</li>
+<li>Horodecki, R., Horodecki, P. and Horodecki, M. Violating Bell inequality by mixed spin-½ states: necessary and sufficient condition. <i>Physics Letters A</i> 200, 340 (1995).</li>
+<li>Mermin, N. D. Extreme quantum entanglement in a superposition of macroscopically distinct states. <i>Physical Review Letters</i> 65, 1838 (1990).</li>
+<li>Wootters, W. K. Entanglement of formation of an arbitrary state of two qubits. <i>Physical Review Letters</i> 80, 2245 (1998).</li>
+<li>Smolin, J. A., Gambetta, J. M. and Smith, G. Efficient method for computing the maximum-likelihood quantum state from measurements with additive Gaussian noise. <i>Physical Review Letters</i> 108, 070502 (2012).</li>
+<li>Temme, K., Bravyi, S. and Gambetta, J. M. Error mitigation for short-depth quantum circuits. <i>Physical Review Letters</i> 119, 180509 (2017).</li>
+<li>Zhou, L., Wang, S.-T., Choi, S., Pichler, H. and Lukin, M. D. Quantum approximate optimization algorithm: performance, mechanism, and implementation on near-term devices. <i>Physical Review X</i> 10, 021067 (2020).</li>
+<li>Page, D. N. Average entropy of a subsystem. <i>Physical Review Letters</i> 71, 1291 (1993).</li>
+<li>Szabo, A. and Ostlund, N. S. <i>Modern Quantum Chemistry</i>. Dover (1996).</li>
+<li>Quantum Algorithm Implementations for Beginners. arXiv:1804.03719 (the paper used in Chapter 9).</li>
+<li>Meta. Meta Model API documentation (models, chat completions, responses, images, speech-to-text, structured output, tool calling), as listed in <code>docs/meta-api/SOURCES.md</code>.</li>
+</ol>
+</section>

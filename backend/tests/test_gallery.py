@@ -29,7 +29,41 @@ GALLERY = {
     "entanglement_swapping": {"00": 1.0},
     "grover3": {**{format(i, "03b"): 1 / 128 for i in range(8)}, "101": 121 / 128},
     "half_adder": {"0000": 0.25, "0101": 0.25, "0110": 0.25, "1011": 0.25},
+    "hidden_shift": {"1011": 1.0},
+    "grover_two_marked": {"011": 0.5, "110": 0.5},
+    "quantum_counting": {"010": 0.5, "110": 0.5},  # k = 2 or 6: M = 4 sin²(πk/8) = 2 marked items
+    "draper_adder": {"1011101": 1.0},  # b = 5 + 6 = 1011, a = 101 untouched
+    "hhl_2x2": {"10": 9 / 16, "11": 1 / 16, "00": 3 / 16, "01": 3 / 16},  # ancilla = 1: x ∝ A⁻¹b, ratio 9 : 1
+    "shor_code": {"1": 1.0},  # |−⟩ survives a Y error
 }
+
+
+def _win_rate(dist: dict[str, float], wins) -> float:
+    return sum(p for bits, p in dist.items() if wins(bits))
+
+
+def test_the_chsh_game_beats_every_classical_strategy(example):
+    """a xor b = x and y, with clbits (a, b, x, y) read right to left: cos²(π/8) > 3/4."""
+    dist = ideal_distribution(parse_spec(example("chsh_game")))
+    rate = _win_rate(dist, lambda s: (int(s[3]) ^ int(s[2])) == (int(s[1]) & int(s[0])))
+    assert rate == pytest.approx(math.cos(math.pi / 8) ** 2, abs=1e-9) and rate > 0.75
+
+
+def test_the_ghz_game_is_won_every_time(example):
+    """Inputs have even parity and the answers' parity equals x or y or z, every shot (classically at most 3/4)."""
+    dist = ideal_distribution(parse_spec(example("mermin_game")))
+    rate = _win_rate(dist, lambda s: (int(s[5]) ^ int(s[4]) ^ int(s[3])) == (int(s[2]) | int(s[1]) | int(s[0]))
+                     and (int(s[2]) ^ int(s[1]) ^ int(s[0])) == 0)
+    assert rate == pytest.approx(1.0, abs=1e-9)
+
+
+def test_every_gallery_algorithm_has_a_category_and_a_spec():
+    from qcanvas import EXAMPLES_DIR
+    from qcanvas.api.app import CATEGORIES
+
+    names = [n for ns in CATEGORIES.values() for n in ns]
+    assert len(names) == len(set(names))
+    assert all((EXAMPLES_DIR / "specs" / f"{n}.json").exists() for n in names)
 
 
 @pytest.mark.parametrize("name,answer", GALLERY.items())

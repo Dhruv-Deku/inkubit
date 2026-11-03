@@ -55,10 +55,35 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     hw_tw = [r["tvd_twin"] for r in hw["runs"]]
     rs = ref["summary"]
     assert not hw["rehearsal"], "the quoted hardware result must come from a real device"
+    hw_cal = [r["tvd_calibrated"] for r in hw["runs"]]
+    cal_beats = sum(r["tvd_calibrated"] < r["tvd_twin"] for r in hw["runs"])
+    dh = _load(ROOT / "examples" / "discovery_hardware.json")
+    assert not dh["rehearsal"], "the quoted discovery-on-hardware result must come from a real device"
+    gc = next(g for g in dh["goals"] if g["id"] == "ghz7_hex")["comparison"]
+    w4 = next(g for g in dh["goals"] if g["id"] == "w4")["variants"]
+    ibmx = _load(ROOT / "examples" / "ibm_experiments.json")
+    assert not ibmx["rehearsal"], "the quoted IBM experiments must come from a real device"
+    gx = {r["placement"]: r["fidelity"] for r in ibmx["ghz"]["rows"]}
+    tff = ibmx["teleport"]["feed_forward"]
+    psb = _load(ROOT / "examples" / "proofsheet_benchmark.json")
+    from qcanvas.api.app import CATEGORIES
+
+    n_alg = sum(len(v) for k, v in CATEGORIES.items() if k != "Basics")
     return [
-        ("real hardware: the twin predicts best", f"best on {hw_best} of {len(hw['runs'])}", BOTH),
+        ("IBM placement: best, median, worst", f"{gx['best']:.3f}, {gx['median']:.3f} and {gx['worst']:.3f}", BOTH),
+        ("IBM teleportation with feed-forward", f"{tff['average']:.3f}", BOTH),
+        ("proof sheet over the gallery", f"{psb['totals'].get('passed', 0)} passed and {psb['totals'].get('failed', 0)} failed", (README,)),
+        ("proof sheet over the gallery", f"{psb['totals'].get('passed', 0)} passed, {psb['totals'].get('failed', 0)} failed", (SUBMISSION,)),
+        ("proof sheet size", f"{psb['checks_per_circuit']} independent checks of {psb['kinds']} kinds", BOTH),
+        ("algorithms and categories", f"{n_alg} algorithms in {len(CATEGORIES) - 1} categories", BOTH),
+        ("real hardware: the twin beats the generic preset", f"generic preset on {hw_best} of {len(hw['runs'])}", (README,)),
         ("real hardware: the twin's distance", f"distance {min(hw_tw):.3f} to {max(hw_tw):.3f}", (README,)),
+        ("real hardware: the calibrated preset's distance", f"came closer still ({min(hw_cal):.3f} to {max(hw_cal):.3f})", (README,)),
+        ("real hardware: calibrated preset vs twin", f"closer than a digital twin on {cal_beats} of {len(hw['runs'])}", (SUBMISSION,)),
         ("real hardware: the device", hw["device"], BOTH),
+        ("discovered GHZ on the chip vs textbook", f"{gc['discovered']:.3f} against {gc['baseline']:.3f}", BOTH),
+        ("discovered GHZ margin", f"({gc['z']:.1f} standard errors)", BOTH),
+        ("W on the chip: two-qubit gates", f"{w4[0]['two_qubit_gates']} two-qubit gates against {w4[1]['two_qubit_gates']}", BOTH),
         ("referee: before and after the debate", f"from {rs['spark_first']} to {rs['final_right']} of {ref['claims']}", (README,)),
         ("referee: before and after the debate", f"from {rs['spark_first']} to {rs['final_right']} right", (SUBMISSION,)),
         ("referee: false alarms and concessions", f"{rs['false_alarms']} false alarms and talked Spark out of {rs['talked_out']} right answers", (README,)),

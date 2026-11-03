@@ -1,0 +1,243 @@
+{
+ "kind": "circuit",
+ "version": "1.0",
+ "num_qubits": 9,
+ "num_clbits": 1,
+ "operations": [
+  {
+   "gate": "X",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    6
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    3,
+    6
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    2
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    4
+   ],
+   "controls": [
+    3
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    5
+   ],
+   "controls": [
+    3
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    7
+   ],
+   "controls": [
+    6
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    8
+   ],
+   "controls": [
+    6
+   ]
+  },
+  {
+   "gate": "Y",
+   "targets": [
+    4
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    2
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    1,
+    2
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    4
+   ],
+   "controls": [
+    3
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    5
+   ],
+   "controls": [
+    3
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    4,
+    5
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    7
+   ],
+   "controls": [
+    6
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    8
+   ],
+   "controls": [
+    6
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    6
+   ],
+   "controls": [
+    7,
+    8
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    3,
+    6
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    6
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    3,
+    6
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0
+   ]
+  }
+ ],
+ "measurements": [
+  {
+   "qubit": 0,
+   "clbit": 0
+  }
+ ],
+ "metadata": {
+  "title": "Shor's 9-qubit code corrects a Y error",
+  "notes": "One logical qubit |−⟩ spread over nine. A Y error on qubit 4 flips its bit and its phase at once; the inner bit-flip codes and the outer phase-flip code each undo their half, and q0 reads 1 every time.",
+  "origin": "manual"
+ }
+}

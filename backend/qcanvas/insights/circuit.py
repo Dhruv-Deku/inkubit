@@ -638,12 +638,32 @@ def chip_layouts(spec: CircuitSpec, preset: NoisePreset) -> tuple[list[LayoutCos
 
 # ---------------------------------------------------------------- exports
 
+# Gates Qiskit writes into OpenQASM 2 that the standard qelib1.inc (the one any OpenQASM 2 reader has) does not
+# define: each is defined in the file from standard gates, so the export reads anywhere (the proof sheet found this).
+QASM2_DEFS = {
+    "sx": "gate sx a { sdg a; h a; sdg a; }",
+    "cp": "gate cp(lambda) a,b { cu1(lambda) a,b; }",
+    "swap": "gate swap a,b { cx a,b; cx b,a; cx a,b; }",
+}
+
+
+def standard_qasm2(text: str) -> str:
+    """Add definitions for the non-standard gates a Qiskit OpenQASM 2 export uses, after the include line."""
+    import re
+
+    used = [g for g in QASM2_DEFS if re.search(rf"^{g}[ (]", text, re.M)]
+    if not used:
+        return text
+    head, sep, rest = text.partition('include "qelib1.inc";\n')
+    return head + sep + "".join(QASM2_DEFS[g] + "\n" for g in used) + rest if sep else text
+
+
 def exports(spec: CircuitSpec) -> Exports:
     qc = QuantumCircuit(spec.num_qubits, spec.num_clbits, name=(spec.metadata.title or "qcanvas")[:40])
     qc.compose(build_reference_circuit(spec), inplace=True)
     for q, c in spec.measured_pairs():
         qc.measure(q, c)
-    return Exports(qasm2=qasm2.dumps(qc), qasm3=qasm3.dumps(qc))  # QASM 2 uses Qiskit's qelib1.inc
+    return Exports(qasm2=standard_qasm2(qasm2.dumps(qc)), qasm3=qasm3.dumps(qc))
 
 
 # ---------------------------------------------------------------- all together

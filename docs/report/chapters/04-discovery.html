@@ -1,0 +1,176 @@
+<section class="chapter">
+<h1>Discovery: AI proposes, physics proves</h1>
+<p class="lede">Models are good at guessing structure, and exact methods are good at judging it. The discovery lab
+combines the two to find shorter circuits than the textbook, and the learning loop shows the model getting better
+only when it sees exact physics' verdicts.</p>
+
+<h2>The discovery lab</h2>
+<p>The task is concrete: prepare a target state on a real chip's wiring with as few CNOTs as possible. Two-qubit gates
+carry about fifteen times the error of one-qubit gates on today's hardware, so every CNOT saved matters. The search
+has three stages:</p>
+<ol>
+<li><b>Propose.</b> Muse Spark proposes CNOT layouts under a JSON schema; pairs the chip cannot do are dropped, and a
+layout is credited to the model when it wins. Spanning trees of the coupling map and random layouts add more. Layouts
+are tried from the fewest CNOTs up.</li>
+<li><b>Fit.</b> For each layout, the single-qubit rotations between the CNOTs are fitted exactly by L-BFGS with
+restarts on a NumPy statevector (checked against Qiskit in a test). The fit is then pruned: rotations under 1e-3 are
+zeroed and the rest re-fitted.</li>
+<li><b>Prove.</b> A winner must reach an overlap of at least 1 − 1e-8 with the target in Qiskit's own
+<code>Statevector</code> of the rebuilt specification. The ML verifier screens the survivors, and exact noisy
+simulation decides between them.</li>
+</ol>
+<p>Two baselines are compiled onto the same coupling map at Qiskit's highest optimisation level: the textbook
+circuit, and Qiskit's general <code>StatePreparation</code>. "Fewest found" is not a proof of minimality, and the page
+says so.</p>
+<table>
+<thead><tr><th>Target</th><th class=n>CNOTs found</th><th>Baselines, compiled onto the same wiring</th></tr></thead>
+<tbody>
+<tr><td>GHZ state on all 7 qubits of an IBM heavy-hex chip</td><td class=n><b>6</b></td><td>textbook circuit 10; Qiskit StatePreparation 197</td></tr>
+<tr><td>W state</td><td class=n><b>5</b></td><td>Qiskit's compiler 11</td></tr>
+<tr><td>Dicke state D(4,2)</td><td class=n><b>5</b></td><td>Qiskit's compiler 11</td></tr>
+<tr><td>A random 3-qubit state</td><td class=n><b>3</b></td><td>Qiskit's compiler 4</td></tr>
+</tbody>
+<caption>Results quoted from the README's record of live runs; each winner proven by Qiskit to overlap 1 − 1e-8 with its target.</caption>
+</table>
+<p>Six CNOTs is the least any circuit can use to entangle seven qubits into one connected group: a spanning tree of
+seven nodes has six edges. On heavy-hex wiring, not all of the textbook circuit's CNOTs fall on the chip's links,
+and routing adds four more.
+The lab found a layout that follows the chip's own tree. The comparison was then repeated on a real chip (Chapter 15):
+on seven qubits of IBM's {{dh_device}} wired the same way, {{dh_src}} reached a GHZ fidelity of {{dh_found}} against
+{{dh_text}} for the textbook circuit.</p>
+<figure><img src="{{shot:31-discovery.png}}" alt="Discovery lab: GHZ-7 on heavy-hex in 6 CNOTs">
+<figcaption>The discovery lab on a GHZ state across all 7 qubits of a heavy-hex chip: 6 CNOTs, proven by Qiskit, against 10 for the compiled textbook circuit.</figcaption></figure>
+
+<h2>An AI scientist that learns under proof</h2>
+<p>The discovery lab uses the model once. The learning loop asks a sharper question: <i>does the model get better when
+it sees what exact physics said about its earlier ideas?</i> Muse Spark proposes up to four CNOT layouts per round for
+a target state. The exact optimiser fits each one, and Qiskit proves every layout that reaches the target. Three
+conditions get the same number of proposals:</p>
+<ul>
+<li><b>With feedback:</b> each round's prompt lists every earlier layout and its verdict;</li>
+<li><b>Asked afresh:</b> the same model, asked again each round with no history (the prompts are numbered so no
+answer is reused from the cache);</li>
+<li><b>Random wiring:</b> random allowed pairs with the same lengths as the feedback run.</li>
+</ul>
+<figure>{{chart:learning}}
+<figcaption>Fewest proven CNOTs after each of {{learn_rounds}} rounds ({{learn_model}}, live, about {{learn_minutes}} minutes in all). With exact feedback the best proven circuit improved on every target; asked afresh it never improved on its first round. The dashed line is the lower bound from each state's structure.</figcaption></figure>
+{{table:learning}}
+
+<h2>What the curves show</h2>
+<p>With feedback, the best proven layout improved on all {{learn_targets}} targets ({{learn_steps}} CNOTs). Without
+feedback the model never improved on its first round, and it repeated itself. On the five-qubit line its first answer
+was already 7, so asking again could not help. Random wiring of the same lengths never reached a target at all, which
+shows that the model's layouts carry real structure.</p>
+<p>The reach rates tell the other half of the story. With feedback, fewer of the model's layouts worked than without
+it (10–15% against 10–35%). The model aimed below its own best and missed more often, and that is how it found the
+shorter ones. This is the behaviour of an experimenter, not of a lookup table: with the evidence in front of it, the
+model takes risks. Without it, it plays safe and stays where it was.</p>
+<div class="callout"><span class="k">Engineering note</span>
+<p>The first full run died on a truncated answer. A cut-off JSON answer is a successful HTTP response and is cached
+like any other, so a plain retry would have returned the same truncation. The retry now doubles the token budget
+and marks itself, which changes the request, while the first attempt stays identical and keeps its cache entry.</p></div>
+</section>
+
+<section class="chapter">
+<h1>AI-designed error-correcting codes</h1>
+<p class="lede">Muse Spark designs stabilizer codes, and an exact checker proves what each one can do. For hardware
+where phase flips dominate, it found a code that needs {{code_dz}} phase-flip errors to fail, {{code_ratio}} times the
+surface code's {{surface_dz}}.</p>
+
+<h2>Stabilizer codes in brief</h2>
+<p>A quantum error-correcting code spreads <i>k</i> logical qubits over <i>n</i> physical ones. A stabilizer code is
+described by <i>n − k</i> commuting Pauli operators, its generators, written as strings such as <code>XZZXI</code>.
+Measuring them reveals errors without disturbing the stored information. The code's distance <i>d</i> is the smallest
+number of single-qubit errors that can change the logical information without being detected. A code with
+<i>d</i> = 3 corrects any single error, and its parameters are written [[<i>n</i>, <i>k</i>, <i>d</i>]].</p>
+<p>Real hardware is often <b>biased</b>: some qubits suffer phase flips (Z errors) far more often than bit flips (X
+errors). For such hardware, what matters is <i>d</i><sub>Z</sub>, the smallest number of Z errors alone that defeats
+the code, as long as the code still corrects any single error of any kind.</p>
+
+<h2>An exact checker</h2>
+<p><code>qcanvas/codes.py</code> checks any stabilizer code exactly, in the symplectic picture where each Pauli string
+is a binary vector:</p>
+<ul>
+<li>the generators must <b>commute</b> (symplectic inner product zero for every pair) and be <b>independent</b> (full
+rank over GF(2)); then <i>k</i> = <i>n</i> − rank;</li>
+<li>the <b>distance</b> is found by brute force over every Pauli error from weight 1 up: the first error that commutes
+with every generator but is not itself in the stabilizer group is a logical error, and its weight is <i>d</i>;</li>
+<li><i>d</i><sub>X</sub> and <i>d</i><sub>Z</sub> are the same search restricted to X-only and to Z-only errors.</li>
+</ul>
+<p>The textbook codes are scored by the same checker, so the model's codes are judged on the same scale:</p>
+{{table:code_refs}}
+
+<h2>What Muse Spark designed</h2>
+<p>For each target, Muse Spark proposed up to three codes per round over {{code_rounds}} rounds, and saw every earlier
+verdict in its next prompt (<code>scripts/codes_bench.py</code>). The first two targets ask for the best possible
+distance in five and in seven qubits (the second only with CSS generators, all-X or all-Z). Muse Spark found the
+five-qubit perfect code and a [[7,1,3]] CSS code in its first round. Both are optimal, so there is no curve to show.
+Some later proposals were invalid; the checker said why (wrong length, for instance), and they never counted.</p>
+{{table:code_best}}
+<p>The third target is the interesting one. Its standard answers in round 1 had <i>d</i><sub>Z</sub> = 3, like the
+surface code. In round {{code_round_found}}, Muse Spark proposed a [[{{code_n}},1,{{code_d}}]] code with
+<i>d</i><sub>Z</sub> = {{code_dz}} and <i>d</i><sub>X</sub> = {{code_dx}}. A logical error caused by phase flips
+alone needs all {{code_n}} qubits to flip, {{code_ratio}} times the surface code's {{surface_dz}}, while any one-qubit
+error of any kind is still corrected. Later rounds found more codes with the same parameters, but none better.</p>
+
+<h2>Reading the result honestly</h2>
+<p>The checker proves the distances; they are facts about the generators, not estimates. Distances are not the whole
+story, though. How well a code performs under realistic biased noise also depends on the decoder, the circuits that
+measure the generators and the error rates. Q-Canvas does not yet simulate a decoder for the new code, so the claim is
+limited to what the checker proves. Muse Spark's own explanation of its design, "adjacent-pair X parts form a
+repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct", is shown as the model's
+idea, next to the checker's verdict. The page lets anyone enter their own generators and get the same exact
+analysis.</p>
+</section>
+
+<section class="chapter">
+<h1>Reading the literature</h1>
+<p class="lede">Muse Spark and Muse Wonder read figures and whole papers; they transcribe and never compute. Exact
+simulation then judges every stated number against its error bar, and the lab says which experiments the paper does
+not specify completely instead of guessing them.</p>
+
+<h2>Reproduce a figure</h2>
+<p>Upload a figure from a paper. Muse Spark transcribes the circuit as OpenQASM, which the exact parser reads, with the
+sketch pipeline as a fallback. It also transcribes the claimed outcome probabilities, the shot count, the hardware and
+the bit order. The circuit is re-run exactly and every claim is judged against an error bar:</p>
+<ul>
+<li>with a known shot count, three standard deviations of shot noise (at least 0.01);</li>
+<li>without one, 0.03 for hardware results and 0.005 for ideal ones; a hardware claim may also sit between Q-Canvas's
+ideal and realistic predictions;</li>
+<li>if the bit order is not stated, both orders are tried, and the better fit is used and labelled as inferred.</li>
+</ul>
+<p>In a live check, Muse Spark read a printed figure's circuit, all eight bar heights, the shot count and the bit order
+in 8 seconds, and every claim was judged within its error bar.</p>
+
+<h2>Reproduce a whole paper</h2>
+<p>A figure is one experiment; a paper is many. Give Q-Canvas an arXiv id or a PDF. One pass over a hundred-page paper,
+with Muse Wonder reading the whole PDF, proved fragile: it listed repeated runs of one Bell circuit, dropped numbers
+into its notes, and once returned truncated JSON. Two passes work:</p>
+<ol>
+<li><b>Find.</b> Muse Wonder reads the whole paper and lists up to eight experiments on <i>different</i> circuits,
+each with the pages it is on.</li>
+<li><b>Transcribe.</b> pypdf cuts those pages, plus the next one, into a small PDF. Muse Spark transcribes each
+experiment on its own, in parallel, under the figure checker's schema.</li>
+<li><b>Judge.</b> Circuits go through the exact parser, and every stated probability through the figure checker's
+judge.</li>
+</ol>
+<p>On {{paper_source}}, <i>Quantum Algorithm Implementations for Beginners</i>, a 100-page paper, the lab listed
+{{paper_n}} experiments in {{paper_seconds}} s live. {{paper_checked}} had a complete circuit and stated odds;
+{{paper_reproduced}} of those were reproduced, and {{paper_ok}} of the {{paper_total}} stated probabilities checked
+out. {{paper_unspecified}} experiments were reported as not completely specified on their pages, instead of being
+guessed.</p>
+{{table:paper}}
+
+<h2>What "not reproduced" means</h2>
+<p>The two experiments not reproduced are Shor's algorithm for 15 and a quantum walk. Their stated numbers are
+measurements from 2018-era hardware, whose noise Q-Canvas's realistic preset does not reach. That is a statement about
+the preset and the old devices, not an accusation against the paper. The lab reports what it can check, with what
+error bars, and leaves the interpretation visible.</p>
+
+<h2>A silent error that a test caught</h2>
+<p>Building the whole-paper lab exposed a quiet bug elsewhere. The QASM extractor stopped at the first statement it did
+not recognise, so a circuit containing an opaque gate became an empty circuit. An empty circuit gives P(000) = 1, and
+a paper claiming a high P(000) was then "reproduced". The extractor now refuses any statement that acts on qubits and
+that it cannot read, and it strips comments first. A wrong reproduction is worse than an honest "cannot check", and
+the test suite now holds that line.</p>
+</section>

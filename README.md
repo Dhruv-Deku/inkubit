@@ -17,7 +17,10 @@ traced back to a tool that computed it.
 
 | | Measured result |
 | --- | --- |
-| **A real IBM quantum computer** | Four circuits ran on IBM's ibm_fez in 10 s: a digital twin built from the chip's own calibration predicted what it measured best on 4 of 4 (distance 0.021 to 0.038), while Q-Canvas's generic noise preset proved too pessimistic for this modern chip: [docs/HARDWARE.md](docs/HARDWARE.md) |
+| **A real IBM quantum computer** | The discovery lab's GHZ circuit for 7 qubits (Muse Spark's own layout) ran on IBM's ibm_fez next to the textbook circuit, on the same seven qubits: GHZ fidelity **0.814 against 0.795** (3.2 standard errors), both certifying genuine 7-qubit entanglement; for W and Dicke states the discovered circuits used 8 two-qubit gates against 17 and tied within shot noise. On four smaller circuits a digital twin from the chip's calibration beat the noiseless odds and the generic preset on 4 of 4 (distance 0.021 to 0.038), and Q-Canvas's new **calibrated preset**, built from the chip's median calibration, came closer still (0.013 to 0.027): [docs/DISCOVERY_HARDWARE.md](docs/DISCOVERY_HARDWARE.md), [docs/HARDWARE.md](docs/HARDWARE.md) |
+| **IBM Quantum, in the app** | Live calibration maps of 3 IBM Heron chips, a placement advisor that scores every way to put a circuit on a chip, and **Run on IBM Quantum** from the editor. On ibm_fez the advisor's best, median and worst placements of the same GHZ-5 circuit measured **0.894, 0.814 and 0.285**, exactly its order; teleportation with real mid-circuit measurement and feed-forward reached an average fidelity of **0.924 ± 0.002** against the classical limit of 0.667 (0.499 without the corrections): [docs/IBM_EXPERIMENTS.md](docs/IBM_EXPERIMENTS.md) |
+| **The proof sheet** | 11 independent checks of 9 kinds on any circuit in about eight seconds (two simulators of each kind, a physical density matrix, translation validation of Qiskit's compiler, OpenQASM read-back, a G-test, the generated code in the sandbox, metamorphic tests); over the whole gallery **299 passed and 0 failed**, and its first run found a real export bug: [docs/PROOFSHEET.md](docs/PROOFSHEET.md) |
+| **25 algorithms in 8 categories** | Each checked against its known answer in a test: the newest are quantum counting, HHL (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, hidden shift, Shor's nine-qubit code, Grover with two marked items and two nonlocal games (CHSH won cos²(π/8) of the time; the GHZ game won every time) |
 | **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; in a 30-mission live benchmark every mission finished, all 68 steps were verified (one repaired by the model), 204 of 209 report numbers were traced to a tool result, median 15 s: [docs/MISSIONS.md](docs/MISSIONS.md) |
 | **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
 | **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise, as learned decoders like AlphaQubit do. At **distance 5** the bigger code suppresses errors **5.9x** per round (Λ; Google's Willow measured 2.14), and a network on top of matching that sees both matchings' corrections makes 10% fewer errors again (paired test z = 7.8) |
@@ -37,7 +40,7 @@ traced back to a tool that computed it.
 | Top of the page | **Mission control** (a whole problem, planned and verified) or a **quick question** to the same exact tools |
 | Sketch to code | Photo or camera, words or voice, the **live board** (point a camera at a whiteboard), the **Quantum Rosetta** (Dirac, OpenQASM, Quil, Qiskit, Cirq and more, both ways) |
 | Discover | **Discovery lab**, **an AI scientist that learns**, **when does quantum win**, **reproduce a paper** (a figure, or a **whole paper** from its PDF) |
-| Hardware & networks | **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, **code lab** (AI-designed codes, check your own), error-correction lab, **distributed quantum computer**, **satellite planner** (SpeQtre and QUBE-II live on today's real orbits, under the cloud forecast) |
+| Hardware & networks | **IBM Quantum** (chip maps, placement advisor, run on IBM), **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, **code lab** (AI-designed codes, check your own), error-correction lab, **distributed quantum computer**, **satellite planner** (SpeQtre and QUBE-II live on today's real orbits, under the cloud forecast) |
 | Labs & games | Challenges, bug hunt (against Muse Spark), Shor, QAOA, H₂ from first principles, BB84 with a spy |
 | Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Q-Canvas, **the AI referee** (Muse Spark against Muse Wonder) |
 
@@ -52,8 +55,8 @@ cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 495 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
-(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D75); what was built on which day is in
+live. 542 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+(`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D81); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
@@ -64,7 +67,9 @@ a free container (512 MB, a tenth of a CPU: about 260 MB in use, 385 MB at the p
 and the slow, input-free results (the observatory, the pulse lab) are stored with the app (`scripts/precompute.py`)
 so a cold start does not spend minutes on them. [Deploy it to Koyeb's free tier](https://app.koyeb.com/deploy?type=git&builder=dockerfile&repository=github.com/Dhruv-Deku/q-canvas&branch=main&name=q-canvas&ports=7860;http;/&instance_type=free&regions=was) in one click (add
 `META_API_KEY` as a secret for the live models), or to a Hugging Face Space with `scripts/deploy_space.py` (Docker
-Spaces need a PRO account). `scripts/hardware_check.py` runs four circuits on
+Spaces need a PRO account). `scripts/discovery_hardware.py` runs the discovery lab's proven circuits on the same chip next
+to the circuits they beat, `scripts/calibration_snapshot.py` turns the chip's calibration into the "Calibrated" noise
+preset in the run bar, and `scripts/hardware_check.py` runs four circuits on
 the least busy IBM quantum computer (with `IBM_QUANTUM_TOKEN` in `.env`) and compares the counts with the ideal odds,
 Q-Canvas's generic preset and a digital twin built from the device's calibration; `--fake` rehearses it offline.
 
@@ -351,7 +356,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (495 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (542 tests,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per

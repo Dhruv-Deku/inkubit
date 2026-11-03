@@ -1,0 +1,695 @@
+{
+ "kind": "circuit",
+ "version": "1.0",
+ "num_qubits": 4,
+ "num_clbits": 2,
+ "operations": [
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    -0.1748598241606194
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    0
+   ],
+   "params": [
+    2.340586860114898
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    1.3222132093144872
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    1
+   ],
+   "params": [
+    1.5707963267948963
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    1
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    -2.100699116543823
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    0
+   ],
+   "params": [
+    1.7177715174584025
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    2.100699116543824
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    1
+   ],
+   "params": [
+    1.5707963267948983
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    1
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    0.685754514808421
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    0
+   ],
+   "params": [
+    1.0062813142139975
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    -2.5625065611114444
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    1
+   ],
+   "params": [
+    -0.7853981633974496
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    2
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RX",
+   "targets": [
+    0
+   ],
+   "params": [
+    -0.10487693873023327
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    2
+   ],
+   "params": [
+    -3.1415926535897913
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    2
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    2
+   ],
+   "controls": [
+    1
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    1
+   ]
+  },
+  {
+   "gate": "RX",
+   "targets": [
+    2
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    -0.26179938779914963
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    0.26179938779914946
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    0.26179938779914946
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RX",
+   "targets": [
+    2
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    -0.26179938779914963
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    -0.26179938779914963
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    1
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    0.26179938779914946
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    -0.7853981633974484
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    0.7853981633974484
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    0.7853981633974484
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    -0.7853981633974484
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    -0.7853981633974484
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    3
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    1
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    2
+   ],
+   "controls": [
+    1
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    1
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    0.7622577748407506
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    0
+   ],
+   "params": [
+    1.7826597290855413
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    2.9248073603206084
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    -2.100699116543823
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    0
+   ],
+   "params": [
+    1.7177715174584025
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    2.100699116543824
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    1
+   ],
+   "params": [
+    1.5707963267948983
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    1
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    0
+   ],
+   "controls": [
+    1
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    -2.2094557120042104
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    0
+   ],
+   "params": [
+    2.247300414474071
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    0
+   ],
+   "params": [
+    2.7064715603596365
+   ]
+  },
+  {
+   "gate": "RZ",
+   "targets": [
+    1
+   ],
+   "params": [
+    -0.7853981633974492
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    1
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    2
+   ],
+   "params": [
+    1.570796326794897
+   ]
+  },
+  {
+   "gate": "RY",
+   "targets": [
+    3
+   ],
+   "params": [
+    0.7853981633974484
+   ]
+  }
+ ],
+ "measurements": [
+  {
+   "qubit": 0,
+   "clbit": 0
+  },
+  {
+   "qubit": 3,
+   "clbit": 1
+  }
+ ],
+ "metadata": {
+  "title": "HHL: solve a 2x2 linear system",
+  "notes": "Solves A x = b for A = [[1, -1/3], [-1/3, 1]], b = (1, 0). When the ancilla reads 1, the other qubit holds x = A⁻¹b ∝ (1, 1/3): outcomes 0 and 1 in the ratio 9 : 1, the classical answer squared.",
+  "origin": "manual"
+ }
+}

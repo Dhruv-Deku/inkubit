@@ -70,7 +70,8 @@ EXTRA_TOOLS = [
     _fn("run_algorithm", "Run a textbook algorithm from the library exactly, with perfect qubits and with realistic "
         "noise: grover2, grover3, bernstein_vazirani, deutsch_jozsa, simon, qft_period, phase_estimation, shor15, "
         "superdense, teleportation, entanglement_swapping, swap_test, w_state, toffoli_and, half_adder, "
-        "bit_flip_code, ising_trotter.",
+        "bit_flip_code, ising_trotter, hidden_shift, grover_two_marked, quantum_counting, draper_adder, hhl_2x2, "
+        "shor_code, chsh_game, mermin_game.",
         {"name": {"type": "string"}}, ["name"]),
     _fn("ml_verify", "The ML verifier: a neural network predicts in microseconds how much of a circuit's answer "
         "survives realistic noise (fidelity with a 90% conformal interval), then exact simulation checks it.",

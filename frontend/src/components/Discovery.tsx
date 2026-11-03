@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, ApiError } from '../api'
-import type { CircuitSpec, DiscoveryEntry, DiscoveryGoal, DiscoveryResult } from '../types'
+import type { CircuitSpec, DiscoveryEntry, DiscoveryGoal, DiscoveryHardware, DiscoveryResult } from '../types'
 import { CallBadge } from './CallBadge'
 import { CircuitPreview } from './CircuitPreview'
 
@@ -44,6 +44,8 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
   const [busy, setBusy] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [pick, setPick] = useState(0)
+  const [hw, setHw] = useState<DiscoveryHardware | null>(null)
+  useEffect(() => { api.discoveryHardware().then((d) => setHw(d.rehearsal ? null : d)).catch(() => setHw(null)) }, [])
   const es = useRef<EventSource | null>(null)
   useEffect(() => { api.discoveryGoals().then((r) => setGoals(r.goals)).catch(() => {}) }, [])
   useEffect(() => () => es.current?.close(), [])
@@ -104,6 +106,7 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
         ))}
       </div>
       {g && <p className="sub" style={{ margin: '8px 0 0', maxWidth: '86ch' }}>{g.blurb}</p>}
+      <OnChip hw={hw} goal={goal} />
       <div className="row wrap" style={{ gap: 8, marginTop: 10 }}>
         <button className="btn primary" onClick={() => { void start(false) }} disabled={busy}>{busy ? `Discovering… ${elapsed.toFixed(0)} s` : 'Start discovery'}</button>
         {live && (
@@ -160,5 +163,26 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
         </div>
       )}
     </div>
+  )
+}
+
+/** One line: how this goal's discovered circuit did on a real IBM chip against the baselines, when that run exists. */
+function OnChip({ hw, goal }: { hw: DiscoveryHardware | null; goal: string }) {
+  const g = hw?.goals.find((x) => x.id === goal)
+  if (!hw || !g) return null
+  const base = (s: string) => s === 'textbook' || s === 'compiler'
+  const found = g.variants.find((v) => !base(v.source))
+  const rivals = g.variants.filter((v) => base(v.source))
+  if (!found || !rivals.length) return null
+  const metric = found.ghz ? 'GHZ fidelity' : 'outcome fidelity'
+  const val = (v: typeof found) => v.ghz?.fidelity ?? v.outcome_fidelity
+  const best = rivals.reduce((a, b) => (val(b) > val(a) ? b : a))
+  const z = g.comparison?.z
+  const said = z === undefined ? '' : z > 2 ? `: a win by ${z.toFixed(1)} standard errors` : z < -2 ? `: a loss by ${(-z).toFixed(1)} standard errors` : ': a tie within shot noise'
+  return (
+    <p className="sub" style={{ margin: '6px 0 0', maxWidth: '86ch' }}>
+      <b>On a real IBM quantum computer</b> ({hw.device}, {hw.date_utc.slice(0, 10)}): the discovered circuit ({found.two_qubit_gates} two-qubit gates on the chip) reached a {metric} of <b>{val(found).toFixed(3)}</b>,
+      {' '}against {val(best).toFixed(3)} for {best.label.toLowerCase().startsWith('textbook') ? 'the textbook circuit' : "Qiskit's state preparation"} ({best.two_qubit_gates}){said}. Details under Evidence.
+    </p>
   )
 }

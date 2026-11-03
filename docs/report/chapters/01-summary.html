@@ -1,0 +1,134 @@
+<section class="chapter">
+<h1>Summary</h1>
+<p class="lede">Q-Canvas is a quantum lab in the browser. Meta's models read, plan and propose, and exact physics
+checks every number before anyone sees it, from a Bell pair drawn in pen to a distance-5 surface code, and from
+satellites in orbit tonight to a real IBM quantum computer.</p>
+
+<h2>What Q-Canvas is</h2>
+<p>You can draw a circuit on paper, photograph a whiteboard, type a problem, say it out loud or give it a paper.
+Q-Canvas turns any of these into a structured plan. SAM 3.1 finds the drawn parts of a sketch. Muse Spark reads the
+photo into a validated specification, writes and repairs code, plans multi-step missions and writes reports. Muse
+Wonder takes the long, many-step questions and reads whole papers. Muse Voice Transcribe takes speech, and Muse Image
+draws illustrations that are always shown next to the exact drawing.</p>
+<p>None of these models produces a physical result itself. The results come from exact engines: density-matrix
+simulation with realistic noise, an independent second simulator, exhaustive search, symplectic checkers for
+error-correcting codes, an SGP4 orbit propagator, closed-form chemistry integrals and a minimum-weight matching
+decoder. These run under physical invariants and statistical tests. If a check fails, Q-Canvas says so: a run that
+cannot be repaired is shown as <b>Not verified</b>, and a number in a model's answer that matches no tool result is
+flagged.</p>
+<p>The same principle runs through every lab. A model proposes a circuit layout, an error-correcting code, a plan
+or a reading of a paper. An exact method then accepts or rejects the proposal and says why. In some labs the verdict
+goes back to the model, which then does better: Chapter 7 shows a model that improves only when it sees exact
+physics' verdicts.</p>
+
+<h2>Results at a glance</h2>
+<table class="results">
+<thead><tr><th>Where</th><th>Measured result</th></tr></thead>
+<tbody>
+<tr><td>A real IBM quantum computer</td><td>The discovery lab's GHZ circuit for 7 qubits ran on IBM's {{dh_device}} next to the textbook circuit, on the same seven qubits: GHZ fidelity {{dh_found}} against {{dh_text}} ({{dh_z}} standard errors), both certifying genuine 7-qubit entanglement. A noise preset calibrated from the chip predicted four earlier circuits within {{hw_cal}}, closer than a digital twin ({{hw_twin}}).</td></tr>
+<tr><td>IBM Quantum</td><td>The same GHZ-5 circuit on the advisor's best, median and worst qubits of {{ix_device}}: {{ix_best}}, {{ix_med}} and {{ix_worst}}, in its order. Teleportation with real mid-circuit feed-forward: {{ix_tele}} against a classical limit of 0.667.</td></tr>
+<tr><td>Mission control</td><td>In a {{m_n}}-mission live benchmark, {{m_done}} of {{m_n}} finished, {{m_verified}} of {{m_steps}} steps were verified ({{m_repaired}} repaired by the model) and {{m_traced}} of {{m_checked}} report numbers were traced to a tool result. Median time per mission: {{m_median}} s.</td></tr>
+<tr><td>An AI scientist that learns</td><td>With exact feedback, Muse Spark's best proven circuit improved on every target ({{learn_steps}} CNOTs). Asked afresh each round, it never improved on its first answer. Random wiring never reached a target.</td></tr>
+<tr><td>AI-designed codes</td><td>For noise dominated by phase flips, Muse Spark found a {{code_n}}-qubit code that needs {{code_dz}} Z errors to fail, against the surface code's {{surface_dz}}, while still correcting any single error.</td></tr>
+<tr><td>Discovery lab</td><td>A GHZ state on all 7 qubits of an IBM heavy-hex chip in 6 CNOTs (the textbook circuit compiled onto the chip needs 10). W and Dicke states in 5 CNOTs, where Qiskit's compiler uses 11.</td></tr>
+<tr><td>Learned decoders</td><td>At distance 3, a network makes {{d3_fewer}}% fewer logical errors than minimum-weight matching at 1% noise. At distance 5, the bigger code suppresses errors {{d5_lam}}× per round, and a network on top of matching makes {{d5_fewer}}% fewer errors again (paired z = {{d5_z}}).</td></tr>
+<tr><td>Reproducing a whole paper</td><td>Muse Wonder found {{paper_n}} experiments in a 100-page paper ({{paper_source}}). Exact simulation reproduced {{paper_reproduced}} of the {{paper_checked}} it could check ({{paper_ok}} of {{paper_total}} stated numbers) in {{paper_seconds}} s.</td></tr>
+<tr><td>The AI referee</td><td>Muse Wonder challenged Muse Spark's answers. The debate raised them from {{ref_first}} to {{ref_final}} of {{ref_n}} right, but Wonder also raised {{ref_false}} false alarms. Only exact simulation knew which challenge was right.</td></tr>
+<tr><td>AI alone</td><td>The same model, with no simulator, was exact on {{ar_tb}} textbook circuits but on only {{ar_big}} bigger new ones, once {{ar_worst}}% off with full confidence.</td></tr>
+<tr><td>ML verifier</td><td>Predicts how much of a circuit's answer survives noise in about {{ml_us}} µs, {{ml_ratio}}× more accurately than the usual rule of thumb, with a calibrated error bar. Each prediction is checked exactly.</td></tr>
+<tr><td>When does quantum win?</td><td>The surface-code resource model lands within {{rsa_qratio}}× (qubits) and {{rsa_tratio}}× (time) of Gidney and Ekerå's published RSA-2048 estimate, and it says "classical wins" when classical wins.</td></tr>
+</tbody>
+</table>
+
+<h2>By the numbers</h2>
+<div class="stats">
+  <div class="stat"><div class="v">{{n_commits}}</div><div class="l">commits, every one made during the building period</div></div>
+  <div class="stat"><div class="v">{{py_lines}}</div><div class="l">lines of Python in the backend package</div></div>
+  <div class="stat"><div class="v">{{ts_lines}}</div><div class="l">lines of TypeScript in the React app</div></div>
+  <div class="stat"><div class="v">{{test_lines}}</div><div class="l">lines of tests</div></div>
+  <div class="stat"><div class="v">{{backend_tests}}</div><div class="l">backend tests, all offline</div></div>
+  <div class="stat"><div class="v">{{e2e_tests}}</div><div class="l">end-to-end browser tests of the built app</div></div>
+  <div class="stat"><div class="v">{{endpoints}}</div><div class="l">HTTP endpoints, with streamed events</div></div>
+  <div class="stat"><div class="v">{{n_decisions}}</div><div class="l">design decisions, each recorded with its reason</div></div>
+</div>
+
+<h2>What makes it different</h2>
+<p>Four things set Q-Canvas apart from a language model put in front of a simulator, and each is measured.</p>
+<ul>
+<li><b>The model never has the last word.</b> Every model output passes a check that does not trust it:
+specs are validated, code is compared with an independent prediction, proposed circuits are proven equal, and
+numbers in reports are traced.</li>
+<li><b>Proposals are checked, not trusted.</b> Discovery, learning, code design and the referee are loops in which a
+model proposes and an exact method decides. The model supplies the ideas; a proven verdict keeps them honest.</li>
+<li><b>It reaches real systems.</b> An AI-discovered circuit beat the textbook circuit on a real IBM quantum computer. The satellite planner flies today's
+quantum-key satellites on their real orbits; the whole-paper lab reads a real 100-page paper.</li>
+<li><b>Its own claims are held to the same rule.</b> A test rebuilds every number in the README and the submission from
+its data file, and this report is generated from the same data.</li>
+</ul>
+</section>
+
+<section class="chapter">
+<h1>The problem and the principle</h1>
+<p class="lede">Quantum programs fail silently, and language models are fluent but not exact. The answer is a division
+of labour: the models read, plan and propose, and exact physics decides what is true.</p>
+
+<h2>A wrong quantum program still runs</h2>
+<p>A reversed CNOT, or a qubit index off by one, does not crash a quantum program. It still runs and still prints a
+histogram; it is just the wrong histogram. On real hardware every histogram is noisy anyway, so a wrong answer can look
+like an ordinary bad day for the chip. Students and researchers sketch circuits and network layouts on paper long before
+they write code, and the step from a sketch to <em>correct</em> code is where the time goes. Errors also come
+from the notation itself: textbooks write states as kets, papers use their own diagrams, and frameworks such as
+Qiskit, Cirq, Quil and OpenQASM disagree on conventions such as bit order.</p>
+<p>The obvious fix today is to ask an AI assistant. The assistant writes plausible code, explains it confidently and
+predicts the output. The prediction is the weak point. A model predicting a circuit's output is doing the calculation
+in its head, and that calculation grows exponentially with the number of qubits.</p>
+
+<h2>Language models are fluent, not exact</h2>
+<p>Q-Canvas measured this before it relied on it (Chapter 15). Muse Spark was asked to predict circuits' outcome odds on
+its own, the way a chat assistant answers, and was scored against exact simulation. It was exact on {{ar_tb}} textbook
+circuits and on {{ar_new}} new small circuits; the easy version of the claim, that chatbots get quantum circuits wrong,
+did not hold. On bigger new circuits of 6 to 8 qubits it was exact on only {{ar_big}}. One answer described a
+near-uniform distribution with full confidence and put {{ar_worst}}% of the probability in the wrong place. Nothing in
+the answer itself warned the reader.</p>
+<div class="callout"><span class="k">The finding that shaped the design</span>
+<p>A model's confidence says nothing about its accuracy on a problem it can't calculate. A checker that
+recomputes the answer exactly is not optional, and it must be independent: it must never read the model's code or
+reasoning, only the specification of what was meant.</p></div>
+
+<h2>The principle: the AI proposes, exact physics has the last word</h2>
+<p>Every feature of Q-Canvas follows one division of labour. The models do the parts that need perception, language
+and imagination. Exact methods do the parts that need correctness. Checks that trust neither side sit between them and
+the user.</p>
+<div class="layers">
+  <div class="layer"><div class="name">Inputs</div><div class="items"><span>pen sketch</span><span>camera on a whiteboard</span><span>typed problem</span><span>speech</span><span>paper (PDF or arXiv id)</span><span>figure from a paper</span><span>notation (Dirac, QASM, Quil, Cirq …)</span></div></div>
+  <div class="layer model"><div class="name">Meta models</div><div class="items"><span>segment the drawing (SAM 3.1)</span><span>read it into a spec</span><span>plan a tool graph</span><span>propose layouts and codes</span><span>write and repair code</span><span>transcribe speech</span><span>write the report</span></div></div>
+  <div class="layer"><div class="name">Exact engines</div><div class="items"><span>density-matrix simulation</span><span>Qiskit Aer</span><span>L-BFGS optimiser</span><span>symplectic code checker</span><span>matching decoders</span><span>SGP4 orbits</span><span>STO-3G integrals</span><span>Lindblad pulses</span></div></div>
+  <div class="layer check"><div class="name">Checks</div><div class="items"><span>spec validation</span><span>shot-noise bound</span><span>second simulator to 1e-6</span><span>physics invariants</span><span>proofs of equality</span><span>number tracing</span><span>paired statistics</span></div></div>
+  <div class="layer"><div class="name">What you see</div><div class="items"><span>verified result or "Not verified"</span><span>the model that said it</span><span>which numbers are traced</span><span>error bars</span></div></div>
+</div>
+
+<h2>Rules the app keeps</h2>
+<p>A principle only matters if the software enforces it. These rules are enforced in code and covered by tests.</p>
+<ul>
+<li><b>Every model answer names its model.</b> The badges say <i>Meta live</i>, <i>Mock</i> or <i>Mock fallback</i>, with
+the error. Offline mode never pretends to read a photo it doesn't know; it says that reading one needs the live
+models.</li>
+<li><b>No faked success.</b> The repair loop stops when the repairer returns the same code twice. After four attempts
+the result is labelled <b>Not verified</b>, and its code and counts are marked as unverified.</li>
+<li><b>Thresholds come from statistics, not from tests.</b> The verification bound is derived from the multinomial
+standard error, and it has never been loosened to make a test pass.</li>
+<li><b>Every number is traced.</b> In the assistant and in mission reports, each number the model writes is matched,
+at the precision written, against the tool results. Untraced numbers are shown as untraced.</li>
+<li><b>Speed-ups and replays are labelled.</b> The demo video tags any sped-up wait on screen. Micius, which re-entered
+the atmosphere in January 2026, flies only as a labelled replay of its 2017 experiments.</li>
+<li><b>Our own documents are checked.</b> <code>tests/test_claims.py</code> rebuilds each quoted number from its
+data and fails if a document says anything else.</li>
+</ul>
+
+<h2>Who it is for</h2>
+<p>The start page offers nine use cases, each illustrated by Muse Image in one flat technical style. Each opens the
+part of the app that does that job: sketch to code, debugging, chemistry, quantum security, optimisation, satellite
+networks, cryptography, real hardware and trust. Students can learn from it by drawing, educators can turn a
+whiteboard into a live simulation, and researchers can check a paper's numbers or a chip's behaviour. The checks are
+the same for everyone.</p>
+</section>

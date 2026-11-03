@@ -1,0 +1,367 @@
+{
+ "kind": "circuit",
+ "version": "1.0",
+ "num_qubits": 7,
+ "num_clbits": 7,
+ "operations": [
+  {
+   "gate": "X",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    4
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    5
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    6
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    5
+   ],
+   "controls": [
+    6
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    5
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    4
+   ],
+   "controls": [
+    6
+   ],
+   "params": [
+    0.7853981633974483
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    4
+   ],
+   "controls": [
+    5
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    4
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    6
+   ],
+   "params": [
+    0.39269908169872414
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    5
+   ],
+   "params": [
+    0.7853981633974483
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    4
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    3
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    0
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    4
+   ],
+   "controls": [
+    0
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    5
+   ],
+   "controls": [
+    0
+   ],
+   "params": [
+    0.7853981633974483
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    4
+   ],
+   "controls": [
+    1
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    5
+   ],
+   "controls": [
+    1
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    5
+   ],
+   "controls": [
+    2
+   ],
+   "params": [
+    3.141592653589793
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    6
+   ],
+   "controls": [
+    2
+   ],
+   "params": [
+    1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    6
+   ],
+   "controls": [
+    1
+   ],
+   "params": [
+    0.7853981633974483
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    6
+   ],
+   "controls": [
+    0
+   ],
+   "params": [
+    0.39269908169872414
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    3
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    4
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    4
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    5
+   ],
+   "params": [
+    -0.7853981633974483
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    4
+   ],
+   "controls": [
+    5
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    5
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    3
+   ],
+   "controls": [
+    6
+   ],
+   "params": [
+    -0.39269908169872414
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    4
+   ],
+   "controls": [
+    6
+   ],
+   "params": [
+    -0.7853981633974483
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    5
+   ],
+   "controls": [
+    6
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    6
+   ]
+  }
+ ],
+ "measurements": [
+  {
+   "qubit": 0,
+   "clbit": 0
+  },
+  {
+   "qubit": 1,
+   "clbit": 1
+  },
+  {
+   "qubit": 2,
+   "clbit": 2
+  },
+  {
+   "qubit": 3,
+   "clbit": 3
+  },
+  {
+   "qubit": 4,
+   "clbit": 4
+  },
+  {
+   "qubit": 5,
+   "clbit": 5
+  },
+  {
+   "qubit": 6,
+   "clbit": 6
+  }
+ ],
+ "metadata": {
+  "title": "Draper adder: 5 + 6 in Fourier space",
+  "notes": "Adds a = 5 (q0-q2) to b = 6 (q3-q5, carry q6) with controlled phases in the Fourier basis, no carry logic at all. The result reads q6..q0 = 1011 101: b holds 11, a is untouched.",
+  "origin": "manual"
+ }
+}

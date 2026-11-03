@@ -4,6 +4,7 @@
     put IBM_QUANTUM_TOKEN=... in .env (and IBM_QUANTUM_INSTANCE=crn:... if your account has several instances)
     .venv/Scripts/python scripts/hardware_check.py           # the least busy real device (uses a little free QPU time)
     .venv/Scripts/python scripts/hardware_check.py --fake    # rehearsal on a fake device (a real calibration snapshot)
+    .venv/Scripts/python scripts/hardware_check.py --rescore # add the calibrated preset's prediction to the stored run
 
 For each circuit (Bell pair, GHZ-3, Bernstein-Vazirani with secret 101, 2-qubit Grover): transpile for the device at
 optimisation level 3, run 4096 shots with SamplerV2, and compare the measured odds with
@@ -11,7 +12,9 @@ optimisation level 3, run 4096 shots with SamplerV2, and compare the measured od
   (b) Q-Canvas's generic "realistic" preset (the one the whole app uses), and
   (c) a digital twin: Qiskit Aer's noise model built from that device's own calibration (NoiseModel.from_backend),
       simulated on the same transpiled circuit.
-Hellinger fidelity and total variation distance for each. A rehearsal is labelled as one everywhere: there the
+Hellinger fidelity and total variation distance for each. --rescore adds (d), Q-Canvas's "calibrated" preset built
+from a calibration snapshot of the device (scripts/calibration_snapshot.py), to the stored counts, which are complete
+(at most 8 outcomes per circuit), with the distance that shot noise alone would give. A rehearsal is labelled as one everywhere: there the
 "device" is itself a simulation, so it only checks the pipeline. Writes examples/hardware_runs.json and
 docs/HARDWARE.md.
 """
@@ -78,7 +81,37 @@ def device(fake: bool):
     return backend, service
 
 
+def shot_noise_tvd(p: dict[str, float], shots: int) -> float:
+    """Expected distance between a distribution and its own sample of ``shots`` (normal approximation per outcome)."""
+    import math
+
+    return 0.5 * sum(math.sqrt(2 * q * (1 - q) / (math.pi * shots)) for q in p.values())
+
+
+def rescore() -> None:
+    path = ROOT / "examples" / "hardware_runs.json"
+    out = json.loads(path.read_text(encoding="utf-8"))
+    cal = json.loads((ROOT / "backend" / "qcanvas" / "data" / "calibration.json").read_text(encoding="utf-8"))
+    for r in out["runs"]:
+        assert abs(sum(r["measured"].values()) - 1) < 1e-9, "stored counts must be complete to rescore"
+        spec = parse_spec(json.loads((ROOT / "examples" / "specs" / f"{r['id']}.json").read_text(encoding="utf-8")))
+        pred = noisy_distribution(spec, "calibrated")
+        r["calibrated"] = {k: pred.get(k, 0.0) for k in r["measured"]}
+        r["tvd_calibrated"] = tvd(pred, r["measured"])
+        r["fidelity_calibrated_prediction"] = hellinger_fidelity(pred, r["measured"])
+        r["shot_noise_tvd"] = shot_noise_tvd(pred, out["shots"])
+        print(f"{r['id']:20s} calibrated preset TVD {r['tvd_calibrated']:.3f} (twin {r['tvd_twin']:.3f}, "
+              f"generic {r['tvd_generic']:.3f}; shot noise alone ~{r['shot_noise_tvd']:.3f})")
+    out["calibration"] = {k: cal[k] for k in ("device", "taken_utc", "calibrated_utc", "two_qubit_error", "readout_p01",
+                                              "readout_p10")}
+    path.write_text(json.dumps(out, indent=1), encoding="utf-8")
+    write_doc(out)
+    print(f"wrote {path}")
+
+
 def main() -> None:
+    if "--rescore" in sys.argv:
+        return rescore()
     fake = "--fake" in sys.argv
     backend, _ = device(fake)
     print(f"device: {backend.name} ({'rehearsal on a fake device' if fake else 'real hardware'})", flush=True)
@@ -135,10 +168,19 @@ def write_doc(out: dict) -> None:
              f"{out['date_utc']}) with `scripts/hardware_check.py`, compared with the ideal odds, Q-Canvas's generic "
              "realistic preset and a digital twin built from the device's own calibration (Qiskit Aer, "
              "NoiseModel.from_backend). Lower total variation distance (TVD) is closer to what the chip did.", "",
-             "| Circuit | Two-qubit gates on the chip | TVD to ideal | TVD to generic preset | TVD to digital twin |",
-             "| --- | --- | --- | --- | --- |"]
+             "| Circuit | Two-qubit gates on the chip | TVD to ideal | TVD to generic preset | TVD to digital twin |"
+             + (" TVD to calibrated preset | Shot noise alone |" if "calibration" in out else ""),
+             "| --- | --- | --- | --- | --- |" + (" --- | --- |" if "calibration" in out else "")]
     for r in out["runs"]:
-        lines.append(f"| {r['circuit']} | {r['two_qubit_gates']} | {r['tvd_ideal']:.3f} | {r['tvd_generic']:.3f} | {r['tvd_twin']:.3f} |")
+        lines.append(f"| {r['circuit']} | {r['two_qubit_gates']} | {r['tvd_ideal']:.3f} | {r['tvd_generic']:.3f} | {r['tvd_twin']:.3f} |"
+                     + (f" {r['tvd_calibrated']:.3f} | {r['shot_noise_tvd']:.3f} |" if "calibration" in out else ""))
+    if "calibration" in out:
+        c = out["calibration"]
+        lines += ["", f"The calibrated preset is Q-Canvas's own noise model with the medians of {c['device']}'s calibration "
+                  f"(snapshot {c['taken_utc']}, calibrated {c['calibrated_utc']}; scripts/calibration_snapshot.py), taken "
+                  "after the run, so it describes the device a few hours later; the stored counts were rescored with "
+                  "`--rescore`. \"Shot noise alone\" is the distance a perfect prediction would still show at this "
+                  "many shots."]
     (ROOT / "docs" / "HARDWARE.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

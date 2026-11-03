@@ -29,6 +29,7 @@ THRESHOLDS: dict[str, Thresholds] = {
     "ideal": Thresholds(tvd_floor=0.02, min_fidelity=0.99),
     "low_noise": Thresholds(tvd_floor=0.03, min_fidelity=0.985),
     "realistic": Thresholds(tvd_floor=0.04, min_fidelity=0.98),
+    "calibrated": Thresholds(tvd_floor=0.03, min_fidelity=0.985),  # today's chips: between low_noise and realistic
 }
 
 

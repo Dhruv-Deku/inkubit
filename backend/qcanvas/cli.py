@@ -35,7 +35,7 @@ def main(argv: list[str] | None = None) -> int:
             stream.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(prog="qcanvas", description=__doc__.split("\n")[0])
     parser.add_argument("spec", type=Path, help="path to a spec JSON file")
-    parser.add_argument("--noise", default="realistic", choices=["ideal", "low_noise", "realistic"])
+    parser.add_argument("--noise", default="realistic", choices=["ideal", "low_noise", "realistic", "calibrated"])
     parser.add_argument("--fault", default=None, help=f"demo fault: auto or one of {', '.join(FAULTS)}")
     parser.add_argument("--shots", type=int, default=4096)
     parser.add_argument("--pace", type=float, default=0.0, help="seconds to pause between steps")

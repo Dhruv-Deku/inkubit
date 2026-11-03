@@ -1,0 +1,130 @@
+{
+ "kind": "circuit",
+ "version": "1.0",
+ "num_qubits": 4,
+ "num_clbits": 4,
+ "operations": [
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    1
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    3
+   ]
+  },
+  {
+   "gate": "CZ",
+   "targets": [
+    1
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CZ",
+   "targets": [
+    3
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    1
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    3
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "gate": "CZ",
+   "targets": [
+    1
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CZ",
+   "targets": [
+    3
+   ],
+   "controls": [
+    2
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ],
+ "measurements": [
+  {
+   "qubit": 0,
+   "clbit": 0
+  },
+  {
+   "qubit": 1,
+   "clbit": 1
+  },
+  {
+   "qubit": 2,
+   "clbit": 2
+  },
+  {
+   "qubit": 3,
+   "clbit": 3
+  }
+ ],
+ "metadata": {
+  "title": "Hidden shift (bent function, s = 1011)",
+  "notes": "f(x) = x0·x1 ⊕ x2·x3 and g(x) = f(x ⊕ s) are known only as phase oracles. Classically finding the shift s takes many queries; here one query to each oracle, between Hadamards, gives s = 1011 every time.",
+  "origin": "manual"
+ }
+}

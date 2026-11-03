@@ -1,0 +1,132 @@
+{
+ "kind": "circuit",
+ "version": "1.0",
+ "num_qubits": 6,
+ "num_clbits": 6,
+ "operations": [
+  {
+   "gate": "H",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    1
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    2
+   ],
+   "controls": [
+    0
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    3,
+    4
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    5
+   ],
+   "controls": [
+    3
+   ]
+  },
+  {
+   "gate": "CX",
+   "targets": [
+    5
+   ],
+   "controls": [
+    4
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    0
+   ],
+   "controls": [
+    3
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    1
+   ],
+   "controls": [
+    4
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "CP",
+   "targets": [
+    2
+   ],
+   "controls": [
+    5
+   ],
+   "params": [
+    -1.5707963267948966
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2
+   ]
+  }
+ ],
+ "measurements": [
+  {
+   "qubit": 0,
+   "clbit": 0
+  },
+  {
+   "qubit": 1,
+   "clbit": 1
+  },
+  {
+   "qubit": 2,
+   "clbit": 2
+  },
+  {
+   "qubit": 3,
+   "clbit": 3
+  },
+  {
+   "qubit": 4,
+   "clbit": 4
+  },
+  {
+   "qubit": 5,
+   "clbit": 5
+  }
+ ],
+ "metadata": {
+  "title": "The GHZ game (Mermin)",
+  "notes": "Three players get bits whose xor is 0 and must answer bits whose xor equals x or y or z. No classical plan wins more than 3 times in 4; three players sharing a GHZ state win every single time.",
+  "origin": "manual"
+ }
+}

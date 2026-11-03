@@ -1,0 +1,328 @@
+{
+ "device": "ibm_fez",
+ "rehearsal": false,
+ "job_id": "dbjpr9pffo6c73ba4adg",
+ "shots": 4096,
+ "date_utc": "2026-11-01T20:16:31+00:00",
+ "circuits": 23,
+ "goals": [
+  {
+   "id": "ghz7_hex",
+   "title": "GHZ on all 7 qubits of an IBM heavy-hex chip",
+   "target": "1/\u221a2 (|0000000\u27e9 + |1111111\u27e9)",
+   "finding": "Found a circuit with 6 CNOTs where the best baseline needs 10; proven to make the state (overlap 1.000000000), it keeps 0.881 of it under realistic noise against 0.814.",
+   "num_qubits": 7,
+   "variants": [
+    {
+     "label": "Muse Spark's layout #4",
+     "source": "muse",
+     "cx_logical": 6,
+     "two_qubit_gates": 6,
+     "depth": 21,
+     "predicted_state_fidelity": 0.8805265595735516,
+     "predicted_outcome_fidelity": 0.7371662209562688,
+     "ideal": {
+      "0000000": 0.49999981157227197,
+      "1111111": 0.5000001884276131
+     },
+     "measured": {
+      "0000000": 0.4501953125,
+      "1111111": 0.410400390625,
+      "0111111": 0.01953125,
+      "1101111": 0.01318359375,
+      "1000000": 0.011962890625,
+      "0010000": 0.009033203125,
+      "1111101": 0.00830078125,
+      "1110000": 0.00830078125
+     },
+     "outcome_fidelity": 0.8601354088573336,
+     "twin_outcome_fidelity": 0.932897745723031,
+     "tvd": 0.13940429687494252,
+     "ghz": {
+      "populations": 0.860595703125,
+      "coherence": 0.7664226914823608,
+      "fidelity": 0.8135091973036803,
+      "se": 0.003980547100219546
+     },
+     "twin_ghz": {
+      "populations": 0.9329000000000001,
+      "coherence": 0.8736787991601539,
+      "fidelity": 0.903289399580077
+     },
+     "parities": [
+      0.7505,
+      0.5,
+      -0.0361,
+      -0.5566,
+      -0.7832,
+      -0.5117,
+      0.0601,
+      0.5898
+     ],
+     "outcome_se": 0.005419476398630954
+    },
+    {
+     "label": "Textbook circuit, compiled onto the wiring",
+     "source": "textbook",
+     "cx_logical": 10,
+     "two_qubit_gates": 10,
+     "depth": 30,
+     "predicted_state_fidelity": 0.8140602001882858,
+     "predicted_outcome_fidelity": 0.6934607399997952,
+     "ideal": {
+      "0000000": 0.5000000000000002,
+      "1111111": 0.5000000000000002
+     },
+     "measured": {
+      "0000000": 0.4326171875,
+      "1111111": 0.40869140625,
+      "0000001": 0.014892578125,
+      "1011111": 0.013916015625,
+      "1111110": 0.0126953125,
+      "1111011": 0.010986328125,
+      "0000100": 0.009521484375,
+      "0000101": 0.009521484375
+     },
+     "outcome_fidelity": 0.8411384543973675,
+     "twin_outcome_fidelity": 0.9258413801379255,
+     "tvd": 0.15869140625000022,
+     "ghz": {
+      "populations": 0.84130859375,
+      "coherence": 0.7488964547310484,
+      "fidelity": 0.7951025242405242,
+      "se": 0.004123049856017377
+     },
+     "twin_ghz": {
+      "populations": 0.9258500000000001,
+      "coherence": 0.8647455330350183,
+      "fidelity": 0.8952977665175093
+     },
+     "parities": [
+      0.7207,
+      0.5439,
+      0.0522,
+      -0.5229,
+      -0.7593,
+      -0.4424,
+      0.146,
+      0.624
+     ],
+     "outcome_se": 0.005711670714974108
+    },
+    {
+     "label": "Qiskit state preparation, optimisation level 3",
+     "source": "compiler",
+     "cx_logical": 197,
+     "two_qubit_gates": 197,
+     "depth": 564,
+     "predicted_state_fidelity": 0.03515537207000445,
+     "predicted_outcome_fidelity": 0.05890302186270851,
+     "ideal": {
+      "0000000": 0.5000000000000108,
+      "1111111": 0.5000000000000103
+     },
+     "measured": {
+      "0000000": 0.215087890625,
+      "1111111": 0.131103515625,
+      "0010000": 0.03515625,
+      "1000000": 0.028564453125,
+      "1110111": 0.02685546875,
+      "0110111": 0.021484375,
+      "0000100": 0.01953125,
+      "1110101": 0.019287109375
+     },
+     "outcome_fidelity": 0.3410206227447676,
+     "twin_outcome_fidelity": 0.623296493161188,
+     "tvd": 0.6538085937500105,
+     "outcome_se": 0.007407066766796402
+    }
+   ],
+   "patch": [
+    118,
+    109,
+    108,
+    110,
+    98,
+    111,
+    112
+   ],
+   "comparison": {
+    "metric": "GHZ fidelity",
+    "discovered": 0.8135091973036803,
+    "baseline": 0.7951025242405242,
+    "baseline_label": "Textbook circuit, compiled onto the wiring",
+    "margin": 0.01840667306315613,
+    "z": 3.2117765597582073
+   }
+  },
+  {
+   "id": "w4",
+   "title": "W state on 4 qubits",
+   "target": "1/2 (|0001\u27e9 + |0010\u27e9 + |0100\u27e9 + |1000\u27e9)",
+   "finding": "Found a circuit with 5 CNOTs where the best baseline needs 11; proven to make the state (overlap 1.000000000), it keeps 0.902 of it under realistic noise against 0.782.",
+   "num_qubits": 4,
+   "variants": [
+    {
+     "label": "Search #1",
+     "source": "search",
+     "cx_logical": 5,
+     "two_qubit_gates": 8,
+     "depth": 30,
+     "predicted_state_fidelity": 0.9015457347169884,
+     "predicted_outcome_fidelity": 0.8498581135350156,
+     "ideal": {
+      "0000": 2.2376395577170805e-11,
+      "0001": 0.2499998015328855,
+      "0010": 0.2499993635266867,
+      "0100": 0.24999956370291865,
+      "0101": 2.745253715457933e-11,
+      "1000": 0.2500012711295692,
+      "1010": 2.8707363315896292e-11,
+      "1011": 2.242046759378816e-12,
+      "1101": 2.24223395584386e-12,
+      "1111": 2.3531547411184907e-11
+     },
+     "measured": {
+      "0010": 0.235107421875,
+      "1000": 0.232177734375,
+      "0001": 0.224609375,
+      "0100": 0.211669921875,
+      "0000": 0.017822265625,
+      "0101": 0.01025390625,
+      "1001": 0.009765625,
+      "1110": 0.009521484375
+     },
+     "outcome_fidelity": 0.9032000679083275,
+     "twin_outcome_fidelity": 0.9581209128764412,
+     "tvd": 0.09643554676775397,
+     "outcome_se": 0.004620114795838778
+    },
+    {
+     "label": "Qiskit state preparation, optimisation level 3",
+     "source": "compiler",
+     "cx_logical": 11,
+     "two_qubit_gates": 17,
+     "depth": 72,
+     "predicted_state_fidelity": 0.7819079309730246,
+     "predicted_outcome_fidelity": 0.7936569792369619,
+     "ideal": {
+      "0001": 0.2500000000000001,
+      "0010": 0.25000000000000044,
+      "0100": 0.24999999999999967,
+      "1000": 0.25000000000000067
+     },
+     "measured": {
+      "0001": 0.247802734375,
+      "1000": 0.228515625,
+      "0010": 0.220458984375,
+      "0100": 0.21484375,
+      "0000": 0.023193359375,
+      "0110": 0.01318359375,
+      "0101": 0.0107421875,
+      "0111": 0.008056640625
+     },
+     "outcome_fidelity": 0.9109499582869879,
+     "twin_outcome_fidelity": 0.9528821217402638,
+     "tvd": 0.08837890625000044,
+     "outcome_se": 0.004450249394563133
+    }
+   ],
+   "comparison": {
+    "metric": "outcome fidelity",
+    "discovered": 0.9032000679083275,
+    "baseline": 0.9109499582869879,
+    "baseline_label": "Qiskit state preparation, optimisation level 3",
+    "margin": -0.007749890378660362,
+    "z": -1.208118925625527
+   }
+  },
+  {
+   "id": "dicke42",
+   "title": "Dicke state |D(4,2)\u27e9",
+   "target": "1/\u221a6 (|0011\u27e9 + |0101\u27e9 + |0110\u27e9 + |1001\u27e9 + |1010\u27e9 + |1100\u27e9)",
+   "finding": "Found a circuit with 5 CNOTs where the best baseline needs 11; proven to make the state (overlap 1.000000000), it keeps 0.900 of it under realistic noise against 0.770.",
+   "num_qubits": 4,
+   "variants": [
+    {
+     "label": "Search #3",
+     "source": "search",
+     "cx_logical": 5,
+     "two_qubit_gates": 8,
+     "depth": 26,
+     "predicted_state_fidelity": 0.9003284390450386,
+     "predicted_outcome_fidelity": 0.8430335825337472,
+     "ideal": {
+      "0000": 5.376524319839747e-11,
+      "0001": 3.4015585842931333e-11,
+      "0010": 2.7198562773641998e-11,
+      "0011": 0.16666654280606297,
+      "0101": 0.16666691177820087,
+      "0110": 0.16666934141295903,
+      "0111": 1.1277136564655627e-12,
+      "1000": 1.1278624003917976e-12,
+      "1001": 0.16666517361059333,
+      "1010": 0.16666483705254334,
+      "1011": 4.496334574554353e-12,
+      "1100": 0.16666719319584977,
+      "1101": 1.8721237588161815e-12,
+      "1110": 3.941560490230017e-12,
+      "1111": 1.5958469824078925e-11
+     },
+     "measured": {
+      "0101": 0.158203125,
+      "1100": 0.15576171875,
+      "1010": 0.15478515625,
+      "1001": 0.149658203125,
+      "0110": 0.144287109375,
+      "0011": 0.139892578125,
+      "1011": 0.014404296875,
+      "0010": 0.013671875
+     },
+     "outcome_fidelity": 0.9021615587536095,
+     "twin_outcome_fidelity": 0.9621625093098592,
+     "tvd": 0.09741210923135292,
+     "outcome_se": 0.0046422053532387065
+    },
+    {
+     "label": "Qiskit state preparation, optimisation level 3",
+     "source": "compiler",
+     "cx_logical": 11,
+     "two_qubit_gates": 17,
+     "depth": 71,
+     "predicted_state_fidelity": 0.769927800308112,
+     "predicted_outcome_fidelity": 0.7894524569210053,
+     "ideal": {
+      "0011": 0.16666666666666716,
+      "0101": 0.16666666666666685,
+      "0110": 0.16666666666666677,
+      "1001": 0.16666666666666663,
+      "1010": 0.1666666666666667,
+      "1100": 0.16666666666666702
+     },
+     "measured": {
+      "1010": 0.15966796875,
+      "1001": 0.1572265625,
+      "0011": 0.1552734375,
+      "0110": 0.1455078125,
+      "1100": 0.143798828125,
+      "0101": 0.143310546875,
+      "0010": 0.012939453125,
+      "0100": 0.0126953125
+     },
+     "outcome_fidelity": 0.9043329592734751,
+     "twin_outcome_fidelity": 0.9534315995541837,
+     "tvd": 0.09521484375000057,
+     "outcome_se": 0.004595845027296994
+    }
+   ],
+   "comparison": {
+    "metric": "outcome fidelity",
+    "discovered": 0.9021615587536095,
+    "baseline": 0.9043329592734751,
+    "baseline_label": "Qiskit state preparation, optimisation level 3",
+    "margin": -0.0021714005198656405,
+    "z": -0.3324062188754988
+   }
+  }
+ ]
+}

@@ -1,0 +1,179 @@
+<section class="chapter">
+<h1>Evidence</h1>
+<p class="lede">Claims about AI and quantum hardware are easy to make and hard to check. This chapter collects the
+measurements behind Q-Canvas's design: how far a model alone can be trusted, what happens when two models debate, how
+good a learned shortcut is, and how the predictions held up on a real quantum computer.</p>
+
+<h2>AI alone vs Q-Canvas</h2>
+<p>The pitch that "a chatbot hallucinates and Q-Canvas does not" was tested, not asserted. The same model
+({{ar_model}}, medium reasoning effort) was given each circuit as data, with no title, no notes and no simulator. It
+predicted every outcome's probability under a JSON schema, the way a chat assistant would answer. Exact simulation
+scored each answer by total variation distance, the share of probability in the wrong place: <i>exact</i> below 1%,
+<i>close</i> below 5%, <i>wrong</i> from 5%. The sets were the textbook examples, which a model has seen many times;
+new seeded circuits of 3 to 5 qubits plus a six-guest QAOA circuit, which is what a student's own sketch looks like to
+a model; and bigger new circuits of 6 to 8 qubits, all put in superposition first, with 4 measured. The recorded run
+is dated {{ar_date}}.</p>
+<figure>{{chart:arena}}
+<figcaption>{{ar_model}} predicting circuits alone, scored by exact simulation. The model is reliable on what it has seen and on small new circuits, and unreliable where hand calculation grows exponentially harder.</figcaption></figure>
+<p>The first run disproved the easy version of the claim: the model was exact on {{ar_tb}} textbook circuits and on
+{{ar_new}} new small ones, and the page says so. It failed where the calculation gets hard. It gave no usable answer
+for the 31-gate QAOA circuit. On the bigger circuits it was exact on {{ar_big}}, close on {{ar_big_close}}, wrong on
+{{ar_big_wrong}}, and gave no answer on {{ar_big_none}}. The wrong answer was confident: it described every outcome
+as equally likely (1/16 each, "a near-maximally mixed marginal") and put {{ar_worst}}% of the probability in the wrong
+place. Nothing in its wording signalled doubt.</p>
+{{table:arena_big}}
+<p>"Ask the AI alone", under the editor, repeats the test live on any circuit. Offline it refuses rather than inventing
+an answer. The models table in the app names the check behind every model step.</p>
+
+<h2>The AI referee</h2>
+<p>If one model can be wrong, can a second model catch it? The referee tests this. Muse Spark answers three questions
+about a circuit. Muse Wonder agrees with or disputes each answer, giving its own value. Muse Spark then stands by its
+answer or concedes. Exact simulation grades every position: probabilities within 0.02, the most likely outcome with
+ties allowed, and entanglement by the negativity of the two-qubit reduced state.</p>
+<p>A first version let Muse Spark choose its own claims. It chose safe ones and was right on 3 of 3 every time, which
+tests nothing. The referee therefore now asks the same three questions of every circuit: the most likely outcome, the
+probability of the second most likely one (picked from the exact odds; the models are not told why) and whether a
+given pair of qubits is entangled. The test used the six bigger circuits from the AI-alone benchmark and two smaller
+new ones, {{ref_n}} answers in all.</p>
+{{table:referee}}
+<p>Debate helped on balance: {{ref_first}} right before, {{ref_final}} after. But it also added errors of its own.
+Muse Wonder raised {{ref_false}} false alarms against right answers and talked Muse Spark out of {{ref_talked}} of
+them, and it let {{ref_missed}} of the {{ref_wrong}} wrong answers through. Twice the two models agreed that a
+pair of qubits was entangled when its negativity was exactly zero (docs/REFEREE.md). A
+debate between models cannot tell which challenge was right; only the simulator can. That is why Q-Canvas checks
+instead of debating.</p>
+
+<h2>The ML verifier</h2>
+<p>Exact density-matrix simulation is the referee everywhere in Q-Canvas, but it costs time that grows exponentially.
+The ML verifier is a fast first opinion: it predicts how much of a circuit's answer survives realistic noise (the
+Hellinger fidelity against the ideal distribution, at a noise scale from 0.05× to 5×), with a calibrated error bar.</p>
+<ul>
+<li><b>Inputs (16):</b> structure (qubits, measured qubits, gates by size, depth, two-qubit depth, the busiest qubit),
+the ideal distribution (entropy, largest outcome, outcomes above 10⁻³), the noise scale, the rule of thumb (the product
+of gate and readout success rates), and two physics-informed inputs computed on the ideal distribution alone: exact
+readout errors, and a global depolarizing model. Those two were added after the first model was systematically
+optimistic on textbook circuits. Structure alone cannot see that a Bell pair's outcomes are two bit flips apart, so
+that every readout error leaves the answer.</li>
+<li><b>Data:</b> {{ml_samples}} random circuits of 1 to 7 qubits in five styles (gate soup, layered, few gates, mirror
+circuits with certain answers, reversible logic), labelled by exact density-matrix simulation ({{ml_exact_ms}} ms
+each on average); {{ml_train}} for training, {{ml_cal}} for calibration and {{ml_test}} held out.</li>
+<li><b>Model:</b> an ensemble of five small tanh networks (16-48-48-1), trained in NumPy with Adam. The ensemble mean is
+the prediction. The interval is adaptive split conformal: the error divided by the ensemble's spread (plus 0.01),
+calibrated at the 90th percentile.</li>
+</ul>
+<div class="side">
+<figure>{{chart:ml}}
+<figcaption>Held-out circuits: predicted against exact fidelity. The ML verifier (blue) hugs the diagonal; the rule of thumb (orange) falls far below it.</figcaption></figure>
+<div>
+{{table:ml}}
+<p class="small">About {{ml_speedup}} times faster than the exact label. The coverage guarantee holds for circuits like
+the training set. That is why every prediction up to 10 qubits is still checked exactly, and why a miss is shown as a
+note about the model, never as a change to the result.</p>
+</div>
+</div>
+
+<h2>A real IBM quantum computer</h2>
+<p>Everything above is simulation. To test the simulations against reality, <code>scripts/hardware_check.py</code> ran
+four circuits (a Bell pair, GHZ-3, Bernstein-Vazirani and two-qubit Grover) on <b>{{hw_device}}</b>, the least busy
+device on the IBM Quantum Platform's Open plan (job <code>{{hw_job}}</code>, {{hw_shots}} shots each, {{hw_date}}, done
+10 seconds after submission). The circuits were transpiled at optimisation level 3, which left one or two two-qubit
+gates each. The measured counts were compared, by total variation distance, with four predictions:</p>
+<ul>
+<li>the <b>noiseless</b> odds;</li>
+<li>Q-Canvas's <b>generic realistic preset</b>, the default noise model of the whole app;</li>
+<li>a <b>digital twin</b>: Qiskit Aer with <code>NoiseModel.from_backend</code>, built from the device's own calibration data and run on the same transpiled circuit;</li>
+<li>Q-Canvas's <b>calibrated preset</b>, added after this run: its own noise model with the median of a calibration snapshot of the same device (below).</li>
+</ul>
+<figure>{{chart:hardware}}
+<figcaption>Distance between what {{hw_device}} measured and each prediction (lower is closer). The twin beat the noiseless odds and the generic preset on {{hw_best}} of {{hw_n}} circuits; the calibrated preset was closer than the twin on {{hw_cal_beats}} of {{hw_n}}.</figcaption></figure>
+{{table:hardware}}
+<p>The digital twin predicted what the chip measured more closely than the noiseless odds and the generic preset on
+<b>{{hw_best}} of {{hw_n}}</b> circuits, at distances of {{hw_twin}}. The finding that matters more for the app is the
+second one. The generic preset ({{hw_generic}}) was
+further off than the noiseless prediction on {{hw_pessimistic}} of {{hw_n}} circuits: it is calibrated to an older,
+noisier class of chip, and this one is better.</p>
+<p>That finding became a feature. <code>scripts/calibration_snapshot.py</code> reads the device's reported calibration
+and keeps the median over its {{cal_qubits}} qubits and couplers: on {{cal_device}} ({{cal_family}}), a two-qubit error
+of {{cal_2q}}, one-qubit error {{cal_1q}}, readout errors of {{cal_p01}} and {{cal_p10}}, T1 {{cal_t1}} µs and T2
+{{cal_t2}} µs, against the generic preset's 1.5%, 0.1%, 2% and 4%. A reported gate error already includes decoherence
+during the gate, so the thermal part is taken out before the rest becomes depolarizing noise; a test checks that each
+gate's composed error equals the reported one. The result is a fourth preset, <b>Calibrated</b>, in the run bar and in
+every analysis. Rescored on the stored counts, it came within <b>{{hw_cal}}</b>, closer than the twin on
+{{hw_cal_beats}} of {{hw_n}}. That is still above the {{hw_noise}} that shot noise alone would leave, so part of the
+chip's behaviour is unmodelled. Two cautions are stated in the app: the snapshot was taken a few hours after the run,
+and medians describe a typical qubit rather than the best patch a compiler picks.</p>
+<div class="callout warn"><span class="k">What this does and does not show</span>
+<p>Four small circuits, with one or two two-qubit gates each, on one device on one day. They show that Q-Canvas's
+pipeline reaches real hardware, and that a calibrated twin predicts it well at this scale. They are not a benchmark of
+the device. An offline rehearsal (<code>--fake</code>, on a simulated backend) checks the pipeline in CI and is never
+shown as hardware data. A test refuses to quote hardware numbers from a rehearsal.</p></div>
+
+<h2>AI-discovered circuits on the chip</h2>
+<p>The discovery lab's claims (Chapter 7) were made in simulation. <code>scripts/discovery_hardware.py</code> reruns
+the lab's search for three goals and sends each goal's best proven circuit to the chip, together with the baselines it
+beat: {{dh_circuits}} circuits on {{dh_device}} (job <code>{{dh_job}}</code>, {{dh_shots}} shots each, {{dh_date}}).
+GHZ-7 runs on seven physical qubits wired like a 7-qubit Falcon chip ({{dh_patch}}, picked by Qiskit's noise-aware
+layout for the discovered circuit). Every variant is compiled onto that same patch, so the textbook circuit pays the
+SWAPs the lab counted: {{dh_text_2q}} two-qubit gates on the chip against {{dh_found_2q}}.</p>
+<p>Computational-basis counts cannot tell a GHZ state from a classical 50/50 mixture of all-0 and all-1, so the GHZ
+circuits also measure a parity oscillation over eight phases. The fidelity estimate is
+F = (P(0…0) + P(1…1))/2 + |coherence|, with error bars from shot noise; both are tested against exact states and
+against repeated sampling. A value above ½ certifies genuine 7-qubit entanglement.</p>
+<figure>{{chart:dh}}
+<figcaption>The discovered circuits on {{dh_device}} against the baselines they beat; bars span two standard errors of shot noise either way, and the axes do not start at zero. Left: GHZ fidelity (above the dashed 0.5, genuine 7-qubit entanglement). Middle and right: outcome fidelity of the computational-basis odds, where the intervals overlap.</figcaption></figure>
+<p><b>GHZ-7:</b> {{dh_src}} reached F = {{dh_found}} ± {{dh_found_se}} (populations {{dh_found_pop}}, coherence
+{{dh_found_coh}}) against {{dh_text}} ± {{dh_text_se}} for the textbook circuit, {{dh_z}} standard errors apart. Both
+certify genuine 7-qubit entanglement. Qiskit's generic state preparation, {{dh_prep_2q}} two-qubit gates, kept an
+outcome fidelity of {{dh_prep_outcome}}. <b>W and Dicke:</b> compiled freely for the chip, the discovered circuits used
+{{dh_w_found_2q}} two-qubit gates against {{dh_w_base_2q}}, yet their measured odds tied with Qiskit's within shot noise
+({{dh_wz}} and {{dh_dz}} standard errors). Computational-basis odds cannot see phase errors, which is much of what fewer
+gates save, and the page reports a tie, not a win. The digital twin was optimistic about every circuit in this run (it
+predicted {{dh_twin_found}} for the discovered GHZ circuit) but ranked them in the same order.</p>
+{{table:dh}}
+
+<h2>IBM Quantum: placement and teleportation</h2>
+<p>The app now maps {{ix_devices}} IBM Heron chips qubit by qubit from their own calibration, and an advisor scores every
+way to place a circuit on them: each embedding of the circuit's two-qubit gates in the chip's working couplers, ranked
+by the chance that no gate or readout fails. Two experiments in one job on {{ix_device}} (<code>{{ix_job}}</code>,
+{{ix_circuits}} circuits) tested what the app now claims.</p>
+<figure><img src="{{shot:39-ibm-chip-map.png}}" alt="IBM Quantum panel: the fleet and a heavy-hex chip map">
+<figcaption>The IBM Quantum panel: three Heron r2 chips, and {{ix_device}}'s 156 qubits and 176 couplers coloured by two-qubit gate error (grey best, orange worst, dashed red unusable).</figcaption></figure>
+<p><b>Placement matters.</b> The advisor scored {{ix_candidates}} placements of a 5-qubit GHZ chain from a snapshot taken
+minutes earlier. The best, median and worst ran on exactly those qubits: GHZ fidelity {{ix_best}} ± {{ix_best_se}},
+{{ix_med}} and {{ix_worst}}, in the advisor's order (its scores: {{ix_best_score}}, {{ix_med_score}},
+{{ix_worst_score}}). The best and the worst placement were {{ix_z}} standard errors apart, and on the worst qubits the
+state no longer certifies entanglement. Same circuit, same chip, same hour; only the qubits differed.</p>
+<p><b>Teleportation with real feed-forward.</b> The simulator has no mid-circuit measurement, but the chip does. A qubit
+was teleported with the Bell measurement in the middle of the circuit and X and Z applied by the chip in real time,
+only when the measured bits said so (qubits {{ix_tele_qubits}}). The six axis states form a 2-design, so their average
+fidelity equals the average over all states: <b>{{ix_tele}} ± {{ix_tele_se}}</b>, against 2/3 for the best classical
+scheme, and {{ix_tele_none}} without the corrections, as theory says.</p>
+
+<h2>The proof sheet: every check on every circuit</h2>
+<p>A run is verified by one comparison (Chapter 5). The proof sheet asks more, of the circuit and of Q-Canvas itself:
+{{ps_checks}} independent checks of {{ps_kinds}} kinds, each guarding against a different mistake. Two ideal simulators
+(Qiskit's quantum_info and Aer's C++) and two noisy ones (closed-form channels and Aer's density matrix) must agree. The
+noisy state must be a physical density matrix. The circuits Qiskit compiles for three chip wirings must be the same
+unitary, ancillas and routing included: translation validation of the compiler. Exports to OpenQASM 2 and 3 must read
+back to the same circuit. Sampled shots must pass the shot-noise bound and a G-test. The generated script must verify in
+the sandbox. Renaming the qubits, or inserting gate pairs that cancel, must leave the answer unchanged (metamorphic
+tests). It runs on any circuit from the editor in about eight seconds.</p>
+<p>Over the whole gallery ({{ps_circuits}} circuits) it recorded <b>{{ps_passed}} passes and {{ps_failed}} failures</b>,
+{{ps_skipped}} check skipped with its reason and {{ps_notes}} notes, where the ML verifier's interval missed the exact
+value, consistent with its coverage on textbook circuits. A test breaks Qiskit's compiler on purpose (dropping one CNOT)
+and requires the compilation check to fail. Its first run also found a real defect: Q-Canvas's OpenQASM 2 export used
+<code>sx</code>, <code>cp</code> and <code>swap</code>, which the standard <code>qelib1.inc</code> does not define, so
+strict readers rejected it. The app's own read-back had used Qiskit's lenient mode and hidden this. The export now
+defines those gates in the file from standard ones.</p>
+{{table:proofsheet}}
+
+<h2>The simulation observatory</h2>
+<p>Five exact simulations show where quantum technology stands, each with its key number written into one sentence
+from the data. Satellites versus fiber is in Chapter 12. The other four:</p>
+<figure>{{chart:grover}}
+<figcaption>{{obs_grover}}</figcaption></figure>
+<p><b>Grover versus noise.</b> Two to five qubits, one marked item, transpiled to native gates and evolved as exact
+density matrices with the verifier's gate channels. With perfect qubits, the search finds the item with near
+certainty. With today's noise the advantage shrinks as the circuits grow, and at five qubits the speedup is gone.</p>
+<p><b>Entanglement growth.</b> {{obs_ent}} <b>The quantum walk.</b> {{obs_walk}} <b>The exponential wall.</b> {{obs_wall}}</p>
+</section>

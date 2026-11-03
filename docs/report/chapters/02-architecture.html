@@ -1,0 +1,207 @@
+<section class="chapter">
+<h1>Architecture</h1>
+<p class="lede">A Python backend of exact engines behind a FastAPI server, a React app that streams every step live,
+and a model layer through which every Meta model call passes. That layer has an offline twin, a cache and an honest
+fallback.</p>
+
+<h2>Overview</h2>
+<p>Q-Canvas is a single web application. The browser sends a request: a photo, a spec, a mission, a question or a
+paper. The server starts a job and returns at once. The job's events (plan, step started, attempt failed, repaired,
+verified) stream back over server-sent events, so the user watches the work happen instead of waiting for a result.
+There is no database: jobs live in memory, share links carry the whole spec in the URL, and per-viewer progress such as
+challenge stars is kept in the browser.</p>
+<div class="flow">
+  <div class="node"><b>Browser</b>React 19 app: sketch, mission, labs; renders the event stream live</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>FastAPI</b>{{endpoints}} endpoints; jobs in memory; SSE event streams</div>
+  <div class="arrow">→</div>
+  <div class="node model"><b>Model layer</b>Meta adapters, offline mocks, on-disk cache, labelled fallback</div>
+  <div class="arrow">→</div>
+  <div class="node exact"><b>Exact engines</b>simulation, optimisers, decoders, orbits, chemistry, networks</div>
+  <div class="arrow">→</div>
+  <div class="node check"><b>Checks</b>validation, independent prediction, invariants, tracing</div>
+</div>
+<div class="legend-keys"><span class="m">uses a Meta model</span><span class="x">exact computation</span><span class="c">verification</span></div>
+<p>The model layer and the exact engines never call each other directly. Orchestration code such as the agent loop,
+mission control or a lab's driver asks the model for a proposal, hands it to an engine and passes the result through
+the checks. That separation is why the model can be swapped for an offline mock without changing anything
+downstream.</p>
+
+<h2>The backend</h2>
+<p>The backend is one Python package, <code>qcanvas</code>, of about {{py_lines}} lines. It runs on Python 3.13 with
+Qiskit 2.6 and Qiskit Aer, NumPy and SciPy, pydantic v2 for every schema, PyMatching for the decoders and the
+<code>sgp4</code> package for orbits. The main parts:</p>
+<table class="compact modules">
+<thead><tr><th>Part</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>spec/</code></td><td>The versioned circuit and network specification (pydantic, <code>extra="forbid"</code>), readable validation that reports every problem with its path, the JSON schema, and the flat draft schema the models fill</td></tr>
+<tr><td><code>adapters/</code></td><td>One interface per model job, with Meta and mock implementations, the response cache and the fallback policy</td></tr>
+<tr><td><code>codegen/</code>, <code>sim/</code></td><td>Deterministic template code, the static safety check, noise presets and the sandboxed subprocess runner</td></tr>
+<tr><td><code>verify/</code>, <code>agent/</code></td><td>The independent expected distribution, metrics and verdicts; the plan → run → verify → diagnose → repair loop, fault injection and the event bus</td></tr>
+<tr><td><code>insights/</code></td><td>Gate-by-gate states, entanglement, error budgets, Bell tests, tomography, zero-noise extrapolation, chip routing</td></tr>
+<tr><td><code>network/</code>, <code>orbits.py</code>, <code>satellites.py</code></td><td>The physical link model, bottleneck search and purification; SGP4 propagation, ground stations on WGS84, pass finding and cloud weighting</td></tr>
+<tr><td><code>mission.py</code>, <code>copilot.py</code></td><td>Mission control (planning, parallel execution, repair, verification, traced reports) and the tool-calling assistant</td></tr>
+<tr><td><code>discovery.py</code>, <code>learning.py</code>, <code>codes.py</code></td><td>The discovery lab, the learning loop and the stabilizer-code checker</td></tr>
+<tr><td><code>paper.py</code>, <code>reproduce.py</code>, <code>referee.py</code>, <code>arena.py</code></td><td>Whole-paper and figure reproduction, the AI referee, the AI-alone benchmark</td></tr>
+<tr><td><code>decoder.py</code>, <code>pulse.py</code>, <code>estimator.py</code>, <code>distributed.py</code></td><td>Surface-code decoders, the transmon pulse simulator, resource estimates, the distributed computer</td></tr>
+<tr><td><code>chem.py</code>, <code>qkd.py</code>, <code>qaoa.py</code>, <code>shor.py</code>, <code>qec.py</code></td><td>The labs: H₂ from first principles, BB84, QAOA Max-Cut, Shor's algorithm, the error-correction lab</td></tr>
+<tr><td><code>rosetta.py</code>, <code>notation.py</code></td><td>The Quantum Rosetta: exact parsers and writers for Dirac notation and quantum languages</td></tr>
+<tr><td><code>mlverify.py</code>, <code>observatory.py</code>, <code>precomputed.py</code></td><td>The ML verifier, the simulation observatory, and the stored input-free results</td></tr>
+</tbody>
+</table>
+
+<h2>The frontend</h2>
+<p>The app is React 19 with TypeScript, built by Vite, about {{ts_lines}} lines in {{components}} components. The
+start page leads with mission control, and a switch puts the quick assistant in the same place. Everything else sits
+in five sections that mount only when opened, so heavy requests do not start on page load. The open section is kept
+in the URL.</p>
+<table class="compact">
+<thead><tr><th>Section</th><th>What is in it</th></tr></thead>
+<tbody>
+<tr><td>Top of the page</td><td>Mission control, or a quick question to the same exact tools</td></tr>
+<tr><td>Sketch to code</td><td>Photo or camera, words or voice, the live board, the Quantum Rosetta, the use-case cards</td></tr>
+<tr><td>Discover</td><td>Discovery lab, an AI scientist that learns, when does quantum win, reproduce a paper (a figure or a whole paper)</td></tr>
+<tr><td>Hardware and networks</td><td>Pulse lab, ML decoder, code lab, error-correction lab, distributed computer, satellite planner</td></tr>
+<tr><td>Labs and games</td><td>Challenges, bug hunt, Shor, QAOA, H₂, BB84 with a spy</td></tr>
+<tr><td>Evidence</td><td>Simulation observatory with the ML verifier, AI alone vs Q-Canvas, the AI referee, the real IBM run</td></tr>
+</tbody>
+</table>
+<p>Visual rules are simple and kept everywhere. The colours are a charcoal ground, one blue for measured data, one
+orange for predictions, green and red only for pass and fail, and gold reserved for entanglement. The Bloch spheres
+are drawn in 3D as SVG and share one camera. Every chart has a crosshair readout, a legend and a "Show the numbers"
+table, and motion stops under <code>prefers-reduced-motion</code>. A guided tour (<code>/#tour</code>) walks through
+the highlights in under two minutes. It starts a real mission and a real discovery run early and comes back to their
+results.</p>
+
+<h2>The model layer</h2>
+<p>Every model job (read a sketch, write code, repair it, explain, plan a mission, propose layouts) is an interface
+with two implementations. The <b>Meta</b> implementation calls <code>https://api.meta.ai/v1</code> using only the
+endpoints and fields in Meta's documentation; the pages used are listed in the repository. The <b>mock</b>
+implementation is deterministic and offline. It recognises the bundled sample sketches by file hash and returns their
+recorded readings. It writes code from the template, repairs with a rule-based repairer, explains from templates
+filled with the real numbers, and refuses anything it can't do honestly.</p>
+<ul>
+<li><b>Cache.</b> Responses are cached on disk by request hash, so repeated demos and runs cost nothing and are
+reproducible.</li>
+<li><b>Fallback.</b> With <code>QCANVAS_ALLOW_FALLBACK=1</code>, a failed live call is answered by the mock, and the
+badge says <i>Mock fallback</i> together with the error.</li>
+<li><b>Public mode.</b> With <code>QCANVAS_PUBLIC=1</code> on a shared host, code written by a model is never executed
+(the agent runs Q-Canvas's own template code). Billed calls stop at 300 per day, counted only on cache misses, after
+which the labelled offline models answer.</li>
+</ul>
+
+<h2>Jobs, events and streaming</h2>
+<p>Long work runs as a job with an event bus. Each step (a plan, an attempt, a verdict, a diagnosis, a repair, a tool
+result, a check) is a plain-language event that streams to the browser as a server-sent event. Mission control runs
+independent steps on a thread pool; each change is an event, and the browser draws it on a live graph. Slow results
+that need no input, such as the observatory's simulations and the pulse lab's sweep and DRAG calibration, are
+computed once and stored with the app. A test checks that they equal a fresh computation, so a cold start on a small
+container does not spend minutes recomputing them.</p>
+
+<h2>Technology</h2>
+<table class="compact">
+<thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Language</td><td>Python 3.13</td><td>Qiskit 2.6 and Aer ship wheels for it; the system Python was too old</td></tr>
+<tr><td>Quantum</td><td>Qiskit 2.6, Qiskit Aer 0.18</td><td>Transpiler, Aer density-matrix simulation, OpenQASM 2/3, the independent second simulator</td></tr>
+<tr><td>Numerics</td><td>NumPy, SciPy</td><td>Closed-form channels, optimisers, the neural networks (no ML framework is needed)</td></tr>
+<tr><td>Decoding</td><td>PyMatching</td><td>Minimum-weight matching at distance 5, checked against an exact matcher at distance 3</td></tr>
+<tr><td>Orbits</td><td>sgp4 (Vallado)</td><td>The standard propagator for CelesTrak elements; checked against Skyfield in a test</td></tr>
+<tr><td>Server</td><td>FastAPI, Uvicorn, sse-starlette</td><td>Typed endpoints and event streams</td></tr>
+<tr><td>Schemas</td><td>pydantic v2</td><td>One source for validation, the JSON schemas the models fill, and API types</td></tr>
+<tr><td>Documents</td><td>pypdf</td><td>Cutting a paper's pages for the second transcription pass</td></tr>
+<tr><td>Frontend</td><td>React 19, TypeScript, Vite</td><td>A typed single-page app; the build is served by the backend</td></tr>
+<tr><td>Testing</td><td>pytest, Playwright</td><td>Offline backend tests; end-to-end tests that drive the built app in Chromium</td></tr>
+<tr><td>Hosting</td><td>Docker, Koyeb free tier</td><td>512 MB and a tenth of a CPU are enough in public mode</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="chapter">
+<h1>Meta's models in Q-Canvas</h1>
+<p class="lede">Five Meta models, each used where it is strongest, each behind a check. The models perceive, plan,
+write and propose; they never produce a physical result themselves.</p>
+
+<h2>Five models, each where it is strongest</h2>
+<table class="compact">
+<thead><tr><th>Model</th><th>Endpoint</th><th>Jobs in Q-Canvas</th><th>Checked by</th></tr></thead>
+<tbody>
+<tr><td><b>Muse Spark 1.3</b></td><td><code>/v1/chat/completions</code>, JSON-schema output, tools</td><td>Chooses what SAM looks for; reads photo and boxes into a spec; turns words into specs; writes and repairs code; explains in 12 languages; answers questions from a run's facts; gives challenge hints; proposes shorter circuits, layouts and codes; plans, repairs and reports missions; drives the assistant's tool calls; transcribes figures and paper pages; plays the bug hunt; predicts alone for the AI-alone benchmark</td><td>Spec validation, independent verification, exact proofs, the code checker, number tracing</td></tr>
+<tr><td><b>Muse Wonder 1.0</b></td><td><code>/v1/chat/completions</code>, tools, <code>reasoning_effort: medium</code></td><td>Deep mode of the assistant (up to six rounds of tool calls); deep mode of mission control; lists the experiments in a whole paper; challenges Muse Spark in the referee</td><td>Number tracing; exact simulation of every experiment and claim</td></tr>
+<tr><td><b>SAM 3.1</b></td><td><code>/v1/responses</code>, streamed</td><td>Finds every drawn part of a sketch or a whiteboard frame, one concept prompt per noun phrase, with confidences</td><td>The overlay shows which model found which box; the user can correct the spec</td></tr>
+<tr><td><b>Muse Image 1.0</b></td><td><code>/v1/images/generations</code></td><td>Illustrates the final circuit or network; the nine use-case images</td><td>Always shown next to the exact Qiskit drawing</td></tr>
+<tr><td><b>Muse Voice Transcribe 1.0</b></td><td><code>/v1/asr/transcribe</code></td><td>Speech for the assistant, mission control and "describe it"; biased toward quantum words</td><td>The transcript goes through the same validated path as typed text</td></tr>
+</tbody>
+</table>
+<p>Muse Spark is the default for nearly everything: it is fast, reads images, follows schemas and calls tools. Muse
+Wonder is Meta's most capable model, built for multi-step agentic work. It costs four to five times as much per token,
+so it is used only where depth pays: long tool chains, the whole-paper pass and the referee. Standard-mode model IDs
+are used, so judges' and users' content is not used for training.</p>
+
+<h2>Structured output as the contract</h2>
+<p>Every model step that feeds an exact engine uses structured output: a JSON schema in <code>response_format</code>
+that the answer must satisfy. The schemas are kept flat on purpose, with every field required and no tuples or
+optional objects, because that is the most reliable shape for constrained decoding. A draft is converted into a real
+specification and validated. If validation fails, the model is re-prompted once with the readable errors, for
+example <code>operations[2] (RX): target qubit 3 is out of range; this circuit has 2 qubits</code>.</p>
+<p>The first live run, with fallback switched off so that nothing could hide behind the mock, found two problems that
+offline tests could not. The circuit draft schema allowed <code>MEASURE</code> as a gate but had no field for its
+classical bit. Muse Spark put the GHZ sketch's meters there, so the spec could never validate; the schema and prompt
+were fixed. Hindi explanations came back in Latin letters; the prompt now names each language's script. The whole live
+run cost about $0.40.</p>
+
+<h2>Tool calling and number tracing</h2>
+<p>The assistant, <i>Ask Q-Canvas</i>, is Muse Spark with tool calling. It chooses among nine function tools, each a
+thin wrapper over an exact engine: circuit simulation, the optimiser, the H₂ molecule, BB84, QAOA, Shor's algorithm,
+network links, error correction and the Rosetta. It calls several in parallel when it needs several. The system prompt
+forbids working out a quantum result without a tool. Tool errors go back to the model as data, so it can fix its own
+arguments.</p>
+<p>After the answer, every number in it is matched against the numbers in the tool results and in the question, at
+the precision written or as a percentage. Small counts and bitstrings are skipped. The page shows "n of n traced", or
+lists the numbers that were not traced. The first live answers traced completely: 3 of 3, 5 of 5 and 14 of 14. Muse
+Wonder's deep mode answered "plan a 1,200 km satellite key link, then check whether a spy on 20% of the photons would
+be caught" by calling the link planner and BB84 in parallel, in 8.9 s, with 13 of 13 numbers traced. Mission control
+applies the same tracer to its reports (Chapter 6).</p>
+
+<h2>Seeing: SAM 3.1 and set-of-marks prompting</h2>
+<p>Reading a sketch pairs the two models the way Meta's documentation recommends: Muse Spark interprets the scene and
+decides what to segment, then hands the concepts to SAM. Muse Spark looks at the photo and names one to four noun
+phrases ("box with letter", "filled dot", "circle with plus"). SAM 3.1 runs once per phrase with confidences
+switched on, and its token output is parsed into boxes scaled to the uploaded image. Muse Spark then sees the photo, a
+copy with numbered boxes drawn on it and the box list, and fills the draft schema, linking every operation to the box
+it came from.</p>
+<p>SAM is trained on photographs, and pen strokes on paper sometimes give few or no masks. The draft schema therefore
+also asks Muse Spark for each element's own box on its 0–1000 grid. If an element has no SAM segment, Muse Spark's box
+is used at confidence 0.6 and labelled <i>seen by muse-spark-1.3</i> in the overlay. The overlay is never empty, and
+it never claims SAM found something it did not.</p>
+
+<h2>Voice and images</h2>
+<p>"Say it" records the microphone with Web Audio, downsamples to 16 kHz and encodes a mono 16-bit WAV in the browser,
+so the server needs no ffmpeg. The recording goes to Muse Voice Transcribe in push-to-talk mode with a keyword list
+(qubit, Hadamard, CNOT, GHZ, Shor, …) that biases recognition toward quantum words. In a live check, three synthesised
+clips played through a fake microphone were transcribed in 3 to 4 s and became the right GHZ, Shor and satellite
+specifications. Offline, the button uses the browser's own recogniser, and the server never invents a transcript.</p>
+<p>Muse Image draws a clean illustration of the final design. It is always shown next to the exact Qiskit drawing, so
+an imperfect picture can never mislead. The nine use-case images were generated in one restrained style (dark
+charcoal, off-white lines, one gold accent, no text) by a cached script, at about one cent per image.</p>
+
+<h2>Reliability and cost</h2>
+<ul>
+<li><b>Truncated answers.</b> A cut-off JSON answer is a successful HTTP response, and the cache stores it. The retry
+therefore doubles the token budget and marks itself, which changes the request, while the first attempt stays
+identical and keeps its cache entry.</li>
+<li><b>Documents.</b> PDFs go to the model as a file block with a base64 data URL. For a long paper, pypdf cuts out
+only the pages each experiment needs (Chapter 9).</li>
+<li><b>Cost control.</b> Everything is cached by request hash. Public mode caps billed calls per day. Muse Wonder is
+opt-in except where its depth is the point.</li>
+</ul>
+
+<h2>An open-weight model on a laptop</h2>
+<p>Meta's open-weight models were tried too. Muse Spark Open is an 816-billion-parameter mixture of experts, out of
+reach of an 8 GB laptop GPU. Muse Glimmer (27.9B, 4-bit, 18 GB with its vision projector) runs through Ollama's
+OpenAI-compatible endpoint with the same Meta client; only the base URL, the model name and a timeout change. It ran
+split 71% on the CPU and 29% on the GPU at about 1.6 tokens a second, so a reasoned answer took about five minutes. It
+answered the Bell pair exactly, under the JSON schema. That is too slow to drive the app, so the hosted models stay. A
+full AI-alone benchmark on Glimmer was stopped after one circuit when the machine ran low on memory, so no Glimmer
+results are claimed.</p>
+</section>

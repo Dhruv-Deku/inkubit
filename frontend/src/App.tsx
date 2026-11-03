@@ -33,8 +33,11 @@ import { HardwarePanel } from './components/Hardware'
 import { CircuitResults, NetworkResults } from './components/Results'
 import { SpecEditor } from './components/SpecEditor'
 import { StartPanel } from './components/StartPanel'
+import { ProofBenchPanel, ProofSheetView } from './components/ProofSheet'
+import { IbmPanel, IbmRunButton } from './components/Ibm'
 import { Tour, type TourSection } from './components/Tour'
 import type {
+  ProofSheet,
   AgentEvent, ChallengeInfo, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, JobSummary, ModelCall,
   NetworkResult, NetworkSpec, RecentRun, RunOptions, SketchAnalysis, Spec, SpecIssue, Verdict,
 } from './types'
@@ -44,9 +47,9 @@ type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
 const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
   { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
   { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
-  { id: 'hardware', label: 'Hardware & networks', hint: 'pulses, decoders, links, satellites', panels: ['Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
+  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, decoders, satellites', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
   { id: 'labs', label: 'Labs & games', hint: 'challenges, bug hunt, Shor, QAOA, H₂, BB84', panels: ['Challenges', 'Bug hunt', "Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy'] },
-  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', panels: ['Simulation observatory', 'AI alone vs Q-Canvas', 'The AI referee'] },
+  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Q-Canvas', 'The AI referee'] },
 ]
 
 type Stage = 'start' | 'edit' | 'run'
@@ -135,6 +138,7 @@ export default function App() {
   const [shared, setShared] = useState<string | null>(null)
   const [recent, setRecent] = useState<RecentRun[]>([])
   const [preview, setPreview] = useState<{ ins: CircuitInsights | null; loading: boolean; error: string | null } | null>(null)
+  const [proof, setProof] = useState<{ sheet: ProofSheet | null; loading: boolean; error: string | null } | null>(null)
   const [challenges, setChallenges] = useState<ChallengeInfo[]>([])
   const [challenge, setChallenge] = useState<ChallengeInfo | null>(null)
   const [progress, setProgress] = useState<Progress>(loadProgress)
@@ -156,8 +160,17 @@ export default function App() {
   })
   const nextChallenge = challenge ? challenges[challenges.findIndex((c) => c.id === challenge.id) + 1] : undefined
 
-  useEffect(() => { setPreview(null) }, [spec, options.noise])
+  useEffect(() => { setPreview(null); setProof(null) }, [spec, options.noise])
 
+  const runProofSheet = async () => {
+    if (!spec || spec.kind !== 'circuit') return
+    setProof({ sheet: null, loading: true, error: null })
+    try {
+      setProof({ sheet: await api.proofsheet(spec, options.noise), loading: false, error: null })
+    } catch (e) {
+      setProof({ sheet: null, loading: false, error: (e as Error).message })
+    }
+  }
   const stepThrough = async () => {
     if (!spec || spec.kind !== 'circuit') return
     setPreview({ ins: null, loading: true, error: null })
@@ -400,6 +413,7 @@ export default function App() {
           {seen.has('hardware') && (
             <div hidden={tab !== 'hardware'}>
             <div className="stack section-body">
+              <IbmPanel spec={spec && spec.kind === 'circuit' ? spec : null} />
               <PulsePanel />
               <DecoderPanel />
               <CodesPanel />
@@ -425,6 +439,7 @@ export default function App() {
             <div hidden={tab !== 'evidence'}>
             <div className="stack section-body">
               <HardwarePanel />
+              <ProofBenchPanel />
               <ObservatoryPanel />
               <ArenaPanel />
               <RefereePanel live={health?.mode === 'meta'} />
@@ -507,12 +522,21 @@ export default function App() {
                   {preview?.loading ? 'Analysing…' : 'Step through'}
                 </button>
               )}
+              {spec.kind === 'circuit' && (
+                <button className="btn big" disabled={!valid || proof?.loading} onClick={runProofSheet}
+                  title="Run every independent check on this circuit: two simulators of each kind, physics, the compiler, exports, statistics, the generated code, metamorphic tests">
+                  {proof?.loading ? 'Proving…' : 'Proof sheet'}
+                </button>
+              )}
+              {spec.kind === 'circuit' && <IbmRunButton spec={spec} valid={valid} />}
               <button className="btn primary big" disabled={!valid} onClick={run}>
                 {checking ? 'Checking…' : issues.length ? 'Fix the spec to run' : `Run ${specTitle(spec)}`}
               </button>
             </div>
           </div>
           {preview?.error && <div className="notice error">{preview.error}</div>}
+          {proof?.error && <div className="notice error">{proof.error}</div>}
+          {proof?.sheet && spec.kind === 'circuit' && <ProofSheetView sheet={proof.sheet} />}
           {preview?.ins && spec.kind === 'circuit' && <InsightsSection spec={spec} ins={preview.ins} wide />}
         </div>
       )}

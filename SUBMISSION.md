@@ -16,7 +16,7 @@ anyone sees it. Press **Guided tour** in the app for the best of it in under two
 | --- | --- |
 | **Creativity** | An **AI scientist that learns under proof**: Muse Spark designs circuits in rounds, sees what exact physics said, and its best proven circuit improves on every target, where the same model without feedback never does. **AI-designed error-correcting codes**: a 9-qubit code that needs 9 phase-flip errors to fail, three times the surface code. **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**; a **whole paper** from its PDF re-run claim by claim; an **AI referee** where Muse Wonder challenges Muse Spark and exact simulation decides |
 | **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
-| **Does it work** | **On a real IBM quantum computer** (ibm_fez): a digital twin from the chip's calibration predicted its counts best on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **495 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
+| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **542 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
 | **Use of Meta models** | **Five Meta models**, each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
 
 ## Built during the hackathon
@@ -150,6 +150,19 @@ grades every position. Over 24 answers, debate raised Muse Spark from 17 to 19 r
 false alarms and talked it out of 2 right answers: models arguing catch mistakes and make new ones, and only the
 simulator knows which. That is why Q-Canvas checks instead of debating.
 
+**IBM Quantum, from calibration to experiment.** The app maps 3 IBM Heron chips qubit by qubit from their own calibration,
+and an advisor scores every way to place a circuit on them. On ibm_fez, the same 5-qubit GHZ circuit on the advisor's best,
+median and worst qubits measured 0.894, 0.814 and 0.285, exactly its order (on the worst it no longer shows
+entanglement). Teleportation with real mid-circuit measurement and feed-forward reached an average fidelity of 0.924
+over the six axis states, against 0.667 for any classical scheme. With a token, any circuit in the editor runs on IBM.
+
+**On a real quantum computer.** The discovery lab's proven circuits ran on IBM's ibm_fez next to the circuits they beat
+(23 circuits, 4096 shots each). On seven qubits wired like a heavy-hex chip, Muse Spark's GHZ circuit used 6 two-qubit gates
+where the textbook needs 10, and a parity-oscillation measurement gave a GHZ fidelity of 0.814 against 0.795, 3.2 standard
+errors apart; both are above 1/2, so both certify genuine 7-qubit entanglement. For W and Dicke states the discovered
+circuits used 8 two-qubit gates against 17 and tied within shot noise, and the page says tie. A fourth noise preset,
+calibrated from the chip's own reported errors, predicted four earlier circuits closer than a digital twin did.
+
 **Discovery lab: AI proposes, physics proves.** Muse Spark proposes CNOT layouts, an exact optimiser fits
 them, Qiskit proves every winner, the ML verifier screens and exact noisy simulation decides. It found a GHZ state on
 all 7 qubits of an IBM heavy-hex chip in 6 CNOTs (the textbook circuit compiled onto the chip needs 10) and W and
@@ -185,9 +198,14 @@ exact simulation predicts in about 151 µs how much of an answer survives
 today's noise: on 900 held-out circuits its average error is 0.010, 9 times smaller than the product-of-gate-fidelities rule of thumb (0.087) and below a global-depolarizing physics model (0.013); its 90% interval held for 90% of them and for 78% of 60 textbook cases it never saw (error 0.020). Every prediction up to 10 qubits is checked exactly, and a
 miss is shown as a note about the model, never a change to the result.
 
-**More algorithms.** The QFT finding a period, Simon's algorithm, the swap test,
-entanglement swapping, a Trotterized quantum magnet, 3-qubit Grover and a quantum
-half adder, each checked against its known answer.
+**25 algorithms in 8 categories.** From the QFT finding a period and Simon's algorithm to quantum counting, an HHL
+solver (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, hidden shift, Shor's nine-qubit code correcting a Y error and
+two nonlocal games (CHSH won cos²(π/8) of the time; the GHZ game won every time), each checked against its known answer.
+
+**The proof sheet.** One button runs 11 independent checks of 9 kinds on any circuit: two simulators of each kind,
+a physical density matrix, translation validation of Qiskit's compiler, OpenQASM read-back, a G-test on sampled
+shots, the generated code in the sandbox and metamorphic tests. Over the gallery: 299 passed, 0 failed.
+Its first run found a real bug: the OpenQASM 2 export used gates the standard library does not define.
 
 **What it can do.** Nine cards on the start page (sketch to code, debugging,
 chemistry, quantum security, optimization, satellite networks, cryptography,
@@ -289,7 +307,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, PyMatching, SGP4, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 495 offline backend tests (spec
+live agent log; React 19 + TypeScript + Vite. 542 offline backend tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, orbits against Skyfield, the live adapters
 against recorded request shapes, API) and 6 end-to-end browser tests of the built app, all in CI on every
@@ -309,6 +327,6 @@ script publish the public mode to a Hugging Face Space.
 
 ## What's next
 
-Calibrating the default noise preset to today's chips (the real IBM run showed it is too pessimistic for them), circuit-level
+Calibrated twins per device and per qubit patch (the median-calibrated preset already beats the generic one), circuit-level
 noise for the decoders, mid-circuit measurement (teleportation, error-correction codes), and multi-page lab-notebook
 sketches.

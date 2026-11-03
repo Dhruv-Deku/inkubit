@@ -1,0 +1,163 @@
+<section class="chapter">
+<h1>Inside a circuit</h1>
+<p class="lede">Verification says whether a run is right. These tools show why: the state after every gate, who is
+entangled with whom, which noise source costs the most, whether a shorter circuit does the same job, and whether any
+classical explanation could fake the correlations.</p>
+
+<h2>Gate by gate</h2>
+<p>After every run, or before it with <b>Step through</b>, Q-Canvas computes from the specification alone the exact
+state after each gate. It shows the amplitudes, with phases relative to the largest amplitude (a global phase is
+unobservable), the state in Dirac notation, and a Bloch sphere per qubit. An arrow shorter than the sphere's radius
+means that qubit is entangled with others. The spheres are drawn in 3D and share one camera, so turning one turns all
+of them and they stay comparable.</p>
+<p>Entanglement is drawn as a web. Each entangled pair gets a gold thread whose width is its concurrence (Wootters'
+formula, tested against Qiskit's), and each qubit's gold arc is its entanglement entropy. Group entanglement in which
+no pair is entangled on its own, as in a GHZ state, is drawn as a dashed hull and named, because concurrence alone
+would show nothing.</p>
+<p>The same view carries the engineering numbers. The <b>error budget</b> gives the fidelity each noise source costs
+when it acts alone. A sweep finds how much better the hardware must be for a 99% match (a Bell pair needs about 7×).
+<b>Readout correction</b> inverts each bit's known confusion matrix. The <b>chip cost</b> compiles the circuit onto
+all-to-all, line and heavy-hex wirings and counts the extra SWAPs. These noisy analyses evolve the density matrix with
+the verifier's own error channels, built in closed form, and a test checks that they agree with Qiskit Aer to 1e-8.
+A <b>what-if</b> slider scales the noise from perfect to ten times worse and shows the exact distribution at each
+position, not an interpolation.</p>
+
+<h2>Shorter circuits, proven equal</h2>
+<p><b>Find a shorter circuit</b> runs up to four optimisers: rewrite rules, the Qiskit transpiler at level 3, the two
+together, and (live) Muse Spark. Each rewrite rule comes with a reason a student can check:</p>
+<ul>
+<li>H·H = 1; S then S is Z; H on both sides turns CX into CZ;</li>
+<li>a CNOT whose control is still |0⟩ never fires; a CZ whose partner is |1⟩ is a Z on the other qubit (phase kickback);</li>
+<li>a diagonal gate right before measurement changes nothing a measurement can see; a SWAP before measurement is a relabelling of classical bits; gates that never reach a measured qubit can go.</li>
+</ul>
+<p>No proposal is trusted. <code>prove()</code> compares each one with the original exactly and labels it with the
+strongest claim that holds: the <i>same gate</i> for every input (process fidelity, up to 8 qubits), the <i>same
+state</i> from |0…0⟩, or the <i>same measured odds</i>. Anything else is rejected, together with the outcome where it
+differs. The thresholds are floating-point tolerances, not physics: 1 − <i>F</i> &lt; 10⁻¹², and a distance below
+10⁻⁹ for the odds. A fuzz test applies the rules to 300 random circuits and requires every rewrite to keep the odds;
+4,000 more passed locally.</p>
+<p>Muse Spark sees the circuit, the measured qubits, its cost and the best cost so far, but never another optimiser's
+circuit. If its proposal is rejected, it gets one retry with the exact reason. On the two-qubit Grover example, whose
+answer is fixed in advance, Muse Spark noticed that the circuit only ever produces |11⟩ and proposed two X gates.
+Exact simulation proved it, where rewrite rules plus Qiskit's level-3 transpiler had stopped at seven gates. When a
+result only flips bits, the panel says so: the circuit's answer was fixed in advance. Phase estimation of a known
+phase, for example, shrinks from 15 two-qubit gates to one X gate. That is true and worth knowing, but it is not a
+trick that works for unknown inputs.</p>
+
+<h2>Zero-noise extrapolation</h2>
+<p>Error mitigation lets today's noisy machines estimate what a perfect one would give. Q-Canvas first inverts readout
+error, then runs the circuit at 1×, 3× and 5× its gate noise by <i>folding</i>: U, then U U⁻¹ U, then U U⁻¹ U U⁻¹ U.
+These have the same ideal result with three and five times the gates, and folding is what hardware can actually do.
+Every outcome's probability is then extrapolated back to zero noise with Richardson weights (15/8, −5/4, 3/8). With
+exact probabilities, a Grover search goes from a 0.882 match as measured to 0.999. The panel repeats the method with
+4,000 sampled shots per noise level, because extrapolation amplifies shot noise: it needs about 5.2 times the shots for
+the same error bars. For some circuits that cost eats the gain, and the panel says so.</p>
+
+<h2>Bell tests and tomography</h2>
+<p><i>Is it really quantum?</i> For every entangled pair, Q-Canvas computes the CHSH value under the best measurement
+settings, from the Horodecki closed form S = 2√(m₁ + m₂) of the pair's correlation matrix. Classical theories allow
+at most 2, and quantum mechanics reaches 2.83. When exactly three qubits are entangled, it also computes the Mermin
+value: classical theories allow at most 2, quantum mechanics 4. That value has no closed form, so it is optimised from
+16 fixed starts, and the panel says the settings were found, not proven optimal. Each value is computed three ways:
+ideal; on the noisy state with the settings planned for the ideal one, as an experiment would do; and from 4,000
+sampled shots per setting, with readout error and a standard error.</p>
+<ul>
+<li>A Bell pair gives 2.828 ideal and 2.395 ± 0.025 on realistic hardware, 16 standard errors above the classical limit.</li>
+<li>A GHZ state has no entangled pair at all, yet reaches the Mermin maximum of 4.</li>
+<li>A W state's pairs are entangled but stay within the classical limit (1.886), while the trio reaches 3.046, the known value.</li>
+</ul>
+<p><b>State tomography</b> rebuilds the state the way a laboratory must, for up to three qubits. It measures along X,
+Y or Z in all 27 combinations (1,000 shots each, readout error included and then inverted), estimates every Pauli
+expectation, inverts to a density matrix and projects it onto the nearest physical state (Smolin, Gambetta and Smith,
+2012). The result is drawn as two 3D cityscapes, the intended state against the rebuilt one, with the fidelity, the
+purity, and how much of the gap is hardware noise and how much is finite shots.</p>
+<div class="figrow">
+<figure><img src="{{shot:17-bell-test.png}}" alt="Bell test">
+<figcaption>Bell tests: the W state's pairs stay classical; the trio does not.</figcaption></figure>
+<figure><img src="{{shot:18-tomography.png}}" alt="State tomography">
+<figcaption>Tomography of a GHZ state from 27 settings, drawn as a density-matrix cityscape.</figcaption></figure>
+</div>
+
+<h2>The Quantum Rosetta</h2>
+<p>Quantum computing is written in several languages at once: Dirac notation, circuit diagrams, and five or more
+programming languages. Newcomers often stall on the notation before they reach the physics. The Rosetta translates
+between all of them, both ways, and checks every translation instead of trusting it.</p>
+<ul>
+<li><b>Reading is exact</b> wherever a grammar exists. A recursive-descent parser reads Dirac notation (implicit
+products, ⊗, √, π, e<sup>iφ</sup>, named states and simple LaTeX). Qiskit's importers read OpenQASM 2 and 3, and small
+line parsers read Quil and Qiskit gate calls. Muse Spark is used only for code without a parser here (Cirq,
+PennyLane, Q#, Braket) and for photos, which it transcribes under a schema with an instruction not to solve. The
+transcription then goes through the exact parser, and model readings are labelled.</li>
+<li><b>A state gets a circuit</b> from the cheapest of several methods: one rotation per independent qubit, a CNOT
+fan-out for GHZ-like groups, a breadth-first search over textbook gates for groups of up to three qubits, Qiskit's
+state preparation, or a gallery circuit that makes the same state. The result must reach fidelity 1 − 10⁻⁸ by exact
+simulation, or the request fails.</li>
+<li><b>Eight output languages</b> are written by fixed rules. The Qiskit, OpenQASM 2 and 3 and Cirq versions are
+executed and must give the same state, and the page says which were run.</li>
+</ul>
+<p>Every step's sentence ("entangles qubits 0 and 1", "changes only a phase") is derived from the exact states before
+and after it, not generated by a model.</p>
+</section>
+
+<section class="chapter">
+<h1>Labs and games</h1>
+<p class="lede">Chemistry, cryptography and optimisation from first principles, and games that teach by being scored
+exactly. In each one the model helps, and exact physics keeps score.</p>
+
+<h2>Challenges</h2>
+<p>Eleven puzzles in three levels (warm-up, entanglement, gate golf) ask the player to build a target state or gate:
+a fair coin, a minus sign, a quarter turn, NOT without X, a Bell pair, a singlet, a hidden phase, GHZ, SWAP from CNOTs,
+CZ from one CNOT, and the W state. Each puzzle is defined by a reference circuit that never leaves the server. State
+puzzles compare |⟨target|ψ⟩|² and gate puzzles compare the process fidelity |Tr(U<sub>t</sub>†U)|²/d², so a global
+phase never counts and any correct construction is accepted. Solved means a fidelity of at least 0.999. Stars work
+like golf (solved, within par + 2, at or under par), and each reference solution is tested to reach exactly par.</p>
+<p>Near misses get specific feedback, such as "the probabilities are already right; a relative phase is off" or "2 of
+4 basis inputs already map correctly". Muse Spark gives hints: it sees the goal, the player's circuit, the exact score
+and the author's hint for that stage, never the solution, and it names at most one gate. A puzzle can be solved by
+clicking gates onto wires, by describing the answer in words, or by drawing it on paper and taking a photo.</p>
+
+<h2>Bug hunt</h2>
+<p>One gate in a known circuit is wrong: a wrong wire, control and target swapped, a look-alike gate, an angle slip
+or a stray gate. The player compares what the circuit should give with what it gave, and clicks the culprit against the
+clock. Rounds are stateless: (level, seed) regenerates the same round, so the page never receives the answer before
+the player guesses. Each planted bug must move at least 20% of the probability, so it can be seen in 1,000 shots.</p>
+<p>Grading is by exact search, not by matching the planted index. Every one-gate edit (delete it, swap the gate, move
+it, flip control and target, change the angle) is simulated, and any gate whose edit restores the intended odds
+exactly counts. Some circuits have many such gates: in Shor's circuit, 22 of 28 gates counted. A round is therefore
+re-planted when too many gates would count. Live, Muse Spark plays the same round in parallel, from exactly what the
+player sees. In checks it found the bug in 4 of 4 rounds, in 9 to 24 seconds.</p>
+
+<h2>Split the party (QAOA)</h2>
+<p>Guests and feuds form a graph the player edits by clicking. QAOA seats the guests at two tables, which is the
+Max-Cut problem, the shape of many scheduling and routing problems. Brute force gives the true best seating; the
+depth-1 landscape shows every angle pair with the optimiser's path; depths 1 to 3 are optimised exactly. Checked:
+the 6-ring at depth 1 gives exactly ¾ of the best cut, the known value, and depth 3 solves it. Three layers find a
+best seating 95% of the time with perfect qubits and about half the time with realistic noise. The summary says
+plainly that at this size QAOA shows the mechanism, not a speedup.</p>
+
+<h2>H₂ from first principles</h2>
+<p>The molecule lab computes the hydrogen molecule without a chemistry package. The STO-3G integrals for two s
+functions have closed forms (Szabo and Ostlund, chapter 3), and they are tested against the book's values. By symmetry
+the problem reduces to one qubit, H = aI + bZ + cX, and the page says so. VQE measures Z and X under the realistic
+preset's noise; since that noise maps the Bloch vector affinely, three simulations fix every angle's expectation
+(checked to 10⁻⁵), taking the lab from 110 s to under 4 s.</p>
+<p>At 2.5 Å, where the electrons become correlated, Hartree-Fock is off by 233 mHa. Raw VQE on realistic
+noisy hardware is off by 21 mHa. Undoing the calibrated noise map, which is what calibration circuits measure on
+hardware, brings it to 0.8 mHa from the exact energy, against a shot-noise error bar of 2.1 mHa at 4,000 shots. The
+mitigated value lands within shot noise of exact at all 28 bond lengths.</p>
+
+<h2>Catch the spy (BB84)</h2>
+<p>Quantum key distribution with an eavesdropper. Random bits and bases, an intercept-resend eavesdropper on a share
+<i>f</i> of the photons, sifting, the error-rate check and privacy amplification run photon by photon, following the
+measurement rule (checked against Qiskit). Eve on a share <i>f</i> adds <i>f</i>/4 to the error rate, estimated from half the sifted bits. Above 11% the key is thrown away; below, it
+shrinks to <i>n</i>(1 − 2h(QBER)), so what remains is what Eve cannot know. At <i>f</i> = 1 she guesses 75% of the
+bits, and both facts are checked statistically.</p>
+
+<h2>The algorithm library</h2>
+<p>The gallery holds {{n_gallery}} circuits: three basics and {{n_algorithms}} algorithms in {{n_categories}} categories,
+each with its exact answer pinned in a test. The newest were written by a script that refuses to save a circuit that
+misses its answer derived on paper; on the way it caught two traps in Qiskit's library (a bit order and a hidden qubit
+permutation, D78). They include quantum counting, HHL (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, Shor's nine-qubit
+code and two nonlocal games: CHSH, won cos²(π/8) of the time against a classical 3/4, and the GHZ game, won every time.</p>
+{{table:algorithms}}
+</section>

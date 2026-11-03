@@ -3,7 +3,7 @@ import type { RBench } from './components/Referee'
 import type { PResult } from './components/Paper'
 import type { CodesLab } from './components/Codes'
 import type {
-  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitMeta, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
+  AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitMeta, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, DiscoveryHardware, ProofSheet, ProofBench, IbmStatus, IbmSnapshot, IbmAdvice, IbmRun, IbmExperiments, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
   SketchAnalysis, Spec, SpecIssue, TextDraft,
 } from './types'
 
@@ -106,6 +106,15 @@ export const api = {
   decoder: (p: number, seed: number, d = 3) => call<DecoderReport>(`/api/decoder?p=${p}&seed=${seed}&d=${d}`),
   pulse: (duration: number, drag: boolean) => call<PulseReport>(`/api/pulse?duration=${duration}&drag=${drag}`),
   hardware: () => call<HardwareRuns>('/api/hardware'),
+  discoveryHardware: () => call<DiscoveryHardware>('/api/hardware/discovery'),
+  proofsheet: (spec: unknown, noise: string) => call<ProofSheet>('/api/proofsheet', json({ spec, noise })),
+  proofBench: () => call<ProofBench>('/api/proofsheet/benchmark'),
+  ibmStatus: (live = false) => call<IbmStatus>(`/api/ibm/status${live ? '?live=true' : ''}`),
+  ibmDevice: (name: string) => call<IbmSnapshot>(`/api/ibm/device/${encodeURIComponent(name)}`),
+  ibmAdvise: (spec: unknown) => call<{ advice: IbmAdvice[] }>('/api/ibm/advise', json({ spec })),
+  ibmRun: (spec: unknown, shots: number) => call<IbmRun>('/api/ibm/run', json({ spec, shots })),
+  ibmRunStatus: (id: string) => call<IbmRun>(`/api/ibm/run/${encodeURIComponent(id)}`),
+  ibmExperiments: () => call<IbmExperiments>('/api/ibm/experiments'),
   estimatePresets: () => call<{ presets: { id: string; label: string }[]; hardware: { id: string; label: string }[] }>('/api/estimate/presets'),
   estimate: (q: { preset?: string; text?: string; hardware: string }) => call<EstimateResult>('/api/estimate', json(q)),
   startDiscovery: (what: { goal?: string; ket?: string }, deep: boolean) =>

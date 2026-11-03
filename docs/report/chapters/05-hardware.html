@@ -1,0 +1,199 @@
+<section class="chapter">
+<h1>Error correction and learned decoders</h1>
+<p class="lede">From the three-qubit bit-flip code to a distance-5 surface code. A neural decoder beats minimum-weight
+matching at distance 3; at distance 5 the bigger code suppresses errors, and a network on top of matching fixes what
+matching gets wrong. Every gain is tested on the same shots, with a paired test.</p>
+
+<h2>The error-correction lab</h2>
+<p>The simplest code spreads one logical qubit over three. Each qubit flips with probability <i>p</i>, then the decoder
+(two CNOTs and a Toffoli, syndrome measurement and correction in deferred form) restores the majority. With perfect
+gates the logical error is 3<i>p</i>² − 2<i>p</i>³; the lab simulates it and checks it against that formula. With
+realistic gates, the code's own gates put a floor under the logical error, so the code beats a bare qubit only above a
+<b>break-even</b> error rate: 10.8% with today's gates, falling to 0.87% with gates ten times better. Switch the noise
+to phase flips and the same code makes things worse than no code at all. That is the threshold idea in one picture,
+and the reason real codes protect against both kinds of error.</p>
+<figure><img src="{{shot:19-qec-lab.png}}" alt="Error-correction lab with the break-even point">
+<figcaption>The error-correction lab: the bit-flip code against a bare qubit on log-log axes, with the break-even point moving as the gate quality slider changes.</figcaption></figure>
+
+<h2>The surface code and its decoders</h2>
+<p>The surface code is the leading candidate for large quantum computers. Data qubits sit on a grid, and X-type and
+Z-type checks measure their parities every round. A decoder reads the pattern of changed checks (the
+<i>detection events</i>) over several rounds and decides which correction to apply. Q-Canvas simulates a rotated
+surface code in a Z-basis memory experiment with phenomenological depolarizing noise. Sampling is exact in NumPy.
+The standard baseline is <b>minimum-weight perfect matching</b>: pair up detection events along the most likely error
+chains in the space-time graph, using log-likelihood weights. At distance 3 Q-Canvas uses its own exact matcher
+(dynamic programming over the events); at distance 5 it uses PyMatching on the same graph.</p>
+<p>Matching has a known weakness. It decodes X and Z errors separately, but a Y error is both at once, and it shows
+up in both kinds of checks. Learned decoders, such as Google DeepMind's AlphaQubit, beat matching partly by seeing such
+correlations.</p>
+
+<h2>Distance 3: a network beats matching</h2>
+<p>The distance-3 network is small (25-128-128-1, ReLU). Its input is every detection event of both check types, plus
+the noise level. It was trained on {{d3_train}} shots at six noise levels and tested on {{d3_test}} new shots per level.
+At 1% noise it makes <b>{{d3_fewer}}% fewer logical errors</b> than matching ({{d3_nn}} against {{d3_mwpm}} over three
+rounds). The gain holds at every one of the {{d3_levels}} tested noise levels, and it exceeds both 95% intervals.</p>
+<figure>{{chart:decoders}}
+<figcaption>Left: logical error at distance 3 (3 rounds), with 95% intervals. Right: logical error per round at distances 3 and 5, and the distance-5 network built on matching.</figcaption></figure>
+
+<h2>Distance 5: a bigger code, fewer errors</h2>
+<p><code>layout(d)</code> generates the rotated surface code for any odd distance. It reproduces the distance-3 lists
+exactly. At <i>d</i> = 5 it gives 25 data qubits with 12 X and 12 Z checks, all commuting, of rank 24, leaving one
+logical qubit. Before PyMatching was trusted, it was run against the exact matcher on 20,000 distance-3 shots and agreed
+on all of them. The detectors had to be ordered time-major: with check-major order the two agreed on only 80%, which is
+how the correct order was pinned down.</p>
+<p>The per-round logical error ε comes from memory experiments of <i>d</i> rounds, through
+1 − 2<i>P</i> = (1 − 2ε)<sup>rounds</sup>. At 1% noise the per-round error falls from {{d5_pr3}} at distance 3 to
+{{d5_pr5}} at distance 5. The suppression factor Λ = ε₃/ε₅ is <b>{{d5_lam}}</b>. It is {{d5_lam_low}} at 0.5% noise
+and shrinks to {{d5_lam_high}} at {{d5_p_high}}, as the code approaches its threshold. For scale, Google's Willow chip
+measured Λ = 2.14 on real hardware in 2024. That comparison is for orientation only: Willow's number includes
+circuit-level noise from real gates and measurements, which the phenomenological model here leaves out.</p>
+
+<h2>A network on top of matching</h2>
+<p>The first distance-5 network saw the events of both kinds plus matching's verdict, and learned only to copy
+matching: +0% at every noise level. The second also sees <i>where</i> matching put its X corrections, and where a
+second matching, on the X checks, put Z corrections. A qubit corrected by both is a Y error, which neither matching
+can see on its own. This 172-256-256-1 network was trained on {{d5_train}} fresh shots, none seen twice. At 1% noise it
+makes <b>{{d5_fewer}}% fewer logical errors</b> than matching.</p>
+<p>Both decoders run on the same shots, so the honest test is paired. A McNemar test counts only the shots on which
+they disagree. At 1% the network fixes {{d5_fixes}} shots that matching gets wrong and breaks {{d5_breaks}} that
+matching gets right (z = {{d5_z}}). The gain is significant at {{d5_sig}} of {{d5_levels}} noise levels; the exception
+is 6%, near threshold.</p>
+<figure>{{chart:lambda}}
+<figcaption>Left: the suppression factor Λ from distance 3 to 5 at each noise level. Right: on the same shots, how often the network was right where matching was wrong, and the reverse.</figcaption></figure>
+{{table:d5}}
+</section>
+
+<section class="chapter">
+<h1>Down to the hardware</h1>
+<p class="lede">Below the circuit is the microwave pulse; beside one chip is a second one; ahead is the question of
+when any of this beats a classical computer. Q-Canvas simulates all three from first principles.</p>
+
+<h2>The pulse lab</h2>
+<p>An X gate on a superconducting qubit is a shaped microwave pulse. A transmon is not really a two-level system: it
+has a third level, and its second transition sits only 300 MHz below the qubit's own in this model. A fast pulse
+leaks population into that level and picks up a phase error from it. The
+pulse lab simulates a three-level transmon in the rotating frame, with T1 and T2 from the realistic preset as Lindblad
+terms. Each pulse is integrated exactly with a 9 × 9 superoperator, and the result is the average gate fidelity of the
+qubit-subspace channel, with leakage counted as error.</p>
+<p>Two pulse shapes are compared. A truncated <b>Gaussian</b> π pulse has σ = T/4. <b>DRAG</b> adds a quadrature
+component −β·dΩ/dt / α that cancels the leakage and phase errors to first order. β is calibrated by a golden-section
+search and lands near 0.5, the first-order optimum for phase errors.</p>
+<figure>{{chart:pulse}}
+<figcaption>X-gate error against pulse length. Short Gaussian pulses leak into the third level; calibrated DRAG reaches the T1/T2 floor at a fraction of the length.</figcaption></figure>
+<p>At the shortest lengths, leakage dominates. By 15 ns a Gaussian pulse's error of {{pulse_gauss15}} is mostly
+the phase error the third level induces; leakage is only {{pulse_leak15}} of it. DRAG's quadrature cancels both. DRAG reaches
+{{pulse_drag_err}} at {{pulse_drag_ns}} ns, where little but decoherence is left. The best Gaussian needs
+{{pulse_gauss_ns}} ns to reach {{pulse_gauss_err}}, and it is limited there by the decoherence that its own length adds.
+This is why every real superconducting device uses DRAG or a descendant of it.</p>
+
+<h2>A distributed quantum computer</h2>
+<p>One way to build bigger machines is to join small chips with links. The distributed computer runs one circuit on
+two chips joined by a link from the network planner (Chapter 12). An exhaustive search finds the split with the fewest
+remote CNOTs. Each remote CNOT is done by gate teleportation (Eisert et al., 2000), which consumes one of the link's
+Bell pairs. With a Werner pair of fidelity <i>F</i>, the ideal CNOT is followed by an X on the target, a Z on the
+control, or both, each with probability (1 − <i>F</i>)/3. This follows from where Pauli errors on the pair propagate,
+and a test checks it. Readout flips on the ancillas add more X and Z errors, the two local CNOTs are charged their
+depolarizing error, and every data qubit idles under T1/T2 while the messages travel.</p>
+<p>The score is process fidelity over all inputs, computed by running the circuit on halves of Bell pairs, which limits
+it to five qubits. State or outcome fidelity were rejected: a relaxed qubit can be steered back to the right answer by
+later gates, which would flatter the link. The page shows fidelity against link length from 10 m to 100 km, against
+one chip, and against long-lived memory qubits.</p>
+
+<h2>When does quantum win?</h2>
+<p>Describe a problem in words or by voice. Muse Spark maps it to factoring, unstructured search, physics simulation or
+"no known speedup". A surface-code resource estimate then meets the best classical route. The quantum model follows
+Beverland et al. (2022):</p>
+<ul>
+<li>logical error per patch per cycle <i>P</i><sub>L</sub> = 0.03 (<i>p</i>/0.01)<sup>(<i>d</i>+1)/2</sup>, with 2<i>d</i>² physical qubits per patch;</li>
+<li>routing overhead 2<i>Q</i> + √(8<i>Q</i>) + 1 patches for <i>Q</i> logical qubits; one logical step per <i>d</i> cycles; a 1% total failure budget;</li>
+<li>magic-state factories of 25 patches producing one T state every 10<i>d</i> cycles, in two 15-to-1 distillation rounds.</li>
+</ul>
+<p>The algorithm costs come from the literature: Gidney and Ekerå (2021) for factoring; Grover with a stated oracle
+cost for search; and first-order Trotter for a 2D Ising magnet, with the rigorous ‖[A,B]‖ ≤ 8n bound and Ross–Selinger
+rotation costs (a worst case, said on the page). The classical side uses the general number field sieve scaled from
+RSA-250 by its L-function, N/2 checks for search, and the exponential memory wall for simulation.</p>
+<table class="kv">
+<thead><tr><th>RSA-2048 on superconducting hardware</th><th class=n>Q-Canvas model</th><th class=n>Gidney &amp; Ekerå (2021)</th></tr></thead>
+<tbody>
+<tr><td>Code distance</td><td class=n>{{rsa_d}}</td><td class=n>–</td></tr>
+<tr><td>Logical qubits</td><td class=n>{{rsa_logical}}</td><td class=n>–</td></tr>
+<tr><td>T gates</td><td class=n>{{rsa_t}}</td><td class=n>–</td></tr>
+<tr><td>Magic-state factories</td><td class=n>{{rsa_factories}} ({{rsa_factory_share}}% of the qubits)</td><td class=n>–</td></tr>
+<tr><td>Physical qubits</td><td class=n>{{rsa_qubits}} million</td><td class=n>20 million</td></tr>
+<tr><td>Runtime</td><td class=n>{{rsa_hours}} hours</td><td class=n>8 hours</td></tr>
+</tbody>
+<caption>The model lands within {{rsa_qratio}}× (qubits) and {{rsa_tratio}}× (time) of the published figure, and every factoring result on the page shows this comparison.</caption>
+</table>
+<p>The estimator says "classical wins" when classical wins. Brute-force search of a 64-bit key, for example, costs
+Grover so much error correction per oracle call that a classical cluster finishes first. Saying "not yet" is part of
+being trustworthy about quantum computing.</p>
+</section>
+
+<section class="chapter">
+<h1>Quantum networks and satellites</h1>
+<p class="lede">The same canvas plans entanglement-distribution networks from physics, finds their bottleneck and fixes
+it. The satellite planner flies the quantum-key satellites in orbit today on their real orbits, under the real
+cloud forecast.</p>
+
+<h2>The link model</h2>
+<p>The network model is analytic and pure Python, and each number in it is a stated assumption:</p>
+<ul>
+<li><b>Fiber:</b> 0.2 dB/km at 1550 nm, light at 2 × 10⁵ km/s, detectors 80% efficient, dark clicks 10⁻⁷ per gate.</li>
+<li><b>Free space at 810 nm:</b> the diffraction spot of the satellite's transmit aperture (1.22 λ/D), broadened by
+8 µrad of turbulence and pointing jitter, against the ground telescope's aperture; 4 dB of atmosphere per pass and
+8 dB of optics and coupling. For the 1,100 + 1,600 km dual downlink this gives about 66 dB and 0.8 pairs per second,
+in line with Micius's published 64–82 dB and about one pair per second over 1,200 km. It was calibrated to that public
+result, not to the tests.</li>
+<li><b>Pairs:</b> 10⁸ pulses per second, 10% pair probability per pulse, intrinsic Werner fidelity 0.98. Accidental
+coincidences from dark and background clicks lower the visibility, so long links lose fidelity as well as rate.</li>
+<li><b>Repeaters</b> herald at L/c with 100 multiplexed modes and store pairs in memories whose Werner parameter decays
+as exp(−t/T2). Swapping multiplies Werner parameters, times 0.99 per swap. <i>F</i> = (3<i>w</i> + 1)/4, and the
+error rate is (1 − <i>w</i>)/2.</li>
+<li><b>Key:</b> the BBM92 asymptotic rate, R = ½ R<sub>pairs</sub> (1 − 1.16 h(e) − h(e)), clamped at zero.</li>
+</ul>
+
+<h2>Bottleneck search and purification</h2>
+<p>The network agent finds the bottleneck: memory decoherence if any stored pair waits longer than 0.3 T2, otherwise
+the lossiest link. It then tries every applicable fix as a new, validated specification and re-simulates each from
+scratch. The fixes are a midpoint relay, a rebalanced repeater spacing, a higher-elevation pass, a bigger telescope
+(up to 1.8 m, the Lijiang telescope used with Micius), better memories and entanglement purification. The best fix is
+kept if it improves the score by more than 1%, for up to three rounds. While there is no key at all, the score is
+pairs per second × (<i>F</i> − ¼), so a fix that makes progress still counts.</p>
+<p>Purification (BBPSSW) turns two noisy pairs into one better pair with some probability. It halves the pair rate, so
+pairs wait longer in memory. With poor memories it therefore makes things worse, and on a 600 km chain the agent
+learns to upgrade the memories first and only then purify, going from no key to 0.05 bit/s. The fiber chain preset
+goes from no key to 0.39 bit/s. The satellite preset, close to the 2017 Micius geometry, goes from 0.013 to 1.87 bit/s
+(pairs from 0.83 to 7.4 per second, fidelity from 0.86 to 0.94). After every search, sanity checks run: fidelity in
+[¼, 1], key no more than half the pair rate, no key above 11% error, and a longer weakest link must not raise the
+rate.</p>
+
+<h2>Satellites versus fiber</h2>
+<p>The simulation observatory uses the planner's own model to ask the basic question of quantum networking: when is a
+satellite worth it? The satellite sits 500 km above the midpoint between two cities. Slant range and elevation come
+from spherical geometry, and the curve stops where either station would see the satellite below 15°.</p>
+<figure>{{chart:satfiber}}
+<figcaption>{{obs_sat}}</figcaption></figure>
+
+<h2>Real satellites, live</h2>
+<p>The planner was first built around Micius. When it was time to swap the modelled orbit for real elements,
+CelesTrak's catalogue showed that Micius had re-entered on 25 January 2026, and Jinan-1 on 15 April 2025. The
+quantum-key satellites in orbit now are <b>SpeQtre</b> (NORAD 66769; RAL Space and SpeQtral; a 12U CubeSat with an
+entangled-photon source and an 80 mm telescope) and <b>QUBE-II</b> (NORAD 69023; a German 8U CubeSat, 85 mm,
+prepare-and-measure). Both now fly on their real orbits, and Micius stays only as a labelled replay of its 2017
+experiments.</p>
+<ul>
+<li><b>Elements:</b> CelesTrak TLEs, checksummed, cached for two hours, with a labelled fallback to the last good copy
+and then a shipped snapshot.</li>
+<li><b>Propagation:</b> SGP4 (Vallado's code) gives TEME coordinates, and IAU-82 GMST rotates them into the
+Earth-fixed frame. Ground stations sit on the WGS84 ellipsoid with the geodetic vertical. Against Skyfield, an
+independent implementation, over a day of SpeQtre passes: elevation and azimuth agree within 0.0035°, range within
+34 m. A test asserts 0.01° and 0.1 km.</li>
+<li><b>Passes:</b> every night pass over two ground stations in the next 24 hours (above 15°, with the Sun below
+−12°), the key each gives through the satellite's own telescope (8 cm spreads the beam about 1.7 times wider than
+Micius's 30 cm), and a 7-day outlook.</li>
+<li><b>Weather:</b> Open-Meteo's hourly cloud cover at each station scales each pass's key by the clear fraction (a
+first approximation: a low pass looks through more sky than the forecast's zenith).</li>
+</ul>
+<p>Pass times, elevations and clouds are real data; key bits remain estimates, because the real payloads' source rates
+and protocols differ from the model. Tests never touch the network: CelesTrak and Open-Meteo are stubbed.</p>
+</section>

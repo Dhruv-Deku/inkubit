@@ -1,0 +1,157 @@
+{
+ "kind": "circuit",
+ "version": "1.0",
+ "num_qubits": 3,
+ "num_clbits": 3,
+ "operations": [
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    2
+   ],
+   "controls": [
+    0,
+    1
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    2
+   ],
+   "controls": [
+    0,
+    1
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    0
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "CCX",
+   "targets": [
+    2
+   ],
+   "controls": [
+    0,
+    1
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    2
+   ]
+  },
+  {
+   "gate": "X",
+   "targets": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "gate": "H",
+   "targets": [
+    0,
+    1,
+    2
+   ]
+  }
+ ],
+ "measurements": [
+  {
+   "qubit": 0,
+   "clbit": 0
+  },
+  {
+   "qubit": 1,
+   "clbit": 1
+  },
+  {
+   "qubit": 2,
+   "clbit": 2
+  }
+ ],
+ "metadata": {
+  "title": "Grover search with two marked items",
+  "notes": "Two of eight items are marked (011 and 110). With two marked, a single Grover query rotates the state exactly onto them: either one comes out, never anything else, where a classical search needs 3.5 looks on average.",
+  "origin": "manual"
+ }
+}

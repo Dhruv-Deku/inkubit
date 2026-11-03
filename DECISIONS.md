@@ -893,3 +893,93 @@ realistic preset was 0.046 to 0.079, further off than the noiseless prediction o
 calibrated to an older, noisier class of chip, and this one is better. The app keeps the generic preset as its default
 (it is a fair middle for a sketch) and says, on the Evidence page, that a calibrated twin is what predicts a given chip.
 
+## D76. AI-discovered circuits on a real quantum computer
+scripts/discovery_hardware.py reruns the discovery lab for GHZ on 7 qubits of heavy-hex wiring, W on 4 qubits and
+Dicke D(4,2) (live models when configured, seeded heuristics always), and sends each goal's best proven circuit to the
+chip with the baselines it beat: 23 circuits on ibm_fez (job dbjpr9pffo6c73ba4adg, 4096 shots each). GHZ-7 runs on
+seven physical qubits wired like a 7-qubit Falcon chip (118, 109, 108, 110, 98, 111, 112, chosen by Qiskit's noise-aware layout for the
+discovered circuit), and every variant is compiled onto that same patch, so the textbook circuit pays the SWAPs the lab
+counted (10 two-qubit gates on the chip against 6). Z-basis odds cannot tell a GHZ state from a classical mixture of
+all-0 and all-1, so qcanvas/hardware.py also measures a parity oscillation over 8 phases and estimates
+F = (P(0…0) + P(1…1))/2 + |coherence|, with shot-noise error bars (tested against exact states and against repeated
+sampling); above 1/2 certifies genuine 7-qubit entanglement. Result: Muse Spark's own layout reached F = 0.814 against
+0.795 for the textbook circuit, 3.2 standard errors apart, and both certify genuine 7-qubit entanglement;
+Qiskit's generic state preparation (197 two-qubit gates) kept an outcome fidelity of 0.34. For W and Dicke,
+compiled freely for the chip, the discovered circuits used 8 two-qubit gates against 17, yet their measured odds tied
+with Qiskit's within shot noise (-1.2 and -0.3 standard errors): computational-basis odds do not see phase errors,
+much of what fewer gates save, and the page says tie, not win. The digital twin was optimistic on every circuit this
+time (GHZ 0.903 predicted, 0.814 measured) but ranked them the same way.
+
+## D77. A calibrated noise preset from a real chip
+The real IBM run (D75) showed the generic preset is calibrated to an older, noisier class of chip. scripts/calibration_snapshot.py
+reads ibm_fez's reported calibration (IBM Quantum Platform) and keeps the median over its 156 qubits and couplers:
+sx error 2.89e-04 (24 ns), cz error 2.49e-03 (68 ns), readout
+0.68% / 1.46%, T1 135 µs, T2 101 µs (data/calibration.json). qcanvas.sim.noise turns it into
+a fourth preset, "calibrated": a reported gate error is an average infidelity that already includes decoherence during
+the gate, so the thermal part (T1/T2 over the gate time, which the preset adds anyway) is taken out first and the rest
+becomes depolarizing, p = r d/(d - 1), as NoiseModel.from_backend does; a test checks the composed error of each gate
+equals the reported one. The codegen, the verifier and every analysis take it like any other preset; its verification
+floors are low_noise's (0.03, 0.985). Rescored on D75's stored counts (complete, at most 8 outcomes each;
+hardware_check.py --rescore): distance 0.013 to 0.027, closer than the twin on 4 of 4 (0.021 to 0.038)
+against a floor of 0.003 to 0.009 that shot noise alone would give, so part of the chip's behaviour is still unmodelled. Two cautions, stated in the panel: the snapshot
+was taken a few hours after the run (a later calibration of the same device), and medians describe a typical qubit,
+not the best patch a compiler picks. The generic preset stays the default for sketches; "Calibrated" sits beside it
+in the run bar.
+
+## D78. Eight more algorithms, in categories
+scripts/make_algorithms.py writes hidden shift (a bent function's shift in one query), Grover with two marked items
+(found with certainty in one query), quantum counting (phase estimation of the Grover operator: k = 2 or 6, M = 2), a
+Draper adder (5 + 6 in Fourier space), HHL on a 2x2 system (with t = 3π/4 the eigenphases are exactly 1/4 and 1/2, so
+the ancilla = 1 branch holds A⁻¹b ∝ (1, 1/3) exactly), Shor's nine-qubit code correcting a Y error, the CHSH game
+(won cos²(π/8)) and the GHZ game (won every time). Each answer is derived on paper in the builder's docstring and the
+script refuses to save a circuit whose exact distribution differs from it by more than 1e-9; tests pin every answer
+(the games by their win rates). Building them caught two traps in Qiskit's library: PhaseEstimation leaves the most
+significant bit on its first evaluation qubit (the opposite of the order assumed), and transpiling at levels 2 and 3
+may remove SWAPs and record a final permutation that a spec cannot carry, so the builder compiles at level 1 and
+asserts no permutation is left. The gallery is now grouped into 8 categories (entanglement & communication, nonlocal games, oracles & hidden structure, search & counting, fourier & phase, arithmetic & logic, linear algebra & simulation, error correction), 25 algorithms in all;
+mission control's run_algorithm tool can run every one.
+
+## D79. The proof sheet
+qcanvas/proofsheet.py runs 11 independent checks of 9 kinds on any circuit, each named by the mistake it would catch:
+the spec validator; two ideal engines (Qiskit's quantum_info and Aer's C++ statevector, to 1e-9) and two noisy ones
+(closed-form channels and Aer's density matrix, to 1e-6); a physical density matrix (trace, Hermiticity, no negative
+eigenvalue, purity); translation validation of Qiskit's compiler (the circuit compiled for all-to-all, line and 7-qubit
+heavy-hex wiring must be the same unitary, routing and spare qubits included: Operator.from_circuit against the original
+padded with idle qubits); OpenQASM 2 and 3 exports read back by Qiskit's strict parsers; 4,096 sampled shots against
+the shot-noise bound and a G-test; the generated script verifying in the sandbox (run in a thread while the others run,
+about 8 s in all); two metamorphic tests (renaming every qubit n − 1 − q, and inserting H·H, X·X and CX·CX, must leave the
+odds unchanged); and the ML verifier's interval (a miss is a note about the model). A test breaks Qiskit's transpile on
+purpose and requires the compilation check to fail. Its first run found a real defect: the OpenQASM 2 export wrote sx,
+cp and swap, which the standard qelib1.inc does not define, so strict readers rejected circuits with them; the Rosetta's
+own read-back had used Qiskit's lenient LEGACY_CUSTOM_INSTRUCTIONS and hidden it. The export now defines the three
+gates in the file from standard ones, and both readers accept it. Over the gallery (scripts/proofsheet_bench.py,
+docs/PROOFSHEET.md): 299 passed, 0 failed, 1 skipped with the reason, 8 notes.
+
+## D80. IBM Quantum in the app: chip maps, a placement advisor, runs from the editor
+scripts/device_snapshot.py stores each device the account can use (ibm_fez, ibm_kingston, ibm_marrakesh; Heron r2, 156 qubits) in full:
+every qubit's T1, T2, readout errors and sx error, every coupler's two-qubit error, the queue and the calibration time
+(data/devices, about 21 KB each). qcanvas/chip.py draws the heavy-hex lattice from the coupling graph alone (runs of
+consecutive qubits joined by couplers are rows; a lone qubit is a bridge drawn between its neighbours; a test checks every
+coupler joins neighbours on the drawing) and advises placement: every embedding of the circuit's two-qubit-gate graph in
+the chip's working couplers (rustworkx VF2) is scored by the chance that no gate or readout fails, from that chip's own
+numbers (a CX is one native CZ, a CP two, a SWAP three; idle decoherence left out, so it ranks rather than predicts); a
+Toffoli's triangle has no embedding in heavy-hex and the advisor says routing is needed. The IBM Quantum panel shows the
+fleet (medians, live queues and the QPU time left when a token is configured), the map coloured by any calibration number
+(grey best, orange worst, unusable couplers dashed red) and the advisor's best, median and worst placement on every chip.
+With a token and outside public mode, "Run on IBM Quantum" sends the circuit in the editor to the least busy chip on the
+advisor's qubits (level-1 compile with that initial layout; level 3 when the circuit does not embed), polls the job and
+compares the counts with the ideal odds and the calibrated preset, next to the distance shot noise alone would leave; runs
+are capped at 10 a day and logged. A race found while testing: qiskit-ibm-runtime imported by a request thread while the
+warm-up thread imported other Qiskit modules came out half-initialised; the warm-up now imports it first, under a lock.
+
+## D81. Placement and teleportation on a real chip
+scripts/ibm_experiments.py, one job on ibm_fez (dbk6mf1kdqps7391s3q0, 63 circuits). Placement: the advisor scored
+804 placements of a 5-qubit GHZ chain from a snapshot taken minutes before; the best-, median- and worst-scored ran
+on exactly those qubits, each with a parity oscillation for the fidelity. Measured: 0.894 ± 0.003, 0.814 ± 0.004 and
+0.285 ± 0.006, the advisor's order exactly; best against worst 95 standard errors apart, and the worst placement no longer
+certifies entanglement (below 1/2). The twin (NoiseModel.from_backend) ranked them the same way and was optimistic on all
+three. Teleportation with dynamic circuits: Bell measurement mid-circuit, X and Z applied by if_test only when the bits
+say so, on the advisor's best 3-qubit chain (110, 109, 118); the six axis states sent and the receiver measured in X, Y and Z. The
+six axis states form a 2-design, so their average fidelity equals the average over all pure states: 0.924 ± 0.002,
+against 2/3 for the best classical (measure and prepare) scheme; without the corrections 0.499 ± 0.005, as theory says. This
+also answers a stated limitation: Q-Canvas's simulator has no mid-circuit measurement, but the chip does.

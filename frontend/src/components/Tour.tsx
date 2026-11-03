@@ -33,6 +33,8 @@ const STEPS: Step[] = [
     text: 'Surface-code estimates against the best classical route, checked against the published RSA-2048 figure. For brute-force search on 64-bit keys, it says plainly: classical wins.' },
   { section: 'discover', panel: 'Discovery lab', title: 'What the search found', seconds: 10,
     text: 'The textbook GHZ circuit, compiled onto the chip, needs 10 CNOTs; the discovered one needs 6, proven exact by Qiskit, and keeps more of the state under realistic noise.' },
+  { section: 'evidence', panel: 'Real hardware', title: 'On a real quantum computer', seconds: 10,
+    text: 'Both GHZ circuits then ran on IBM’s ibm_fez, on the same seven qubits: the discovered one reached a GHZ fidelity of 0.814 against 0.795, 3.2 standard errors apart, and both certify genuine 7-qubit entanglement. A noise preset calibrated from the chip predicts its counts closer than a digital twin did.' },
   { section: 'build', panel: 'Live board', title: 'Point, draw, see', seconds: 9,
     text: 'Point a camera at a whiteboard: when the drawing changes and holds still, SAM 3.1 and Muse Spark read it and the odds appear on the wires. The original pipeline, sketch to verified code with a self-repair agent, is right above.' },
   { section: null, panel: 'Mission control', title: 'Back to the mission', seconds: 10,

@@ -6,12 +6,15 @@ The numbers are deliberately ordinary for today's superconducting hardware
 
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Literal
 
 from qiskit_aer.noise import NoiseModel, QuantumError, ReadoutError, depolarizing_error, thermal_relaxation_error
 
-NoisePresetName = Literal["ideal", "low_noise", "realistic"]
+NoisePresetName = Literal["ideal", "low_noise", "realistic", "calibrated"]
+CALIBRATION = Path(__file__).resolve().parents[1] / "data" / "calibration.json"
 
 ONE_QUBIT_GATES = ["h", "x", "y", "z", "s", "t", "sdg", "tdg", "sx", "rx", "ry", "rz"]
 TWO_QUBIT_GATES = ["cx", "cz", "cp", "swap"]
@@ -53,6 +56,39 @@ PRESETS: dict[str, NoisePreset] = {
         readout_p01=0.02, readout_p10=0.04, t1_us=100.0, t2_us=80.0,
     ),
 }
+
+
+def calibrated_preset(path: Path = CALIBRATION) -> NoisePreset | None:
+    """The preset of a real device, from its calibration snapshot (scripts/calibration_snapshot.py); None without one.
+
+    A reported gate error is an average gate infidelity that already includes decoherence during the gate. The thermal
+    part (T1/T2 over the gate time, which gate_errors adds) is taken out first and the rest becomes depolarizing,
+    p = r d / (d - 1) on d levels, as Qiskit's NoiseModel.from_backend does; so the composed error of a gate equals the
+    reported one (a test checks it). The values are medians over the device: a typical qubit (DECISIONS.md D77).
+    """
+    if not path.exists():
+        return None
+    from qiskit.quantum_info import average_gate_fidelity
+
+    c = json.loads(path.read_text(encoding="utf-8"))
+    t1, t2 = c["t1_us"], min(c["t2_us"], 2 * c["t1_us"])
+    g1, g2 = c["sx_ns"] / 1000, c["two_qubit_ns"] / 1000
+
+    def thermal(t_us: float, n: int) -> float:
+        err = thermal_relaxation_error(t1, t2, t_us)
+        return 1 - average_gate_fidelity((err.expand(err) if n == 2 else err).to_quantumchannel())
+
+    return NoisePreset(
+        name="calibrated", label=f"Calibrated: {c['device']} ({c['taken_utc'][:10]})",
+        p1=round(max(c["sx_error"] - thermal(g1, 1), 0.0) * 2, 7),
+        p2=round(max(c["two_qubit_error"] - thermal(g2, 2), 0.0) * 4 / 3, 7),
+        readout_p01=round(c["readout_p01"], 6), readout_p10=round(c["readout_p10"], 6),
+        t1_us=round(t1, 2), t2_us=round(t2, 2), gate_1q_us=g1, gate_2q_us=g2,
+    )
+
+
+if (_calibrated := calibrated_preset()) is not None:
+    PRESETS["calibrated"] = _calibrated
 
 
 def get_preset(name: str) -> NoisePreset:

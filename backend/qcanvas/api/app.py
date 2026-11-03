@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import threading
 import logging
 from typing import Any
 
@@ -43,6 +44,11 @@ def _warm_up() -> None:
 
     def work() -> None:
         try:
+            from qcanvas import ibm
+
+            # first, under ibm's lock: qiskit-ibm-runtime imported by a request thread while this thread imports other
+            # Qiskit modules can come out half-initialised (seen as an ImportError on the first IBM status request)
+            ibm.available()
             from qcanvas.observatory import observatory
             from qcanvas.orbits import plan
             from qcanvas.pulse import sweep
@@ -91,9 +97,19 @@ def _budget_left(cap: int) -> int | None:
     return BUDGET.left(cap)
 
 
-ALGORITHMS = {"grover2", "bernstein_vazirani", "deutsch_jozsa", "phase_estimation", "superdense", "toffoli_and",
-              "teleportation", "w_state", "bit_flip_code", "shor15", "qft_period", "simon", "swap_test",
-              "entanglement_swapping", "ising_trotter", "grover3", "half_adder"}
+CATEGORIES: dict[str, list[str]] = {  # the gallery, by what each algorithm does (every answer is pinned in a test)
+    "Basics": ["superposition", "bell", "ghz3"],
+    "Entanglement & communication": ["w_state", "superdense", "teleportation", "entanglement_swapping", "swap_test"],
+    "Nonlocal games": ["chsh_game", "mermin_game"],
+    "Oracles & hidden structure": ["deutsch_jozsa", "bernstein_vazirani", "simon", "hidden_shift"],
+    "Search & counting": ["grover2", "grover3", "grover_two_marked", "quantum_counting"],
+    "Fourier & phase": ["phase_estimation", "qft_period", "shor15"],
+    "Arithmetic & logic": ["toffoli_and", "half_adder", "draper_adder"],
+    "Linear algebra & simulation": ["hhl_2x2", "ising_trotter"],
+    "Error correction": ["bit_flip_code", "shor_code"],
+}
+CATEGORY_OF = {name: cat for cat, names in CATEGORIES.items() for name in names}
+ALGORITHMS = {name for cat, names in CATEGORIES.items() if cat != "Basics" for name in names}
 
 
 @app.get("/api/examples")
@@ -103,12 +119,12 @@ def examples() -> dict[str, Any]:
     for path in sorted((EXAMPLES_DIR / "specs").glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         meta = data.get("metadata", {})
-        group = ("Networks" if data.get("kind") == "network" else "Algorithms" if path.stem in ALGORITHMS
-                 else "Check the validator" if path.stem == "invalid_circuit" else "Basics")
+        group = ("Networks" if data.get("kind") == "network" else "Check the validator" if path.stem == "invalid_circuit"
+                 else CATEGORY_OF.get(path.stem, "Basics"))
         specs.append({"id": path.stem, "title": meta.get("title") or path.stem, "kind": data.get("kind"),
                       "notes": meta.get("notes", ""), "valid": path.stem != "invalid_circuit", "group": group,
                       "spec": data})
-    order = ["Basics", "Algorithms", "Networks", "Check the validator"]
+    order = [*CATEGORIES, "Networks", "Check the validator"]
     specs.sort(key=lambda s: (order.index(s["group"]), s["title"]))
     images = []
     for path in sorted((EXAMPLES_DIR / "images").glob("*.json")):
@@ -144,6 +160,40 @@ def validate(body: SpecRequest) -> dict[str, Any]:
 class InsightsRequest(BaseModel):
     spec: dict[str, Any]
     noise: str = "realistic"
+
+
+_PROOF_SLOTS = threading.BoundedSemaphore(2)  # a proof sheet runs a sandbox and several exact engines
+
+
+@app.get("/api/proofsheet/benchmark")
+def proofsheet_benchmark() -> dict[str, Any]:
+    """The proof sheet run over the whole gallery (scripts/proofsheet_bench.py)."""
+    path = EXAMPLES_DIR / "proofsheet_benchmark.json"
+    if not path.exists():
+        raise HTTPException(404, "no proof sheet benchmark yet")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+@app.post("/api/proofsheet")
+def proofsheet(body: InsightsRequest) -> dict[str, Any]:
+    """Every independent check Q-Canvas has, run on one circuit (qcanvas/proofsheet.py)."""
+    from qcanvas.proofsheet import proof_sheet
+    from qcanvas.spec.models import CircuitSpec
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(status_code=422, detail={"issues": _issues(err)}) from err
+    if not isinstance(spec, CircuitSpec):
+        raise HTTPException(status_code=422, detail="The proof sheet is for circuits.")
+    if body.noise not in PRESETS:
+        raise HTTPException(status_code=422, detail=f"unknown noise preset '{body.noise}'")
+    if not _PROOF_SLOTS.acquire(timeout=60):
+        raise HTTPException(status_code=503, detail="Two proof sheets are already running; try again in a moment.")
+    try:
+        return proof_sheet(spec, body.noise).model_dump(mode="json")
+    finally:
+        _PROOF_SLOTS.release()
 
 
 @app.post("/api/insights")
@@ -730,6 +780,109 @@ def hardware_runs() -> dict[str, Any]:
     if not path.exists():
         raise HTTPException(404, "no real hardware run yet")
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+class IbmRunRequest(BaseModel):
+    spec: dict[str, Any]
+    shots: int = Field(default=2048, ge=100, le=4096)
+    device: str | None = Field(default=None, max_length=40)
+
+
+@app.get("/api/ibm/status")
+def ibm_status(live: bool = False) -> dict[str, Any]:
+    """The IBM fleet from its calibration snapshots; with live=1 (and a token) also today's queues and QPU time left."""
+    from qcanvas import ibm
+    from qcanvas.chip import device_names, load, summary
+
+    ok, why = ibm.available()
+    out: dict[str, Any] = {"can_run": ok, "reason": why, "runs_today": ibm.runs_today() if ok else 0,
+                           "devices": [summary(load(n)) for n in device_names()], "live": None}
+    if ok and live:
+        try:
+            out["live"] = ibm.live_status()
+        except Exception as err:  # noqa: BLE001 - the snapshots still answer
+            out["live"] = {"error": str(err)[:200]}
+    return out
+
+
+@app.get("/api/ibm/device/{name}")
+def ibm_device(name: str) -> dict[str, Any]:
+    """One device's full calibration snapshot with drawing coordinates (the chip map)."""
+    from qcanvas.chip import load, summary
+
+    try:
+        d = load(name)
+    except KeyError:
+        raise HTTPException(404, f"no snapshot of '{name}'") from None
+    return {**d, "summary": summary(d)}
+
+
+@app.post("/api/ibm/advise")
+def ibm_advise(body: InsightsRequest) -> dict[str, Any]:
+    """Where on each IBM chip this circuit should run, from the calibration snapshots."""
+    from qcanvas.chip import advise, device_names
+    from qcanvas.spec.models import CircuitSpec
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(status_code=422, detail={"issues": _issues(err)}) from err
+    if not isinstance(spec, CircuitSpec):
+        raise HTTPException(status_code=422, detail="The advisor places circuits.")
+    return {"advice": [advise(spec, n).model_dump(mode="json") for n in device_names()]}
+
+
+@app.post("/api/ibm/run")
+def ibm_run(body: IbmRunRequest) -> dict[str, Any]:
+    """Run the circuit on a real IBM quantum computer (local use only; see qcanvas/ibm.py)."""
+    from qcanvas import ibm
+    from qcanvas.spec.models import CircuitSpec
+
+    try:
+        spec = parse_spec(body.spec)
+    except SpecError as err:
+        raise HTTPException(status_code=422, detail={"issues": _issues(err)}) from err
+    if not isinstance(spec, CircuitSpec) or not spec.measured_pairs():
+        raise HTTPException(status_code=422, detail="Only a circuit with measurements can run on hardware.")
+    try:
+        return ibm.submit(spec, body.shots, body.device)
+    except PermissionError as err:
+        raise HTTPException(status_code=403, detail=str(err)) from err
+
+
+@app.get("/api/ibm/run/{job_id}")
+def ibm_run_status(job_id: str) -> dict[str, Any]:
+    from qcanvas import ibm
+
+    try:
+        return ibm.poll(job_id)
+    except KeyError:
+        raise HTTPException(404, "no such IBM run") from None
+
+
+@app.get("/api/ibm/experiments")
+def ibm_experiments() -> dict[str, Any]:
+    """Placement and teleportation experiments on a real device (scripts/ibm_experiments.py); 404 before a real run."""
+    path = EXAMPLES_DIR / "ibm_experiments.json"
+    if not path.exists():
+        raise HTTPException(404, "no IBM experiments yet")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if data.get("rehearsal"):
+        raise HTTPException(404, "only a rehearsal exists")
+    return data
+
+
+@app.get("/api/hardware/discovery")
+def discovery_hardware() -> dict[str, Any]:
+    """The discovery lab's proven circuits run on a real IBM device next to the baselines they beat
+    (scripts/discovery_hardware.py); 404 before a real run, never a rehearsal."""
+    path = EXAMPLES_DIR / "discovery_hardware.json"
+    if not path.exists():
+        raise HTTPException(404, "no real hardware run of the discovered circuits yet")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if data.get("rehearsal"):
+        raise HTTPException(404, "only a rehearsal exists")
+    return data
 
 
 @app.get("/api/observatory")

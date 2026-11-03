@@ -1,0 +1,49 @@
+<section class="front">
+<h1 class="nonum">About this report</h1>
+<p class="lede">This report describes Q-Canvas: what it is for, how it is built, how it uses Meta's models, what its labs
+found, and how each result was checked. It is for hackathon judges, and for anyone who wants to know how the
+project works beyond the demo video.</p>
+
+<p>Q-Canvas started from one observation. A language model can describe a quantum experiment fluently, but it can't
+tell you whether its own numbers are right. Q-Canvas makes the models do what they are good at: reading sketches,
+photos, papers and speech, planning multi-step work and proposing circuits and codes. Everything that becomes a
+number is computed by exact physics: density-matrix simulation, an independent second simulator, exhaustive checkers
+and physical invariants. Every number a model writes in an answer is traced back to the tool that computed it.</p>
+
+<p>The report holds itself to the same rule. Each number in a chart or a generated table, and each benchmark result quoted in the prose, is
+read from the repository's data files when the report is built, by
+<code>scripts/build_report.py</code>. These are the same files the app shows and the test suite checks. A few
+numbers come from features that keep no stored result, such as live runs of the network planner or the discovery lab.
+Those are quoted from the README and the decision log, which record the runs that produced them, and the text says so
+where it matters. The test <code>tests/test_claims.py</code> already fails the build if the README or the submission
+text quotes a number its data no longer supports. This report is generated from the same data, so it cannot drift from
+it either.</p>
+
+<table class="kv meta">
+<tbody>
+<tr><td>Project</td><td>Q-Canvas, a quantum lab where the AI never gets the last word</td></tr>
+<tr><td>Event</td><td>Meta Global AI Developer Hackathon 2026; building period 27 October to 4 November 2026</td></tr>
+<tr><td>Track and problem</td><td>Indie developer; Push the Frontier (accelerate a scientific experiment; understand and control a physical system)</td></tr>
+<tr><td>Built by</td><td>One developer, during the building period; first commit {{first_commit}}</td></tr>
+<tr><td>Code</td><td>github.com/Dhruv-Deku/q-canvas, MIT licence</td></tr>
+<tr><td>Meta models</td><td>Muse Spark 1.3, Muse Wonder 1.0, SAM 3.1, Muse Image 1.0, Muse Voice Transcribe 1.0</td></tr>
+<tr><td>This edition</td><td>Built {{build_date}} from commit {{commit}} ({{n_commits}} commits)</td></tr>
+</tbody>
+</table>
+
+<h3>How the report is organised</h3>
+<p>Chapters 1 and 2 give the summary and the idea. Chapters 3 and 4 cover the architecture and how each Meta model is
+used. Chapters 5 and 6 cover the two main ways in: turning a sketch into verified code, and mission control, which
+turns a whole problem into a plan of exact tools. Chapters 7 to 9 cover the research labs where the AI proposes and
+physics decides: discovery, learning under proof, AI-designed error-correcting codes and reproducing the literature.
+Chapters 10 to 12 go down to the hardware (decoders, pulses, distributed machines, resource estimates) and out to
+orbit. Chapters 13 and 14 cover the tools for looking inside a circuit, and the labs and games. Chapter 15 collects
+the evidence, including the run on a real IBM quantum computer. Chapters 16 to 18 cover engineering, limitations and
+the build timeline. The appendices list the API, the decision index, the commands that reproduce every result, a
+glossary and references.</p>
+</section>
+
+<section class="toc-page">
+<h1 class="nonum">Contents</h1>
+{{toc}}
+</section>

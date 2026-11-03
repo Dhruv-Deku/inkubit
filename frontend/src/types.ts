@@ -846,5 +846,41 @@ export interface PulseReport {
     decoherence_only: number[]; best_gaussian: [number, number]; best_drag: [number, number] }
 }
 
-export interface HardwareRun { circuit: string; id: string; two_qubit_gates: number; depth: number; tvd_ideal: number; tvd_generic: number; tvd_twin: number }
-export interface HardwareRuns { device: string; rehearsal: boolean; job_id: string; shots: number; date_utc: string; runs: HardwareRun[] }
+export interface HardwareRun { circuit: string; id: string; two_qubit_gates: number; depth: number; tvd_ideal: number; tvd_generic: number; tvd_twin: number
+  tvd_calibrated?: number; shot_noise_tvd?: number }
+export interface HardwareRuns { device: string; rehearsal: boolean; job_id: string; shots: number; date_utc: string; runs: HardwareRun[]
+  calibration?: { device: string; taken_utc: string; calibrated_utc: string | null; two_qubit_error: number; readout_p01: number; readout_p10: number } }
+export interface GhzEstimate { populations: number; coherence: number; fidelity: number; se?: number }
+export interface DiscoveryHardwareVariant { label: string; source: string; cx_logical: number; two_qubit_gates: number; depth: number
+  predicted_state_fidelity: number; predicted_outcome_fidelity: number; outcome_fidelity: number; outcome_se?: number; twin_outcome_fidelity: number; tvd: number
+  ghz?: GhzEstimate; twin_ghz?: GhzEstimate }
+export interface DiscoveryHardwareGoal { id: string; title: string; target: string; finding: string; num_qubits: number; patch?: number[]; variants: DiscoveryHardwareVariant[]
+  comparison?: { metric: string; discovered: number; baseline: number; baseline_label: string; margin: number; z: number } }
+export interface DiscoveryHardware { device: string; rehearsal: boolean; job_id: string; shots: number; date_utc: string; circuits: number; goals: DiscoveryHardwareGoal[] }
+
+export interface ProofCheck { id: string; category: string; title: string; guards: string; status: 'pass' | 'fail' | 'skipped' | 'note'; detail: string; ms: number }
+export interface ProofSheet { title: string; num_qubits: number; gates: number; noise: string; checks: ProofCheck[]
+  passed: number; failed: number; skipped: number; notes: number; seconds: number; summary: string }
+export interface ProofBench { date_utc: string; circuits: number; categories: number; checks_per_circuit: number; kinds: number
+  totals: { passed?: number; failed?: number; skipped?: number; notes?: number }
+  rows: { id: string; title: string; category: string; qubits: number; gates: number; passed: number; failed: number; skipped: number; notes: number; seconds: number }[]
+  per_check: Record<string, { category: string; title: string; guards: string; pass?: number; fail?: number; skipped?: number; note?: number }> }
+
+export interface IbmDevice { device: string; processor: { family?: string; revision?: string }; num_qubits: number; couplers: number
+  taken_utc: string; calibrated_utc: string | null; pending_jobs: number; dynamic_circuits: boolean
+  two_qubit_error: number | null; sx_error: number | null; readout_error: number | null; t1_us: number; t2_us: number; unusable_couplers: number }
+export interface IbmStatus { can_run: boolean; reason: string; runs_today: number; devices: IbmDevice[]
+  live: null | { error?: string; devices?: { device: string; operational: boolean; pending_jobs: number }[]; usage?: { used_s: number; limit_s: number; left_s: number } | null; checked_utc?: string } }
+export interface IbmQubit { t1_us: number | null; t2_us: number | null; p01: number | null; p10: number | null; sx_error: number | null }
+export interface IbmSnapshot { device: string; num_qubits: number; two_qubit_gate: string; taken_utc: string; calibrated_utc: string | null
+  qubits: IbmQubit[]; edges: Record<string, number>; coords: [number, number][]; summary: IbmDevice }
+export interface IbmPatch { qubits: number[]; success: number }
+export interface IbmAdvice { device: string; ok: boolean; note: string; candidates: number; best: IbmPatch | null; median: IbmPatch | null; worst: IbmPatch | null; seconds: number }
+export interface IbmRun { job_id: string; device: string; shots: number; placement: number[] | null; how: string; two_qubit_gates: number; title: string
+  submitted_utc: string; status: string
+  result: null | { error?: string; measured?: Record<string, number>; ideal?: Record<string, number>; tvd_ideal?: number; tvd_calibrated?: number | null; shot_noise?: number; finished_utc?: string } }
+export interface IbmExperiments { device: string; job_id: string; date_utc: string; snapshot_utc: string; circuits: number
+  ghz: { n: number; shots: number; candidates: number; rows: { placement: string; qubits: number[]; advisor_score: number; fidelity: number; se: number; populations: number; coherence: number; twin_fidelity: number }[] }
+  teleport: { qubits: number[]; shots: number; classical_limit: number
+    feed_forward: { average: number; se: number; twin_average: number; rows: { state: string; fidelity: number; se: number; twin_fidelity: number }[] }
+    no_corrections: { average: number; se: number; twin_average: number; rows: { state: string; fidelity: number; se: number; twin_fidelity: number }[] } } }

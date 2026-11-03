@@ -1,0 +1,206 @@
+<section class="chapter">
+<h1>Sketch to verified code</h1>
+<p class="lede">The original pipeline: draw a circuit on paper, and get running code whose result is proven right by an
+independent simulation of what you meant. When the code is wrong, the agent explains why, fixes it and runs it
+again, live on screen.</p>
+
+<h2>Reading a sketch</h2>
+<div class="flow">
+  <div class="node"><b>Photo</b>upload, camera or sample; EXIF-rotated, at most 1600 px</div>
+  <div class="arrow">→</div>
+  <div class="node model"><b>Muse Spark</b>picks the diagram kind and 1–4 noun phrases</div>
+  <div class="arrow">→</div>
+  <div class="node model"><b>SAM 3.1</b>one concept prompt per phrase: boxes and confidences</div>
+  <div class="arrow">→</div>
+  <div class="node model"><b>Muse Spark</b>photo + numbered boxes → flat draft, each gate linked to a box</div>
+  <div class="arrow">→</div>
+  <div class="node check"><b>Validate</b>readable errors; one re-prompt; then the editor</div>
+</div>
+<p class="flow-note">The reading path. The user sees the photo and the specification side by side and can correct either.</p>
+<p>A sketch can be a circuit or a quantum network; Muse Spark decides which from the photo. The result is not trusted
+blindly. It is a draft that the user sees overlaid on the photo: hovering over a box highlights its line in the
+editor, and the editor validates as the user types. Words and speech take a parallel path. Muse Spark fills the same
+draft schema from a description such as "Bernstein-Vazirani with secret 1011" or "300 km of fiber with 2
+repeaters". Offline, a deterministic parser handles named algorithms, gate lists and simple networks, and anything
+else gets a list of what it understands, never a guess.</p>
+<figure><img src="{{shot:2-overlay.png}}" alt="Photo overlay and spec editor">
+<figcaption>The photo with every part SAM 3.1 boxed, next to the specification Muse Spark read from it. Each operation is linked to its box, and validation runs as you type.</figcaption></figure>
+
+<h2>The specification</h2>
+<p>Everything downstream works from one JSON document, discriminated by <code>kind</code> and versioned. It is
+deliberately small: it is what the models fill, what the user edits, what the code is generated from, and what the
+verifier rebuilds the circuit from, independently.</p>
+<pre><code>{ "kind": "circuit", "version": "1.0", "num_qubits": 2, "num_clbits": 2,
+  "operations": [
+    {"gate": "H", "targets": [0], "source": {"bbox": [310, 250, 410, 350], "confidence": 0.97, "segment_id": "s0"}},
+    {"gate": "CX", "controls": [0], "targets": [1]} ],
+  "measurements": [{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}],
+  "metadata": {"title": "Bell pair", "origin": "image"} }</code></pre>
+<p>The gate set (H, X, Y, Z, S, T and their inverses, √X, rotations, CX, CZ, controlled phase, SWAP and Toffoli) is
+enough for Grover search, Bernstein-Vazirani, Deutsch-Jozsa, the QFT, phase estimation, teleportation and the W
+state. Measurements are terminal, which keeps the independent prediction exact. A circuit without a measurement is
+invalid, because there would be nothing to verify. Unknown fields are errors, not silently ignored typos. Common
+aliases such as <code>CNOT</code> are normalised, because hand labels and model output use them. Networks list ground
+stations, satellites and repeaters with optional memory coherence times and apertures, and fiber or free-space links
+with lengths and losses.</p>
+
+<h2>Writing and running code safely</h2>
+<p>Muse Spark writes a standalone Qiskit script for the specification; offline, a deterministic template does. In
+<b>demo mode</b>, the first attempt is broken on purpose with one of six realistic bugs, so that the repair is always
+visible: a missing CNOT, a reversed CNOT, a wrong qubit index, a missing measurement, an old import path, or a faked
+result that prints plausible counts without running anything.</p>
+<p>Model-written code is treated as untrusted. Before it runs, the abstract syntax tree is checked: only
+<code>qiskit</code>, <code>qiskit_aer</code>, <code>json</code>, <code>math</code> and <code>numpy</code> may be
+imported, and calls such as <code>open</code>, <code>eval</code> and <code>exec</code> are rejected. The script then
+runs in a fresh, isolated Python process in a scratch folder, with a 60-second timeout and an environment from which
+every variable named like a key, token or secret has been removed, so generated code can never read the Meta key.
+This is a guard rail, not an operating-system sandbox, and the README says so. On the public host, model-written code
+is never executed at all.</p>
+
+<h2>Verification</h2>
+<p>The verifier never reads the generated code. It rebuilds the circuit from the specification with its own builder
+and computes the <b>exact, noise-aware</b> distribution the run should produce: a density-matrix simulation with the
+preset's gate noise, then the readout error applied exactly to each bit. Then it compares that prediction with the
+counts the code actually produced. A run passes only if both of these hold:</p>
+<p class="eq">TVD(measured, expected) ≤ max(floor, ³⁄₂ Σ<sub>i</sub> √(p<sub>i</sub>(1 − p<sub>i</sub>) / N))
+<span class="r">and</span> Hellinger fidelity ≥ minimum</p>
+<p>The second term is three standard deviations of sampling error on every outcome at once. For a Bell pair at 4,096
+shots it is about 0.023, so honest runs essentially never fail. The floors (0.02, 0.03 and 0.04 for the ideal,
+low-noise and realistic presets) and the minimum fidelities (0.99, 0.985, 0.98) absorb the small differences between
+two independent constructions. Real faults are far outside these limits: a missing or reversed CNOT on a Bell pair
+gives a distance of about 0.46 to 0.5. In the submission's example, a correct Bell pair run was 0.004 from its
+prediction, against a limit of 0.040.</p>
+<table class="compact">
+<thead><tr><th>Preset</th><th class=n>1-qubit depolarizing</th><th class=n>2-qubit depolarizing</th><th class=n>Readout 0→1 / 1→0</th><th>T1 / T2</th></tr></thead>
+<tbody>
+<tr><td>ideal</td><td class=n>0</td><td class=n>0</td><td class=n>0 / 0</td><td>none</td></tr>
+<tr><td>low_noise</td><td class=n>0.05%</td><td class=n>0.5%</td><td class=n>0.5% / 1%</td><td>none</td></tr>
+<tr><td>realistic</td><td class=n>0.1%</td><td class=n>1.5%</td><td class=n>2% / 4%</td><td>100 µs / 80 µs (50 ns and 400 ns gates)</td></tr>
+</tbody>
+</table>
+<div class="callout warn"><span class="k">Known blind spots, stated in the app</span>
+<p>Verification compares measurement statistics. It cannot see a pure phase error that leaves the outcome
+distribution unchanged, and it does not catch changes smaller than the threshold, such as an angle off by a few
+degrees. The circuit tools in Chapter 13 (state-by-state inspection, process-fidelity proofs, Bell tests and
+tomography) look further than the verifier does.</p></div>
+
+<h2>Diagnosis and repair</h2>
+<p>When a run fails, the agent explains why in plain words, from the statistics alone. Correlations that should exist
+but don't suggest a missing or reversed entangling gate. Wrong marginals suggest a gate on the wrong qubit. A single
+outcome where noise should spread the counts suggests faked results. For example:</p>
+<div class="callout"><p><i>"Attempt 1 failed: expected ~50% |00⟩ and 50% |11⟩, got 49% |00⟩ and 48% |01⟩. Bits c0
+and c1 should agree every time but come out independent; the entangling gate looks missing or points the wrong way.
+Repairing…"</i></p></div>
+<p>The repairer (Muse Spark live, a deliberately limited rule-based repairer offline) gets the full evidence: the
+specification, the code, the error, the verifier's verdict, the diagnosis and the history of earlier attempts. Every
+attempt keeps its code and a unified diff, so the interface shows exactly what each repair changed. There are at most
+four attempts. If the repairer returns identical code, the loop stops and reports failure instead of burning attempts.
+A run that cannot be fixed is reported as <b>Not verified</b>, and its code and counts are labelled as unverified.</p>
+
+<h2>The planted-fault benchmark</h2>
+<p><code>scripts/benchmark.py</code> runs every gallery circuit under realistic noise, once clean and once with each
+fault that can be planted in it. It runs offline (template code and the rule-based repairer), so it measures the agent
+loop and the independent verifier, not a language model. <b>55 of 55 runs ended correctly</b>: every clean run
+verified on the first attempt, all 37 repairable faults were verified after one repair, and all 9 faked results were
+caught. The rule-based repairer deliberately has no rule for faked results, which is how the honest-failure path is
+demonstrated and tested. Muse Spark gets the same evidence and can fix that fault too.</p>
+<table class="compact">
+<thead><tr><th>Circuit</th><th>clean</th><th>import</th><th>no measure</th><th>wrong qubit</th><th>reversed CX</th><th>no CX</th><th>fake result</th></tr></thead>
+<tbody>
+<tr><td>Bell pair</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>caught</td></tr>
+<tr><td>Bernstein-Vazirani (101)</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>caught</td></tr>
+<tr><td>Deutsch-Jozsa (balanced)</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>caught</td></tr>
+<tr><td>GHZ-3</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>caught</td></tr>
+<tr><td>Grover search (2 qubits)</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>–</td><td>–</td><td>caught</td></tr>
+<tr><td>Phase estimation of T</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>–</td><td>–</td><td>caught</td></tr>
+<tr><td>Superdense coding (11)</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>caught</td></tr>
+<tr><td>Superposition with a tilt</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>–</td><td>–</td><td>caught</td></tr>
+<tr><td>Quantum AND (Toffoli)</td><td>✓ 1</td><td>✓ 2</td><td>✓ 2</td><td>✓ 2</td><td>–</td><td>–</td><td>caught</td></tr>
+</tbody>
+<caption>✓ n: verified after n attempts. Caught: the verifier refused a faked result. –: the fault cannot be planted in this circuit. Wall time 92 s.</caption>
+</table>
+
+<h2>Understanding the result</h2>
+<p>A verified result is only the start. Muse Spark explains it to a student using the real numbers, in any of twelve
+languages, each in its own script; offline, an English template is used and the page says so. Muse Image draws a clean
+diagram beside the exact one. The user can then ask questions about the run ("why did attempt 1 fail?"). Muse Spark
+answers only from that run's facts and says when the facts don't contain the answer. Any design can be shared as a
+link that carries the whole specification in the URL, so nothing is stored on a server, or downloaded as a one-file
+HTML report.</p>
+</section>
+
+<section class="chapter">
+<h1>Mission control</h1>
+<p class="lede">One request, typed, spoken or photographed, becomes a plan of exact tools that runs live in parallel,
+repairs itself, verifies every step and writes a report in which every number is traced.</p>
+
+<h2>From one request to a plan</h2>
+<p>A mission can combine words, a photo and speech: "connect two cities 1,200 km apart with quantum-secure keys,
+compare satellite and fiber, and check whether a spy on 25% of the photons is caught". A photo goes through the sketch
+pipeline (SAM 3.1 and Muse Spark into a validated specification). If it is not a drawing, it goes to the Rosetta's
+notation reader instead. Muse Spark, or Muse Wonder in deep mode, then plans up to eight steps under a JSON schema.
+Each step has a tool, arguments (checked against that tool's own schema), dependencies and a stated purpose.</p>
+<p>Circuits pass between steps by reference: an argument <code>circuit_from</code> names an earlier step, or the photo.
+A proven shorter circuit from the optimiser can therefore feed the ML verifier without the model copying gates, which
+is where models make transcription mistakes.</p>
+<div class="flow">
+  <div class="node model"><b>Perceive</b>SAM 3.1 + Muse Spark read the photo; Muse Voice the speech</div>
+  <div class="arrow">→</div>
+  <div class="node model"><b>Plan</b>Muse Spark: a dependency graph of ≤ 8 tool steps (JSON schema)</div>
+  <div class="arrow">→</div>
+  <div class="node exact"><b>Run</b>independent steps in parallel; a failed step repaired once</div>
+  <div class="arrow">→</div>
+  <div class="node check"><b>Verify</b>physics invariants; two independent simulators; ML verifier note</div>
+  <div class="arrow">→</div>
+  <div class="node model"><b>Report</b>Muse Spark writes from the facts; every number traced</div>
+</div>
+<p class="flow-note">The mission loop. The live graph in the app follows the same five columns.</p>
+
+<h2>Running in parallel</h2>
+<p>Before anything runs, the plan is checked: unknown tools are dropped, and every dependency must point to an
+earlier step, which rules out cycles. A thread pool then runs every step whose dependencies are done. Each change is
+an event that streams to the browser and lights up the graph. A step that fails gets one repair: Muse Spark sees the
+error and the tool's schema and returns new arguments. Live runs in the interface took 12 to 23 seconds for missions
+such as two cities, photo to hardware, a molecule at three bond lengths, RSA, and exam scheduling.</p>
+<figure><img src="{{shot:29-mission-control.png}}" alt="Mission control with a verified plan and report">
+<figcaption>Mission control, live. Muse Spark planned three steps (two Shor runs and a Grover search) that ran in parallel and were each verified. The report's seven numbers were all traced to exact tools.</figcaption></figure>
+
+<h2>Verification that does not trust the tools</h2>
+<p>The tools are exact, but the checks assume they could still be wrong, through a bug or arguments a model chose
+badly. Every tool has physics invariants:</p>
+<ul>
+<li>the variational principle for H₂: no computed energy below the exact ground state;</li>
+<li>QAOA never above the brute-force best cut;</li>
+<li>Shor's factors must multiply back to the number;</li>
+<li>link fidelity in [¼, 1], and no key above the 11% error rate;</li>
+<li>for circuits, two independent noisy simulators that must agree to 1e-6: Q-Canvas's closed-form channels and Qiskit Aer's density matrix.</li>
+</ul>
+<p>The ML verifier (Chapter 15) also runs on every circuit. A miss there grades the model, not the result, so it
+appears as a note and never flags the step.</p>
+
+<h2>Reports with every number traced</h2>
+<p>Muse Spark writes the report from the step facts and the text of their checks. The tracer then matches every number
+in the report against the tool results at the precision written. A number counts as traced only if a tool computed
+it; rounding 2,089 to 2,090 is not traced, by design. A finished mission downloads as one self-contained page: the
+plan, every step with its results, checks and arguments, the report with each number marked green (traced) or amber
+(not traced), the model calls, and standalone Qiskit code for every circuit.</p>
+
+<h2>The {{m_n}}-mission benchmark</h2>
+<p><code>scripts/mission_bench.py</code> ran {{m_n}} varied missions live, with Muse Spark planning and reporting.
+Three are hard on purpose: a number the Shor tool cannot factor, a problem with no quantum angle, and an ambiguous
+request.</p>
+<div class="stats">
+  <div class="stat"><div class="v">{{m_done}} / {{m_n}}</div><div class="l">missions finished with a report; {{m_muse}} of {{m_n}} plans written by Muse Spark</div></div>
+  <div class="stat"><div class="v">{{m_verified}} / {{m_steps}}</div><div class="l">steps verified ({{m_repaired}} repaired by the model first)</div></div>
+  <div class="stat"><div class="v">{{m_traced}} / {{m_checked}}</div><div class="l">report numbers traced to a tool result</div></div>
+  <div class="stat"><div class="v">{{m_median}} s</div><div class="l">median per mission, live; slowest {{m_max}} s</div></div>
+</div>
+<figure>{{chart:missions}}
+<figcaption>Time per mission in the live benchmark. {{m_flagged}} steps were flagged by a physics check and {{m_failed}} failed or were skipped.</figcaption></figure>
+<p>The five untraced numbers are the model rounding a tool's value (2,089 written as 2,090, twice, in two missions) or
+writing 6.4e-18 as "6.4 × 10^-18". The tracer flags a number unless it matches a tool result at the precision
+written, rather than guess. The hard cases were answered honestly. "Factor 21" ran the Shor tool and reported that the
+demonstration factored 15, not 21. "Sort a million numbers" reported that quantum search does not sort a list. "Do
+something interesting with entanglement" became four verified steps.</p>
+{{table:missions}}
+</section>

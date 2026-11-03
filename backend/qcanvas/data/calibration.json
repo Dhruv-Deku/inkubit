@@ -1,0 +1,20 @@
+{
+ "device": "ibm_fez",
+ "processor": {
+  "family": "Heron",
+  "revision": "2"
+ },
+ "taken_utc": "2026-11-01T18:34:00+00:00",
+ "calibrated_utc": "2026-11-01T23:46:12+05:30",
+ "qubits": 156,
+ "two_qubit_gate": "cz",
+ "sx_error": 0.00028937833200985816,
+ "sx_ns": 24.0,
+ "two_qubit_error": 0.0024897509516795258,
+ "two_qubit_ns": 68.0,
+ "readout_p01": 0.0068359375,
+ "readout_p10": 0.0146484375,
+ "t1_us": 134.9818855630784,
+ "t2_us": 100.51211536995623,
+ "note": "Medians over the device's qubits and couplers: a typical qubit, not the best patch a compiler picks."
+}
