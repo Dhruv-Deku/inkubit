@@ -49,7 +49,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 ## Needs human
 1. Put the Meta key in `.env`: `META_API_KEY=LLM_...` and `INKUBIT_MODEL_PROVIDER=meta`. Then run `cd backend && ../.venv/Scripts/python -m pytest -m live -q` (three tiny calls, < $0.02).
 2. Try one real phone photo of a hand-drawn circuit in live mode; check SAM finds the parts (concept phrases are chosen by Muse Spark).
-3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/inkubit-demo-v4.mp4`; optionally add a voice-over.
+3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/inkubit-demo-v5.mp4`; optionally add a voice-over.
 4. Repo is pushed to https://github.com/Dhruv-Deku/inkubit (**private**): make it public before submitting (`gh repo edit Dhruv-Deku/inkubit --visibility public --accept-visibility-change-consequences`), then fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
