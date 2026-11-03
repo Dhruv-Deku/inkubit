@@ -13,7 +13,7 @@ from typing import Any
 from inkubit.spec.models import GateName
 
 _GATES = list(GateName.__args__)  # type: ignore[attr-defined]
-_DRAFT_GATES = [g for g in _GATES if g != "MEASURE"]  # meters go in "measurements", which carries the clbit
+_DRAFT_GATES = [g for g in _GATES if g not in ("MEASURE", "RESET")]  # meters go in "measurements"; resets are added in the editor
 
 
 def _obj(props: dict[str, Any]) -> dict[str, Any]:
@@ -70,7 +70,7 @@ NETWORK_DRAFT_SCHEMA = _obj({
 REWRITE_SCHEMA = _obj({
     "idea": {"type": "string", "description": "One sentence: what you simplified and why the results stay the same."},
     "operations": {"type": "array", "items": _obj({
-        "gate": {"type": "string", "enum": [g for g in _GATES if g not in ("MEASURE", "BARRIER")]},
+        "gate": {"type": "string", "enum": [g for g in _GATES if g not in ("MEASURE", "RESET", "BARRIER")]},
         "targets": _INTS,
         "controls": _INTS,
         "params": {"type": "array", "items": {"type": "number"}, "description": "Angles in radians."},
@@ -106,9 +106,33 @@ CONCEPTS_SCHEMA = _obj({
 })
 
 
-def draft_schema(kind: str) -> dict[str, Any]:
-    """The draft schema for ``kind``."""
-    return CIRCUIT_DRAFT_SCHEMA if kind == "circuit" else NETWORK_DRAFT_SCHEMA
+# Descriptions can ask for feed-forward, sketches (so far) cannot: text gets its own circuit draft, so the sketch
+# reader's schema, and every cached sketch reading, stays exactly as it was.
+CIRCUIT_TEXT_DRAFT_SCHEMA = _obj({
+    **CIRCUIT_DRAFT_SCHEMA["properties"],
+    "operations": {"type": "array", "items": _obj({
+        "gate": {"type": "string", "enum": _GATES},
+        "targets": _INTS,
+        "controls": _INTS,
+        "params": {"type": "array", "items": {"type": "number"}, "description": "Angles in radians."},
+        "clbits": {**_INTS, "description": "MEASURE in the middle of the circuit: the classical bit for each target. "
+                                           "Empty for every other gate."},
+        "condition_bits": {**_INTS, "description": "Feed-forward: the classical bits, written by earlier MEASUREs, "
+                                                   "this gate depends on. Empty when it always runs."},
+        "condition_value": {"type": "integer", "minimum": 0,
+                            "description": "The value those bits must read, in binary with the first listed bit "
+                                           "lowest (one bit: 0 or 1). 0 when the gate always runs."},
+        "segment_id": {"type": "string", "description": "Leave empty."},
+        "box": _BOX,
+    })},
+})
+
+
+def draft_schema(kind: str, text: bool = False) -> dict[str, Any]:
+    """The draft schema for ``kind`` (``text``: a description, which may ask for feed-forward)."""
+    if kind != "circuit":
+        return NETWORK_DRAFT_SCHEMA
+    return CIRCUIT_TEXT_DRAFT_SCHEMA if text else CIRCUIT_DRAFT_SCHEMA
 
 
 GRID_CONFIDENCE = 0.6  # a box Muse Spark reported itself, used when no SAM segment matches
@@ -152,17 +176,25 @@ def draft_to_spec(kind: str, draft: dict[str, Any], segments: list[dict[str, Any
         ops = []
         measurements = [{"qubit": m.get("qubit"), "clbit": m.get("clbit")} for m in draft.get("measurements", [])]
         for op in draft.get("operations", []):
+            if op.get("gate") == "MEASURE" and op.get("clbits"):  # a mid-circuit measurement (descriptions only)
+                ops.append({"gate": "MEASURE", "targets": op.get("targets") or [], "clbits": op["clbits"]})
+                continue
             if op.get("gate") == "MEASURE":  # a meter put in the wrong list: it has no clbit, so give it one
                 _add_measurements(measurements, op.get("targets") or [])
                 continue
             item: dict[str, Any] = {k: op.get(k, []) for k in ("targets", "controls", "params")}
             item["gate"] = op.get("gate")
+            bits = op.get("condition_bits") or []
+            if bits:
+                item["conditional"] = {"classical_register": bits[0] if len(bits) == 1 else bits,
+                                       "value": int(op.get("condition_value") or 0)}
             src = _source(op, by_id, size)
             if src:
                 item["source"] = src
             ops.append(item)
         num_clbits = draft.get("num_clbits")
         used = [m["clbit"] for m in measurements if isinstance(m.get("clbit"), int)]
+        used += [c for o in ops if o["gate"] == "MEASURE" for c in o.get("clbits", []) if isinstance(c, int)]
         if used and isinstance(num_clbits, int) and max(used) >= num_clbits:
             num_clbits = max(used) + 1
         return {

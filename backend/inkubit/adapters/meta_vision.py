@@ -168,7 +168,7 @@ class MetaReasoningModel(ReasoningModel):
     def _draft_validated(self, messages: list[dict[str, Any]], kind: str, seg_dicts: list[dict[str, Any]],
                          size: tuple[int, int] | None, what: str):
         """Structured draft, validated; one re-prompt with the readable issues if it fails."""
-        schema = draft_schema(kind)
+        schema = draft_schema(kind, text=what == "description")
         data, cached, raw = self._json(messages, schema, f"{kind}_draft", "medium")
         attempts = 1
         spec = draft_to_spec(kind, data, seg_dicts, size)
@@ -434,8 +434,10 @@ def diagram_prompt(spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> s
                 angle = f"({op.params[0]:.2f} rad)" if op.params else ""
                 steps.append(f"a box labelled {op.gate}{angle} on " + ", ".join(f"q{q}" for q in op.targets))
             if op.conditional is not None and len(steps) > before:
-                c, v = op.conditional.classical_register, op.conditional.value
-                steps[-1] += f", applied only when c{c} reads {v} (a dashed line from the gate down to c{c}, labelled ={v})"
+                pairs = op.conditional.pairs()
+                when = " and ".join(f"c{c} reads {v}" for c, v in pairs)
+                wires = ", ".join(f"c{c} (={v})" for c, v in pairs)
+                steps[-1] += f", applied only when {when} (a dashed line from the gate down to {wires})"
         measured = (result.get("verdict") or {}).get("measured", {})
         top = ", ".join(f"{k}: {v * 100:.0f}%" for k, v in sorted(measured.items(), key=lambda kv: -kv[1])[:4])
         return (f"An annotated quantum circuit diagram titled '{spec.metadata.title or 'Quantum circuit'}'. "

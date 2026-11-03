@@ -20,7 +20,7 @@ traced back to a tool that computed it.
 | **A real IBM quantum computer** | The discovery lab's GHZ circuit for 7 qubits (Muse Spark's own layout) ran on IBM's ibm_fez next to the textbook circuit, on the same seven qubits: GHZ fidelity **0.814 against 0.795** (3.2 standard errors), both certifying genuine 7-qubit entanglement; for W and Dicke states the discovered circuits used 8 two-qubit gates against 17 and tied within shot noise. On four smaller circuits a digital twin from the chip's calibration beat the noiseless odds and the generic preset on 4 of 4 (distance 0.021 to 0.038), and Inkubit's new **calibrated preset**, built from the chip's median calibration, came closer still (0.013 to 0.027): [docs/DISCOVERY_HARDWARE.md](docs/DISCOVERY_HARDWARE.md), [docs/HARDWARE.md](docs/HARDWARE.md) |
 | **IBM Quantum, in the app** | Live calibration maps of 3 IBM Heron chips, a placement advisor that scores every way to put a circuit on a chip, and **Run on IBM Quantum** from the editor. On ibm_fez the advisor's best, median and worst placements of the same GHZ-5 circuit measured **0.894, 0.814 and 0.285**, exactly its order; teleportation with real mid-circuit measurement and feed-forward reached an average fidelity of **0.924 ± 0.002** against the classical limit of 0.667 (0.499 without the corrections): [docs/IBM_EXPERIMENTS.md](docs/IBM_EXPERIMENTS.md) |
 | **The proof sheet** | 11 independent checks of 9 kinds on any circuit in about eight seconds (two simulators of each kind, a physical density matrix, translation validation of Qiskit's compiler, OpenQASM read-back, a G-test, the generated code in the sandbox, metamorphic tests); over the whole gallery **299 passed and 0 failed**, and its first run found a real export bug: [docs/PROOFSHEET.md](docs/PROOFSHEET.md) |
-| **26 algorithms in 8 categories** | Each checked against its known answer in a test: the newest is teleportation with real feed-forward (mid-circuit measurement, then X and Z only when the measured bits say so), then quantum counting, HHL (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, hidden shift, Shor's nine-qubit code, Grover with two marked items and two nonlocal games (CHSH won cos²(π/8) of the time; the GHZ game won every time) |
+| **27 algorithms in 8 categories** | Each checked against its known answer in a test: the newest are a bit-flip code that measures its syndrome with one reused helper qubit and fixes only the qubit the two syndrome bits point to, and teleportation with real feed-forward (X and Z only when the measured bits say so), then quantum counting, HHL (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, hidden shift, Shor's nine-qubit code, Grover with two marked items and two nonlocal games (CHSH won cos²(π/8) of the time; the GHZ game won every time) |
 | **Mission control** | A whole problem in words, a photo or speech becomes a plan of exact tools that runs live in parallel; in a 30-mission live benchmark every mission finished, all 68 steps were verified (one repaired by the model), 204 of 209 report numbers were traced to a tool result, median 15 s: [docs/MISSIONS.md](docs/MISSIONS.md) |
 | **Discovery lab** | Muse Spark proposes, physics proves: a GHZ state on all 7 qubits of an IBM heavy-hex chip in **6 CNOTs** (the textbook circuit compiled onto the chip: 10), W and Dicke states in **5** where Qiskit's compiler uses 11, each proven by Qiskit |
 | **ML error-correction decoder** | On the distance-3 surface code a NumPy network makes **21% fewer logical errors** than minimum-weight matching at 1% noise, as learned decoders like AlphaQubit do. At **distance 5** the bigger code suppresses errors **5.9x** per round (Λ; Google's Willow measured 2.14), and a network on top of matching that sees both matchings' corrections makes 10% fewer errors again (paired test z = 7.8) |
@@ -55,7 +55,7 @@ cd backend && python -m uvicorn inkubit.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 571 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+live. 591 backend tests, all offline except one opt-in live check (`cd backend && python -m pytest -q`), and browser tests drive the built app
 (`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D81); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
@@ -356,7 +356,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (571 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (591 tests, one opt-in live,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per
@@ -385,27 +385,37 @@ Gates: `H X Y Z S T SDG TDG SX RX RY RZ CX CZ CP SWAP CCX MEASURE BARRIER` (enou
 Grover, Bernstein-Vazirani, Deutsch-Jozsa, QFT, phase estimation, teleportation and the W state;
 all but QFT are in the example gallery, and QFT is one sentence away in "describe it in words").
 
-**Feed-forward.** A `MEASURE` operation can sit in the middle of the list (a mid-circuit measurement), and any gate can
-carry an optional `conditional`: it runs only when a classical bit written by an earlier `MEASURE` reads the value.
+**Feed-forward.** A `MEASURE` operation can sit in the middle of the list (a mid-circuit measurement), a measured qubit
+can be used and measured again, `RESET` puts a qubit back to 0, and any gate can carry an optional `conditional`: it
+runs only when classical bits written by earlier `MEASURE`s read the value. Several bits are a list, with the value read
+in binary and the first listed bit lowest (Qiskit's register convention).
 
 ```json
-{"gate": "MEASURE", "targets": [0, 1], "clbits": [0, 1]},
-{"gate": "X", "targets": [2], "conditional": {"classical_register": 1, "value": 1}},
+{"gate": "MEASURE", "targets": [3], "clbits": [0]},
+{"gate": "RESET", "targets": [3]},
+{"gate": "MEASURE", "targets": [3], "clbits": [1]},
+{"gate": "X", "targets": [1], "conditional": {"classical_register": [0, 1], "value": 3}},
 {"gate": "Z", "targets": [2], "conditional": {"classical_register": 0, "value": 1}}
 ```
 
-The generated code writes it as Qiskit's `with qc.if_test((qc.clbits[1], 1)):` (Qiskit 2 removed `c_if`), the same
-construct IBM's chips run, so **Run on IBM Quantum** sends it unchanged. The verifier predicts it exactly, without
+The generated code writes a condition as Qiskit's `with qc.if_test((qc.clbits[0], 1)):` (Qiskit 2 removed `c_if`),
+nested one level per bit, and a reset as `qc.reset(q)`: the constructs IBM's chips run, so **Run on IBM Quantum** sends
+them unchanged (both examples compile for ibm_fez with native `if_else` and `reset`). The verifier predicts it exactly, without
 sampling, by deferred measurement: each mid-circuit measurement copies its qubit onto a record qubit, a conditioned gate
-becomes the same gate controlled by that record, readout flips act on the record (the chip acts on the bit it read), and
-a conditioned gate's error acts only in the branch where it fires. Against 200,000-shot Aer runs of the generated
+becomes the same gate controlled by its records, a reset swaps the qubit's state onto a fresh qubit nobody reads,
+readout flips act on the record (the chip acts on the bit it read), and a conditioned gate's error acts only in the
+branch where it fires. Against 200,000-shot Aer runs of the generated
 `if_test` code that prediction agrees to the shot-noise floor, including under deliberately heavy noise with conditional
-two-qubit gates (`tests/test_feedforward.py`). The editor draws classical bits as double lines and each conditional gate
-with a dashed line down to the bit it reads; a checkbox per gate makes it conditional. Safety checks refuse a condition
-on a bit nothing has measured yet (or measures later), on an out-of-range bit, on a `MEASURE` itself, a gate on a qubit
-after it was measured, and a circuit whose record qubits would pass 10. Tools built on one state (step-through, live
-state, optimizer, proof sheet, Rosetta exports) refuse feed-forward circuits in words rather than guess. Example:
-`examples/specs/teleportation_feedforward.json`.
+two-qubit gates, resets, reused qubits and two-bit conditions (`tests/test_feedforward.py`). The editor draws classical
+bits as double lines, a reset as |0⟩, and each conditional gate with a dashed line down to the bits it reads (a filled dot
+for 1, a hollow one for 0); per gate, "if c[x] = v" with + for another bit. Safety checks refuse a condition on a bit
+nothing has measured yet (or measures later), on an out-of-range or repeated bit, a value that does not fit its bits, a
+conditional `MEASURE`, `RESET` or `BARRIER`, a classical bit written twice, and a circuit whose added qubits would pass
+10. Tools built on one state (step-through, live state, optimizer, proof sheet, Rosetta exports) refuse these circuits
+in words rather than guess. Descriptions reach them too: offline, "teleportation with feed-forward", "bit-flip error
+correction with a measured syndrome" and "active reset" route to the exact examples; live, Muse Spark fills a text-only
+draft that can carry mid-circuit measurements and conditions (the sketch reader's format is unchanged). Examples:
+`examples/specs/bit_flip_feedforward.json`, `teleportation_feedforward.json`, `active_reset.json`.
 
 Networks list `nodes` (`ground_station`, `satellite`,
 `repeater`, optional `memory_t2_ms`, `aperture_m`, `position`), `links`
@@ -559,10 +569,11 @@ results caught. Regenerate with `scripts/benchmark.py`.
 - Verification compares measurement statistics. It cannot see a pure phase error
   that does not change the outcome distribution, and it does not catch changes
   smaller than the threshold (e.g. an angle off by a few degrees). See D8.
-- Feed-forward is supported in the run, the verifier, the editor and IBM runs, but a measured qubit cannot be reused
-  (no reset), conditions read one classical bit, and the tools built on a single state (step-through, live state,
-  optimizer, proof sheet, Rosetta exports) refuse feed-forward circuits. Sketch and text reading do not produce
-  conditions yet; add them in the editor. Circuits are capped at 12 qubits (10 with record qubits).
+- Feed-forward (mid-circuit measurement, reuse, reset, conditions on several bits) is supported in the run, the
+  verifier, the editor, descriptions and IBM runs, but each classical bit is written once, a reset cannot itself be
+  conditional (measure and flip instead), and the tools built on a single state (step-through, live state, optimizer,
+  proof sheet, Rosetta exports) refuse these circuits. Sketches do not produce conditions yet; add them in the editor.
+  Circuits are capped at 12 qubits (10 counting the qubits the exact model adds).
 - The code sandbox is a guard rail (AST check, subprocess, timeout, scrubbed
   environment), not an OS-level sandbox. Run untrusted model output on a machine
   you control.

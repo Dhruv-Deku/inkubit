@@ -16,7 +16,7 @@ SPEC_VERSION = "1.0"
 
 GateName = Literal[
     "H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX", "RX", "RY", "RZ",
-    "CX", "CZ", "CP", "SWAP", "CCX", "MEASURE", "BARRIER"
+    "CX", "CZ", "CP", "SWAP", "CCX", "MEASURE", "RESET", "BARRIER"
 ]
 
 SINGLE_QUBIT_GATES = frozenset({"H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX", "RX", "RY", "RZ"})
@@ -71,10 +71,22 @@ class Metadata(_Strict):
 
 
 class Conditional(_Strict):
-    """Feed-forward: the gate runs only when an earlier mid-circuit measurement read this value."""
+    """Feed-forward: the gate runs only when earlier mid-circuit measurements read this value.
 
-    classical_register: int = Field(ge=0, description="Index of the classical bit the gate depends on.")
-    value: Literal[0, 1] = Field(description="The gate runs only when that bit reads this value.")
+    ``classical_register`` is one classical bit, or a list of them; ``value`` is read in binary with the first listed
+    bit as the least significant (Qiskit's register convention), so ``[0, 1]`` with value 1 means c0 = 1 and c1 = 0.
+    """
+
+    classical_register: Annotated[int, Field(ge=0)] | list[Annotated[int, Field(ge=0)]] = Field(
+        description="The classical bit, or bits, the gate depends on.")
+    value: int = Field(ge=0, description="The gate runs only when the bits read this value (first listed bit lowest).")
+
+    def bits(self) -> list[int]:
+        return [self.classical_register] if isinstance(self.classical_register, int) else list(self.classical_register)
+
+    def pairs(self) -> list[tuple[int, int]]:
+        """(classical bit, the value it must read), first listed bit first."""
+        return [(c, (self.value >> k) & 1) for k, c in enumerate(self.bits())]
 
 
 class Operation(_Strict):
@@ -124,8 +136,19 @@ class CircuitSpec(_Strict):
         return self
 
     def is_dynamic(self) -> bool:
-        """True when a gate depends on a mid-circuit measurement (feed-forward)."""
-        return any(op.conditional is not None for op in self.operations)
+        """True when the run depends on a mid-circuit measurement: a gate conditioned on a measured bit, a reset,
+        or a qubit used or measured again after it was measured. Such a run branches, so it has no single state."""
+        measured: set[int] = set()
+        for op in self.operations:
+            if op.conditional is not None or op.gate == "RESET":
+                return True
+            if op.gate == "MEASURE":
+                if measured & set(op.targets):
+                    return True
+                measured |= set(op.targets)
+            elif op.gate != "BARRIER" and measured & {*op.targets, *op.controls}:
+                return True
+        return bool(measured & {m.qubit for m in self.measurements})
 
     def measured_pairs(self) -> list[tuple[int, int]]:
         """All (qubit, clbit) measurement pairs, from MEASURE ops and the measurement list."""

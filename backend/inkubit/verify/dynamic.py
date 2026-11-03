@@ -1,8 +1,9 @@
 """Exact outcome distributions for circuits with mid-circuit measurement and feed-forward.
 
 The deferred-measurement principle makes them exact without sampling. Each mid-circuit measurement copies the
-measured qubit's Z value onto a fresh record qubit (the classical bit), a gate conditioned on that bit becomes the
-same gate controlled by its record, and the records are read at the end along with the terminal measurements. Under
+measured qubit's Z value onto a fresh record qubit (the classical bit), a gate conditioned on bits becomes the
+same gate controlled by their records, a reset swaps the qubit's state onto a fresh qubit that is never read again
+(exactly "forget it and start from 0"), and the records are read at the end along with the terminal measurements. Under
 noise the record passes through the readout channel, because the chip acts on the bit it read, flips included, and a
 conditioned gate's error channel acts only in the branch where the gate fires. The channels are the verifier's own
 (``insights.circuit.gate_channels``, checked against Aer in a test), so a sampled run of the generated ``if_test`` code
@@ -15,7 +16,7 @@ from functools import lru_cache
 
 import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import CXGate
+from qiskit.circuit.library import CXGate, SwapGate
 from qiskit.quantum_info import DensityMatrix, Kraus, SuperOp, Statevector
 
 from inkubit.sim.noise import NoisePreset
@@ -25,8 +26,8 @@ _PROJ = (np.diag([1.0, 0.0]), np.diag([0.0, 1.0]))
 
 
 def record_count(spec: CircuitSpec) -> int:
-    """Record qubits the model adds: one per qubit measured mid-circuit."""
-    return sum(len(op.targets) for op in spec.operations if op.gate == "MEASURE")
+    """Qubits the model adds: a record per qubit measured mid-circuit, a fresh qubit per reset."""
+    return sum(len(op.targets) for op in spec.operations if op.gate in ("MEASURE", "RESET"))
 
 
 @lru_cache(maxsize=16)
@@ -38,10 +39,14 @@ def _readout(p01: float, p10: float) -> Kraus:
     ])
 
 
-def _branch(channel: SuperOp, value: int) -> Kraus:
-    """A gate's error channel on its qubits, applied only where the record (the last qubit) reads ``value``."""
+def _branch(channel: SuperOp, values: list[int]) -> Kraus:
+    """A gate's error channel on its qubits, applied only where the records (the qubits after them, first listed
+    lowest) read ``values``; elsewhere nothing happens."""
     ks = Kraus(channel).data
-    fire, idle = _PROJ[value], _PROJ[1 - value]
+    fire = np.array([[1.0]])
+    for v in values:  # the first record is the lowest of the record qubits, so it is the rightmost factor
+        fire = np.kron(_PROJ[v], fire)
+    idle = np.eye(fire.shape[0]) - fire
     return Kraus([np.kron(fire, k) for k in ks] + [np.kron(idle, np.eye(ks[0].shape[0]))])
 
 
@@ -64,6 +69,11 @@ def distribution(spec: CircuitSpec, preset: NoisePreset | None) -> dict[str, flo
     for op in spec.operations:
         if op.gate == "BARRIER":
             continue
+        if op.gate == "RESET":  # the state leaves on a fresh qubit nobody reads; the qubit starts again from 0
+            for q in op.targets:
+                state = state.evolve(SwapGate(), qargs=[q, nxt])
+                nxt += 1
+            continue
         if op.gate == "MEASURE":
             for q, c in zip(op.targets, op.clbits):
                 state = state.evolve(CXGate(), qargs=[q, nxt])
@@ -84,10 +94,11 @@ def distribution(spec: CircuitSpec, preset: NoisePreset | None) -> dict[str, flo
                 if k in channels:
                     state = state.evolve(channels[k], qargs=qargs)
             else:
-                rec = record[cond.classical_register]
-                state = state.evolve(inst.operation.control(1, ctrl_state=cond.value), qargs=[rec, *qargs])
+                pairs_cv = cond.pairs()
+                recs = [record[c] for c, _ in pairs_cv]
+                state = state.evolve(inst.operation.control(len(recs), ctrl_state=cond.value), qargs=[*recs, *qargs])
                 if k in channels:
-                    state = state.evolve(_branch(channels[k], cond.value), qargs=[*qargs, rec])
+                    state = state.evolve(_branch(channels[k], [v for _, v in pairs_cv]), qargs=[*qargs, *recs])
     pairs += [(m.qubit, m.clbit) for m in spec.measurements]
     dist = _to_clbit_keys(state.probabilities_dict(qargs=[q for q, _ in pairs]), spec, pairs)
     if noisy:  # records already carry their readout flips; the terminal measurements get theirs here

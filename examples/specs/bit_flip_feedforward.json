@@ -1,0 +1,32 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 4,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "RY", "targets": [0], "params": [2.0943951023931953]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "CX", "targets": [2], "controls": [0]},
+    {"gate": "X", "targets": [1]},
+    {"gate": "CX", "targets": [3], "controls": [0]},
+    {"gate": "CX", "targets": [3], "controls": [1]},
+    {"gate": "MEASURE", "targets": [3], "clbits": [0]},
+    {"gate": "RESET", "targets": [3]},
+    {"gate": "CX", "targets": [3], "controls": [1]},
+    {"gate": "CX", "targets": [3], "controls": [2]},
+    {"gate": "MEASURE", "targets": [3], "clbits": [1]},
+    {"gate": "X", "targets": [0], "conditional": {"classical_register": [0, 1], "value": 1}},
+    {"gate": "X", "targets": [1], "conditional": {"classical_register": [0, 1], "value": 3}},
+    {"gate": "X", "targets": [2], "conditional": {"classical_register": [0, 1], "value": 2}},
+    {"gate": "CX", "targets": [2], "controls": [0]},
+    {"gate": "CX", "targets": [1], "controls": [0]}
+  ],
+  "measurements": [
+    {"qubit": 0, "clbit": 2}
+  ],
+  "metadata": {
+    "title": "Bit-flip code with feed-forward correction",
+    "notes": "q0 holds RY(2pi/3)|0> and is copied onto q1 and q2; an X error hits q1 on purpose. One helper qubit, q3, measures the parity of q0 q1 into c0, is reset, and measures the parity of q1 q2 into c1. The syndrome (c0, c1) says which qubit flipped and only that one is fixed, decided on the chip. Decoded, q0 reads 1 with 75%, as if the error never happened.",
+    "origin": "manual"
+  }
+}

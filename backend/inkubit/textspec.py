@@ -88,6 +88,15 @@ def _qft_ops(qubits: list[int]) -> list[dict[str, Any]]:
 
 def _named_circuit(text: str) -> tuple[dict[str, Any], str] | None:
     t = text.lower()
+    # feed-forward first: "teleportation with feed-forward" must not fall through to a plain Bell pair
+    ff = bool(re.search(r"feed.?forward|mid.?circuit|classical(?:ly)?.control|dynamic circuit|if.?test|syndrome", t))
+    qec = bool(re.search(r"bit.?flip|error.?correct|syndrome|repetition code", t))
+    if ff and "teleport" in t:
+        return _with_origin(_example("teleportation_feedforward")), "teleportation with feed-forward"
+    if ff and qec:
+        return _with_origin(_example("bit_flip_feedforward")), "a bit-flip code with a measured syndrome and feed-forward correction"
+    if "active reset" in t or (ff and "reset" in t):
+        return _with_origin(_example("active_reset")), "an active reset (measure, then flip back if it read 1)"
     if re.search(r"\bbell\b|epr pair", t):
         return _with_origin(_example("bell")), "a Bell pair"
     if "ghz" in t or "cat state" in t:

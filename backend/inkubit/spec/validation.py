@@ -77,7 +77,12 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
             add(where, "the same target qubit is listed twice.")
 
         g = op.gate
-        if g in SINGLE_QUBIT_GATES:
+        if g == "RESET":
+            if not op.targets:
+                add(where, "RESET needs at least one target qubit.")
+            if op.controls or op.params or op.clbits:
+                add(where, "RESET takes only target qubits.")
+        elif g in SINGLE_QUBIT_GATES:
             if not op.targets:
                 add(where, "needs at least one target qubit.")
             if op.controls:
@@ -118,23 +123,27 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
             if op.controls or op.params:
                 add(where, "BARRIER takes only target qubits (or none, meaning all).")
 
-        if g not in ("MEASURE", "BARRIER"):
-            for q in [*op.targets, *op.controls]:
-                if q in measured_at:
-                    add(where, f"acts on qubit {q} after it was measured in operations[{measured_at[q]}]; a measured "
-                               "qubit cannot be used again, but later gates on other qubits can depend on its "
-                               "result through a conditional.")
         cond = op.conditional
         if cond is not None:
-            c = cond.classical_register
-            if g in ("MEASURE", "BARRIER"):
-                add(where, f"{g} cannot be conditional; only gates can depend on a measured bit.")
-            elif not 0 <= c < nc:
-                add(where, f"is conditional on classical bit {c}, which is out of range; this circuit has {nc} "
-                           f"classical bit{'s' if nc != 1 else ''}.")
-            elif c not in written_at:
-                add(where, f"is conditional on classical bit {c}, but no earlier MEASURE writes it; add a "
-                           f"mid-circuit MEASURE into c{c} before this gate.")
+            bits = cond.bits()
+            if g in ("MEASURE", "BARRIER", "RESET"):
+                add(where, f"{g} cannot be conditional; only gates can depend on measured bits (for an active reset, "
+                           "measure and apply X when the bit reads 1).")
+            elif not bits:
+                add(where, "the conditional lists no classical bit.")
+            elif len(set(bits)) != len(bits):
+                add(where, "the conditional lists the same classical bit twice.")
+            elif cond.value >= 2 ** len(bits):
+                add(where, f"the conditional value {cond.value} does not fit in {len(bits)} bit"
+                           f"{'s' if len(bits) != 1 else ''} (largest {2 ** len(bits) - 1}).")
+            else:
+                for c in bits:
+                    if not 0 <= c < nc:
+                        add(where, f"is conditional on classical bit {c}, which is out of range; this circuit has "
+                                   f"{nc} classical bit{'s' if nc != 1 else ''}.")
+                    elif c not in written_at:
+                        add(where, f"is conditional on classical bit {c}, but no earlier MEASURE writes it; add a "
+                                   f"mid-circuit MEASURE into c{c} before this gate.")
         if g == "MEASURE":
             for q in op.targets:
                 measured_at.setdefault(q, i)
@@ -142,11 +151,11 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
                 written_at.setdefault(c, i)
 
     if spec.is_dynamic():
-        records = sum(len(op.targets) for op in spec.operations if op.gate == "MEASURE")
+        records = sum(len(op.targets) for op in spec.operations if op.gate in ("MEASURE", "RESET"))
         if nq + records > MAX_DYNAMIC_QUBITS:
             add("operations", f"feed-forward circuits are verified exactly with one record qubit per mid-circuit "
-                              f"measurement; this one needs {nq + records} qubits, above the limit of "
-                              f"{MAX_DYNAMIC_QUBITS}. Use fewer qubits or mid-circuit measurements.")
+                              f"measurement or reset; this one needs {nq + records} qubits, above the limit of "
+                              f"{MAX_DYNAMIC_QUBITS}. Use fewer qubits, measurements or resets.")
 
     for j, m in enumerate(spec.measurements):
         where = f"measurements[{j}]"
@@ -161,9 +170,7 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
                             "add a measurement for each qubit you want to read.")
     seen_q: set[int] = set()
     seen_c: set[int] = set()
-    for q, c in pairs:
-        if q in seen_q:
-            add("measurements", f"qubit {q} is measured more than once.")
+    for q, c in pairs:  # a qubit may be measured again (it can be reused); a classical bit is written once
         if c in seen_c:
             add("measurements", f"classical bit {c} is written more than once.")
         seen_q.add(q)

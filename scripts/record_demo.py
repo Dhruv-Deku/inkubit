@@ -378,6 +378,28 @@ async def sketch_story(d: Director) -> None:
     await d.wait(0.8)
 
 
+async def feedforward_story(d: Director) -> None:
+    """Feed-forward: an error-correction cycle that measures its syndrome mid-circuit and fixes only the flipped qubit."""
+    page = d.page
+    btn = page.locator(".spec-list button", has_text="Bit-flip code with feed-forward")
+    await d.scroll_to(btn, block="center", pause=0.5)
+    await d.click(btn)
+    await page.wait_for_selector(".preview svg", timeout=60_000)
+    await d.scroll_to(page.locator(".preview").first, block="center", pause=0.6)
+    await d.caption("**Feed-forward**: a helper qubit measures the error syndrome mid-circuit, is reset and reused, "
+                    "and only the qubit the two bits point to is fixed, on the chip.", hold=4.6)
+    await d.caption(None)
+    await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.3)
+    await d.click(page.locator("button.btn.primary.big"))
+    await d.fast(4, "sandbox run")
+    await page.wait_for_selector(".verdict-badge", timeout=240_000)
+    await d.normal()
+    await d.caption("Predicted exactly over every branch, verified, and it compiles for IBM's ibm_fez as it is.", hold=3.4)
+    await d.scroll_top()
+    await d.click(page.locator("nav.steps button >> nth=0"))
+    await d.wait(0.8)
+
+
 async def discovery_story(d: Director) -> None:
     page, live = d.page, d.live
     await section(d, "Discover")
@@ -500,7 +522,7 @@ async def record(base: str, out: Path) -> None:
             await page.screenshot(path=str(out.with_suffix(".png")))
             await d.hide_card()
             F.update(facts())
-            for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("discovery", discovery_story),
+            for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("feedforward", feedforward_story), ("discovery", discovery_story),
                                 ("learning", learning_story), ("estimator", estimator_story), ("paper", paper_story),
                                 ("hardware", hardware_story), ("evidence", evidence_story)):
                 print(name, f"{rec._video_time(time.monotonic()):.1f} s", flush=True)

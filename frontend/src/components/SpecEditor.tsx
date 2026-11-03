@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CircuitSpec, Gate, NetLink, NetNode, NetworkSpec, Operation, Spec, SpecIssue } from '../types'
 import { GATE_LABEL, GATES } from '../types'
-import { angleText, clone, parseAngle, parseIntList, resizeCircuit } from '../util'
+import { angleText, clone, condFrom, condPairs, parseAngle, parseIntList, resizeCircuit } from '../util'
 import { CircuitPreview, SHORT, wiresFor, type Compose } from './CircuitPreview'
 import { Down, Trash, Up } from './Icons'
 import { LiveStrip } from './LiveState'
@@ -155,7 +155,11 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
   const changeGate = (i: number, g: Gate) => {
     const op = spec.operations[i]
     const next: Operation = { ...op, gate: g }
-    if (g === 'MEASURE' || g === 'BARRIER') next.conditional = null
+    if (g === 'MEASURE' || g === 'BARRIER' || g === 'RESET') next.conditional = null
+    if (g === 'RESET') {
+      setOp(i, { ...next, targets: op.targets.length ? op.targets : [0], controls: [], params: [], clbits: [] })
+      return
+    }
     if (g === 'MEASURE') {
       const c = freeClbit(spec)
       update((s) => {
@@ -233,7 +237,7 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
                     s.operations[i] = { ...s.operations[i], clbits: v }
                     s.num_clbits = Math.max(s.num_clbits, ...v.map((c) => c + 1))
                   })} /></span>
-                ) : op.gate === 'BARRIER' ? <span className="muted">—</span> : (
+                ) : op.gate === 'BARRIER' || op.gate === 'RESET' ? <span className="muted">—</span> : (
                   <Condition op={op} bits={bitsBefore(spec, i)} onChange={(c) => setOp(i, { conditional: c })} />
                 )}</td>
                 <td>{op.source ? <span className="chip-src">{Math.round(op.source.confidence * 100)}% sure</span> : <span className="muted">added</span>}</td>
@@ -294,24 +298,34 @@ function bitsBefore(s: CircuitSpec, i: number): number[] {
   return [...new Set(s.operations.slice(0, i).flatMap((o) => (o.gate === 'MEASURE' ? o.clbits ?? [] : [])))].sort((a, b) => a - b)
 }
 
-/** "Make conditional on classical bit X": a checkbox, the bit and the value it must read. */
+/** "Make conditional on classical bit X": a checkbox, then one "c[x] = v" per bit; + adds a bit, − drops the last. */
 function Condition({ op, bits, onChange }: { op: Operation; bits: number[]; onChange: (c: Operation['conditional']) => void }) {
-  const cond = op.conditional
-  const options = cond && !bits.includes(cond.classical_register) ? [...bits, cond.classical_register] : bits
+  const pairs = op.conditional ? condPairs(op.conditional) : []
+  const used = pairs.map(([c]) => c)
+  const spare = bits.filter((c) => !used.includes(c))
+  const set = (k: number, pair: [number, number]) => onChange(condFrom(pairs.map((p, j) => (j === k ? pair : p))))
   return (
-    <span className="ff" title={bits.length || cond ? 'Run this gate only when an earlier mid-circuit measurement read this value'
+    <span className="ff" title={bits.length || pairs.length ? 'Run this gate only when earlier mid-circuit measurements read these values'
       : 'Add a mid-circuit measurement above this gate first: a gate can only depend on a bit measured before it'}>
-      <input type="checkbox" aria-label="Make conditional on a classical bit" checked={!!cond} disabled={!cond && !bits.length}
-        onChange={(e) => onChange(e.target.checked ? { classical_register: bits[bits.length - 1], value: 1 } : null)} />
-      {cond ? (
+      <input type="checkbox" aria-label="Make conditional on a classical bit" checked={pairs.length > 0} disabled={!pairs.length && !bits.length}
+        onChange={(e) => onChange(e.target.checked ? condFrom([[bits[bits.length - 1], 1]]) : null)} />
+      {pairs.length ? (
         <>
-          if c<select aria-label="Classical bit" value={cond.classical_register}
-            onChange={(e) => onChange({ ...cond, classical_register: Number(e.target.value) })}>
-            {options.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-          =<select aria-label="Value" value={cond.value} onChange={(e) => onChange({ ...cond, value: Number(e.target.value) as 0 | 1 })}>
-            <option value={1}>1</option><option value={0}>0</option>
-          </select>
+          {pairs.map(([c, v], k) => {
+            const options = [c, ...spare].sort((a, b) => a - b)
+            return (
+              <span key={k} className="ff-bit">{k ? 'and ' : 'if '}c<select aria-label="Classical bit" value={c}
+                onChange={(e) => set(k, [Number(e.target.value), v])}>
+                {options.map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>=<select aria-label="Value" value={v} onChange={(e) => set(k, [c, Number(e.target.value)])}>
+                <option value={1}>1</option><option value={0}>0</option>
+              </select></span>
+            )
+          })}
+          {spare.length > 0 && <button className="icon-btn ff-more" title="Also depend on another measured bit"
+            onClick={() => onChange(condFrom([...pairs, [spare[0], 1]]))}>+</button>}
+          {pairs.length > 1 && <button className="icon-btn ff-more" title="Drop the last bit"
+            onClick={() => onChange(condFrom(pairs.slice(0, -1)))}>−</button>}
         </>
       ) : <span className="muted">{bits.length ? 'conditional' : 'measure first'}</span>}
     </span>

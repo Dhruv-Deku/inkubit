@@ -940,3 +940,5 @@ details summary { cursor: pointer; }
 .uc-who { text-transform: none; letter-spacing: 0; font-size: 12px; }
 .uc-cta { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
 .uc-card:hover .uc-cta { color: var(--text); }
+.ops .ff .ff-bit { display: inline-flex; align-items: center; gap: 2px; }
+.ops .ff .ff-more { width: 20px; height: 20px; font-size: 14px; line-height: 1; }

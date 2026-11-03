@@ -25,6 +25,9 @@ GALLERY = {
     "teleportation_feedforward": {**{f"0{k}": 0.0625 for k in ("00", "01", "10", "11")}, **{f"1{k}": 0.1875 for k in ("00", "01", "10", "11")}},
     "w_state": {"001": 1 / 3, "010": 1 / 3, "100": 1 / 3},
     "bit_flip_code": {"0": 0.25, "1": 0.75},  # the error on q1 is corrected
+    # the same code with a measured syndrome: (c0, c1) always reads (1, 1), q1 is fixed on the chip, q0 decodes as RY
+    "bit_flip_feedforward": {"011": 0.25, "111": 0.75},
+    "active_reset": {"00": 0.5, "01": 0.5},  # measured, flipped back if it read 1: the second reading is always 0
     "qft_period": {"000": 0.5, "100": 0.5},
     "simon": {"00": 0.5, "11": 0.5},
     "swap_test": {"0": 0.75, "1": 0.25},

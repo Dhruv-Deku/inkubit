@@ -1,12 +1,12 @@
 import { useState, type ReactElement } from 'react'
 import type { CircuitSpec, Gate, Operation } from '../types'
-import { angleText } from '../util'
+import { angleText, condPairs } from '../util'
 
 const COL = 64
 const ROW = 46
 const LEFT = 46
 const MULTI = new Set(['CX', 'CZ', 'CP', 'CCX'])
-export const SHORT: Record<string, string> = { SDG: 'S†', TDG: 'T†', SX: '√X' }
+export const SHORT: Record<string, string> = { SDG: 'S†', TDG: 'T†', SX: '√X', RESET: '|0⟩' }
 
 /** How many wires a composer click sequence picks for a gate: controls first, then the target. */
 export const wiresFor = (g: Gate) => (g === 'CCX' ? 3 : MULTI.has(g) || g === 'SWAP' ? 2 : 1)
@@ -29,7 +29,7 @@ function lane(gate: Gate, qs: number[], n: number): number[] {
 /** Classical bits a feed-forward drawing shows as wires: those mid-circuit measurements write or gates read. */
 function classicalBits(ops: Operation[]): number {
   const used = ops.flatMap((op) => [...(op.gate === 'MEASURE' ? op.clbits ?? [] : []),
-    ...(op.conditional ? [op.conditional.classical_register] : [])])
+    ...(op.conditional ? condPairs(op.conditional).map(([c]) => c) : [])])
   return used.length ? Math.max(...used) + 1 : 0
 }
 
@@ -44,7 +44,7 @@ function layout(ops: Operation[], n: number, nc: number): { cols: number[]; free
     const range = op.gate === 'BARRIER' && !op.targets.length ? [0, n - 1] : span
     let lane = MULTI.has(op.gate) || op.gate === 'SWAP' || op.gate === 'BARRIER'
       ? Array.from({ length: range[1] - range[0] + 1 }, (_, i) => range[0] + i) : qs
-    const bits = op.gate === 'MEASURE' && nc ? op.clbits ?? [] : op.conditional ? [op.conditional.classical_register] : []
+    const bits = op.gate === 'MEASURE' && nc ? op.clbits ?? [] : op.conditional ? condPairs(op.conditional).map(([c]) => c) : []
     if (bits.length && qs.length) {
       const deepest = Math.max(...bits.filter((c) => c < nc), 0)
       lane = Array.from({ length: n + deepest + 1 - Math.min(...qs) }, (_, i) => Math.min(...qs) + i)
@@ -88,16 +88,21 @@ export function CircuitPreview({ spec, highlight, onPick, compose }: {
     </g>
   )
 
-  /** Feed-forward: a dashed line from the gate down to the bit it reads, a dot there (filled 1, hollow 0) and "=v". */
+  /** Feed-forward: a dashed line from the gate down past the bits it reads, a dot on each (filled 1, hollow 0), "=v". */
   const condition = (op: Operation, cx: number, from: number): ReactElement | null => {
-    const cond = op.conditional
-    if (!cond || cond.classical_register >= nc) return null
-    const cy = yc(cond.classical_register)
+    if (!op.conditional) return null
+    const pairs = condPairs(op.conditional).filter(([c]) => c < nc)
+    if (!pairs.length) return null
+    const deepest = yc(Math.max(...pairs.map(([c]) => c)))
     return (
       <g pointerEvents="none">
-        <line x1={cx} x2={cx} y1={from} y2={cy} stroke="var(--primary)" strokeWidth={1.6} strokeDasharray="4 3" />
-        <circle cx={cx} cy={cy} r={4.5} fill={cond.value ? 'var(--primary)' : 'var(--bg)'} stroke="var(--primary)" strokeWidth={1.6} />
-        <text x={cx + 8} y={cy - 6} fontSize={10.5} fill="var(--primary)" fontFamily="var(--mono)">={cond.value}</text>
+        <line x1={cx} x2={cx} y1={from} y2={deepest} stroke="var(--primary)" strokeWidth={1.6} strokeDasharray="4 3" />
+        {pairs.map(([c, v]) => (
+          <g key={c}>
+            <circle cx={cx} cy={yc(c)} r={4.5} fill={v ? 'var(--primary)' : 'var(--bg)'} stroke="var(--primary)" strokeWidth={1.6} />
+            <text x={cx + 8} y={yc(c) - 6} fontSize={10.5} fill="var(--primary)" fontFamily="var(--mono)">={v}</text>
+          </g>
+        ))}
       </g>
     )
   }

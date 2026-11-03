@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import type { Amplitude, CircuitSpec, LiveState } from '../types'
-import { pct } from '../util'
+import { isDynamic, pct } from '../util'
 import { BlochSphere } from './Bloch'
 import { EntanglementWeb } from './EntanglementWeb'
 
@@ -52,7 +52,7 @@ export function AmplitudeTable({ amps, hidden = 0, max = 16 }: { amps: Amplitude
 export function LiveStrip({ spec, valid }: { spec: CircuitSpec; valid: boolean }) {
   const [live, setLive] = useState<LiveState | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const branching = spec.operations.some((op) => op.conditional)
+  const branching = isDynamic(spec)
   useEffect(() => {
     if (!valid || branching) return
     const ctl = new AbortController()
@@ -66,7 +66,8 @@ export function LiveStrip({ spec, valid }: { spec: CircuitSpec; valid: boolean }
   if (branching) {
     return (
       <div className="notice" style={{ marginTop: 12 }}>
-        Feed-forward: this circuit branches on its mid-circuit measurements, so there is no single live state to draw.
+        This circuit branches on its mid-circuit measurements (feed-forward, a reset or a reused qubit), so there is no
+        single live state to draw.
         Run it: the result is verified exactly over every branch, and it can run on a real IBM chip as it is.
       </div>
     )

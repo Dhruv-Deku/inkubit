@@ -63,8 +63,15 @@ def test_static_specs_are_unchanged(example):
     ([H0, M0, {"gate": "X", "targets": [1], "conditional": {"classical_register": 7, "value": 1}}], "out of range"),
     ([H0, M0, {"gate": "MEASURE", "targets": [1], "clbits": [1], "conditional": {"classical_register": 0, "value": 1}}],
      "MEASURE cannot be conditional"),
-    ([H0, M0, {"gate": "X", "targets": [0], "conditional": {"classical_register": 0, "value": 1}}],
-     "cannot be used again"),
+    ([H0, M0, {"gate": "RESET", "targets": [0], "conditional": {"classical_register": 0, "value": 1}}],
+     "RESET cannot be conditional"),
+    ([H0, M0, {"gate": "X", "targets": [1], "conditional": {"classical_register": [0, 1], "value": 1}}],
+     "no earlier MEASURE writes it"),
+    ([H0, M0, {"gate": "X", "targets": [1], "conditional": {"classical_register": [0, 0], "value": 1}}],
+     "same classical bit twice"),
+    ([H0, M0, {"gate": "MEASURE", "targets": [1], "clbits": [1]},
+      {"gate": "X", "targets": [2], "conditional": {"classical_register": [0, 1], "value": 4}}], "does not fit in 2 bits"),
+    ([H0, M0, {"gate": "RESET", "targets": [0], "params": [1.0]}], "RESET takes only target qubits"),
 ])
 def test_unsafe_feed_forward_is_refused(ops, message):
     with pytest.raises(SpecError, match=message):
@@ -198,3 +205,110 @@ def test_a_feed_forward_job_runs_verifies_and_draws(example):
     assert job.status == "done" and job.result["verified"]
     assert job.result["exact_diagram"]["image_b64"]
     assert job.result.get("insights") is None
+
+
+# ---------------------------------------------------------------- reuse, reset and conditions on several bits
+
+def test_what_counts_as_feed_forward():
+    terminal = parse_spec(_ff([H0, M0], n=1, nc=1, measurements=[]))
+    assert not terminal.is_dynamic()  # a MEASURE at the end is an ordinary terminal measurement
+    other = parse_spec(_ff([H0, M0, {"gate": "H", "targets": [1]}], n=2, nc=2, measurements=[{"qubit": 1, "clbit": 1}]))
+    assert not other.is_dynamic()  # later gates on other qubits do not depend on it
+    for extra in ({"gate": "H", "targets": [0]}, {"gate": "RESET", "targets": [0]},
+                  {"gate": "MEASURE", "targets": [0], "clbits": [1]}):
+        assert parse_spec(_ff([H0, M0, extra], n=1, nc=2, measurements=[])).is_dynamic()
+
+
+def test_a_reused_qubit_measured_twice_gives_two_independent_coins():
+    spec = parse_spec(_ff([H0, M0, H0, {"gate": "MEASURE", "targets": [0], "clbits": [1]}], n=1, nc=2, measurements=[]))
+    assert ideal_distribution(spec) == pytest.approx({"00": 0.25, "01": 0.25, "10": 0.25, "11": 0.25})
+
+
+def test_reset_forgets_the_state_and_starts_from_zero():
+    spec = parse_spec(_ff([{"gate": "X", "targets": [0]}, {"gate": "CX", "controls": [0], "targets": [1]},
+                           {"gate": "RESET", "targets": [0]}],
+                          n=2, nc=2, measurements=[{"qubit": 0, "clbit": 0}, {"qubit": 1, "clbit": 1}]))
+    assert ideal_distribution(spec) == pytest.approx({"10": 1.0})  # q0 back to 0, its partner untouched
+
+
+def test_a_condition_on_two_bits_reads_the_first_listed_bit_lowest():
+    ops = [{"gate": "X", "targets": [0]}, {"gate": "MEASURE", "targets": [0, 1], "clbits": [0, 1]},
+           {"gate": "X", "targets": [2], "conditional": {"classical_register": [0, 1], "value": 1}}]
+    assert ideal_distribution(parse_spec(_ff(ops))) == pytest.approx({"101": 1.0})  # c0 = 1, c1 = 0: fires
+    ops[2]["conditional"]["value"] = 2
+    assert ideal_distribution(parse_spec(_ff(ops))) == pytest.approx({"001": 1.0})  # wants c1 = 1: stays quiet
+
+
+@pytest.mark.parametrize("name", ["bit_flip_feedforward", "active_reset"])
+def test_reuse_reset_and_two_bit_conditions_match_a_large_sample_under_heavy_noise(example, name):
+    spec = parse_spec(example(name))
+    stress = dataclasses.replace(get_preset("realistic"), name="stress", label="stress",
+                                 p1=0.06, p2=0.12, readout_p01=0.07, readout_p10=0.1)
+    exact = noisy_distribution(spec, stress)
+    sampled = _sampled(spec, stress)
+    assert total_variation_distance(exact, sampled) < 3 * _shot_floor(exact, 200_000)
+
+
+def test_the_error_correction_cycle_code_nests_if_test_resets_and_verifies(example):
+    spec = parse_spec(example("bit_flip_feedforward"))
+    code = generate_code(spec, noise="realistic")
+    assert "qc.reset(3)" in code
+    assert "with qc.if_test((qc.clbits[0], 1)):  # op 12: only when c0 reads 1 and c1 reads 1" in code
+    assert "        with qc.if_test((qc.clbits[1], 1)):" in code and "            qc.x(1)" in code
+    run = run_code(code)
+    assert run.ok, run.stderr
+    verdict = verify_counts(spec, run.counts, "realistic")
+    assert verdict.passed, verdict.reason
+    qc = physical_circuit(spec)
+    assert qc.count_ops()["reset"] == 1 and qc.count_ops()["if_else"] == 3
+
+
+@pytest.mark.parametrize("fault", ["auto", "missing_measurement"])
+def test_the_agent_repairs_a_planted_bug_in_the_error_correction_cycle(example, fault):
+    result = run_agent(parse_spec(example("bit_flip_feedforward")), MockCodeModel(),
+                       AgentOptions(noise="realistic", demo_fault=fault))
+    assert result.verified and len(result.attempts) >= 2
+    assert "qc.reset(3)" in result.final_code
+
+
+# ---------------------------------------------------------------- descriptions
+
+@pytest.mark.parametrize("text,name", [
+    ("teleportation with feed-forward", "teleportation_feedforward"),
+    ("bit-flip error correction with a measured syndrome", "bit_flip_feedforward"),
+    ("an active reset on one qubit", "active_reset"),
+])
+def test_offline_descriptions_reach_the_feed_forward_circuits(example, text, name):
+    from inkubit.textspec import parse_description
+
+    spec, _ = parse_description(text)
+    assert spec["operations"] == example(name)["operations"]
+
+
+def test_a_text_draft_carries_mid_circuit_measurements_and_conditions_but_the_sketch_draft_does_not():
+    from inkubit.spec.draft import draft_schema, draft_to_spec
+
+    blank = {"controls": [], "params": [], "segment_id": "", "box": []}
+    draft = {"title": "t", "num_qubits": 3, "num_clbits": 3, "notes": "",
+             "measurements": [{"qubit": 2, "clbit": 2, "segment_id": ""}],
+             "operations": [{"gate": "H", "targets": [0], "clbits": [], "condition_bits": [], "condition_value": 0, **blank},
+                            {"gate": "MEASURE", "targets": [0, 1], "clbits": [0, 1], "condition_bits": [], "condition_value": 0, **blank},
+                            {"gate": "X", "targets": [2], "clbits": [], "condition_bits": [0, 1], "condition_value": 3, **blank}]}
+    spec = parse_spec(draft_to_spec("circuit", draft, []))
+    assert spec.operations[1].gate == "MEASURE" and spec.operations[1].clbits == [0, 1]
+    assert spec.operations[2].conditional.pairs() == [(0, 1), (1, 1)]
+    assert "condition_bits" in str(draft_schema("circuit", text=True))
+    assert "condition_bits" not in str(draft_schema("circuit"))  # sketch readings (and their cache) are unchanged
+
+
+@pytest.mark.live
+def test_muse_spark_writes_feed_forward_from_a_description():
+    from inkubit.adapters.registry import get_models
+
+    draft = get_models().reasoning.spec_from_text(
+        "Teleport RY(pi/3)|0> from q0 to q2 with real feed-forward: measure q0 and q1 halfway, then apply X to q2 if c1 "
+        "reads 1 and Z to q2 if c0 reads 1, and measure q2 into c2.")
+    spec = parse_spec(draft.spec)
+    assert spec.is_dynamic()
+    c2_one = sum(p for k, p in ideal_distribution(spec).items() if k[0] == "1")
+    assert c2_one == pytest.approx(math.sin(math.pi / 6) ** 2)

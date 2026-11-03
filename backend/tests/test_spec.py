@@ -64,10 +64,10 @@ def test_no_measurement_is_an_error():
                     "operations": [{"gate": "H", "targets": [0]}]})
 
 
-def test_gate_after_measurement_rejected():
-    with pytest.raises(SpecError, match="after it was measured"):
-        parse_spec({"kind": "circuit", "num_qubits": 1, "num_clbits": 1, "operations": [
-            {"gate": "MEASURE", "targets": [0], "clbits": [0]}, {"gate": "X", "targets": [0]}]})
+def test_a_gate_after_a_measurement_reuses_the_qubit():
+    spec = parse_spec({"kind": "circuit", "num_qubits": 1, "num_clbits": 1, "operations": [
+        {"gate": "MEASURE", "targets": [0], "clbits": [0]}, {"gate": "X", "targets": [0]}]})
+    assert spec.is_dynamic()  # the measurement now matters mid-run, so the exact feed-forward model handles it
 
 
 def test_network_links_must_reference_real_nodes(example):

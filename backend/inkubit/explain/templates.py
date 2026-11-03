@@ -18,14 +18,16 @@ def _angle(theta: float) -> str:
 def _op_phrase(op: Operation) -> str:
     phrase = _gate_phrase(op)
     if op.conditional is not None:
-        c, v = op.conditional.classical_register, op.conditional.value
-        phrase = f"only if classical bit c{c} reads {v}, {phrase}"
+        when = " and ".join(f"c{c} reads {v}" for c, v in op.conditional.pairs())
+        phrase = f"only if {when}, {phrase}"
     return phrase
 
 
 def _gate_phrase(op: Operation) -> str:
     qs = ", ".join(f"q{q}" for q in op.targets)
     g = op.gate
+    if g == "RESET":
+        return f"a reset puts {qs} back to 0 so it can be used again"
     if g == "H":
         return f"a Hadamard gate puts {qs} into an equal mix of 0 and 1"
     if g == "X":

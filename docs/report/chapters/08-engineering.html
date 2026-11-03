@@ -97,10 +97,10 @@ app or the README where it applies.</p>
 <li><b>Verification sees statistics.</b> It cannot see a pure phase error that leaves the measured distribution
 unchanged, and it does not catch changes smaller than its threshold, such as an angle off by a few degrees. The
 optimiser's proofs, tomography and the Bell tests look further, but they are not run on every result.</li>
-<li><b>Circuits.</b> Feed-forward (mid-circuit measurement and gates conditioned on one measured bit) runs, verifies
-exactly and goes to IBM chips, but a measured qubit cannot be reused, and the tools built on a single state
-(step-through, live state, optimizer, proof sheet) refuse it. Circuits are capped at 12 qubits, 10 with feed-forward
-record qubits, and the noisy analyses at 10.</li>
+<li><b>Circuits.</b> Feed-forward (mid-circuit measurement, qubit reuse, reset and conditions on several measured
+bits) runs, verifies exactly and goes to IBM chips, but each classical bit is written once and the tools built on a
+single state (step-through, live state, optimizer, proof sheet) refuse it. Circuits are capped at 12 qubits, 10 counting
+the qubits the exact model adds, and the noisy analyses at 10.</li>
 <li><b>The sandbox</b> is a guard rail, not an operating-system sandbox; on a shared host model code is not run.</li>
 <li><b>The network model</b> is analytic and simplified: simple BBPSSW purification, no multi-pair emission and lumped
 atmospheric loss. Its numbers are order-of-magnitude estimates, not engineering predictions. For the real satellites,
@@ -123,7 +123,8 @@ claimed.</li>
 than a digital twin did; per-qubit errors for the patch the compiler picks are the next step.</li>
 <li><b>Circuit-level noise for the decoders</b>, so that Λ can be compared with hardware like for like, and a decoder
 study of the AI-designed biased-noise code.</li>
-<li><b>Qubit reuse after measurement</b> (reset), for repeated syndrome extraction on top of the feed-forward that exists.</li>
+<li><b>Repeated error-correction cycles</b>: the one-cycle bit-flip code with a reused helper qubit exists; several
+cycles need more than the 10 qubits the exact model allows today.</li>
 <li><b>Full-state tests on hardware:</b> the discovered W and Dicke circuits tied in the computational basis;
 tomography would show what their fewer gates save in phase coherence.</li>
 <li><b>Multi-page lab notebooks:</b> sketches that span pages, read as one experiment.</li>

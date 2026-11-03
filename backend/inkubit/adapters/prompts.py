@@ -22,6 +22,9 @@ This circuit uses feed-forward (Qiskit 2.x has no c_if; use if_test):
 - A MEASURE operation in the middle of the list is a mid-circuit measurement: emit qc.measure(q, c) right there.
 - An operation with "conditional": {"classical_register": c, "value": v} runs only when classical bit c reads v.
   Write it as `with qc.if_test((qc.clbits[c], v)):` with the gate call indented inside, in list order.
+- When "classical_register" is a list, "value" is read in binary with the first listed bit lowest: nest one
+  if_test per bit, outermost first (e.g. [0, 1] with value 1 means c0 reads 1 and c1 reads 0).
+- RESET puts a qubit back to 0: qc.reset(q). A qubit may be used and measured again after it was measured.
 """
 
 GENERATE_SYSTEM = (
@@ -58,7 +61,11 @@ TEXT_SYSTEM = (
     "radians. Measure every qubit into the classical bit of the same index unless the description says "
     "otherwise, and leave helper (ancilla) qubits unmeasured. For networks, use ground_station, satellite "
     "and repeater nodes with realistic distances. Leave every segment_id empty and every box empty. Put any "
-    "assumption you had to make in notes."
+    "assumption you had to make in notes. When the description asks for mid-circuit measurement, feed-forward, "
+    "classical control, teleportation with corrections, an active reset or error correction with a measured "
+    "syndrome: put each mid-circuit MEASURE in operations with its clbits (each classical bit written once), give "
+    "each gate that depends on measured bits its condition_bits and condition_value, and use RESET to reuse a "
+    "measured qubit. Otherwise leave clbits and condition_bits empty and condition_value 0."
 )
 
 ASK_SYSTEM = (

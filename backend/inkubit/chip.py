@@ -125,7 +125,7 @@ def advise(spec: CircuitSpec, name: str) -> Advice:
         elif op.gate == "CCX":
             return Advice(device=name, ok=False, note="A Toffoli couples three qubits in a triangle, which heavy-hex "
                           "wiring does not have: it needs routing, so there is no direct placement to advise.")
-        elif op.gate not in ("BARRIER", "MEASURE"):
+        elif op.gate not in ("BARRIER", "MEASURE", "RESET"):
             for q in op.targets:
                 one[q] += 1
     measured = {q for q, _ in spec.measured_pairs()}

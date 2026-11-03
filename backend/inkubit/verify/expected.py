@@ -27,7 +27,7 @@ def append_operation(qc: QuantumCircuit, op: Operation) -> None:
     A conditional operation raises: a caller building one unitary or one state cannot honour it, and applying the
     gate unconditionally would be silently wrong. ``physical_circuit`` and ``verify.dynamic`` handle conditions.
     """
-    if op.conditional is not None:
+    if op.conditional is not None or op.gate == "RESET":
         raise DynamicCircuitError(NO_FEED_FORWARD)
     g = op.gate
     if g in _ONE_Q:
@@ -95,14 +95,26 @@ def physical_circuit(spec: CircuitSpec) -> QuantumCircuit:
                 qc.measure(q, c)
         elif op.gate == "BARRIER":
             qc.barrier(*op.targets)
+        elif op.gate == "RESET":
+            for q in op.targets:
+                qc.reset(q)
         elif op.conditional is not None:
-            with qc.if_test((qc.clbits[op.conditional.classical_register], op.conditional.value)):
-                append_operation(qc, op.model_copy(update={"conditional": None}))
+            _conditioned(qc, op.conditional.pairs(), op.model_copy(update={"conditional": None}))
         else:
             append_operation(qc, op)
     for m in spec.measurements:
         qc.measure(m.qubit, m.clbit)
     return qc
+
+
+def _conditioned(qc: QuantumCircuit, pairs: list[tuple[int, int]], op: Operation) -> None:
+    """One if_test per bit, nested: the gate runs only when every bit reads its value (what IBM's chips run)."""
+    if not pairs:
+        append_operation(qc, op)
+        return
+    (c, v), rest = pairs[0], pairs[1:]
+    with qc.if_test((qc.clbits[c], v)):
+        _conditioned(qc, rest, op)
 
 
 def ideal_distribution(spec: CircuitSpec) -> Distribution:

@@ -112,3 +112,30 @@ export async function decodeSpec(text: string): Promise<Spec> {
   const bytes = text[0] === 'z' ? await pipe(raw, new DecompressionStream('deflate-raw')) : raw
   return JSON.parse(new TextDecoder().decode(bytes)) as Spec
 }
+
+type Cond = NonNullable<CircuitSpec['operations'][number]['conditional']>
+
+/** (classical bit, the value it must read) for a condition, first listed bit first. */
+export function condPairs(cond: Cond): [number, number][] {
+  const bits = Array.isArray(cond.classical_register) ? cond.classical_register : [cond.classical_register]
+  return bits.map((c, k) => [c, (cond.value >> k) & 1])
+}
+
+/** A condition from (bit, value) pairs: one bit stays a number, several become a list. */
+export function condFrom(pairs: [number, number][]): Cond {
+  const value = pairs.reduce((v, [, b], k) => v | (b << k), 0)
+  return pairs.length === 1 ? { classical_register: pairs[0][0], value } : { classical_register: pairs.map(([c]) => c), value }
+}
+
+/** Mirrors CircuitSpec.is_dynamic: a conditioned gate, a reset, or a qubit used or measured again after a measurement. */
+export function isDynamic(spec: CircuitSpec): boolean {
+  const measured = new Set<number>()
+  for (const op of spec.operations) {
+    if (op.conditional || op.gate === 'RESET') return true
+    if (op.gate === 'MEASURE') {
+      if (op.targets.some((q) => measured.has(q))) return true
+      op.targets.forEach((q) => measured.add(q))
+    } else if (op.gate !== 'BARRIER' && [...op.targets, ...(op.controls ?? [])].some((q) => measured.has(q))) return true
+  }
+  return spec.measurements.some((m) => measured.has(m.qubit))
+}

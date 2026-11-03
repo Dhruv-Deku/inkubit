@@ -63,6 +63,8 @@ def operation_lines(i: int, op: Operation) -> list[str]:
         return [f"    qc.barrier({args}){tag}"]
     if g == "MEASURE":
         return [f"    qc.measure({q}, {c}){tag} q{q} -> c{c}" for q, c in zip(op.targets, op.clbits)]
+    if g == "RESET":
+        return [f"    qc.reset({q}){tag} q{q} back to 0" for q in op.targets]
     raise ValueError(f"unsupported gate {g}")
 
 
@@ -133,10 +135,13 @@ def generate_code(
         f"    qc = QuantumCircuit({spec.num_qubits}, {spec.num_clbits})",
     ]
     for i, op in enumerate(spec.operations):
-        if op.conditional is not None:  # feed-forward: the chip decides from the bit it just measured
-            c, v = op.conditional.classical_register, op.conditional.value
-            body.append(f"    with qc.if_test((qc.clbits[{c}], {v})):  # op {i}: only when c{c} reads {v}")
-            body += ["    " + line for line in operation_lines(i, op)]
+        if op.conditional is not None:  # feed-forward: the chip decides from the bits it just measured
+            pairs = op.conditional.pairs()
+            when = " and ".join(f"c{c} reads {v}" for c, v in pairs)
+            for depth, (c, v) in enumerate(pairs):
+                note = f"  # op {i}: only when {when}" if depth == 0 else ""
+                body.append("    " * (depth + 1) + f"with qc.if_test((qc.clbits[{c}], {v})):{note}")
+            body += ["    " * len(pairs) + line for line in operation_lines(i, op)]
         else:
             body += operation_lines(i, op)
     for m in spec.measurements:

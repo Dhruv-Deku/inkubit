@@ -1,0 +1,18 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 1,
+  "num_clbits": 2,
+  "operations": [
+    {"gate": "H", "targets": [0]},
+    {"gate": "MEASURE", "targets": [0], "clbits": [0]},
+    {"gate": "X", "targets": [0], "conditional": {"classical_register": 0, "value": 1}},
+    {"gate": "MEASURE", "targets": [0], "clbits": [1]}
+  ],
+  "measurements": [],
+  "metadata": {
+    "title": "Active reset (measure, then fix)",
+    "notes": "q0 is a coin flip; it is measured, and flipped back only if it read 1. Measured again, it reads 0 every time: the qubit is ready to reuse, decided on the chip from its own result.",
+    "origin": "manual"
+  }
+}

@@ -10,12 +10,12 @@ export interface SourceRef {
 
 export type Gate =
   | 'H' | 'X' | 'Y' | 'Z' | 'S' | 'T' | 'SDG' | 'TDG' | 'SX' | 'RX' | 'RY' | 'RZ'
-  | 'CX' | 'CZ' | 'CP' | 'SWAP' | 'CCX' | 'MEASURE' | 'BARRIER'
+  | 'CX' | 'CZ' | 'CP' | 'SWAP' | 'CCX' | 'MEASURE' | 'RESET' | 'BARRIER'
 
-export const GATES: Gate[] = ['H', 'X', 'Y', 'Z', 'S', 'T', 'SDG', 'TDG', 'SX', 'RX', 'RY', 'RZ', 'CX', 'CZ', 'CP', 'SWAP', 'CCX', 'MEASURE', 'BARRIER']
+export const GATES: Gate[] = ['H', 'X', 'Y', 'Z', 'S', 'T', 'SDG', 'TDG', 'SX', 'RX', 'RY', 'RZ', 'CX', 'CZ', 'CP', 'SWAP', 'CCX', 'MEASURE', 'RESET', 'BARRIER']
 
 /** How a gate is written on screen (S† rather than SDG). */
-export const GATE_LABEL: Partial<Record<Gate, string>> = { SDG: 'S†', TDG: 'T†', SX: '√X', CCX: 'CCX (Toffoli)', CP: 'CP (phase)', MEASURE: 'Measure (mid-circuit)' }
+export const GATE_LABEL: Partial<Record<Gate, string>> = { SDG: 'S†', TDG: 'T†', SX: '√X', CCX: 'CCX (Toffoli)', CP: 'CP (phase)', MEASURE: 'Measure (mid-circuit)', RESET: 'Reset to |0⟩' }
 
 export interface Operation {
   gate: Gate
@@ -23,8 +23,9 @@ export interface Operation {
   controls?: number[]
   params?: number[]
   clbits?: number[]
-  /** Feed-forward: run only when the classical bit (written by an earlier MEASURE) reads this value. */
-  conditional?: { classical_register: number; value: 0 | 1 } | null
+  /** Feed-forward: run only when the classical bit(s), written by earlier MEASUREs, read this value
+   * (several bits: the first listed is the lowest bit of the value). */
+  conditional?: { classical_register: number | number[]; value: number } | null
   source?: SourceRef | null
 }
 

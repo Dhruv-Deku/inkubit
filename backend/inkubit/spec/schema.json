@@ -56,20 +56,28 @@
     },
     "Conditional": {
       "additionalProperties": false,
-      "description": "Feed-forward: the gate runs only when an earlier mid-circuit measurement read this value.",
+      "description": "Feed-forward: the gate runs only when earlier mid-circuit measurements read this value.\n\n``classical_register`` is one classical bit, or a list of them; ``value`` is read in binary with the first listed\nbit as the least significant (Qiskit's register convention), so ``[0, 1]`` with value 1 means c0 = 1 and c1 = 0.",
       "properties": {
         "classical_register": {
-          "description": "Index of the classical bit the gate depends on.",
-          "minimum": 0,
-          "title": "Classical Register",
-          "type": "integer"
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "The classical bit, or bits, the gate depends on.",
+          "title": "Classical Register"
         },
         "value": {
-          "description": "The gate runs only when that bit reads this value.",
-          "enum": [
-            0,
-            1
-          ],
+          "description": "The gate runs only when the bits read this value (first listed bit lowest).",
+          "minimum": 0,
           "title": "Value",
           "type": "integer"
         }
@@ -397,6 +405,7 @@
             "SWAP",
             "CCX",
             "MEASURE",
+            "RESET",
             "BARRIER"
           ],
           "title": "Gate",

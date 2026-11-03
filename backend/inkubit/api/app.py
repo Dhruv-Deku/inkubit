@@ -114,7 +114,7 @@ def headline() -> dict[str, Any]:
 
 
 CATEGORIES: dict[str, list[str]] = {  # the gallery, by what each algorithm does (every answer is pinned in a test)
-    "Basics": ["superposition", "bell", "ghz3"],
+    "Basics": ["superposition", "bell", "ghz3", "active_reset"],
     "Entanglement & communication": ["w_state", "superdense", "teleportation", "teleportation_feedforward",
                                      "entanglement_swapping", "swap_test"],
     "Nonlocal games": ["chsh_game", "mermin_game"],
@@ -123,7 +123,7 @@ CATEGORIES: dict[str, list[str]] = {  # the gallery, by what each algorithm does
     "Fourier & phase": ["phase_estimation", "qft_period", "shor15"],
     "Arithmetic & logic": ["toffoli_and", "half_adder", "draper_adder"],
     "Linear algebra & simulation": ["hhl_2x2", "ising_trotter"],
-    "Error correction": ["bit_flip_code", "shor_code"],
+    "Error correction": ["bit_flip_code", "bit_flip_feedforward", "shor_code"],
 }
 CATEGORY_OF = {name: cat for cat, names in CATEGORIES.items() for name in names}
 ALGORITHMS = {name for cat, names in CATEGORIES.items() if cat != "Basics" for name in names}

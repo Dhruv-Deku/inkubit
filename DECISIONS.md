@@ -1014,3 +1014,28 @@ allowed terminal measurements only. Now any gate may carry `"conditional": {"cla
   that, which is why the guard sits at the lowest level.
 - **Scope.** No qubit reuse after measurement, one bit per condition, at most 10 qubits including records. Model prompts
   change only for feed-forward circuits, so every cached response for other circuits still matches.
+
+## D84. Reuse, reset, conditions on several bits, and descriptions that ask for feed-forward (2026-11-03)
+D83 left four limits; three are lifted and the fourth (sketches) is left on purpose.
+
+- **Reuse.** A measured qubit may be used and measured again. The deferred-measurement model already handles it: the
+  record is never touched after the copy, so the qubit carries on in its post-measurement state. A circuit counts as
+  feed-forward (`CircuitSpec.is_dynamic`) when a gate is conditioned, a qubit is reset, or a qubit is used or measured
+  again after a measurement; a `MEASURE` at the end, or followed only by gates on other qubits, stays an ordinary
+  terminal measurement.
+- **Reset.** `RESET` (Qiskit `reset`) swaps the qubit's state onto a fresh qubit that is never read: exactly "forget it
+  and start from 0", with no error channel, as in the run's noise model. It cannot be conditional; an active reset is a
+  measurement and a conditional X (`active_reset`).
+- **Several bits.** `classical_register` may be a list, `value` read in binary with the first listed bit lowest. The
+  code nests one `if_test` per bit rather than an aliased classical register (which would split Aer's counts keys) or a
+  classical expression; the exact model controls on all the records and applies the gate's error only where every bit
+  matches.
+- **The showcase** (`bit_flip_feedforward`): one helper qubit measures both parities, reset in between, and the two-bit
+  syndrome fixes only the qubit it points to, on the chip. It compiles for ibm_fez (3 `if_else`, 1 `reset`); its
+  prediction matches 200,000-shot Aer runs under heavy noise.
+- **Descriptions.** Offline, feed-forward phrases route to the exact examples. Live, text gets its own circuit draft with
+  `clbits`, `condition_bits` and `condition_value`; the sketch draft is unchanged, so no cached sketch reading is lost.
+  Muse Spark wrote correct feed-forward teleportation and the reset-and-reuse bit-flip code from plain descriptions on
+  the first try (`pytest -m live`).
+- **Sketches** would need a drawn double-line convention, a new sample and new segmentation phrases, and would change
+  the sketch prompt that every cached reading depends on; left for after the hackathon.
