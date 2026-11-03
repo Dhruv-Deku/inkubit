@@ -1095,5 +1095,9 @@ photographed sketch (Muse Spark picks concepts, SAM 3.1 segments, Muse Spark rea
 the same qubit count and the same unitary up to a global phase (overlap at least 0.999, since a figure prints angles to
 two decimals). A wrong figure goes to Muse Image's edit endpoint (`/images/edits`, the figure as a data URL) with the
 exact difference, at most twice; if it never matches, the exact Qiskit drawing is shown and the page says why.
-`scripts/figure_bench.py` measures it over the small gallery circuits (`examples/figure_benchmark.json`).
+`scripts/figure_bench.py` measures it over the small gallery circuits (`examples/figure_benchmark.json`): of 20,
+Muse Image was right first time on 5 (Bell pair, Deutsch-Jozsa (balanced), GHZ-3, Superdense coding (sends 11), Superposition with a tilt) and after one correction on 1
+(the Toffoli); the other 14 never matched within two corrections. In the six checked by eye, the read-back was right: gates on the wrong
+wires, a Toffoli drawn for two CNOTs, controls joined to nothing, boxes spanning several wires. So the benchmark
+measures Muse Image, and the rule (never show an unproven figure on its own) is what makes it safe to use.
 

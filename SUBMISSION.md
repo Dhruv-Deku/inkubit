@@ -16,8 +16,8 @@ anyone sees it. Press **Guided tour** in the app for the best of it in under two
 | --- | --- |
 | **Creativity** | An **AI scientist that learns under proof**: Muse Spark designs circuits in rounds, sees what exact physics said, and its best proven circuit improves on every target, where the same model without feedback never does. **AI-designed error-correcting codes**: a 9-qubit code that needs 9 phase-flip errors to fail, three times the surface code. **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**; a **whole paper** from its PDF re-run claim by claim; an **AI referee** where Muse Wonder challenges Muse Spark and exact simulation decides |
 | **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. **Feed-forward** (mid-circuit measurement, gates that run only when a measured bit says so) is in the format and the editor, predicted exactly by deferred measurement and sent to IBM chips unchanged. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
-| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **592 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
-| **Use of Meta models** | **Five Meta models**, each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
+| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **615 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
+| **Use of Meta models** | **Five Meta models**, all five in one run of the **lecture checker** (a filmed explanation: Muse Voice tells the speakers apart, SAM 3.1 tracks each drawn part through the video, Muse Spark writes every claim out, exact simulation judges each, Muse Wonder writes corrected notes, Muse Image's figure is read back and proven before it is shown), and each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
 
 ## Built during the hackathon
 
@@ -182,6 +182,18 @@ resource estimate meets the best classical route, checked against Gidney and Eke
 search on 2^64 keys: classical wins. Upload a figure from a paper: Muse Spark transcribes circuit and claims, an
 exact re-run judges every number against its error bar. Point a camera at a whiteboard: the odds appear on the wires.
 
+**The lecture checker: a filmed explanation, every claim checked.** Upload a short video of someone explaining a circuit
+at a board. Muse Voice Transcribe (diarization) gives who said what and when; SAM 3.1 tracks every drawn part through
+the video, so the board's history is known; Muse Spark reads the finished board and writes each spoken claim out
+formally; exact simulation judges each one against the board as it was when it was said; Muse Wonder writes corrected
+notes. On the bundled sample, a teacher and a student build a GHZ state: of 12 claims, the 3 wrong ones are caught, one
+from each speaker ("the third qubit is entangled too", said before it was wired in; "this is the W state").
+
+**Proven illustrations.** Muse Image draws well but can put a gate on the wrong wire, so a figure shown on its own is
+read back by SAM 3.1 and Muse Spark and must be exactly the same circuit; a wrong one is corrected with Muse Image's
+edit endpoint and read back again, and one that never matches is replaced by the exact drawing. Over 20 gallery circuits
+Muse Image was right first time on 5 and after one correction on 1; the other 14 are shown as the exact drawing.
+
 **Mission control: whole problems, planned, run live and verified.** Type, say or
 photograph a whole problem ("connect two cities 1,200 km apart with quantum-secure
 keys, compare satellite and fiber, and check whether a spy on 25% of the photons is
@@ -289,11 +301,11 @@ repeatable and cheap.
 
 | Model | Job |
 | --- | --- |
-| **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo; the same for each new frame of the live whiteboard camera |
+| **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo; the same for each new frame of the live whiteboard camera; **on video**, every drawn part of a filmed lecture tracked through the clip with a stable id, so the board's history is known; and reading back Muse Image's figures to prove them |
 | **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Inkubit with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; proposes circuit layouts in the discovery lab; maps a problem in words to an algorithm and hardware for the resource estimator; transcribes a paper's figure, circuit and claims for the reproducibility checker; reads the whiteboard; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
 | **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Inkubit: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
-| **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing |
-| **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser |
+| **Muse Image 1.0** (`/v1/images/generations`, `/v1/images/edits`) | Clean illustration of the final circuit or network, always shown next to the exact drawing; a figure shown on its own is read back and proven first, and corrected with **image edits** when the read-back finds a mistake |
+| **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser; **diarization** for the lecture checker (who said what, and when) |
 | **Muse Code** (opt-in, experimental) | Alternative repair backend: the verifier, not the agent's exit code, decides if a fix worked |
 
 Tested live end to end: all three sample sketches read correctly (SAM 3.1 finds
@@ -307,7 +319,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, PyMatching, SGP4, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 592 backend tests (spec
+live agent log; React 19 + TypeScript + Vite. 615 backend tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, orbits against Skyfield, the live adapters
 against recorded request shapes, API) and 6 end-to-end browser tests of the built app, all in CI on every

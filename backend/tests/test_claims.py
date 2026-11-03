@@ -69,7 +69,18 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     from inkubit.api.app import CATEGORIES
 
     n_alg = sum(len(v) for k, v in CATEGORIES.items() if k != "Basics")
+    lec = _load(ROOT / "examples" / "lecture" / "lecture_run.json")
+    figs = _load(ROOT / "examples" / "figure_benchmark.json")["totals"]
+    cx = [o["appears"] for o in lec["ops"] if o["label"].startswith("CX")]
     return [
+        ("lecture checker: claims written out", f"writes out {len(lec['claims'])} claims", (README,)),
+        ("proven illustrations", f"Over {figs['circuits']} small gallery circuits Muse Image was right first time "
+                                 f"on {figs['first_try']} and right after one correction on {figs['repaired']}; the other "
+                                 f"{figs['mismatch'] + figs['unread']} never matched", (README,)),
+        ("proven illustrations", f"Muse Image was right first time on {figs['first_try']} and after one correction on "
+                                 f"{figs['repaired']}; the other {figs['mismatch'] + figs['unread']} are shown", (SUBMISSION,)),
+        ("lecture checker: wrong claims found", f"finds the {lec['tally']['false']} wrong ones", (README,)),
+        ("lecture checker: when the CNOTs appeared", f"appear at {cx[0]:.1f} s and {cx[1]:.1f} s", (README,)),
         ("IBM placement: best, median, worst", f"{gx['best']:.3f}, {gx['median']:.3f} and {gx['worst']:.3f}", BOTH),
         ("IBM teleportation with feed-forward", f"{tff['average']:.3f}", BOTH),
         ("proof sheet over the gallery", f"{psb['totals'].get('passed', 0)} passed and {psb['totals'].get('failed', 0)} failed", (README,)),
