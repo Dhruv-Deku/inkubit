@@ -10,9 +10,9 @@ import wave
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.voice import KEYWORDS, AudioError, MetaSpeechModel, MockSpeechModel, check_wav
-from qcanvas.api.app import app
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.voice import KEYWORDS, AudioError, MetaSpeechModel, MockSpeechModel, check_wav
+from inkubit.api.app import app
 
 
 def make_wav(seconds: float = 1.0, rate: int = 16000, channels: int = 1, width: int = 2) -> bytes:

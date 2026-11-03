@@ -10,7 +10,7 @@ from qiskit import qasm2
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import DensityMatrix, Operator, SuperOp, concurrence, random_density_matrix
 
-from qcanvas.insights.circuit import (
+from inkubit.insights.circuit import (
     TARGET_FIDELITY,
     ZNE_SCALES,
     _concurrence,
@@ -25,13 +25,13 @@ from qcanvas.insights.circuit import (
     step_states,
     zero_noise,
 )
-from qcanvas.spec.models import Operation
-from qcanvas.verify.expected import append_operation
-from qcanvas.sim.noise import gate_errors, get_preset
-from qcanvas.spec import parse_spec
-from qcanvas.verify.expected import apply_readout_error, ideal_distribution
-from qcanvas.verify.expected import noisy_distribution as aer_noisy_distribution
-from qcanvas.verify.metrics import hellinger_fidelity
+from inkubit.spec.models import Operation
+from inkubit.verify.expected import append_operation
+from inkubit.sim.noise import gate_errors, get_preset
+from inkubit.spec import parse_spec
+from inkubit.verify.expected import apply_readout_error, ideal_distribution
+from inkubit.verify.expected import noisy_distribution as aer_noisy_distribution
+from inkubit.verify.metrics import hellinger_fidelity
 
 
 @pytest.mark.parametrize("name", ["bell", "phase_estimation", "toffoli_and"])

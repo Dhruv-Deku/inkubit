@@ -1,4 +1,4 @@
-"""Does Muse Spark get better at designing circuits when it sees what exact physics said? (backend/qcanvas/learning.py)
+"""Does Muse Spark get better at designing circuits when it sees what exact physics said? (backend/inkubit/learning.py)
 
     .venv/Scripts/python scripts/learning_bench.py
 
@@ -17,11 +17,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
-os.environ["QCANVAS_ALLOW_FALLBACK"] = "0"
+os.environ.setdefault("INKUBIT_MODEL_PROVIDER", "meta")
+os.environ["INKUBIT_ALLOW_FALLBACK"] = "0"
 
-from qcanvas.adapters.registry import get_models  # noqa: E402
-from qcanvas.learning import ROUNDS, TARGETS, run_all  # noqa: E402
+from inkubit.adapters.registry import get_models  # noqa: E402
+from inkubit.learning import ROUNDS, TARGETS, run_all  # noqa: E402
 
 LABEL = {"feedback": "With feedback", "fresh": "No feedback", "random": "Random wiring"}
 
@@ -54,7 +54,7 @@ def fmt(v) -> str:
 def write_doc(out: dict) -> None:
     lines = ["# An AI scientist that learns under proof", "",
              f"Muse Spark (`{out['model']}`) proposed CNOT layouts for three target states over {out['rounds']} rounds "
-             "of up to four layouts each (`scripts/learning_bench.py`, `backend/qcanvas/learning.py`). The exact "
+             "of up to four layouts each (`scripts/learning_bench.py`, `backend/inkubit/learning.py`). The exact "
              "optimiser judged every layout and Qiskit proved every one that reached the target. With feedback, each "
              "round's prompt listed every earlier layout and its verdict; without feedback, the same model was asked "
              "afresh; random wiring used the same lengths as the feedback run with random allowed pairs.", "",

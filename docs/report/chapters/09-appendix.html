@@ -4,7 +4,7 @@
 discovery and learning runs) returns an id at once, and its <code>/events</code> endpoint streams every step as
 server-sent events.</p>
 {{table:routes}}
-<p class="small muted">All endpoints are served by <code>backend/qcanvas/api/app.py</code>. The built frontend is served
+<p class="small muted">All endpoints are served by <code>backend/inkubit/api/app.py</code>. The built frontend is served
 from the same origin. <code>/api/health</code> reports the model provider (Meta live, mock, or mock fallback), and the
 recorder and the interface read it before naming a model.</p>
 </section>
@@ -25,10 +25,10 @@ quick.</p>
 <pre><code>py -3.13 -m venv .venv
 .venv/Scripts/python -m pip install -r backend/requirements.txt
 cd frontend &amp;&amp; npm ci &amp;&amp; npm run build &amp;&amp; cd ..
-cd backend &amp;&amp; ../.venv/Scripts/python -m uvicorn qcanvas.api.app:app --port 8000   # http://127.0.0.1:8000
+cd backend &amp;&amp; ../.venv/Scripts/python -m uvicorn inkubit.api.app:app --port 8000   # http://127.0.0.1:8000
 cd backend &amp;&amp; ../.venv/Scripts/python -m pytest -q                                  # {{backend_tests}} offline tests
 .venv/Scripts/python -m pytest e2e                                                   # browser tests (after the build)</code></pre>
-<p>Put <code>META_API_KEY</code> and <code>QCANVAS_MODEL_PROVIDER=meta</code> in <code>.env</code> for the live models;
+<p>Put <code>META_API_KEY</code> and <code>INKUBIT_MODEL_PROVIDER=meta</code> in <code>.env</code> for the live models;
 without them everything runs on the labelled offline models.</p>
 
 <h2>Results and the scripts that produce them</h2>
@@ -37,7 +37,7 @@ without them everything runs on the labelled offline models.</p>
 <tbody>
 <tr><td>Planted-fault benchmark (55 of 55)</td><td><code>scripts/benchmark.py</code></td><td>offline</td></tr>
 <tr><td>Mission control benchmark ({{m_n}} missions)</td><td><code>scripts/mission_bench.py</code></td><td>Meta key</td></tr>
-<tr><td>AI alone vs Q-Canvas</td><td><code>scripts/arena_bench.py</code> (<code>--glimmer</code> for the open-weight model)</td><td>Meta key</td></tr>
+<tr><td>AI alone vs Inkubit</td><td><code>scripts/arena_bench.py</code> (<code>--glimmer</code> for the open-weight model)</td><td>Meta key</td></tr>
 <tr><td>Learning under proof</td><td><code>scripts/learning_bench.py</code></td><td>Meta key</td></tr>
 <tr><td>AI-designed codes</td><td><code>scripts/codes_bench.py</code></td><td>Meta key</td></tr>
 <tr><td>The AI referee</td><td><code>scripts/referee_bench.py</code></td><td>Meta key</td></tr>
@@ -71,7 +71,7 @@ without them everything runs on the labelled offline models.</p>
 <dt>Concurrence, negativity</dt><dd>Measures of entanglement between two qubits; zero means the pair is not entangled.</dd>
 <dt>Conformal prediction</dt><dd>A way to put an error bar on a model's prediction that holds a stated fraction of the time for data like the calibration set.</dd>
 <dt>CSS code</dt><dd>A stabilizer code whose generators are all-X or all-Z, so bit and phase errors are corrected separately.</dd>
-<dt>Density matrix</dt><dd>The full description of a possibly noisy quantum state; simulating it exactly is what Q-Canvas's verifier does.</dd>
+<dt>Density matrix</dt><dd>The full description of a possibly noisy quantum state; simulating it exactly is what Inkubit's verifier does.</dd>
 <dt>Digital twin</dt><dd>A simulation of a specific device, built from its own calibration data.</dd>
 <dt>Distance (d, dX, dZ)</dt><dd>The fewest single-qubit errors (of any kind, X only, or Z only) that defeat a code without being detected.</dd>
 <dt>DRAG</dt><dd>Derivative Removal by Adiabatic Gate: a pulse shape that cancels leakage and phase errors in weakly anharmonic qubits.</dd>

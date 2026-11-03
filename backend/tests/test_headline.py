@@ -4,9 +4,9 @@ import json
 
 from fastapi.testclient import TestClient
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.api.app import app
-from qcanvas.headline import MODELS, headline
+from inkubit import EXAMPLES_DIR
+from inkubit.api.app import app
+from inkubit.headline import MODELS, headline
 
 
 def _load(name: str):
@@ -28,7 +28,7 @@ def test_stats_match_the_stored_results():
 
 
 def test_models_listed_are_the_configured_ones():
-    from qcanvas.adapters.config import load_settings
+    from inkubit.adapters.config import load_settings
 
     configured = set(load_settings().public()["models"].values())
     assert len(configured) == len(MODELS)

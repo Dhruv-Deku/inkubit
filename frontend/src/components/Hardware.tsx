@@ -4,7 +4,7 @@ import type { DiscoveryHardware, DiscoveryHardwareVariant, HardwareRuns } from '
 
 const range = (xs: number[]) => `${Math.min(...xs).toFixed(3)}–${Math.max(...xs).toFixed(3)}`
 
-/** Counts from a real IBM quantum computer next to Q-Canvas's predictions. Hidden until a real run exists. */
+/** Counts from a real IBM quantum computer next to Inkubit's predictions. Hidden until a real run exists. */
 export function HardwarePanel() {
   const [h, setH] = useState<HardwareRuns | null>(null)
   useEffect(() => { api.hardware().then(setH).catch(() => setH(null)) }, [])
@@ -20,8 +20,8 @@ export function HardwarePanel() {
         <span className="sub">{h.runs.length} circuits on {h.device} (IBM Quantum), {h.shots.toLocaleString()} shots, {h.date_utc.slice(0, 10)}, job {h.job_id}</span></div>
       <p className="obs-head" style={{ margin: '0 0 8px', fontSize: 14, lineHeight: 1.5, color: 'var(--text)', maxWidth: '90ch' }}>
         A real IBM quantum computer ran {h.runs.length} circuits. A digital twin built from the chip's own calibration predicted what it measured more closely than the noiseless odds and the generic preset on <b>{best} of {h.runs.length}</b> (distance {span('tvd_twin')}).
-        {pessimistic ? ` Q-Canvas's generic noise preset was too pessimistic for this chip (${span('tvd_generic')}): on ${pessimistic === h.runs.length ? 'every circuit' : `${pessimistic} of ${h.runs.length}`} it was further off than the noiseless prediction.` : ''}
-        {cal ? <> The <b>calibrated preset</b>, Q-Canvas's own noise model with {cal.device}'s median calibration, came within {range(h.runs.map((r) => r.tvd_calibrated ?? 0))}, closer than the twin on {calBeats} of {h.runs.length}.</> : null}</p>
+        {pessimistic ? ` Inkubit's generic noise preset was too pessimistic for this chip (${span('tvd_generic')}): on ${pessimistic === h.runs.length ? 'every circuit' : `${pessimistic} of ${h.runs.length}`} it was further off than the noiseless prediction.` : ''}
+        {cal ? <> The <b>calibrated preset</b>, Inkubit's own noise model with {cal.device}'s median calibration, came within {range(h.runs.map((r) => r.tvd_calibrated ?? 0))}, closer than the twin on {calBeats} of {h.runs.length}.</> : null}</p>
       <table className="calls">
         <thead><tr><th>Circuit</th><th className="num">2-qubit gates on the chip</th><th className="num">distance to ideal</th>
           <th className="num">to the generic preset</th><th className="num">to the digital twin</th>

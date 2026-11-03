@@ -7,11 +7,11 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.api.app import app
-from qcanvas.bughunt import _round, bug_round, describe, judge, muse_facts, search
-from qcanvas.verify.metrics import total_variation_distance
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.api.app import app
+from inkubit.bughunt import _round, bug_round, describe, judge, muse_facts, search
+from inkubit.verify.metrics import total_variation_distance
 
 
 @pytest.mark.parametrize("level", [1, 2])
@@ -85,7 +85,7 @@ def test_endpoints():
 
 
 def test_rounds_are_fair_and_the_hard_level_includes_the_qaoa_circuit():
-    from qcanvas.bughunt import MAX_SHARE
+    from inkubit.bughunt import MAX_SHARE
 
     titles = set()
     for level, seeds in ((1, range(10)), (3, range(4))):

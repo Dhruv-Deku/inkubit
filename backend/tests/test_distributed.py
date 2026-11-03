@@ -9,10 +9,10 @@ import pytest
 from fastapi.testclient import TestClient
 from qiskit.quantum_info import DensityMatrix, random_density_matrix
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.api.app import app
-from qcanvas.distributed import _remote_channel, best_split, compile_ops, distribute
-from qcanvas.spec import parse_spec
+from inkubit import EXAMPLES_DIR
+from inkubit.api.app import app
+from inkubit.distributed import _remote_channel, best_split, compile_ops, distribute
+from inkubit.spec import parse_spec
 
 
 def _example(name: str):

@@ -3,7 +3,7 @@
 **/__pycache__
 **/node_modules
 frontend/dist
-backend/.qcanvas_cache
+backend/.inkubit_cache
 .env
 .env.*
 docs/video

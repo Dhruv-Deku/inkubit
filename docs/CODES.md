@@ -1,6 +1,6 @@
 # Code lab: AI-designed error-correcting codes
 
-Muse Spark (`muse-spark-1.3`) proposed stabilizer codes over 4 rounds of up to three per target, seeing every earlier verdict (`scripts/codes_bench.py`, `backend/qcanvas/codes.py`). Each code was checked exactly: commuting, independent generators, k = n - rank, and the distance d by brute force over every Pauli error from weight 1 up (dX, dZ: only X, only Z errors).
+Muse Spark (`muse-spark-1.3`) proposed stabilizer codes over 4 rounds of up to three per target, seeing every earlier verdict (`scripts/codes_bench.py`, `backend/inkubit/codes.py`). Each code was checked exactly: commuting, independent generators, k = n - rank, and the distance d by brute force over every Pauli error from weight 1 up (dX, dZ: only X, only Z errors).
 
 ## Known codes, scored by the same checker
 

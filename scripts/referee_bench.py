@@ -1,4 +1,4 @@
-"""The AI referee benchmark: Muse Spark claims, Muse Wonder challenges, exact simulation decides (backend/qcanvas/referee.py).
+"""The AI referee benchmark: Muse Spark claims, Muse Wonder challenges, exact simulation decides (backend/inkubit/referee.py).
 
     .venv/Scripts/python scripts/referee_bench.py
 
@@ -18,13 +18,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
-os.environ["QCANVAS_ALLOW_FALLBACK"] = "0"
+os.environ.setdefault("INKUBIT_MODEL_PROVIDER", "meta")
+os.environ["INKUBIT_ALLOW_FALLBACK"] = "0"
 
-from qcanvas.adapters.registry import get_models  # noqa: E402
-from qcanvas.arena import bigger_circuits, fresh_circuits  # noqa: E402
-from qcanvas.referee import debate  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
+from inkubit.adapters.registry import get_models  # noqa: E402
+from inkubit.arena import bigger_circuits, fresh_circuits  # noqa: E402
+from inkubit.referee import debate  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
 
 
 def circuits() -> list[tuple[str, dict]]:

@@ -1,4 +1,4 @@
-# AI alone vs Q-Canvas
+# AI alone vs Inkubit
 
 Muse Spark (`muse-spark-1.3`) was asked to predict each circuit's measured outcome odds on its own, the way a chat assistant answers: the circuit as data (no title or notes), no simulator, medium reasoning effort. Answers are scored against exact simulation by total variation distance (the share of probability in the wrong place): exact below 1%, close below 5%, wrong from 5%. Two sets: the textbook examples, which a model has seen many times, and new circuits no textbook contains (seeded random circuits of 3 to 5 qubits and the six-guest QAOA circuit), which is what a student's own sketch looks like to a model, and bigger new circuits of 6 to 8 qubits (all in superposition first, 4 qubits measured). Regenerate with `scripts/arena_bench.py`; run on 2026-10-31.
 
@@ -39,4 +39,4 @@ Muse Spark (`muse-spark-1.3`) was asked to predict each circuit's measured outco
 | bigger | Bigger circuit 5 (8 qubits, 26 gates) | 8 | 26 | matched | 0.0% | 0 | 0 |
 | bigger | Bigger circuit 6 (8 qubits, 22 gates) | 8 | 22 | matched | 0.0% | 0 | 0 |
 
-Q-Canvas never shows a model's answer unchecked: every run is compared with exact simulation, and in the planted-fault benchmark (docs/BENCHMARK.md) 55 of 55 runs ended correctly, including 9 of 9 faked results caught.
+Inkubit never shows a model's answer unchecked: every run is compared with exact simulation, and in the planted-fault benchmark (docs/BENCHMARK.md) 55 of 55 runs ended correctly, including 9 of 9 faked results caught.

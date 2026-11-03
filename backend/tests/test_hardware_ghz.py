@@ -7,7 +7,7 @@ import pytest
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import DensityMatrix, Statevector
 
-from qcanvas.hardware import append_parity_basis, ghz_fidelity, parity, parity_phases
+from inkubit.hardware import append_parity_basis, ghz_fidelity, parity, parity_phases
 
 
 def _odds(state, n: int, phi: float | None) -> dict[str, float]:
@@ -62,8 +62,8 @@ def test_matches_the_exact_fidelity_of_a_noisy_ghz_state():
 
 def test_the_error_bars_match_repeated_sampling():
     """Draw the counts many times from a known noisy GHZ state: the spread of the estimates is the stated error."""
-    from qcanvas.hardware import hellinger_se
-    from qcanvas.verify.metrics import hellinger_fidelity
+    from inkubit.hardware import hellinger_se
+    from inkubit.verify.metrics import hellinger_fidelity
 
     n, p, shots, reps = 4, 0.25, 4096, 400
     psi = _ghz(n).data

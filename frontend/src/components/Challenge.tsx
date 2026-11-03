@@ -8,7 +8,7 @@ import { AmplitudeTable } from './LiveState'
 
 export type Progress = Record<string, number>
 
-const KEY = 'qcanvas.challenges.v1'
+const KEY = 'inkubit.challenges.v1'
 
 export function loadProgress(): Progress {
   try {

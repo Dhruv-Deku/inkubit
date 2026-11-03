@@ -54,7 +54,7 @@ function Annotated({ url, read }: { url: string; read: LiveRead }) {
   )
 }
 
-/** Live board: point a camera at a whiteboard; when the drawing changes and holds still, Q-Canvas reads it with
+/** Live board: point a camera at a whiteboard; when the drawing changes and holds still, Inkubit reads it with
  *  SAM 3.1 and Muse Spark, simulates it exactly and pins the odds to the wires. */
 export function LiveBoardPanel({ live, onOpen }: { live: boolean; onOpen?: (s: CircuitSpec) => void }) {
   const video = useRef<HTMLVideoElement | null>(null)

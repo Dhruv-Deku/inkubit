@@ -7,10 +7,10 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.api.app import app
-from qcanvas.live import marginals, wires
-from qcanvas.sketch import OverlayBox, SketchAnalysis
+from inkubit import EXAMPLES_DIR
+from inkubit.api.app import app
+from inkubit.live import marginals, wires
+from inkubit.sketch import OverlayBox, SketchAnalysis
 
 
 def test_marginals_follow_qiskit_bit_order():

@@ -1,4 +1,4 @@
-"""Ask Q-Canvas: the tools, the number tracer, the live tool loop (with a scripted model) and the offline router."""
+"""Ask Inkubit: the tools, the number tracer, the live tool loop (with a scripted model) and the offline router."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.base import ModelCall
-from qcanvas.api.app import app
-from qcanvas.copilot import TOOLS, ToolRun, ask_live, ask_offline, run_tool, trace
+from inkubit.adapters.base import ModelCall
+from inkubit.api.app import app
+from inkubit.copilot import TOOLS, ToolRun, ask_live, ask_offline, run_tool, trace
 
 GHZ = {"num_qubits": 3, "operations": [{"gate": "H", "targets": [0]}, {"gate": "CX", "controls": [0], "targets": [1]},
                                        {"gate": "CX", "controls": [0], "targets": [2]}]}
@@ -94,8 +94,8 @@ class ToolClient:
 
 
 def test_deep_mode_asks_muse_wonder_with_more_effort():
-    from qcanvas.adapters.config import load_settings
-    from qcanvas.adapters.meta_vision import MetaReasoningModel
+    from inkubit.adapters.config import load_settings
+    from inkubit.adapters.meta_vision import MetaReasoningModel
 
     fake = ToolClient()
     m = MetaReasoningModel(load_settings(), fake)  # type: ignore[arg-type]

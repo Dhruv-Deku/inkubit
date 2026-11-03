@@ -7,9 +7,9 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.chip import UNUSABLE, advise, coordinates, device_names, load, summary
-from qcanvas.spec import parse_spec
+from inkubit import EXAMPLES_DIR
+from inkubit.chip import UNUSABLE, advise, coordinates, device_names, load, summary
+from inkubit.spec import parse_spec
 
 
 def _spec(name: str):
@@ -73,9 +73,9 @@ def test_summaries_are_medians_of_working_parts():
 
 
 def test_ibm_endpoints_offline(monkeypatch):
-    import qcanvas.api.app as appmod
+    import inkubit.api.app as appmod
 
-    monkeypatch.setenv("QCANVAS_PUBLIC", "1")  # a shared host: never run on hardware, never call IBM
+    monkeypatch.setenv("INKUBIT_PUBLIC", "1")  # a shared host: never run on hardware, never call IBM
     client = TestClient(appmod.app)
     st = client.get("/api/ibm/status").json()
     assert not st["can_run"] and "public mode" in st["reason"] and st["live"] is None
@@ -90,7 +90,7 @@ def test_ibm_endpoints_offline(monkeypatch):
 
 
 def test_ibm_experiments_endpoint_refuses_a_rehearsal(monkeypatch, tmp_path):
-    import qcanvas.api.app as appmod
+    import inkubit.api.app as appmod
 
     monkeypatch.setattr(appmod, "EXAMPLES_DIR", tmp_path)
     client = TestClient(appmod.app)

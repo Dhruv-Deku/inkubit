@@ -1,4 +1,4 @@
-"""Train the neural surface-code decoder (backend/qcanvas/decoder.py) and score it against matching.
+"""Train the neural surface-code decoder (backend/inkubit/decoder.py) and score it against matching.
 
     .venv/Scripts/python scripts/train_decoder.py [shots_per_noise_level]
 
@@ -6,7 +6,7 @@ Training data: fresh simulated memory experiments (d = 3, 3 rounds, phenomenolog
 inputs are every detection event of both check types plus log p (a deployed decoder is calibrated to its device).
 Network: 25-128-128-1, ReLU, sigmoid output, binary cross-entropy, Adam with mini-batches, 8 epochs, fixed seeds.
 Test: new shots at each noise level (other seeds), both decoders on the same shots; 95% intervals by the normal
-approximation. Writes backend/qcanvas/data/decoder.json.
+approximation. Writes backend/inkubit/data/decoder.json.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas.decoder import WEIGHTS, features, mlp_forward, mwpm, sample, unprotected  # noqa: E402
+from inkubit.decoder import WEIGHTS, features, mlp_forward, mwpm, sample, unprotected  # noqa: E402
 
 TRAIN_P = [0.005, 0.01, 0.02, 0.03, 0.04, 0.06]
 TEST_P = [0.003, 0.005, 0.01, 0.015, 0.02, 0.03, 0.04, 0.06]

@@ -1,4 +1,4 @@
-"""Code lab benchmark: Muse Spark designs error-correcting codes in rounds; exact checks prove each one (qcanvas.codes).
+"""Code lab benchmark: Muse Spark designs error-correcting codes in rounds; exact checks prove each one (inkubit.codes).
 
     .venv/Scripts/python scripts/codes_bench.py
 
@@ -17,11 +17,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
-os.environ["QCANVAS_ALLOW_FALLBACK"] = "0"
+os.environ.setdefault("INKUBIT_MODEL_PROVIDER", "meta")
+os.environ["INKUBIT_ALLOW_FALLBACK"] = "0"
 
-from qcanvas.adapters.registry import get_models  # noqa: E402
-from qcanvas.codes import ROUNDS, TARGETS, references, run  # noqa: E402
+from inkubit.adapters.registry import get_models  # noqa: E402
+from inkubit.codes import ROUNDS, TARGETS, references, run  # noqa: E402
 
 
 def main() -> None:
@@ -48,7 +48,7 @@ def main() -> None:
 def write_doc(out: dict) -> None:
     lines = ["# Code lab: AI-designed error-correcting codes", "",
              f"Muse Spark (`{out['model']}`) proposed stabilizer codes over {out['rounds']} rounds of up to three per target, "
-             "seeing every earlier verdict (`scripts/codes_bench.py`, `backend/qcanvas/codes.py`). Each code was checked "
+             "seeing every earlier verdict (`scripts/codes_bench.py`, `backend/inkubit/codes.py`). Each code was checked "
              "exactly: commuting, independent generators, k = n - rank, and the distance d by brute force over every "
              "Pauli error from weight 1 up (dX, dZ: only X, only Z errors).", "",
              "## Known codes, scored by the same checker", "",

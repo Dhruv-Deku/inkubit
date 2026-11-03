@@ -10,8 +10,8 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.api.app import app
+from inkubit import EXAMPLES_DIR
+from inkubit.api.app import app
 
 client = TestClient(app)
 

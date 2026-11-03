@@ -387,5 +387,5 @@
   "no_answer": 1,
   "mean_tvd": 0.08924
  },
- "verifier": "Q-Canvas never shows a model's answer unchecked: every run is compared with exact simulation, and in the planted-fault benchmark (docs/BENCHMARK.md) 55 of 55 runs ended correctly, including 9 of 9 faked results caught."
+ "verifier": "Inkubit never shows a model's answer unchecked: every run is compared with exact simulation, and in the planted-fault benchmark (docs/BENCHMARK.md) 55 of 55 runs ended correctly, including 9 of 9 faked results caught."
 }

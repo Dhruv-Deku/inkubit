@@ -11,8 +11,8 @@ shor_code           Shor's nine-qubit code corrects a Y error (a bit flip and a 
 chsh_game           the CHSH game: quantum players win cos²(π/8) ≈ 85.4% of the time, classical ones at most 75%
 mermin_game         the GHZ (Mermin) game: three quantum players always win; classical ones at most 75%
 
-Every spec uses only Q-Canvas gates; circuits built with Qiskit's library are compiled to them first. The check is
-the exact ideal distribution of the saved spec, rebuilt by Q-Canvas's own spec reader, against the answer derived
+Every spec uses only Inkubit gates; circuits built with Qiskit's library are compiled to them first. The check is
+the exact ideal distribution of the saved spec, rebuilt by Inkubit's own spec reader, against the answer derived
 on paper (in the docstring of each builder), so a spec that drifts from its answer is never written.
 """
 
@@ -28,8 +28,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas.spec import parse_spec  # noqa: E402
-from qcanvas.verify.expected import ideal_distribution  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
+from inkubit.verify.expected import ideal_distribution  # noqa: E402
 
 SPEC_GATES = ["h", "x", "y", "z", "s", "sdg", "t", "tdg", "sx", "rx", "ry", "rz", "cx", "cz", "cp", "swap", "ccx"]
 
@@ -44,7 +44,7 @@ def op(gate: str, targets, controls=None, params=None) -> dict:
 
 
 def from_qiskit(qc) -> list[dict]:
-    """Compile a Qiskit circuit to Q-Canvas gates and turn it into spec operations."""
+    """Compile a Qiskit circuit to Inkubit gates and turn it into spec operations."""
     from qiskit import transpile
 
     # level 1: levels 2 and 3 may remove SWAPs and record a qubit permutation instead, which a spec cannot carry

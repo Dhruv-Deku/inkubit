@@ -6,12 +6,12 @@ import json
 
 import pytest
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.adapters.mock_vision import MockReasoningModel
-from qcanvas.spec import parse_spec
-from qcanvas.textspec import UnknownTextError, parse_description
-from qcanvas.verify import ideal_distribution
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.adapters.mock_vision import MockReasoningModel
+from inkubit.spec import parse_spec
+from inkubit.textspec import UnknownTextError, parse_description
+from inkubit.verify import ideal_distribution
 
 
 @pytest.mark.parametrize("text,answer", [

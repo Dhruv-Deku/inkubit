@@ -1,4 +1,4 @@
-"""Run a few circuits on a real IBM quantum computer and compare the counts with Q-Canvas's predictions.
+"""Run a few circuits on a real IBM quantum computer and compare the counts with Inkubit's predictions.
 
     pip install qiskit-ibm-runtime
     put IBM_QUANTUM_TOKEN=... in .env (and IBM_QUANTUM_INSTANCE=crn:... if your account has several instances)
@@ -9,10 +9,10 @@
 For each circuit (Bell pair, GHZ-3, Bernstein-Vazirani with secret 101, 2-qubit Grover): transpile for the device at
 optimisation level 3, run 4096 shots with SamplerV2, and compare the measured odds with
   (a) the ideal odds,
-  (b) Q-Canvas's generic "realistic" preset (the one the whole app uses), and
+  (b) Inkubit's generic "realistic" preset (the one the whole app uses), and
   (c) a digital twin: Qiskit Aer's noise model built from that device's own calibration (NoiseModel.from_backend),
       simulated on the same transpiled circuit.
-Hellinger fidelity and total variation distance for each. --rescore adds (d), Q-Canvas's "calibrated" preset built
+Hellinger fidelity and total variation distance for each. --rescore adds (d), Inkubit's "calibrated" preset built
 from a calibration snapshot of the device (scripts/calibration_snapshot.py), to the stored counts, which are complete
 (at most 8 outcomes per circuit), with the distance that shot noise alone would give. A rehearsal is labelled as one everywhere: there the
 "device" is itself a simulation, so it only checks the pipeline. Writes examples/hardware_runs.json and
@@ -36,9 +36,9 @@ from qiskit import transpile  # noqa: E402
 from qiskit_aer import AerSimulator  # noqa: E402
 from qiskit_aer.noise import NoiseModel  # noqa: E402
 
-from qcanvas.spec import parse_spec  # noqa: E402
-from qcanvas.verify.expected import build_reference_circuit, ideal_distribution, noisy_distribution  # noqa: E402
-from qcanvas.verify.metrics import hellinger_fidelity  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
+from inkubit.verify.expected import build_reference_circuit, ideal_distribution, noisy_distribution  # noqa: E402
+from inkubit.verify.metrics import hellinger_fidelity  # noqa: E402
 
 CIRCUITS = ["bell", "ghz3", "bernstein_vazirani", "grover2"]
 SHOTS = 4096
@@ -91,7 +91,7 @@ def shot_noise_tvd(p: dict[str, float], shots: int) -> float:
 def rescore() -> None:
     path = ROOT / "examples" / "hardware_runs.json"
     out = json.loads(path.read_text(encoding="utf-8"))
-    cal = json.loads((ROOT / "backend" / "qcanvas" / "data" / "calibration.json").read_text(encoding="utf-8"))
+    cal = json.loads((ROOT / "backend" / "inkubit" / "data" / "calibration.json").read_text(encoding="utf-8"))
     for r in out["runs"]:
         assert abs(sum(r["measured"].values()) - 1) < 1e-9, "stored counts must be complete to rescore"
         spec = parse_spec(json.loads((ROOT / "examples" / "specs" / f"{r['id']}.json").read_text(encoding="utf-8")))
@@ -165,7 +165,7 @@ def main() -> None:
 def write_doc(out: dict) -> None:
     lines = ["# Real hardware check", "",
              f"{len(out['runs'])} circuits run on **{out['device']}** (IBM Quantum, job `{out['job_id']}`, {out['shots']} shots, "
-             f"{out['date_utc']}) with `scripts/hardware_check.py`, compared with the ideal odds, Q-Canvas's generic "
+             f"{out['date_utc']}) with `scripts/hardware_check.py`, compared with the ideal odds, Inkubit's generic "
              "realistic preset and a digital twin built from the device's own calibration (Qiskit Aer, "
              "NoiseModel.from_backend). Lower total variation distance (TVD) is closer to what the chip did.", "",
              "| Circuit | Two-qubit gates on the chip | TVD to ideal | TVD to generic preset | TVD to digital twin |"
@@ -176,7 +176,7 @@ def write_doc(out: dict) -> None:
                      + (f" {r['tvd_calibrated']:.3f} | {r['shot_noise_tvd']:.3f} |" if "calibration" in out else ""))
     if "calibration" in out:
         c = out["calibration"]
-        lines += ["", f"The calibrated preset is Q-Canvas's own noise model with the medians of {c['device']}'s calibration "
+        lines += ["", f"The calibrated preset is Inkubit's own noise model with the medians of {c['device']}'s calibration "
                   f"(snapshot {c['taken_utc']}, calibrated {c['calibrated_utc']}; scripts/calibration_snapshot.py), taken "
                   "after the run, so it describes the device a few hours later; the stored counts were rescored with "
                   "`--rescore`. \"Shot noise alone\" is the distance a perfect prediction would still show at this "

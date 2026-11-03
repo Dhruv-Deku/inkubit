@@ -5,5 +5,5 @@ set -e
 cd "$(dirname "$0")/../backend"
 if [ -x ../.venv/bin/python ]; then PY=../.venv/bin/python; else PY=../.venv/Scripts/python; fi
 SPEC="${1:-../examples/specs/bell.json}"
-FAULT="${QCANVAS_DEMO_FAULT:-auto}"
-exec "$PY" -m qcanvas.cli "$SPEC" --fault "$FAULT" --noise "${QCANVAS_NOISE:-realistic}" --pace "${QCANVAS_PACE:-0.4}"
+FAULT="${INKUBIT_DEMO_FAULT:-auto}"
+exec "$PY" -m inkubit.cli "$SPEC" --fault "$FAULT" --noise "${INKUBIT_NOISE:-realistic}" --pace "${INKUBIT_PACE:-0.4}"

@@ -18,10 +18,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas import EXAMPLES_DIR  # noqa: E402
-from qcanvas.api.app import CATEGORIES  # noqa: E402
-from qcanvas.proofsheet import proof_sheet  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
+from inkubit import EXAMPLES_DIR  # noqa: E402
+from inkubit.api.app import CATEGORIES  # noqa: E402
+from inkubit.proofsheet import proof_sheet  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
 
 
 def main() -> None:
@@ -49,7 +49,7 @@ def main() -> None:
     (ROOT / "examples" / "proofsheet_benchmark.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     lines = ["# The proof sheet over the gallery", "",
              f"`scripts/proofsheet_bench.py` ran the proof sheet ({out['checks_per_circuit']} checks of {out['kinds']} kinds, "
-             f"`backend/qcanvas/proofsheet.py`) on all {out['circuits']} gallery circuits in {out['categories']} categories, "
+             f"`backend/inkubit/proofsheet.py`) on all {out['circuits']} gallery circuits in {out['categories']} categories, "
              f"{out['date_utc'][:10]}: **{total['passed']} passed, {total['failed']} failed**, {total['skipped']} skipped with "
              f"the reason, {total['notes']} notes (the ML verifier's interval missing the exact value: a note about the "
              "model, not the circuit).", "", "| Check | Kind | Guards against | Passed | Failed | Skipped | Notes |",

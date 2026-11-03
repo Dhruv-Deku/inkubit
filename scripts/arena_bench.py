@@ -1,4 +1,4 @@
-"""AI alone vs Q-Canvas: ask Muse Spark to predict circuits' outcome odds on its own, with no simulator.
+"""AI alone vs Inkubit: ask Muse Spark to predict circuits' outcome odds on its own, with no simulator.
 
 Two sets: the textbook examples (famous circuits a model has seen many times) and new circuits no textbook contains
 (seeded, like a student's own sketch). Needs the live model (META_API_KEY in .env). Answers are cached, so a re-run
@@ -21,24 +21,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
-os.environ["QCANVAS_ALLOW_FALLBACK"] = "0"
+os.environ.setdefault("INKUBIT_MODEL_PROVIDER", "meta")
+os.environ["INKUBIT_ALLOW_FALLBACK"] = "0"
 GLIMMER = "--glimmer" in sys.argv
 if GLIMMER:  # the local model needs no key; the real one is never sent to it
-    os.environ |= {"QCANVAS_MODEL_PROVIDER": "meta", "META_API_KEY": "ollama", "QCANVAS_REASONING_MODEL": "muse-glimmer",
-                   "QCANVAS_META_BASE_URL": "http://127.0.0.1:11434/v1", "QCANVAS_HTTP_TIMEOUT": "1800"}
+    os.environ |= {"INKUBIT_MODEL_PROVIDER": "meta", "META_API_KEY": "ollama", "INKUBIT_REASONING_MODEL": "muse-glimmer",
+                   "INKUBIT_META_BASE_URL": "http://127.0.0.1:11434/v1", "INKUBIT_HTTP_TIMEOUT": "1800"}
 SUFFIX = "_glimmer" if GLIMMER else ""
 MODEL_LABEL = ("Muse Glimmer, Meta's open-weight model (30B, 4-bit, run with Ollama on a laptop: RTX 5050 8 GB plus CPU)"
                if GLIMMER else "Muse Spark")
 
-from qcanvas.adapters.registry import get_models  # noqa: E402
-from qcanvas.arena import BENCH_FILE, BenchRow, ask_alone, bigger_circuits, fresh_circuits, summarise  # noqa: E402
-from qcanvas.bughunt import _load  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
+from inkubit.adapters.registry import get_models  # noqa: E402
+from inkubit.arena import BENCH_FILE, BenchRow, ask_alone, bigger_circuits, fresh_circuits, summarise  # noqa: E402
+from inkubit.bughunt import _load  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
 
 TEXTBOOK = ["bell", "ghz3", "superposition", "superdense", "toffoli_and", "deutsch_jozsa", "bernstein_vazirani",
             "grover2", "w_state", "teleportation", "bit_flip_code", "phase_estimation", "shor15"]
-VERIFIER = ("Q-Canvas never shows a model's answer unchecked: every run is compared with exact simulation, and in "
+VERIFIER = ("Inkubit never shows a model's answer unchecked: every run is compared with exact simulation, and in "
             "the planted-fault benchmark (docs/BENCHMARK.md) 55 of 55 runs ended correctly, including 9 of 9 faked "
             "results caught.")
 
@@ -46,7 +46,7 @@ VERIFIER = ("Q-Canvas never shows a model's answer unchecked: every run is compa
 def main() -> None:
     models = get_models()
     if models.settings.provider != "meta" or not models.settings.has_key:
-        sys.exit("needs the live model: set META_API_KEY and QCANVAS_MODEL_PROVIDER=meta")
+        sys.exit("needs the live model: set META_API_KEY and INKUBIT_MODEL_PROVIDER=meta")
     todo = [("textbook", name, _load(name)) for name in TEXTBOOK]
     todo += [("new", f"new{k + 1}", d) for k, d in enumerate(fresh_circuits())]
     todo.append(("new", "qaoa_party", _load("qaoa_party")))
@@ -80,7 +80,7 @@ def main() -> None:
                 f"{s.mean_tvd * 100:.1f}% of the probability in the wrong place (over the answers given).")
 
     lines = [
-        "# AI alone vs Q-Canvas",
+        "# AI alone vs Inkubit",
         "",
         f"{MODEL_LABEL} (`{bench.model}`) was asked to predict each circuit's measured outcome odds on its own, the way "
         "a chat assistant answers: the circuit as data (no title or notes), no simulator, medium reasoning effort. "

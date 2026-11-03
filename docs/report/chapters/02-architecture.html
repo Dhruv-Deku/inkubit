@@ -5,7 +5,7 @@ and a model layer through which every Meta model call passes. That layer has an 
 fallback.</p>
 
 <h2>Overview</h2>
-<p>Q-Canvas is a single web application. The browser sends a request: a photo, a spec, a mission, a question or a
+<p>Inkubit is a single web application. The browser sends a request: a photo, a spec, a mission, a question or a
 paper. The server starts a job and returns at once. The job's events (plan, step started, attempt failed, repaired,
 verified) stream back over server-sent events, so the user watches the work happen instead of waiting for a result.
 There is no database: jobs live in memory, share links carry the whole spec in the URL, and per-viewer progress such as
@@ -28,7 +28,7 @@ the checks. That separation is why the model can be swapped for an offline mock 
 downstream.</p>
 
 <h2>The backend</h2>
-<p>The backend is one Python package, <code>qcanvas</code>, of about {{py_lines}} lines. It runs on Python 3.13 with
+<p>The backend is one Python package, <code>inkubit</code>, of about {{py_lines}} lines. It runs on Python 3.13 with
 Qiskit 2.6 and Qiskit Aer, NumPy and SciPy, pydantic v2 for every schema, PyMatching for the decoders and the
 <code>sgp4</code> package for orbits. The main parts:</p>
 <table class="compact modules">
@@ -63,7 +63,7 @@ in the URL.</p>
 <tr><td>Discover</td><td>Discovery lab, an AI scientist that learns, when does quantum win, reproduce a paper (a figure or a whole paper)</td></tr>
 <tr><td>Hardware and networks</td><td>Pulse lab, ML decoder, code lab, error-correction lab, distributed computer, satellite planner</td></tr>
 <tr><td>Labs and games</td><td>Challenges, bug hunt, Shor, QAOA, H₂, BB84 with a spy</td></tr>
-<tr><td>Evidence</td><td>Simulation observatory with the ML verifier, AI alone vs Q-Canvas, the AI referee, the real IBM run</td></tr>
+<tr><td>Evidence</td><td>Simulation observatory with the ML verifier, AI alone vs Inkubit, the AI referee, the real IBM run</td></tr>
 </tbody>
 </table>
 <p>Visual rules are simple and kept everywhere. The colours are a charcoal ground, one blue for measured data, one
@@ -83,10 +83,10 @@ filled with the real numbers, and refuses anything it can't do honestly.</p>
 <ul>
 <li><b>Cache.</b> Responses are cached on disk by request hash, so repeated demos and runs cost nothing and are
 reproducible.</li>
-<li><b>Fallback.</b> With <code>QCANVAS_ALLOW_FALLBACK=1</code>, a failed live call is answered by the mock, and the
+<li><b>Fallback.</b> With <code>INKUBIT_ALLOW_FALLBACK=1</code>, a failed live call is answered by the mock, and the
 badge says <i>Mock fallback</i> together with the error.</li>
-<li><b>Public mode.</b> With <code>QCANVAS_PUBLIC=1</code> on a shared host, code written by a model is never executed
-(the agent runs Q-Canvas's own template code). Billed calls stop at 300 per day, counted only on cache misses, after
+<li><b>Public mode.</b> With <code>INKUBIT_PUBLIC=1</code> on a shared host, code written by a model is never executed
+(the agent runs Inkubit's own template code). Billed calls stop at 300 per day, counted only on cache misses, after
 which the labelled offline models answer.</li>
 </ul>
 
@@ -118,13 +118,13 @@ container does not spend minutes recomputing them.</p>
 </section>
 
 <section class="chapter">
-<h1>Meta's models in Q-Canvas</h1>
+<h1>Meta's models in Inkubit</h1>
 <p class="lede">Five Meta models, each used where it is strongest, each behind a check. The models perceive, plan,
 write and propose; they never produce a physical result themselves.</p>
 
 <h2>Five models, each where it is strongest</h2>
 <table class="compact">
-<thead><tr><th>Model</th><th>Endpoint</th><th>Jobs in Q-Canvas</th><th>Checked by</th></tr></thead>
+<thead><tr><th>Model</th><th>Endpoint</th><th>Jobs in Inkubit</th><th>Checked by</th></tr></thead>
 <tbody>
 <tr><td><b>Muse Spark 1.3</b></td><td><code>/v1/chat/completions</code>, JSON-schema output, tools</td><td>Chooses what SAM looks for; reads photo and boxes into a spec; turns words into specs; writes and repairs code; explains in 12 languages; answers questions from a run's facts; gives challenge hints; proposes shorter circuits, layouts and codes; plans, repairs and reports missions; drives the assistant's tool calls; transcribes figures and paper pages; plays the bug hunt; predicts alone for the AI-alone benchmark</td><td>Spec validation, independent verification, exact proofs, the code checker, number tracing</td></tr>
 <tr><td><b>Muse Wonder 1.0</b></td><td><code>/v1/chat/completions</code>, tools, <code>reasoning_effort: medium</code></td><td>Deep mode of the assistant (up to six rounds of tool calls); deep mode of mission control; lists the experiments in a whole paper; challenges Muse Spark in the referee</td><td>Number tracing; exact simulation of every experiment and claim</td></tr>
@@ -151,7 +151,7 @@ were fixed. Hindi explanations came back in Latin letters; the prompt now names 
 run cost about $0.40.</p>
 
 <h2>Tool calling and number tracing</h2>
-<p>The assistant, <i>Ask Q-Canvas</i>, is Muse Spark with tool calling. It chooses among nine function tools, each a
+<p>The assistant, <i>Ask Inkubit</i>, is Muse Spark with tool calling. It chooses among nine function tools, each a
 thin wrapper over an exact engine: circuit simulation, the optimiser, the H₂ molecule, BB84, QAOA, Shor's algorithm,
 network links, error correction and the Rosetta. It calls several in parallel when it needs several. The system prompt
 forbids working out a quantum result without a tool. Tool errors go back to the model as data, so it can fix its own

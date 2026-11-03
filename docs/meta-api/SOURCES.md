@@ -1,4 +1,4 @@
-# Meta Model API docs used by Q-Canvas
+# Meta Model API docs used by Inkubit
 
 No human-provided docs were present when work started, so these pages were
 downloaded on 2026-10-28 from Meta's official Markdown docs
@@ -6,7 +6,7 @@ downloaded on 2026-10-28 from Meta's official Markdown docs
 map `/` to `_`, for example `sam_reading-segmentation.md` is
 `https://dev.meta.ai/docs/sam/reading-segmentation.md`.
 
-Every endpoint, model ID and request field in `backend/qcanvas/adapters/meta*.py`
+Every endpoint, model ID and request field in `backend/inkubit/adapters/meta*.py`
 comes from these files:
 
 | What we use | Where it is documented |
@@ -23,5 +23,5 @@ comes from these files:
 | Muse Wonder (`muse-wonder-1.0`) on Chat Completions with tools and `reasoning_effort`; Standard mode only, $4 / $20 per 1M input / output tokens | `models.md`, `reasoning.md`, `pricing-rate-limits.md`, `tool-calling.md` |
 | Error envelope and retry guidance | `error-handling.md` |
 
-The docs name the env var `MODEL_API_KEY`; Q-Canvas reads `META_API_KEY` first
+The docs name the env var `MODEL_API_KEY`; Inkubit reads `META_API_KEY` first
 and falls back to `MODEL_API_KEY`.

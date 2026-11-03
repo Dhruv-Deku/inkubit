@@ -9,12 +9,12 @@ import random
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.base import ModelCall, Proposal
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.api.app import app
-from qcanvas.optimize import cost, optimize, prove, qiskit_proposal, rewrite
-from qcanvas.spec import parse_spec
+from inkubit.adapters.base import ModelCall, Proposal
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.api.app import app
+from inkubit.optimize import cost, optimize, prove, qiskit_proposal, rewrite
+from inkubit.spec import parse_spec
 
 client = TestClient(app)
 

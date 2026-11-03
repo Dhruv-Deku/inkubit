@@ -3,7 +3,7 @@
     .venv/Scripts/python scripts/train_decoder_d5.py [million_training_shots]
 
 Memory experiments of d rounds (3 at d = 3, 5 at d = 5) under the same phenomenological noise as the distance-3
-study (backend/qcanvas/decoder.py). Matching is PyMatching on the same space-time graph and weights, checked equal to
+study (backend/inkubit/decoder.py). Matching is PyMatching on the same space-time graph and weights, checked equal to
 the exact matcher at d = 3 (tests). Per-round logical error e from 1 - 2P = (1 - 2e)^rounds; below threshold a
 bigger code suppresses errors by Lambda = e3 / e5 (Google's Willow chip measured 2.14 from distance 5 to 7, 2024).
 
@@ -15,7 +15,7 @@ Adam with a cosine learning rate; scored with matching on the same new shots: 95
 approximation, and a paired (McNemar) test on the shots one decoder gets right and the other wrong.
 (A first version that saw only the events and matching's verdict learned to copy matching: +0% at every noise level.)
 --eval-only re-scores the stored network.
-Writes backend/qcanvas/data/decoder_d5.json.
+Writes backend/inkubit/data/decoder_d5.json.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas.decoder import WEIGHTS_D5, inputs_d5 as inputs, matching, mlp_forward, per_round, sample  # noqa: E402
+from inkubit.decoder import WEIGHTS_D5, inputs_d5 as inputs, matching, mlp_forward, per_round, sample  # noqa: E402
 
 TRAIN_P = [0.01, 0.015, 0.02, 0.03, 0.04]
 TEST_P = [0.005, 0.0075, 0.01, 0.015, 0.02, 0.03, 0.04, 0.05, 0.06]

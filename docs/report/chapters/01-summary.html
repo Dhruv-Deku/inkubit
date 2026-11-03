@@ -1,19 +1,19 @@
 <section class="chapter">
 <h1>Summary</h1>
-<p class="lede">Q-Canvas is a quantum lab in the browser. Meta's models read, plan and propose, and exact physics
+<p class="lede">Inkubit is a quantum lab in the browser. Meta's models read, plan and propose, and exact physics
 checks every number before anyone sees it, from a Bell pair drawn in pen to a distance-5 surface code, and from
 satellites in orbit tonight to a real IBM quantum computer.</p>
 
-<h2>What Q-Canvas is</h2>
+<h2>What Inkubit is</h2>
 <p>You can draw a circuit on paper, photograph a whiteboard, type a problem, say it out loud or give it a paper.
-Q-Canvas turns any of these into a structured plan. SAM 3.1 finds the drawn parts of a sketch. Muse Spark reads the
+Inkubit turns any of these into a structured plan. SAM 3.1 finds the drawn parts of a sketch. Muse Spark reads the
 photo into a validated specification, writes and repairs code, plans multi-step missions and writes reports. Muse
 Wonder takes the long, many-step questions and reads whole papers. Muse Voice Transcribe takes speech, and Muse Image
 draws illustrations that are always shown next to the exact drawing.</p>
 <p>None of these models produces a physical result itself. The results come from exact engines: density-matrix
 simulation with realistic noise, an independent second simulator, exhaustive search, symplectic checkers for
 error-correcting codes, an SGP4 orbit propagator, closed-form chemistry integrals and a minimum-weight matching
-decoder. These run under physical invariants and statistical tests. If a check fails, Q-Canvas says so: a run that
+decoder. These run under physical invariants and statistical tests. If a check fails, Inkubit says so: a run that
 cannot be repaired is shown as <b>Not verified</b>, and a number in a model's answer that matches no tool result is
 flagged.</p>
 <p>The same principle runs through every lab. A model proposes a circuit layout, an error-correcting code, a plan
@@ -53,7 +53,7 @@ physics' verdicts.</p>
 </div>
 
 <h2>What makes it different</h2>
-<p>Four things set Q-Canvas apart from a language model put in front of a simulator, and each is measured.</p>
+<p>Four things set Inkubit apart from a language model put in front of a simulator, and each is measured.</p>
 <ul>
 <li><b>The model never has the last word.</b> Every model output passes a check that does not trust it:
 specs are validated, code is compared with an independent prediction, proposed circuits are proven equal, and
@@ -84,7 +84,7 @@ predicts the output. The prediction is the weak point. A model predicting a circ
 in its head, and that calculation grows exponentially with the number of qubits.</p>
 
 <h2>Language models are fluent, not exact</h2>
-<p>Q-Canvas measured this before it relied on it (Chapter 15). Muse Spark was asked to predict circuits' outcome odds on
+<p>Inkubit measured this before it relied on it (Chapter 15). Muse Spark was asked to predict circuits' outcome odds on
 its own, the way a chat assistant answers, and was scored against exact simulation. It was exact on {{ar_tb}} textbook
 circuits and on {{ar_new}} new small circuits; the easy version of the claim, that chatbots get quantum circuits wrong,
 did not hold. On bigger new circuits of 6 to 8 qubits it was exact on only {{ar_big}}. One answer described a
@@ -96,7 +96,7 @@ recomputes the answer exactly is not optional, and it must be independent: it mu
 reasoning, only the specification of what was meant.</p></div>
 
 <h2>The principle: the AI proposes, exact physics has the last word</h2>
-<p>Every feature of Q-Canvas follows one division of labour. The models do the parts that need perception, language
+<p>Every feature of Inkubit follows one division of labour. The models do the parts that need perception, language
 and imagination. Exact methods do the parts that need correctness. Checks that trust neither side sit between them and
 the user.</p>
 <div class="layers">

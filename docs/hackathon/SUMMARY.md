@@ -1,4 +1,4 @@
-# Meta Global AI Developer Hackathon: what matters for Q-Canvas
+# Meta Global AI Developer Hackathon: what matters for Inkubit
 
 Collected on 2026-10-28 from the official pages (saved copies in this folder:
 `cerebralvalley.md`, `meta-event.html`). Official sources:
@@ -24,7 +24,7 @@ Collected on 2026-10-28 from the official pages (saved copies in this folder:
 
 Themes: "Build for Your World" and **"Push the Frontier"** ("accelerate a
 scientific experiment, or unlock a better way to understand and control a
-physical system"). Q-Canvas enters Push the Frontier.
+physical system"). Inkubit enters Push the Frontier.
 
 A third-party listing (internshala) quotes weights of Impact 30%, Use of Meta
 AI tooling 25%, Technical depth 20%, Demo 25%. That is **not** on the official

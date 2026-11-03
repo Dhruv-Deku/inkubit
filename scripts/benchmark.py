@@ -20,11 +20,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas.adapters.mock_code import MockCodeModel  # noqa: E402
-from qcanvas.agent.faults import FAULTS  # noqa: E402
-from qcanvas.agent.loop import AgentOptions, run_agent  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
-from qcanvas.spec.models import CircuitSpec  # noqa: E402
+from inkubit.adapters.mock_code import MockCodeModel  # noqa: E402
+from inkubit.agent.faults import FAULTS  # noqa: E402
+from inkubit.agent.loop import AgentOptions, run_agent  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
+from inkubit.spec.models import CircuitSpec  # noqa: E402
 
 UNREPAIRABLE = {"fake_result"}
 

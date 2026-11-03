@@ -1,10 +1,10 @@
-"""The stored results (qcanvas.precomputed) equal a fresh computation, so a small server can serve them safely."""
+"""The stored results (inkubit.precomputed) equal a fresh computation, so a small server can serve them safely."""
 
 from __future__ import annotations
 
 import math
 
-from qcanvas import observatory, precomputed, pulse
+from inkubit import observatory, precomputed, pulse
 
 
 def _close(a, b, path="") -> None:

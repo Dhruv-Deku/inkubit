@@ -1,6 +1,6 @@
 # An AI scientist that learns under proof
 
-Muse Spark (`muse-spark-1.3`) proposed CNOT layouts for three target states over 5 rounds of up to four layouts each (`scripts/learning_bench.py`, `backend/qcanvas/learning.py`). The exact optimiser judged every layout and Qiskit proved every one that reached the target. With feedback, each round's prompt listed every earlier layout and its verdict; without feedback, the same model was asked afresh; random wiring used the same lengths as the feedback run with random allowed pairs.
+Muse Spark (`muse-spark-1.3`) proposed CNOT layouts for three target states over 5 rounds of up to four layouts each (`scripts/learning_bench.py`, `backend/inkubit/learning.py`). The exact optimiser judged every layout and Qiskit proved every one that reached the target. With feedback, each round's prompt listed every earlier layout and its verdict; without feedback, the same model was asked afresh; random wiring used the same lengths as the feedback run with random allowed pairs.
 
 Fewest proven CNOTs after each round (– means none proven yet):
 

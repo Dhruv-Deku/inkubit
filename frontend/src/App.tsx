@@ -47,10 +47,10 @@ import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
 const SECTIONS: { id: SectionId; label: string; hint: string; art: string; panels: string[] }[] = [
   { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', art: 'sketch', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
-  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', art: 'bughunt', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
   { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, decoders, satellites', art: 'hardware', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
-  { id: 'labs', label: 'Labs & games', hint: 'challenges, bug hunt, Shor, QAOA, H₂, BB84', art: 'molecule', panels: ['Challenges', 'Bug hunt', "Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy'] },
-  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', art: 'evidence', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Q-Canvas', 'The AI referee'] },
+  { id: 'evidence', label: 'Proof', hint: 'proof sheet, real chip runs, AI alone', art: 'evidence', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Inkubit', 'The AI referee'] },
+  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', art: 'bughunt', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
+  { id: 'labs', label: 'Labs', hint: 'Shor, QAOA, H₂, BB84, bug hunt, puzzles', art: 'molecule', panels: ["Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy', 'Bug hunt', 'Challenges'] },
 ]
 
 type Stage = 'start' | 'edit' | 'run'
@@ -123,8 +123,8 @@ export default function App() {
       window.setTimeout(() => scrollToPanel(title, true), 150)
       window.setTimeout(() => scrollToPanel(title, true), 1100)  // again once the panels above have loaded
     }
-    window.addEventListener('qcanvas:goto', onGoto)
-    return () => window.removeEventListener('qcanvas:goto', onGoto)
+    window.addEventListener('inkubit:goto', onGoto)
+    return () => window.removeEventListener('inkubit:goto', onGoto)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [sketch, setSketch] = useState<{ url: string; analysis: SketchAnalysis } | null>(null)
   const [spec, setSpec] = useState<Spec | null>(null)
@@ -329,7 +329,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <Logo />
-          <div><h1>Q-Canvas</h1><p>sketch → verified quantum simulation</p></div>
+          <div><h1>Inkubit</h1><p>sketch → proven quantum results</p></div>
         </div>
         <nav className="steps" aria-label="Steps">
           <button className={`step ${stage === 'start' ? 'active' : 'done'}`} onClick={() => setStage('start')}><span className="n">1</span>Sketch</button>
@@ -337,7 +337,7 @@ export default function App() {
           <button className={`step ${stage === 'run' ? 'active' : job?.result ? 'done' : ''}`} disabled={!job} onClick={() => setStage('run')}><span className="n">3</span>Run &amp; verify</button>
         </nav>
         <span className="spacer" />
-        <button className="btn small primary" onClick={() => { setStage('start'); setTouring(true) }} title="Under two minutes: the best of Q-Canvas, step by step">Guided tour</button>
+        <button className="btn small primary" onClick={() => { setStage('start'); setTouring(true) }} title="Under two minutes: the best of Inkubit, step by step">Guided tour</button>
         <label className={`toggle ${options.demo_mode ? 'on' : ''}`} title="Break the first attempt on purpose so the repair loop is visible">
           <input type="checkbox" hidden checked={options.demo_mode} onChange={(e) => setOptions({ ...options, demo_mode: e.target.checked })} />
           <span className="track" />Demo mode
@@ -434,12 +434,12 @@ export default function App() {
           {seen.has('labs') && (
             <div hidden={tab !== 'labs'}>
             <div className="stack section-body">
-              <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
-              <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
               <ShorLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QaoaLabPanel onOpen={(s) => onSpec(clone(s))} />
               <ChemLabPanel onOpen={(s) => onSpec(clone(s))} />
               <QkdLabPanel onOpen={(s) => onSpec(clone(s))} />
+              <BugHuntPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+              <ChallengeList list={challenges} progress={progress} onStart={startChallenge} />
             </div>
             </div>
           )}

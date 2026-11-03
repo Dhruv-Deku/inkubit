@@ -34,7 +34,7 @@ export function ArenaPanel() {
   return (
     <div className="panel">
       <div className="panel-head">
-        <h2>AI alone vs Q-Canvas</h2>
+        <h2>AI alone vs Inkubit</h2>
         <span className="sub">why no answer here reaches you unchecked</span>
         <span className="spacer" />
         <span className="sub mono">{bench.model} · {bench.date}</span>
@@ -48,7 +48,7 @@ export function ArenaPanel() {
       <p className="lead">
         A chat model answers from patterns and has nothing to check itself against. We asked {glimmer
           ? 'Muse Glimmer, Meta\'s open-weight model, running on this laptop (30B, 4-bit, Ollama),'
-          : 'the same model Q-Canvas uses'} to predict what circuits output on its own, like a chatbot with no simulator, and scored every answer against exact
+          : 'the same model Inkubit uses'} to predict what circuits output on its own, like a chatbot with no simulator, and scored every answer against exact
         simulation: famous textbook circuits, new ones no textbook contains, and bigger new ones.
       </p>
       <div className="tiles" style={{ marginTop: 4 }}>
@@ -58,7 +58,7 @@ export function ArenaPanel() {
           <div className="s">{misses(f) || f.close ? miss(f) : 'all right this time'}</div></div>
         {b.count > 0 && <div className="tile"><div className="k">Bigger new circuits</div><div className={`v ${misses(b) ? 'bad' : 'good'}`}>{b.matched} of {b.count} exact</div>
           <div className="s">{misses(b) || b.close ? miss(b) : 'all right this time'}</div></div>}
-        <div className="tile"><div className="k">In Q-Canvas</div><div className="v good">Checked</div>
+        <div className="tile"><div className="k">In Inkubit</div><div className="v good">Checked</div>
           <div className="s">every run against exact simulation · 55 of 55 in the fault benchmark</div></div>
       </div>
       {groups.map(([label, sub, rows]) => rows.length > 0 && (
@@ -82,9 +82,9 @@ export function ArenaPanel() {
       ))}
       <p className="lead" style={{ margin: '12px 0 0' }}>
         {fresh
-          ? 'On small circuits the model alone is excellent. As circuits grow, working them out by hand gets exponentially harder (each qubit doubles the amplitudes), and that is where an answer with nothing behind it fails. Exact simulation does not get tired: Q-Canvas computes every circuit up to 12 qubits exactly. '
-          : 'It did well on every set. Q-Canvas still checks every answer, because you cannot tell in advance which one is wrong. '}
-        In Q-Canvas the model does what it is good at (reading your drawing, writing the code), and nothing it says is shown
+          ? 'On small circuits the model alone is excellent. As circuits grow, working them out by hand gets exponentially harder (each qubit doubles the amplitudes), and that is where an answer with nothing behind it fails. Exact simulation does not get tired: Inkubit computes every circuit up to 12 qubits exactly. '
+          : 'It did well on every set. Inkubit still checks every answer, because you cannot tell in advance which one is wrong. '}
+        In Inkubit the model does what it is good at (reading your drawing, writing the code), and nothing it says is shown
         until the code has run and matched an independent exact simulation; when it is wrong, the agent sees the exact
         difference and repairs it. Try any circuit with “Ask the AI alone” under the editor.
       </p>
@@ -131,7 +131,7 @@ export function AskAlone({ spec, valid }: { spec: CircuitSpec; valid: boolean })
               || 'Same outcomes as the truth; compare the heights.'}
           </div>
           <Histogram predicted={c.truth} ideal={c.truth} measured={c.guess} shots={1}
-            predictedLabel="Exact truth (what Q-Canvas checks against)" measuredLabel="What the AI alone said" idealMarks={false} />
+            predictedLabel="Exact truth (what Inkubit checks against)" measuredLabel="What the AI alone said" idealMarks={false} />
           <div className="bug-muse-says">
             <CallBadge call={r.call} />
             <span>“{r.reasoning}”</span>

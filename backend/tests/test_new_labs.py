@@ -10,8 +10,8 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.base import ModelCall
-from qcanvas.api.app import app
+from inkubit.adapters.base import ModelCall
+from inkubit.api.app import app
 
 CHAIN5 = [(0, 1), (1, 0), (1, 2), (2, 1), (2, 3), (3, 2), (3, 4), (4, 3)]
 
@@ -23,7 +23,7 @@ def _call(name: str) -> ModelCall:
 # ---------------------------------------------------------------- learning under proof
 
 def test_the_judge_proves_reaches_and_rejects():
-    from qcanvas.learning import TARGETS, judge, target_of
+    from inkubit.learning import TARGETS, judge, target_of
 
     g = TARGETS["w5_line"]
     t, rng, seen = target_of(g), np.random.default_rng(1), set()
@@ -35,7 +35,7 @@ def test_the_judge_proves_reaches_and_rejects():
 
 
 def test_feedback_reaches_the_prompt_and_random_wiring_uses_the_same_lengths():
-    from qcanvas.learning import TARGETS, run_condition, target_of
+    from inkubit.learning import TARGETS, run_condition, target_of
 
     g = TARGETS["w5_line"]
     seen_prompts = []
@@ -66,8 +66,8 @@ def test_learning_endpoints():
 # ---------------------------------------------------------------- the AI referee
 
 def test_the_referee_grades_every_kind_of_claim_exactly():
-    from qcanvas.referee import check, negativity, questions, truth
-    from qcanvas.spec import parse_spec
+    from inkubit.referee import check, negativity, questions, truth
+    from inkubit.spec import parse_spec
 
     bell = parse_spec({"kind": "circuit", "version": "1.0", "num_qubits": 3, "num_clbits": 3,
                        "operations": [{"gate": "H", "targets": [0]}, {"gate": "CX", "controls": [0], "targets": [1]},
@@ -84,8 +84,8 @@ def test_the_referee_grades_every_kind_of_claim_exactly():
 
 
 def test_a_debate_counts_catches_false_alarms_and_concessions():
-    from qcanvas.referee import debate
-    from qcanvas.spec import parse_spec
+    from inkubit.referee import debate
+    from inkubit.spec import parse_spec
 
     spec = parse_spec(json.loads(open(__file__.replace("tests/test_new_labs.py", "../examples/specs/bell.json").replace(
         "tests\\test_new_labs.py", "..\\examples\\specs\\bell.json"), encoding="utf-8").read()))
@@ -118,7 +118,7 @@ BELL_QASM = 'OPENQASM 2.0; include "qelib1.inc"; qreg q[2]; creg c[2]; h q[0]; c
 
 
 def test_an_experiment_is_judged_or_reported_never_guessed():
-    from qcanvas.paper import check_experiment
+    from inkubit.paper import check_experiment
 
     ok = check_experiment({"name": "Bell", "page": 3, "quote": "", "circuit_qasm": BELL_QASM, "shots": 1000, "hardware": "sim",
                            "bit_order": "unknown", "claims": [{"outcome": "00", "probability": 0.507, "kind": "simulated"},
@@ -133,7 +133,7 @@ def test_an_experiment_is_judged_or_reported_never_guessed():
 def test_two_passes_over_a_pdf_and_repeat_runs_count_once():
     from pypdf import PdfWriter
 
-    from qcanvas.paper import fetch_arxiv, pages_pdf, reproduce_paper
+    from inkubit.paper import fetch_arxiv, pages_pdf, reproduce_paper
 
     w = PdfWriter()
     for _ in range(5):
@@ -171,7 +171,7 @@ def test_paper_endpoints():
 # ---------------------------------------------------------------- the code lab
 
 def test_the_checker_scores_textbook_codes():
-    from qcanvas.codes import analyse, references
+    from inkubit.codes import analyse, references
 
     refs = {r["name"]: r for r in references()}
     assert (refs["Five-qubit perfect code"]["n"], refs["Five-qubit perfect code"]["d"]) == (5, 3)
@@ -184,7 +184,7 @@ def test_the_checker_scores_textbook_codes():
 
 
 def test_a_design_run_keeps_the_best_proven_code():
-    from qcanvas.codes import TARGETS, run
+    from inkubit.codes import TARGETS, run
 
     class Scripted:
         def __init__(self):

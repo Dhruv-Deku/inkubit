@@ -1,4 +1,4 @@
-// Mirrors the backend's JSON shapes (backend/qcanvas/**). Keep in sync by hand.
+// Mirrors the backend's JSON shapes (backend/inkubit/**). Keep in sync by hand.
 
 export type Bbox = [number, number, number, number]
 

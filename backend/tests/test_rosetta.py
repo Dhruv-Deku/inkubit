@@ -9,15 +9,15 @@ import pytest
 from fastapi.testclient import TestClient
 from qiskit.quantum_info import random_statevector
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.api.app import app
-from qcanvas.copilot import ask_offline, run_tool
-from qcanvas.insights.circuit import step_states
-from qcanvas.notation import NotationError, dirac, parse_ket, scalar
-from qcanvas.rosetta import (ReadError, detect, dictionary, languages, prepare, read_qasm, read_qiskit, read_quil,
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.api.app import app
+from inkubit.copilot import ask_offline, run_tool
+from inkubit.insights.circuit import step_states
+from inkubit.notation import NotationError, dirac, parse_ket, scalar
+from inkubit.rosetta import (ReadError, detect, dictionary, languages, prepare, read_qasm, read_qiskit, read_quil,
                              statevector, translate)
-from qcanvas.spec import parse_spec
+from inkubit.spec import parse_spec
 
 S = 1 / math.sqrt(2)
 
@@ -165,7 +165,7 @@ def test_dictionary_examples_all_translate():
 
 
 def test_step_states_carry_dirac():
-    spec = parse_spec(json.loads((__import__("qcanvas").PROJECT_DIR / "examples/specs/ghz3.json").read_text()))
+    spec = parse_spec(json.loads((__import__("inkubit").PROJECT_DIR / "examples/specs/ghz3.json").read_text()))
     assert [s.dirac for s in step_states(spec)][-1] == "1/√2 (|000⟩ + |111⟩)"  # type: ignore[arg-type]
 
 

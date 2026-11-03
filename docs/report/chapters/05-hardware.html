@@ -18,10 +18,10 @@ and the reason real codes protect against both kinds of error.</p>
 <h2>The surface code and its decoders</h2>
 <p>The surface code is the leading candidate for large quantum computers. Data qubits sit on a grid, and X-type and
 Z-type checks measure their parities every round. A decoder reads the pattern of changed checks (the
-<i>detection events</i>) over several rounds and decides which correction to apply. Q-Canvas simulates a rotated
+<i>detection events</i>) over several rounds and decides which correction to apply. Inkubit simulates a rotated
 surface code in a Z-basis memory experiment with phenomenological depolarizing noise. Sampling is exact in NumPy.
 The standard baseline is <b>minimum-weight perfect matching</b>: pair up detection events along the most likely error
-chains in the space-time graph, using log-likelihood weights. At distance 3 Q-Canvas uses its own exact matcher
+chains in the space-time graph, using log-likelihood weights. At distance 3 Inkubit uses its own exact matcher
 (dynamic programming over the events); at distance 5 it uses PyMatching on the same graph.</p>
 <p>Matching has a known weakness. It decodes X and Z errors separately, but a Y error is both at once, and it shows
 up in both kinds of checks. Learned decoders, such as Google DeepMind's AlphaQubit, beat matching partly by seeing such
@@ -66,7 +66,7 @@ is 6%, near threshold.</p>
 <section class="chapter">
 <h1>Down to the hardware</h1>
 <p class="lede">Below the circuit is the microwave pulse; beside one chip is a second one; ahead is the question of
-when any of this beats a classical computer. Q-Canvas simulates all three from first principles.</p>
+when any of this beats a classical computer. Inkubit simulates all three from first principles.</p>
 
 <h2>The pulse lab</h2>
 <p>An X gate on a superconducting qubit is a shaped microwave pulse. A transmon is not really a two-level system: it
@@ -113,7 +113,7 @@ cost for search; and first-order Trotter for a 2D Ising magnet, with the rigorou
 rotation costs (a worst case, said on the page). The classical side uses the general number field sieve scaled from
 RSA-250 by its L-function, N/2 checks for search, and the exponential memory wall for simulation.</p>
 <table class="kv">
-<thead><tr><th>RSA-2048 on superconducting hardware</th><th class=n>Q-Canvas model</th><th class=n>Gidney &amp; Ekerå (2021)</th></tr></thead>
+<thead><tr><th>RSA-2048 on superconducting hardware</th><th class=n>Inkubit model</th><th class=n>Gidney &amp; Ekerå (2021)</th></tr></thead>
 <tbody>
 <tr><td>Code distance</td><td class=n>{{rsa_d}}</td><td class=n>–</td></tr>
 <tr><td>Logical qubits</td><td class=n>{{rsa_logical}}</td><td class=n>–</td></tr>

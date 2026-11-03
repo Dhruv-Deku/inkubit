@@ -45,7 +45,7 @@ export function CodeViewer({ attempts, finalCode }: { attempts: Attempt[]; final
         )}
         <span className="grow" />
         <button className="btn small" onClick={copy}><Copy />{copied ? 'Copied' : 'Copy'}</button>
-        <button className="btn small" onClick={() => downloadText(`qcanvas_attempt_${current?.attempt ?? 'final'}.py`, code)}>Download .py</button>
+        <button className="btn small" onClick={() => downloadText(`inkubit_attempt_${current?.attempt ?? 'final'}.py`, code)}>Download .py</button>
       </div>
       {current?.diagnosis && !current.passed && (
         <div className="notice error" style={{ marginBottom: 8 }}>

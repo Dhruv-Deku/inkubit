@@ -21,7 +21,7 @@ jobs:
       - name: "Tests (offline: mock models, no API key, no billed calls)"
         working-directory: backend
         env:
-          QCANVAS_MODEL_PROVIDER: mock
+          INKUBIT_MODEL_PROVIDER: mock
         run: python -m pytest -q
 
   frontend:

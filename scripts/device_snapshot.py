@@ -4,7 +4,7 @@
 
 For each device: the coupling map, and per qubit T1, T2, readout error each way and the one-qubit (sx) gate error;
 per coupler the two-qubit gate error; the processor, the calibration time and the queue at the moment of the snapshot.
-Writes backend/qcanvas/data/devices/<name>.json (a few tens of KB each). Needs IBM_QUANTUM_TOKEN in .env.
+Writes backend/inkubit/data/devices/<name>.json (a few tens of KB each). Needs IBM_QUANTUM_TOKEN in .env.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "backend" / "qcanvas" / "data" / "devices"
+OUT = ROOT / "backend" / "inkubit" / "data" / "devices"
 
 
 def snapshot(backend) -> dict:

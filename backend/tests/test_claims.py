@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA = ROOT / "backend" / "qcanvas" / "data"
+DATA = ROOT / "backend" / "inkubit" / "data"
 README = (ROOT / "README.md").read_text(encoding="utf-8")
 SUBMISSION = (ROOT / "SUBMISSION.md").read_text(encoding="utf-8")
 BOTH = (README, SUBMISSION)
@@ -40,7 +40,7 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     ml = _load(DATA / "ml_verifier.json")["metrics"]
     ratio = ml["test_mae_baseline"] / ml["test_mae_ml"]
 
-    from qcanvas.estimator import HARDWARE, factoring_algorithm, surface_code
+    from inkubit.estimator import HARDWARE, factoring_algorithm, surface_code
 
     rsa = surface_code(factoring_algorithm(2048), HARDWARE["superconducting"])
     learn = _load(ROOT / "examples" / "learning_benchmark.json")["targets"]
@@ -66,7 +66,7 @@ def claims() -> list[tuple[str, str, tuple[str, ...]]]:
     gx = {r["placement"]: r["fidelity"] for r in ibmx["ghz"]["rows"]}
     tff = ibmx["teleport"]["feed_forward"]
     psb = _load(ROOT / "examples" / "proofsheet_benchmark.json")
-    from qcanvas.api.app import CATEGORIES
+    from inkubit.api.app import CATEGORIES
 
     n_alg = sum(len(v) for k, v in CATEGORIES.items() if k != "Basics")
     return [

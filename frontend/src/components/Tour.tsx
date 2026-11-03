@@ -16,8 +16,8 @@ const STEPS: Step[] = [
   { section: null, panel: 'Mission control', title: 'Mission control', seconds: 12,
     action: { action: 'mission', sample: 'Secure two cities' },
     text: 'One request in words, a photo or speech. Muse Spark plans a graph of exact tools, independent steps run in parallel, every result passes physics checks and two independent simulators, and every number in the report is traced. A real mission is starting now.' },
-  { section: 'evidence', panel: 'AI alone vs Q-Canvas', title: 'Why verify at all?', seconds: 9,
-    text: 'Asked alone, the same model was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence. So Q-Canvas never shows a number nothing checked.' },
+  { section: 'evidence', panel: 'AI alone vs Inkubit', title: 'Why verify at all?', seconds: 9,
+    text: 'Asked alone, the same model was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence. So Inkubit never shows a number nothing checked.' },
   { section: 'discover', panel: 'Discovery lab', title: 'AI proposes, physics proves', seconds: 11,
     action: { action: 'discovery', goal: 'ghz7_hex' },
     text: 'Muse Spark proposes circuit layouts for a GHZ state on all 7 qubits of an IBM heavy-hex chip; an exact optimiser fits them and Qiskit proves each winner. The search is running; we come back for the result.' },
@@ -55,7 +55,7 @@ export function Tour({ onGo, onClose }: { onGo: (section: TourSection, panel: st
     if (step.action && !fired.current.has(i)) {
       fired.current.add(i)
       const a = step.action
-      window.setTimeout(() => window.dispatchEvent(new CustomEvent('qcanvas:tour', { detail: a })), 600)
+      window.setTimeout(() => window.dispatchEvent(new CustomEvent('inkubit:tour', { detail: a })), 600)
     }
   }, [i]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {

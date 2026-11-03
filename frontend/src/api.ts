@@ -22,7 +22,7 @@ async function call<T>(url: string, init?: RequestInit): Promise<T> {
   try {
     resp = await fetch(url, init)
   } catch {
-    throw new ApiError('Cannot reach the Q-Canvas backend. Is it running on port 8000?', 0)
+    throw new ApiError('Cannot reach the Inkubit backend. Is it running on port 8000?', 0)
   }
   if (!resp.ok) {
     let detail: unknown = resp.statusText

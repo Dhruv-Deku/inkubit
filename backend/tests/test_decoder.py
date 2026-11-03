@@ -5,8 +5,8 @@ from __future__ import annotations
 import numpy as np
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.decoder import LOGICAL_X, LOGICAL_Z, X_CHECKS, Z_CHECKS, model, mwpm, sample, unprotected
+from inkubit.api.app import app
+from inkubit.decoder import LOGICAL_X, LOGICAL_Z, X_CHECKS, Z_CHECKS, model, mwpm, sample, unprotected
 
 
 def test_checks_commute_and_logicals_are_valid():
@@ -46,7 +46,7 @@ def test_endpoint():
 
 
 def test_the_layout_generator_gives_the_distance_3_code_and_a_valid_distance_5_code():
-    from qcanvas.decoder import code, layout
+    from inkubit.decoder import code, layout
 
     assert layout(3) == (X_CHECKS, Z_CHECKS, LOGICAL_Z, LOGICAL_X)
     xs, zs, lz, lx = layout(5)
@@ -58,7 +58,7 @@ def test_the_layout_generator_gives_the_distance_3_code_and_a_valid_distance_5_c
 
 
 def test_pymatching_agrees_with_the_exact_matcher():
-    from qcanvas.decoder import matching
+    from inkubit.decoder import matching
 
     s = sample(3000, 0.03, seed=11)
     cache: dict = {}
@@ -67,7 +67,7 @@ def test_pymatching_agrees_with_the_exact_matcher():
 
 
 def test_distance_5_suppresses_errors_below_threshold():
-    from qcanvas.decoder import model_d5
+    from inkubit.decoder import model_d5
 
     curve = {r["p"]: r for r in model_d5()["curve"]}
     assert curve[0.005]["lam"] > 5 and curve[0.01]["lam"] > 2  # far below threshold the bigger code wins big

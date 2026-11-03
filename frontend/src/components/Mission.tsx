@@ -187,8 +187,8 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
       if (photo) { URL.revokeObjectURL(photo.url); setPhoto(null) }
       void launch(s.goal)
     }
-    window.addEventListener('qcanvas:tour', onTour)
-    return () => window.removeEventListener('qcanvas:tour', onTour)
+    window.addEventListener('inkubit:tour', onTour)
+    return () => window.removeEventListener('inkubit:tour', onTour)
   })
   const steps = nodes.filter((n) => n.lane === 'step')
   const sel = useMemo(() => nodes.find((n) => n.id === selected) ?? null, [nodes, selected])

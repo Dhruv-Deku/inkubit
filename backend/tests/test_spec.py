@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from qcanvas.spec import CircuitSpec, NetworkSpec, SpecError, find_path, parse_spec
-from qcanvas.spec.schema import SCHEMA_PATH, kind_schema, spec_json_schema
+from inkubit.spec import CircuitSpec, NetworkSpec, SpecError, find_path, parse_spec
+from inkubit.spec.schema import SCHEMA_PATH, kind_schema, spec_json_schema
 
 VALID = ["bell", "ghz3", "superposition", "network_satellite", "network_fiber_chain"]
 
@@ -92,7 +92,7 @@ def test_find_path(example):
 
 def test_schema_file_is_current():
     on_disk = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-    assert on_disk == spec_json_schema(), "run `python -m qcanvas.spec.schema` to regenerate"
+    assert on_disk == spec_json_schema(), "run `python -m inkubit.spec.schema` to regenerate"
     assert on_disk["discriminator"]["propertyName"] == "kind"
 
 

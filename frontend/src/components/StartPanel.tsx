@@ -55,7 +55,7 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
         <div className="panel hero-copy">
           <h2>Start from a photo of your drawing.</h2>
           <p>
-            Photograph a hand-drawn circuit or a satellite network. Q-Canvas reads it, writes the Qiskit code,
+            Photograph a hand-drawn circuit or a satellite network. Inkubit reads it, writes the Qiskit code,
             runs it under realistic noise, and checks the answer against an independent simulation. When the
             code is wrong, you watch the agent find the bug and fix it.
           </p>

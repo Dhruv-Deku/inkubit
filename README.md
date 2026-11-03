@@ -1,12 +1,12 @@
-# Q-Canvas
+# Inkubit
 
-[![tests](https://github.com/Dhruv-Deku/q-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/Dhruv-Deku/q-canvas/actions/workflows/ci.yml)
+[![tests](https://github.com/Dhruv-Deku/inkubit/actions/workflows/ci.yml/badge.svg)](https://github.com/Dhruv-Deku/inkubit/actions/workflows/ci.yml)
 · MIT · built during the Meta Global AI Developer Hackathon 2026 (Push the Frontier)
 
 **Sketch it, say it or photograph it: Meta's models turn a quantum idea into a plan, and exact physics checks every
 number before you see it.**
 
-Q-Canvas is a quantum lab where the AI never gets the last word. Muse Spark, Muse Wonder, SAM 3.1, Muse Image and
+Inkubit is a quantum lab where the AI never gets the last word. Muse Spark, Muse Wonder, SAM 3.1, Muse Image and
 Muse Voice read sketches, photos, papers and speech, plan multi-step experiments and propose circuits; exact
 simulation, independent re-runs and physics invariants verify every result, and every number in every AI answer is
 traced back to a tool that computed it.
@@ -17,7 +17,7 @@ traced back to a tool that computed it.
 
 | | Measured result |
 | --- | --- |
-| **A real IBM quantum computer** | The discovery lab's GHZ circuit for 7 qubits (Muse Spark's own layout) ran on IBM's ibm_fez next to the textbook circuit, on the same seven qubits: GHZ fidelity **0.814 against 0.795** (3.2 standard errors), both certifying genuine 7-qubit entanglement; for W and Dicke states the discovered circuits used 8 two-qubit gates against 17 and tied within shot noise. On four smaller circuits a digital twin from the chip's calibration beat the noiseless odds and the generic preset on 4 of 4 (distance 0.021 to 0.038), and Q-Canvas's new **calibrated preset**, built from the chip's median calibration, came closer still (0.013 to 0.027): [docs/DISCOVERY_HARDWARE.md](docs/DISCOVERY_HARDWARE.md), [docs/HARDWARE.md](docs/HARDWARE.md) |
+| **A real IBM quantum computer** | The discovery lab's GHZ circuit for 7 qubits (Muse Spark's own layout) ran on IBM's ibm_fez next to the textbook circuit, on the same seven qubits: GHZ fidelity **0.814 against 0.795** (3.2 standard errors), both certifying genuine 7-qubit entanglement; for W and Dicke states the discovered circuits used 8 two-qubit gates against 17 and tied within shot noise. On four smaller circuits a digital twin from the chip's calibration beat the noiseless odds and the generic preset on 4 of 4 (distance 0.021 to 0.038), and Inkubit's new **calibrated preset**, built from the chip's median calibration, came closer still (0.013 to 0.027): [docs/DISCOVERY_HARDWARE.md](docs/DISCOVERY_HARDWARE.md), [docs/HARDWARE.md](docs/HARDWARE.md) |
 | **IBM Quantum, in the app** | Live calibration maps of 3 IBM Heron chips, a placement advisor that scores every way to put a circuit on a chip, and **Run on IBM Quantum** from the editor. On ibm_fez the advisor's best, median and worst placements of the same GHZ-5 circuit measured **0.894, 0.814 and 0.285**, exactly its order; teleportation with real mid-circuit measurement and feed-forward reached an average fidelity of **0.924 ± 0.002** against the classical limit of 0.667 (0.499 without the corrections): [docs/IBM_EXPERIMENTS.md](docs/IBM_EXPERIMENTS.md) |
 | **The proof sheet** | 11 independent checks of 9 kinds on any circuit in about eight seconds (two simulators of each kind, a physical density matrix, translation validation of Qiskit's compiler, OpenQASM read-back, a G-test, the generated code in the sandbox, metamorphic tests); over the whole gallery **299 passed and 0 failed**, and its first run found a real export bug: [docs/PROOFSHEET.md](docs/PROOFSHEET.md) |
 | **25 algorithms in 8 categories** | Each checked against its known answer in a test: the newest are quantum counting, HHL (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, hidden shift, Shor's nine-qubit code, Grover with two marked items and two nonlocal games (CHSH won cos²(π/8) of the time; the GHZ game won every time) |
@@ -31,7 +31,7 @@ traced back to a tool that computed it.
 | **ML verifier** | Predicts how much of a circuit survives noise in about 150 µs with a conformal error bar: **9x more accurate** than the usual rule of thumb, and checked exactly every time |
 | **When does quantum win?** | Surface-code resource estimates against the best classical route; the model lands within 1.3x (qubits) and 2.3x (time) of Gidney and Ekerå's published RSA-2048 figure, and it says "classical wins" when it does |
 | **Reproduce a paper** | Muse Spark read a printed figure's circuit, all 8 bar heights, the shot count and the bit order in 8 s; an exact re-run judged every claim against its error bar |
-| **AI alone vs Q-Canvas** | The same model alone was exact on small circuits but only 3 of 6 on 6- to 8-qubit ones, once 43% off with full confidence: [docs/ARENA.md](docs/ARENA.md). That is why everything here is verified |
+| **AI alone vs Inkubit** | The same model alone was exact on small circuits but only 3 of 6 on 6- to 8-qubit ones, once 43% off with full confidence: [docs/ARENA.md](docs/ARENA.md). That is why everything here is verified |
 
 ### Where things are
 
@@ -42,7 +42,7 @@ traced back to a tool that computed it.
 | Discover | **Discovery lab**, **an AI scientist that learns**, **when does quantum win**, **reproduce a paper** (a figure, or a **whole paper** from its PDF) |
 | Hardware & networks | **IBM Quantum** (chip maps, placement advisor, run on IBM), **Pulse lab** (DRAG on a three-level transmon), **ML decoder**, **code lab** (AI-designed codes, check your own), error-correction lab, **distributed quantum computer**, **satellite planner** (SpeQtre and QUBE-II live on today's real orbits, under the cloud forecast) |
 | Labs & games | Challenges, bug hunt (against Muse Spark), Shor, QAOA, H₂ from first principles, BB84 with a spy |
-| Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Q-Canvas, **the AI referee** (Muse Spark against Muse Wonder) |
+| Evidence | Simulation observatory (satellites vs fiber, Grover vs noise, entanglement growth, the memory wall, the ML verifier), AI alone vs Inkubit, **the AI referee** (Muse Spark against Muse Wonder) |
 
 ### Run it in two minutes
 
@@ -50,32 +50,32 @@ traced back to a tool that computed it.
 python3.13 -m venv .venv && source .venv/bin/activate     # Windows: py -3.13 -m venv .venv; .venv\Scripts\activate
 pip install -r backend/requirements.txt
 (cd frontend && npm ci && npm run build)
-cd backend && python -m uvicorn qcanvas.api.app:app --port 8000   # then open http://127.0.0.1:8000
+cd backend && python -m uvicorn inkubit.api.app:app --port 8000   # then open http://127.0.0.1:8000
 ```
 
 Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 542 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
+live. 546 backend tests run offline (`cd backend && python -m pytest -q`), and browser tests drive the built app
 (`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D81); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
 ### Host it, and check it on real hardware
 
-The `Dockerfile` runs Q-Canvas in public mode: code written by a model is never executed (the agent runs Q-Canvas's
+The `Dockerfile` runs Inkubit in public mode: code written by a model is never executed (the agent runs Inkubit's
 own template code) and billed model calls stop at 300 a day, after which the labelled offline models answer. It fits
 a free container (512 MB, a tenth of a CPU: about 260 MB in use, 385 MB at the peak of a sketch run with its sandbox),
 and the slow, input-free results (the observatory, the pulse lab) are stored with the app (`scripts/precompute.py`)
-so a cold start does not spend minutes on them. [Deploy it to Koyeb's free tier](https://app.koyeb.com/deploy?type=git&builder=dockerfile&repository=github.com/Dhruv-Deku/q-canvas&branch=main&name=q-canvas&ports=7860;http;/&instance_type=free&regions=was) in one click (add
+so a cold start does not spend minutes on them. [Deploy it to Koyeb's free tier](https://app.koyeb.com/deploy?type=git&builder=dockerfile&repository=github.com/Dhruv-Deku/inkubit&branch=main&name=inkubit&ports=7860;http;/&instance_type=free&regions=was) in one click (add
 `META_API_KEY` as a secret for the live models), or to a Hugging Face Space with `scripts/deploy_space.py` (Docker
 Spaces need a PRO account). `scripts/discovery_hardware.py` runs the discovery lab's proven circuits on the same chip next
 to the circuits they beat, `scripts/calibration_snapshot.py` turns the chip's calibration into the "Calibrated" noise
 preset in the run bar, and `scripts/hardware_check.py` runs four circuits on
 the least busy IBM quantum computer (with `IBM_QUANTUM_TOKEN` in `.env`) and compares the counts with the ideal odds,
-Q-Canvas's generic preset and a digital twin built from the device's calibration; `--fake` rehearses it offline.
+Inkubit's generic preset and a digital twin built from the device's calibration; `--fake` rehearses it offline.
 
 ## The original pipeline: sketch to verified code
 
-Draw a quantum circuit or a satellite link on paper and get running, verified code in seconds. Q-Canvas turns the
+Draw a quantum circuit or a satellite link on paper and get running, verified code in seconds. Inkubit turns the
 photo into a structured spec, writes Qiskit code for it, runs that code under realistic noise, and **proves the
 result is right** by checking it against an independent simulation of the spec. When the code is wrong, a
 self-repair agent diagnoses the failure in plain language, fixes it, and runs it again, live on screen.
@@ -89,7 +89,7 @@ runs and still prints a histogram; it is just the wrong histogram. Students and
 researchers sketch circuits and network layouts on paper long before they write
 code, and the jump from sketch to *correct* code is where time goes.
 
-Q-Canvas closes that gap and refuses to fake success:
+Inkubit closes that gap and refuses to fake success:
 
 - Every run is compared with the **exact** distribution the spec predicts under
   the same noise model, computed by a separate code path that never sees the
@@ -114,7 +114,7 @@ Q-Canvas closes that gap and refuses to fake success:
 | Reproduce a paper | Upload a figure from a paper: Muse Spark transcribes the circuit as OpenQASM (read by the exact parser, sketch pipeline as fallback) and the claimed odds, shots and bit order; the circuit is re-run exactly and every claim judged against shot-noise error bars, bit order inferred when unstated | **Muse Spark 1.3** reads the figure |
 | ML error-correction decoder | Distance-3 rotated surface code, 3 rounds of phenomenological noise: exact minimum-weight matching against a NumPy network that also reads the X checks (Y errors correlate them). At 1% noise: 0.72% logical errors against 0.92% for matching (21% fewer, beyond the error bars at every noise level). **Distance 5** (25 qubits, 5 rounds; layout generated for any odd distance, matching by PyMatching, equal to the exact matcher on 20,000 distance-3 shots): per-round logical error 5.0 × 10⁻⁴ against 3.0 × 10⁻³ at distance 3, a suppression Λ = 5.9 at 1% noise (11.3 at 0.5%, 1.15 at 6%). A 172-256-256-1 network on top of matching, fed where each kind of matching put its corrections (a qubit in both is a Y error), makes 10% fewer logical errors at 1%: on the same shots it fixes 123 and breaks 27 (McNemar z = 7.8), significant at 8 of 9 noise levels. A first version without the corrections only learned to copy matching | – |
 | Pulse lab | An X gate as the microwave pulse on a three-level transmon (anharmonicity −300 MHz, T1/T2 as Lindblad terms): Gaussian against calibrated DRAG; short Gaussians leak into |2⟩, DRAG reaches 1.1e-4 error at 15 ns where only T1/T2 is left, its calibrated β ≈ 0.5 matching first-order theory | – |
-| Ask Q-Canvas | One assistant for the whole lab. Ask in words or by voice ("compare H₂ at 0.74 and 2.5 Å", "Eve listens to 30% of photons", "split these six people into two teams", "make a GHZ state and run it on noisy hardware"): the model calls nine exact tools (circuit simulation, optimizer, H₂, BB84, QAOA, Shor, network links, error correction, the Rosetta), in parallel when it needs several, and answers with live result cards. **Every number in the answer is traced to a tool result**; untraced numbers are flagged | **Muse Spark 1.3** with tool calling, **Muse Voice Transcribe 1.0** for voice |
+| Ask Inkubit | One assistant for the whole lab. Ask in words or by voice ("compare H₂ at 0.74 and 2.5 Å", "Eve listens to 30% of photons", "split these six people into two teams", "make a GHZ state and run it on noisy hardware"): the model calls nine exact tools (circuit simulation, optimizer, H₂, BB84, QAOA, Shor, network links, error correction, the Rosetta), in parallel when it needs several, and answers with live result cards. **Every number in the answer is traced to a tool result**; untraced numbers are flagged | **Muse Spark 1.3** with tool calling, **Muse Voice Transcribe 1.0** for voice |
 | 1. Sketch | Upload a photo, take one with the camera, pick a sample, **describe it in words or say it out loud**, or paste JSON | **Muse Voice Transcribe 1.0** hears it, **Muse Spark 1.3** turns the description into a spec |
 | 2. See the parts | The kind of diagram is identified and every drawn part is boxed | **Muse Spark 1.3** picks noun phrases, **SAM 3.1** segments each one |
 | 3. Read it | The boxes and the photo become a validated JSON spec, each operation linked to its box | **Muse Spark 1.3** with structured output |
@@ -132,7 +132,7 @@ Q-Canvas closes that gap and refuses to fake success:
 | Simulation observatory | Five exact simulations of where quantum technology stands, each with its key number written out: **satellites vs fiber** (secret key between two cities from 25 to 3,000 km, the network planner's own model, satellite geometry from the Earth's curvature, Micius's 1,203 km marked); **Grover vs noise** (2 to 5 qubits compiled to CNOTs and evolved as exact density matrices under the realistic preset: at 5 qubits the noise erases the speedup); **quantum walk** vs a random walk (play it step by step; spread grows with t, not √t); **entanglement growth** in random circuits up to Page's limit; **the exponential wall** (memory for an exact state, laptop to supercomputer) | exact simulation, no model |
 | Molecule lab (H₂) | The hydrogen molecule from first principles: STO-3G integrals computed in closed form (checked against Szabo and Ostlund), Hartree-Fock against the exact energy as the bond stretches, and VQE on one qubit with realistic noise, raw and with the calibrated noise undone (within shot noise of exact at every bond length). Shows why the classical shortcut fails when the electrons become correlated | exact simulation, no model |
 | Catch the spy (BB84) | Quantum key distribution: random bits and bases, an intercept-resend eavesdropper on a share of photons you choose, sifting, the error-rate check and the 11% abort, privacy amplification. Eve on a share f adds f/4 to the error rate, so she is caught; each photon also opens as a circuit | exact simulation, no model |
-| AI alone vs Q-Canvas | The same model, asked to predict circuits' outcome odds on its own like a chatbot, scored against exact simulation ([docs/ARENA.md](docs/ARENA.md)): exact on 13 of 13 textbook circuits and 10 of 11 new small ones, but only 3 of 6 bigger ones (6 to 8 qubits), with one confidently wrong answer that put 43% of the probability in the wrong place and one with no usable answer. "Ask the AI alone" under the editor runs the same test on any circuit; the models table says how each model step is checked | **Muse Spark 1.3** answers alone; exact simulation scores it |
+| AI alone vs Inkubit | The same model, asked to predict circuits' outcome odds on its own like a chatbot, scored against exact simulation ([docs/ARENA.md](docs/ARENA.md)): exact on 13 of 13 textbook circuits and 10 of 11 new small ones, but only 3 of 6 bigger ones (6 to 8 qubits), with one confidently wrong answer that put 43% of the probability in the wrong place and one with no usable answer. "Ask the AI alone" under the editor runs the same test on any circuit; the models table says how each model step is checked | **Muse Spark 1.3** answers alone; exact simulation scores it |
 | Bug hunt | One gate in a known circuit is wrong (wrong wire, control and target swapped, a look-alike gate, an angle slip, a stray gate). Compare what it should give with what it gave and click the culprit, against the clock. An exact search tries every one-gate edit, so any gate whose fix restores the odds counts, and rounds where too many gates would count are re-planted. Three levels; score and streak saved in the browser | Live, **Muse Spark 1.3** plays the same round in parallel from the same facts, and its pick and reasoning appear after yours |
 | Split the party (QAOA) | Guests and feuds as a graph you edit by clicking; QAOA seats them at two tables (Max-Cut). Brute force gives the true best; the depth-1 landscape shows every angle pair with the optimizer's path, and you can click it to try your own angles; depths 1 to 3 are optimized exactly, with the odds of a best seating with perfect and with realistic qubits. The circuit opens in the editor | exact simulation, no model |
 | Network mode | Physics model of every link, bottleneck search, fixes (relays, telescopes, memories, **entanglement purification**) re-simulated, before/after on an animated **network map** (entangled pairs in flight, thicker links deliver more, the weakest link marked) | **Muse Spark 1.3** explains, **Muse Image 1.0** draws |
@@ -176,7 +176,7 @@ Q-Canvas closes that gap and refuses to fake success:
 </tr>
 <tr>
 <td><img src="docs/screenshots/22-ai-alone.png" alt="The AI alone says every outcome is equally likely; the exact truth has four peaks"></td>
-<td><img src="docs/screenshots/23-arena.png" alt="AI alone vs Q-Canvas: exact on small circuits, unreliable on bigger ones"></td>
+<td><img src="docs/screenshots/23-arena.png" alt="AI alone vs Inkubit: exact on small circuits, unreliable on bigger ones"></td>
 </tr>
 <tr>
 <td><img src="docs/screenshots/24-molecule.png" alt="Molecule lab: Hartree-Fock fails as H2 is pulled apart; mitigated VQE follows the exact curve"></td>
@@ -229,7 +229,7 @@ Backend: Python 3.11+, FastAPI, Qiskit 2.6 + qiskit-aer 0.18, pydantic v2, SSE.
 Frontend: React 19 + TypeScript + Vite. No database; jobs live in memory.
 
 ```
-backend/qcanvas/
+backend/inkubit/
   spec/      versioned pydantic models, readable validation, schema.json, model-facing draft schema
   adapters/  model interfaces; meta (Meta Model API) and mock implementations, cache, fallback
   codegen/   deterministic template codegen, static safety check
@@ -275,12 +275,12 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   9. plays the bug hunt: given a broken circuit's operations, the intended odds and the
      observed counts (exactly what the player sees), it names the wrong gate, the fix and
      its reasoning (structured output); the exact search grades it like the player.
-  10. answers alone, like a chatbot with no simulator, for the "AI alone vs Q-Canvas" comparison
+  10. answers alone, like a chatbot with no simulator, for the "AI alone vs Inkubit" comparison
      (structured output: every outcome and its probability), scored against exact simulation.
-  11. runs **Ask Q-Canvas** with tool calling (`tools` on Chat Completions): it chooses among nine
+  11. runs **Ask Inkubit** with tool calling (`tools` on Chat Completions): it chooses among nine
       function tools, each a wrapper over an exact engine, gets their results back as `tool` messages and
       answers; every number in the answer is then traced to a tool result.
-  12. reads for the **Quantum Rosetta** what Q-Canvas cannot parse exactly: code in Cirq, PennyLane, Q# or
+  12. reads for the **Quantum Rosetta** what Inkubit cannot parse exactly: code in Cirq, PennyLane, Q# or
       Braket (into the circuit spec, labelled as a model's reading) and photos of notation from a textbook,
       slide or whiteboard (`read_notation`: transcribed as text under a JSON schema, with an instruction not to
       solve or simplify; the exact parser then reads the text).
@@ -289,7 +289,7 @@ using only endpoints and fields documented in Meta's docs (list of pages in
       schema (`step_repair`), and writes the mission report from the step facts and their checks
       (`mission_report`); every number in the report is traced.
 - **Muse Wonder 1.0** (`muse-wonder-1.0`, `POST /v1/chat/completions` with `tools`,
-  `reasoning_effort: "medium"`): the deep mode of Ask Q-Canvas, for questions that
+  `reasoning_effort: "medium"`): the deep mode of Ask Inkubit, for questions that
   take several steps ("plan a 1200 km satellite key link, then check whether a spy
   would be caught"). Same nine tools, same tracing, up to six rounds of tool calls.
   Muse Wonder is in preview; Muse Spark stays the fast default.
@@ -303,22 +303,22 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   `response_format: b64_json`): a clean, annotated illustration of the final
   design. It is always shown next to the exact Qiskit drawing, so an imperfect
   illustration can never mislead.
-- **Muse Code** (opt-in, `QCANVAS_CODE_BACKEND=muse-cli`): repairs are handed to
+- **Muse Code** (opt-in, `INKUBIT_CODE_BACKEND=muse-cli`): repairs are handed to
   the Muse Code agent headlessly (`muse exec --prompt-file task.txt
-  --disable-approval --max-model-steps 12`) in a scratch workspace; Q-Canvas's
+  --disable-approval --max-model-steps 12`) in a scratch workspace; Inkubit's
   verifier, not the CLI's exit code, decides whether the fix worked.
 
-Responses are cached on disk by request hash (`backend/.qcanvas_cache/`), so
+Responses are cached on disk by request hash (`backend/.inkubit_cache/`), so
 repeated demos and runs cost nothing. Standard-mode model IDs are used, so
 content is not used for training.
 
 **Mock mode.** Every model sits behind an adapter with a deterministic offline
-implementation (`QCANVAS_MODEL_PROVIDER=mock`, the default without a key): the
+implementation (`INKUBIT_MODEL_PROVIDER=mock`, the default without a key): the
 sample sketches are recognised by file hash and return their recorded
 ground-truth boxes and spec, code comes from the template, repairs from a
 rule-based repairer, explanations from a template filled with the real numbers,
 diagrams from Qiskit's drawer. If a live call fails and
-`QCANVAS_ALLOW_FALLBACK=1`, the mock answers and the UI badge says
+`INKUBIT_ALLOW_FALLBACK=1`, the mock answers and the UI badge says
 **Mock fallback** with the error. Mock mode never pretends to read an unknown
 photo; it says so.
 
@@ -327,7 +327,7 @@ photo; it says so.
 Requirements: Python 3.11+ (3.13 tested), Node 20+ (24 tested).
 
 ```sh
-git clone <this repo> q-canvas && cd q-canvas
+git clone <this repo> inkubit && cd inkubit
 scripts/setup.sh          # venv + pinned Python deps, npm ci, frontend build, .env from .env.example
 scripts/dev.sh            # backend :8000 + Vite :5173 -> open http://127.0.0.1:5173
 ```
@@ -338,7 +338,7 @@ On Windows run the scripts from Git Bash, or do the steps by hand:
 py -3.13 -m venv .venv
 .venv/Scripts/python -m pip install -r backend/requirements.txt
 cd frontend && npm ci && npm run build && cd ..
-cd backend && ../.venv/Scripts/python -m uvicorn qcanvas.api.app:app --port 8000
+cd backend && ../.venv/Scripts/python -m uvicorn inkubit.api.app:app --port 8000
 # the built frontend is served at http://127.0.0.1:8000
 ```
 
@@ -346,8 +346,8 @@ cd backend && ../.venv/Scripts/python -m uvicorn qcanvas.api.app:app --port 8000
 
 ```sh
 META_API_KEY=LLM_...
-QCANVAS_MODEL_PROVIDER=meta
-QCANVAS_ALLOW_FALLBACK=1
+INKUBIT_MODEL_PROVIDER=meta
+INKUBIT_ALLOW_FALLBACK=1
 ```
 
 The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: mock fallback)**.
@@ -356,7 +356,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (542 tests,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (546 tests,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per
@@ -367,7 +367,7 @@ submission quote from the data file it comes from, so a document cannot drift fr
 ## The spec format
 
 One JSON document, discriminated by `kind`, version `1.0`. Full schema:
-[`backend/qcanvas/spec/schema.json`](backend/qcanvas/spec/schema.json).
+[`backend/inkubit/spec/schema.json`](backend/inkubit/spec/schema.json).
 
 ```json
 {
@@ -417,7 +417,7 @@ Every step streams to the browser over SSE.
 
 ### Network mode
 
-An analytic model (`backend/qcanvas/network`): fiber at 0.2 dB/km; satellite
+An analytic model (`backend/inkubit/network`): fiber at 0.2 dB/km; satellite
 downlinks from diffraction plus turbulence spot size against the receiving
 telescope, plus atmosphere and optics; Werner-state pairs whose fidelity drops
 with accidental clicks; repeaters that swap pairs and store them in memories that
@@ -435,7 +435,7 @@ then purification); the satellite preset from 0.013 to 1.9 bit/s.
 
 ### Inside the circuit
 
-After every circuit run (or before it, with **Step through**), Q-Canvas computes
+After every circuit run (or before it, with **Step through**), Inkubit computes
 from the spec alone: the exact state after each gate with a Bloch sphere per
 qubit (a shrinking arrow means the qubit is entangled), pairwise concurrence ideal
 vs noisy (GHZ states are recognised as group entanglement), the fidelity each
@@ -558,7 +558,9 @@ results caught. Regenerate with `scripts/benchmark.py`.
 Everything in this repository, and everything the demo video shows, was built
 during the hackathon's building period (Oct 27 to Nov 4, 2026). Nothing was
 carried over from an earlier project. The git history is the record: the first
-commit (`a892217`, the spec format) is from Oct 27, 2026 at 14:57 ET.
+commit (`a892217`, the spec format) is from Oct 27, 2026 at 14:57 ET. Until Nov 3
+the project's working name was Q-Canvas, which older commit messages still use; it
+was renamed because an unrelated QCanvas already exists (decision D82).
 
 | Day (ET) | What was built |
 | --- | --- |
@@ -566,7 +568,7 @@ commit (`a892217`, the spec format) is from Oct 27, 2026 at 14:57 ET.
 | Oct 28 | Algorithm gallery, gate-by-gate inspector and circuit analyses, entanglement purification, describe in words, ask about a run, chip routing, 12 languages, HTML reports, the planted-fault benchmark |
 | Oct 29 | Challenge mode, 3D Bloch spheres, the optimizer with exact proofs, zero-noise extrapolation, Bell tests, tomography, the error-correction lab, voice input |
 | Oct 30 | First live run against the Meta Model API, Shor's algorithm, Muse Voice Transcribe, the QAOA party lab, the bug hunt |
-| Oct 31 | AI alone vs Q-Canvas, the molecule lab, the BB84 spy lab, use cases with Muse Image photos, Ask Q-Canvas (tool calling) with a Muse Wonder deep mode, the demo video |
+| Oct 31 | AI alone vs Inkubit, the molecule lab, the BB84 spy lab, use cases with Muse Image photos, Ask Inkubit (tool calling) with a Muse Wonder deep mode, the demo video |
 | Nov 1 | The Quantum Rosetta: Dirac notation both ways, exact OpenQASM, Quil and Qiskit readers, proven state preparation, eight output languages, the quantum dictionary, photos of notation; the simulation observatory; Muse Image illustrations for the use-case cards; mission control (multimodal planning, parallel execution, repair, verification, traced reports); the ML verifier; seven more algorithms; the discovery lab, distributed computer, resource estimator, live board, satellite planner, paper reproducibility checker, ML decoder and pulse lab |
 
 ## Third-party code and assets

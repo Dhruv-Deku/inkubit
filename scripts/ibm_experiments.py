@@ -4,10 +4,10 @@ with real mid-circuit measurement and feed-forward?
     .venv/Scripts/python scripts/ibm_experiments.py [device]     # default ibm_fez; a little free QPU time
     .venv/Scripts/python scripts/ibm_experiments.py --fake       # rehearsal on Aer with a fake device's noise
 
-1. Placement. The advisor (qcanvas.chip) scores every way of putting a 5-qubit GHZ chain on the chip from the
+1. Placement. The advisor (inkubit.chip) scores every way of putting a 5-qubit GHZ chain on the chip from the
    device's own calibration snapshot (scripts/device_snapshot.py, taken just before). The best-, median- and
    worst-scored placements run on exactly those physical qubits (initial layout, no re-layout), and each one's GHZ
-   fidelity is measured from Z-basis odds plus a parity oscillation over 8 phases (qcanvas.hardware), with error bars.
+   fidelity is measured from Z-basis odds plus a parity oscillation over 8 phases (inkubit.hardware), with error bars.
 2. Teleportation with dynamic circuits. A qubit is teleported: Bell measurement in the middle of the circuit, then X and
    Z on the receiver only when the measured bits say so (if_test, decided on the chip in real time). The six axis states
    |0⟩, |1⟩, |±⟩, |±i⟩ are sent and the receiver's Bloch vector is measured in X, Y and Z; for a qubit channel the
@@ -36,9 +36,9 @@ from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
 from qiskit_aer import AerSimulator  # noqa: E402
 from qiskit_aer.noise import NoiseModel  # noqa: E402
 
-from qcanvas.chip import advise, load  # noqa: E402
-from qcanvas.hardware import append_parity_basis, ghz_fidelity, norm, parity, parity_phases  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
+from inkubit.chip import advise, load  # noqa: E402
+from inkubit.hardware import append_parity_basis, ghz_fidelity, norm, parity, parity_phases  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
 
 GHZ_N = 5
 SHOTS_GHZ = 4096

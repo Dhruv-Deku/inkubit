@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from qcanvas.agent.events import EventBus
-from qcanvas.network import physics as ph
-from qcanvas.network.agent import run_network_agent, sanity_checks
-from qcanvas.network.model import simulate
-from qcanvas.spec import parse_spec
+from inkubit.agent.events import EventBus
+from inkubit.network import physics as ph
+from inkubit.network.agent import run_network_agent, sanity_checks
+from inkubit.network.model import simulate
+from inkubit.spec import parse_spec
 
 
 def chain(lengths: list[float], t2_ms: float = 1000.0, medium: str = "fiber") -> dict:

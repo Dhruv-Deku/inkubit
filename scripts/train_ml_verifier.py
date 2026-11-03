@@ -1,4 +1,4 @@
-"""Train the ML verifier (backend/qcanvas/mlverify.py) and write backend/qcanvas/data/ml_verifier.json.
+"""Train the ML verifier (backend/inkubit/mlverify.py) and write backend/inkubit/data/ml_verifier.json.
 
     .venv/Scripts/python scripts/train_ml_verifier.py [samples]
 
@@ -29,9 +29,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas.mlverify import FEATURES, WEIGHTS, exact_fidelity, features, mlp_forward  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
-from qcanvas.verify.expected import ideal_distribution  # noqa: E402
+from inkubit.mlverify import FEATURES, WEIGHTS, exact_fidelity, features, mlp_forward  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
+from inkubit.verify.expected import ideal_distribution  # noqa: E402
 
 ONE = ["H", "X", "Y", "Z", "S", "T", "SDG", "TDG", "SX"]
 BETA = 0.01  # floor added to the ensemble spread in the adaptive interval

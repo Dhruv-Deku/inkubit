@@ -6,7 +6,7 @@ import { CircuitPreview } from './CircuitPreview'
 import { Histogram } from './Histogram'
 
 const LEVELS = [{ id: 1, label: 'Warm-up' }, { id: 2, label: 'Tricky' }, { id: 3, label: 'Hard' }]
-const KEY = 'qcanvas.bughunt'
+const KEY = 'inkubit.bughunt'
 
 interface Score { you: number; muse: number; rounds: number; streak: number; best: number }
 const ZERO: Score = { you: 0, muse: 0, rounds: 0, streak: 0, best: 0 }

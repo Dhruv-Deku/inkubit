@@ -7,12 +7,12 @@ import json
 import pytest
 from qiskit.quantum_info import average_gate_fidelity
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.hardware import tvd
-from qcanvas.sim.noise import CALIBRATION, PRESETS, build_noise_model, calibrated_preset, gate_errors
-from qcanvas.spec import parse_spec
-from qcanvas.verify.expected import noisy_distribution
-from qcanvas.verify.verdict import THRESHOLDS
+from inkubit import EXAMPLES_DIR
+from inkubit.hardware import tvd
+from inkubit.sim.noise import CALIBRATION, PRESETS, build_noise_model, calibrated_preset, gate_errors
+from inkubit.spec import parse_spec
+from inkubit.verify.expected import noisy_distribution
+from inkubit.verify.verdict import THRESHOLDS
 
 CAL = json.loads(CALIBRATION.read_text(encoding="utf-8"))
 
@@ -52,7 +52,7 @@ def test_the_stored_hardware_comparison_matches_the_preset():
 def test_discovery_hardware_endpoint_refuses_a_rehearsal(monkeypatch, tmp_path):
     from fastapi.testclient import TestClient
 
-    import qcanvas.api.app as appmod
+    import inkubit.api.app as appmod
 
     monkeypatch.setattr(appmod, "EXAMPLES_DIR", tmp_path)
     client = TestClient(appmod.app)

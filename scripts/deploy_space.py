@@ -1,12 +1,12 @@
-"""Publish Q-Canvas to a Hugging Face Space (Docker SDK) in public mode.
+"""Publish Inkubit to a Hugging Face Space (Docker SDK) in public mode.
 
     pip install huggingface_hub && hf auth login          # once, with a token that can write
-    .venv/Scripts/python scripts/deploy_space.py <user>/q-canvas [--with-key] [--dry-run]
+    .venv/Scripts/python scripts/deploy_space.py <user>/inkubit [--with-key] [--dry-run]
 
 Stages only what the image needs (no .env, no node_modules, no videos, no tests), seeds the model-answer cache with
 the small cached answers so the samples run instantly and cost nothing, writes the Space README header and uploads.
 Public mode is set in the Dockerfile: code written by a model is never executed and billed calls stop at
-QCANVAS_DAILY_CALLS (300) a day. --with-key stores META_API_KEY from .env as an encrypted Space secret (it never
+INKUBIT_DAILY_CALLS (300) a day. --with-key stores META_API_KEY from .env as an encrypted Space secret (it never
 goes into the files); without it the Space runs on the labelled offline models.
 """
 
@@ -19,11 +19,11 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SKIP_DIRS = {"__pycache__", "node_modules", "dist", ".qcanvas_cache", "tests", "seed_cache", ".pytest_cache"}
+SKIP_DIRS = {"__pycache__", "node_modules", "dist", ".inkubit_cache", "tests", "seed_cache", ".pytest_cache"}
 SEED_LIMIT = 900_000  # bytes: small cached answers only (large image generations stay out)
 
 SPACE_README = """---
-title: Q-Canvas
+title: Inkubit
 colorFrom: gray
 colorTo: blue
 sdk: docker
@@ -33,14 +33,14 @@ license: mit
 short_description: Sketch, say or photograph a quantum idea; exact physics checks it
 ---
 
-# Q-Canvas
+# Inkubit
 
 Meta's models (Muse Spark, Muse Wonder, SAM 3.1, Muse Image, Muse Voice Transcribe) turn sketches, photos, papers and
 speech into quantum experiments, and exact simulation checks every number before you see it.
 
 Public mode: code written by a model is never executed here, and live model calls are capped per day (after that the
 app answers with its labelled offline models). Source, tests and every design decision:
-https://github.com/Dhruv-Deku/q-canvas
+https://github.com/Dhruv-Deku/inkubit
 """
 
 
@@ -64,7 +64,7 @@ def stage(dest: Path) -> int:
     copy_tree(ROOT / "frontend", dest / "frontend")
     (dest / "README.md").write_text(SPACE_README, encoding="utf-8")
     seeded = 0
-    cache = ROOT / "backend" / ".qcanvas_cache"
+    cache = ROOT / "backend" / ".inkubit_cache"
     for p in cache.rglob("*.json") if cache.exists() else []:
         if p.stat().st_size <= SEED_LIMIT:
             target = dest / "backend" / "seed_cache" / p.relative_to(cache)
@@ -97,7 +97,7 @@ def main() -> None:
         api = HfApi()
         api.create_repo(repo_id, repo_type="space", space_sdk="docker", exist_ok=True)
         api.upload_folder(folder_path=str(dest), repo_id=repo_id, repo_type="space",
-                          commit_message="Deploy Q-Canvas (public mode)")
+                          commit_message="Deploy Inkubit (public mode)")
         if "--with-key" in sys.argv:
             from dotenv import dotenv_values
 

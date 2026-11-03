@@ -7,12 +7,12 @@ import json
 
 import pytest
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaImageModel, MetaReasoningModel, diagram_prompt
-from qcanvas.adapters.mock_vision import MockImageModel, MockReasoningModel
-from qcanvas.network.agent import run_network_agent
-from qcanvas.spec import parse_spec
-from qcanvas.verify import verify_counts
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaImageModel, MetaReasoningModel, diagram_prompt
+from inkubit.adapters.mock_vision import MockImageModel, MockReasoningModel
+from inkubit.network.agent import run_network_agent
+from inkubit.spec import parse_spec
+from inkubit.verify import verify_counts
 
 PNG = b"\x89PNG\r\n\x1a\n"
 
@@ -83,7 +83,7 @@ def test_explanations_in_other_languages(example):
 
 
 def test_unknown_language_is_rejected():
-    from qcanvas.api.jobs import RunOptions
+    from inkubit.api.jobs import RunOptions
 
     with pytest.raises(ValueError, match="available in"):
         RunOptions(language="Klingon")

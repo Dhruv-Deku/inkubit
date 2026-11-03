@@ -1,4 +1,4 @@
-"""AI alone vs Q-Canvas: scoring a model's own prediction against exact simulation, and the endpoints."""
+"""AI alone vs Inkubit: scoring a model's own prediction against exact simulation, and the endpoints."""
 
 from __future__ import annotations
 
@@ -7,11 +7,11 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.api.app import app
-from qcanvas.arena import compare, facts, load_benchmark
-from qcanvas.spec import parse_spec
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.api.app import app
+from inkubit.arena import compare, facts, load_benchmark
+from inkubit.spec import parse_spec
 
 
 def bell(example):
@@ -66,7 +66,7 @@ def test_endpoints(example):
 
 
 def test_new_and_bigger_circuits_are_valid_repeatable_and_unnamed():
-    from qcanvas.arena import bigger_circuits, fresh_circuits
+    from inkubit.arena import bigger_circuits, fresh_circuits
 
     assert fresh_circuits() == fresh_circuits() and bigger_circuits() == bigger_circuits()
     for d in fresh_circuits() + bigger_circuits():

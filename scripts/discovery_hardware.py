@@ -12,7 +12,7 @@ and Qiskit's state preparation, compiled the same way.
 - GHZ-7 runs on seven physical qubits wired like IBM's 7-qubit Falcon chips (an H-shaped patch of the heavy-hex lattice,
   chosen by Qiskit's noise-aware layout for the discovered circuit), and every variant is compiled onto that same patch,
   so the textbook circuit needs the SWAPs the lab counted. Its fidelity is estimated from the Z-basis odds plus a
-  parity oscillation (qcanvas.hardware); above 1/2 certifies genuine 7-qubit entanglement.
+  parity oscillation (inkubit.hardware); above 1/2 certifies genuine 7-qubit entanglement.
 - W and Dicke run wherever Qiskit's level-3 compiler puts them on the chip; the outcome odds are compared with the ideal.
 
 Each variant is also predicted by a digital twin of the device (NoiseModel.from_backend). Raw counts, no readout
@@ -39,12 +39,12 @@ from qiskit.transpiler import CouplingMap  # noqa: E402
 from qiskit_aer import AerSimulator  # noqa: E402
 from qiskit_aer.noise import NoiseModel  # noqa: E402
 
-from qcanvas.discovery import GOALS, Discovery, _pairs, goal_target, run_discovery  # noqa: E402
-from qcanvas.hardware import append_parity_basis, ghz_fidelity, hellinger_se, norm, parity, parity_phases, tvd  # noqa: E402
-from qcanvas.notation import dirac  # noqa: E402
-from qcanvas.spec import parse_spec  # noqa: E402
-from qcanvas.verify.expected import append_operation, ideal_distribution  # noqa: E402
-from qcanvas.verify.metrics import hellinger_fidelity  # noqa: E402
+from inkubit.discovery import GOALS, Discovery, _pairs, goal_target, run_discovery  # noqa: E402
+from inkubit.hardware import append_parity_basis, ghz_fidelity, hellinger_se, norm, parity, parity_phases, tvd  # noqa: E402
+from inkubit.notation import dirac  # noqa: E402
+from inkubit.spec import parse_spec  # noqa: E402
+from inkubit.verify.expected import append_operation, ideal_distribution  # noqa: E402
+from inkubit.verify.metrics import hellinger_fidelity  # noqa: E402
 
 GOAL_IDS = ["ghz7_hex", "w4", "dicke42"]
 SHOTS = 4096
@@ -69,7 +69,7 @@ def device(fake: bool):
 
 def discover(goal_id: str) -> dict[str, Any]:
     """The lab's own search, as in the app: live models when configured, seeded heuristics always."""
-    from qcanvas.adapters.registry import get_models
+    from inkubit.adapters.registry import get_models
 
     models = get_models()
     live = models.settings.provider == "meta" and models.settings.has_key

@@ -8,21 +8,21 @@ import json
 import pytest
 from PIL import Image
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel, MetaSegmentationModel
-from qcanvas.adapters.mock_vision import (
+from inkubit import EXAMPLES_DIR
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel, MetaSegmentationModel
+from inkubit.adapters.mock_vision import (
     MockReasoningModel,
     MockSegmentationModel,
     UnknownImageError,
     sample_fixtures,
 )
-from qcanvas.adapters.registry import Models, _WithFallback, get_models
-from qcanvas.adapters.sam_parse import parse_sam_output
-from qcanvas.sketch import analyze_image
-from qcanvas.spec import parse_spec
-from qcanvas.spec.draft import draft_to_spec
-from qcanvas.verify import ideal_distribution
+from inkubit.adapters.registry import Models, _WithFallback, get_models
+from inkubit.adapters.sam_parse import parse_sam_output
+from inkubit.sketch import analyze_image
+from inkubit.spec import parse_spec
+from inkubit.spec.draft import draft_to_spec
+from inkubit.verify import ideal_distribution
 
 IMAGES = EXAMPLES_DIR / "images"
 DOC_LINE = ("<0f>0<|box;x1=353;y1=382;x2=453;y2=427;w=537;h=561|><|mask;x=0;y=0;data=46,101,~a|b~!|>,"
@@ -109,7 +109,7 @@ def test_draft_measure_ops_become_measurements():
 
 
 def test_draft_schema_keeps_meters_out_of_operations():
-    from qcanvas.spec.draft import CIRCUIT_DRAFT_SCHEMA
+    from inkubit.spec.draft import CIRCUIT_DRAFT_SCHEMA
 
     gates = CIRCUIT_DRAFT_SCHEMA["properties"]["operations"]["items"]["properties"]["gate"]["enum"]
     assert "MEASURE" not in gates and "H" in gates
@@ -177,8 +177,8 @@ def test_fallback_is_labelled():
 
 
 def test_meta_without_key_falls_back_honestly(monkeypatch):
-    monkeypatch.setenv("QCANVAS_MODEL_PROVIDER", "meta")
-    monkeypatch.setenv("QCANVAS_ALLOW_FALLBACK", "1")
+    monkeypatch.setenv("INKUBIT_MODEL_PROVIDER", "meta")
+    monkeypatch.setenv("INKUBIT_ALLOW_FALLBACK", "1")
     monkeypatch.delenv("META_API_KEY", raising=False)
     monkeypatch.delenv("MODEL_API_KEY", raising=False)
     models: Models = get_models()
@@ -188,7 +188,7 @@ def test_meta_without_key_falls_back_honestly(monkeypatch):
 
 
 def test_meta_draft_falls_back_to_grid_boxes_when_sam_finds_nothing():
-    from qcanvas.adapters.base import ModelCall, SegmentationResult
+    from inkubit.adapters.base import ModelCall, SegmentationResult
 
     draft_json = {"title": "Bell", "num_qubits": 2, "num_clbits": 2, "notes": "",
                   "operations": [{"gate": "H", "targets": [0], "controls": [], "params": [], "segment_id": "",

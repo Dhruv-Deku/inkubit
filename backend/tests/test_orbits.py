@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.orbits import (
+from inkubit.api.app import app
+from inkubit.orbits import (
     ALT_KM, INC_DEG, J2, MU, R_E, START, bb84_key_rate, elevation, julian, orbit_ecef, plan, station, subpoint, sun_eci,
     up_vector,
 )

@@ -5,10 +5,10 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.qkd import ABORT, bb84, photon_spec
-from qcanvas.spec import parse_spec
-from qcanvas.verify.expected import ideal_distribution
+from inkubit.api.app import app
+from inkubit.qkd import ABORT, bb84, photon_spec
+from inkubit.spec import parse_spec
+from inkubit.verify.expected import ideal_distribution
 
 
 @pytest.mark.parametrize("bit", [0, 1])

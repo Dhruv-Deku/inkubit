@@ -5,27 +5,27 @@ Every number below comes from a run of this repo.
 
 **Track:** Indie developer · **Problem statement:** Push the Frontier (accelerate a scientific experiment; understand and control a physical system)
 
-**Demo video:** `<YouTube / Loom link>` · **Code:** https://github.com/Dhruv-Deku/q-canvas (public, MIT) · **Try it:** `<hosted app link>` (public mode: model-written code is never executed, live calls capped per day)
+**Demo video:** `<YouTube / Loom link>` · **Code:** https://github.com/Dhruv-Deku/inkubit (public, MIT) · **Try it:** `<hosted app link>` (public mode: model-written code is never executed, live calls capped per day)
 
 ## At a glance (for judges)
 
-Q-Canvas is a quantum lab where Meta's models read, plan and propose, and exact physics checks every number before
+Inkubit is a quantum lab where Meta's models read, plan and propose, and exact physics checks every number before
 anyone sees it. Press **Guided tour** in the app for the best of it in under two minutes.
 
 | Criterion | What to look at |
 | --- | --- |
 | **Creativity** | An **AI scientist that learns under proof**: Muse Spark designs circuits in rounds, sees what exact physics said, and its best proven circuit improves on every target, where the same model without feedback never does. **AI-designed error-correcting codes**: a 9-qubit code that needs 9 phase-flip errors to fail, three times the surface code. **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**; a **whole paper** from its PDF re-run claim by claim; an **AI referee** where Muse Wonder challenges Muse Spark and exact simulation decides |
 | **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
-| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **542 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
+| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **546 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
 | **Use of Meta models** | **Five Meta models**, each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
 
 ## Built during the hackathon
 
-Everything in the repository and in the video was built during the building period, Oct 27 to Nov 4, 2026, by one developer. Nothing was carried over from an earlier project: the first commit (the spec format) is from Oct 27 at 14:57 ET, and the README has a day-by-day table taken from the git log. Third-party code is limited to open-source libraries installed from PyPI and npm (Qiskit, Qiskit Aer, FastAPI, React and others, all listed in the README); the images were generated with Muse Image or drawn by the repo's own scripts.
+Everything in the repository and in the video was built during the building period, Oct 27 to Nov 4, 2026, by one developer. Nothing was carried over from an earlier project: the first commit (the spec format) is from Oct 27 at 14:57 ET, and the README has a day-by-day table taken from the git log. Until Nov 3 the working name was Q-Canvas, which older commit messages still use; it was renamed because an unrelated QCanvas already exists. Third-party code is limited to open-source libraries installed from PyPI and npm (Qiskit, Qiskit Aer, FastAPI, React and others, all listed in the README); the images were generated with Muse Image or drawn by the repo's own scripts.
 
 ## Project name
 
-Q-Canvas
+Inkubit
 
 ## Tagline (one line)
 
@@ -34,7 +34,7 @@ plan, and exact physics checks every number before you see it.
 
 ## Short description (about 50 words)
 
-Q-Canvas is a quantum lab where the AI never gets the last word. Meta's models
+Inkubit is a quantum lab where the AI never gets the last word. Meta's models
 read sketches, photos, papers and speech, plan multi-step experiments and
 propose circuits; exact simulation, independent re-runs and physics checks
 verify every result, from a drawn Bell pair to a distance-5 surface code and
@@ -48,7 +48,7 @@ wrong one. Students and researchers sketch circuits and network layouts on paper
 long before they write code, and the jump from sketch to *correct* code is where
 the time goes.
 
-**What Q-Canvas does.**
+**What Inkubit does.**
 
 1. **Reads the sketch.** Muse Spark looks at the photo and decides what to look
    for; SAM 3.1 boxes every gate, dot, circle and meter; Muse Spark reads the
@@ -80,7 +80,7 @@ the time goes.
    get for a 99% match (a Bell pair needs about 7x), what readout correction
    recovers, and how many SWAPs real chip wirings add.
 
-**Ask it anything.** "Ask Q-Canvas" is one assistant for the whole lab, typed
+**Ask it anything.** "Ask Inkubit" is one assistant for the whole lab, typed
 or spoken (Muse Voice Transcribe). Muse Spark, or Muse Wonder for questions that
 take several steps, chooses among nine exact tools (circuit simulation, the
 optimizer, the H₂ molecule, BB84 key distribution, QAOA Max-Cut, Shor's
@@ -110,7 +110,7 @@ every term an example state computed exactly.
 way a chatbot answers, Muse Spark was exact on 13 of 13 textbook circuits and 10
 of 11 new small ones. On bigger new circuits (6 to 8 qubits) it was exact on 3
 of 6, and once confidently put 43% of the probability in the wrong place
-(docs/ARENA.md). Q-Canvas never relies on that: the model drives the
+(docs/ARENA.md). Inkubit never relies on that: the model drives the
 simulation, and the simulation gives the answer.
 
 **Three labs from first principles.** *Chemistry:* the H₂ molecule from
@@ -148,7 +148,7 @@ under two minutes, and said which circuits the paper does not specify completely
 **The AI referee.** Muse Spark answers three questions about a circuit, Muse Wonder challenges, and exact simulation
 grades every position. Over 24 answers, debate raised Muse Spark from 17 to 19 right, but Muse Wonder also raised 5
 false alarms and talked it out of 2 right answers: models arguing catch mistakes and make new ones, and only the
-simulator knows which. That is why Q-Canvas checks instead of debating.
+simulator knows which. That is why Inkubit checks instead of debating.
 
 **IBM Quantum, from calibration to experiment.** The app maps 3 IBM Heron chips qubit by qubit from their own calibration,
 and an advisor scores every way to place a circuit on them. On ibm_fez, the same 5-qubit GHZ circuit on the advisor's best,
@@ -236,7 +236,7 @@ goes from a 0.882 match as measured to 0.999. It is shown with exact
 probabilities and with 4,000 shots per level, because extrapolation amplifies
 shot noise and the honest question is whether it pays off.
 
-**Is it really quantum?** For every entangled pair Q-Canvas runs a Bell test
+**Is it really quantum?** For every entangled pair Inkubit runs a Bell test
 (CHSH; Mermin for three qubits) ideal, with realistic noise, and from simulated
 shots with error bars: a Bell pair still beats every classical explanation by
 16 standard errors on realistic hardware, and a W state shows that no pair
@@ -265,7 +265,7 @@ answer. Any design can be shared as a link or downloaded as a one-file HTML
 report.
 
 **Quantum networks.** The same canvas plans entanglement-distribution networks.
-Q-Canvas models every link from physics (fiber attenuation; satellite downlinks
+Inkubit models every link from physics (fiber attenuation; satellite downlinks
 with diffraction, turbulence and atmosphere; Werner-state fidelity; quantum
 memory decoherence; entanglement swapping; BBM92 secret-key rate), finds the
 bottleneck, tries real fixes (relays, higher passes, bigger telescopes, better
@@ -290,8 +290,8 @@ repeatable and cheap.
 | Model | Job |
 | --- | --- |
 | **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo; the same for each new frame of the live whiteboard camera |
-| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Q-Canvas with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; proposes circuit layouts in the discovery lab; maps a problem in words to an algorithm and hardware for the resource estimator; transcribes a paper's figure, circuit and claims for the reproducibility checker; reads the whiteboard; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
-| **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Q-Canvas: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
+| **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Inkubit with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; proposes circuit layouts in the discovery lab; maps a problem in words to an algorithm and hardware for the resource estimator; transcribes a paper's figure, circuit and claims for the reproducibility checker; reads the whiteboard; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
+| **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Inkubit: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
 | **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing; the nine use-case photos |
 | **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser |
 | **Muse Code** (opt-in, experimental) | Alternative repair backend: the verifier, not the agent's exit code, decides if a fix worked |
@@ -307,7 +307,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, PyMatching, SGP4, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 542 offline backend tests (spec
+live agent log; React 19 + TypeScript + Vite. 546 offline backend tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, orbits against Skyfield, the live adapters
 against recorded request shapes, API) and 6 end-to-end browser tests of the built app, all in CI on every

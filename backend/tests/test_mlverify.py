@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.mlverify import FEATURES, check, exact_fidelity, features, load_model, predict
-from qcanvas.spec import parse_spec
+from inkubit.api.app import app
+from inkubit.mlverify import FEATURES, check, exact_fidelity, features, load_model, predict
+from inkubit.spec import parse_spec
 
 
 def _ghz(n: int) -> dict:

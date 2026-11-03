@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import pytest
 
-from qcanvas.adapters.base import CodeModel, CodeResult, ModelCall, RepairRequest, RepairResult
-from qcanvas.adapters.mock_code import MockCodeModel
-from qcanvas.agent import FAULTS, AgentOptions, EventBus, run_agent
-from qcanvas.agent.codeparse import extract_calls
-from qcanvas.agent.faults import inject, pick_demo_fault
-from qcanvas.agent.repair_rules import align_with_spec
-from qcanvas.codegen.template import generate_code
-from qcanvas.spec import parse_spec
+from inkubit.adapters.base import CodeModel, CodeResult, ModelCall, RepairRequest, RepairResult
+from inkubit.adapters.mock_code import MockCodeModel
+from inkubit.agent import FAULTS, AgentOptions, EventBus, run_agent
+from inkubit.agent.codeparse import extract_calls
+from inkubit.agent.faults import inject, pick_demo_fault
+from inkubit.agent.repair_rules import align_with_spec
+from inkubit.codegen.template import generate_code
+from inkubit.spec import parse_spec
 
 pytestmark = pytest.mark.slow
 

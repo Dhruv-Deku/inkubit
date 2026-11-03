@@ -6,11 +6,11 @@ import math
 
 import pytest
 
-from qcanvas.codegen.safety import check_code
-from qcanvas.codegen.template import format_angle, generate_code
-from qcanvas.sim.noise import PRESETS, build_noise_model, get_preset
-from qcanvas.sim.runner import _child_env, run_code
-from qcanvas.spec import parse_spec
+from inkubit.codegen.safety import check_code
+from inkubit.codegen.template import format_angle, generate_code
+from inkubit.sim.noise import PRESETS, build_noise_model, get_preset
+from inkubit.sim.runner import _child_env, run_code
+from inkubit.spec import parse_spec
 
 
 @pytest.mark.slow

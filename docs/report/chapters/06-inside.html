@@ -5,7 +5,7 @@ entangled with whom, which noise source costs the most, whether a shorter circui
 classical explanation could fake the correlations.</p>
 
 <h2>Gate by gate</h2>
-<p>After every run, or before it with <b>Step through</b>, Q-Canvas computes from the specification alone the exact
+<p>After every run, or before it with <b>Step through</b>, Inkubit computes from the specification alone the exact
 state after each gate. It shows the amplitudes, with phases relative to the largest amplitude (a global phase is
 unobservable), the state in Dirac notation, and a Bloch sphere per qubit. An arrow shorter than the sphere's radius
 means that qubit is entangled with others. The spheres are drawn in 3D and share one camera, so turning one turns all
@@ -45,7 +45,7 @@ phase, for example, shrinks from 15 two-qubit gates to one X gate. That is true 
 trick that works for unknown inputs.</p>
 
 <h2>Zero-noise extrapolation</h2>
-<p>Error mitigation lets today's noisy machines estimate what a perfect one would give. Q-Canvas first inverts readout
+<p>Error mitigation lets today's noisy machines estimate what a perfect one would give. Inkubit first inverts readout
 error, then runs the circuit at 1×, 3× and 5× its gate noise by <i>folding</i>: U, then U U⁻¹ U, then U U⁻¹ U U⁻¹ U.
 These have the same ideal result with three and five times the gates, and folding is what hardware can actually do.
 Every outcome's probability is then extrapolated back to zero noise with Richardson weights (15/8, −5/4, 3/8). With
@@ -54,7 +54,7 @@ exact probabilities, a Grover search goes from a 0.882 match as measured to 0.99
 the same error bars. For some circuits that cost eats the gain, and the panel says so.</p>
 
 <h2>Bell tests and tomography</h2>
-<p><i>Is it really quantum?</i> For every entangled pair, Q-Canvas computes the CHSH value under the best measurement
+<p><i>Is it really quantum?</i> For every entangled pair, Inkubit computes the CHSH value under the best measurement
 settings, from the Horodecki closed form S = 2√(m₁ + m₂) of the pair's correlation matrix. Classical theories allow
 at most 2, and quantum mechanics reaches 2.83. When exactly three qubits are entangled, it also computes the Mermin
 value: classical theories allow at most 2, quantum mechanics 4. That value has no closed form, so it is optimised from

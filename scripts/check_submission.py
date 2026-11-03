@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEADLINE = datetime(2026, 11, 5, 2, 0, tzinfo=timezone.utc)  # Nov 4, 9:00 PM ET
-VIDEO = ROOT / "docs" / "video" / "q-canvas-demo-v3.mp4"
+VIDEO = ROOT / "docs" / "video" / "inkubit-demo-v3.mp4"
 PY = sys.executable
 rows: list[tuple[str, str, str]] = []
 
@@ -38,13 +38,13 @@ def main() -> None:
     sub = (ROOT / "SUBMISSION.md").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
-    code, out = run(["gh", "repo", "view", "Dhruv-Deku/q-canvas", "--json", "visibility", "-q", ".visibility"])
+    code, out = run(["gh", "repo", "view", "Dhruv-Deku/inkubit", "--json", "visibility", "-q", ".visibility"])
     vis = out.strip()
     add("OK" if vis == "PUBLIC" else "TODO", "Repository is public (the rules require it)",
-        "" if vis == "PUBLIC" else f"now {vis or 'unknown'}: gh repo edit Dhruv-Deku/q-canvas --visibility public --accept-visibility-change-consequences")
+        "" if vis == "PUBLIC" else f"now {vis or 'unknown'}: gh repo edit Dhruv-Deku/inkubit --visibility public --accept-visibility-change-consequences")
 
     add("TODO" if "<YouTube / Loom link>" in sub else "OK", "Video link in SUBMISSION.md",
-        "upload docs/video/q-canvas-demo-v3.mp4 (unlisted is fine), thumbnail docs/thumbnail.png, paste the link" if "<YouTube" in sub else "")
+        "upload docs/video/inkubit-demo-v3.mp4 (unlisted is fine), thumbnail docs/thumbnail.png, paste the link" if "<YouTube" in sub else "")
     add("TODO" if "<hosted app link>" in sub else "OK", "Hosted demo link in SUBMISSION.md",
         "deploy with the Koyeb button in the README (free), paste the URL; or delete the 'Try it' part" if "<hosted app" in sub else "")
     hw = ROOT / "examples" / "hardware_runs.json"

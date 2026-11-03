@@ -7,10 +7,10 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.api.app import app
-from qcanvas.challenges import BY_ID, CHALLENGES, check, hint_facts, info
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.api.app import app
+from inkubit.challenges import BY_ID, CHALLENGES, check, hint_facts, info
 
 client = TestClient(app)
 

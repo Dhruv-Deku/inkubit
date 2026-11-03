@@ -1,11 +1,11 @@
-"""Builds docs/Q-Canvas-Technical-Report.pdf from the repository.
+"""Builds docs/Inkubit-Technical-Report.pdf from the repository.
 
 The chapters are HTML templates in docs/report/chapters. Every number a chart or a generated table shows, and every
 {{placeholder}} in the prose, is read here from the data file it comes from (the rule tests/test_claims.py applies to
 the README); an unknown placeholder fails the build instead of printing a blank. Chromium (system Edge by default)
 prints the pages; a second pass fills the contents with the page numbers the first pass produced.
 
-    .venv/Scripts/python scripts/build_report.py [--out docs/Q-Canvas-Technical-Report.pdf] [--no-collect]
+    .venv/Scripts/python scripts/build_report.py [--out docs/Inkubit-Technical-Report.pdf] [--no-collect]
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from pypdf import PdfReader, PdfWriter  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT = ROOT / "docs" / "report"
-DATA = ROOT / "backend" / "qcanvas" / "data"
+DATA = ROOT / "backend" / "inkubit" / "data"
 EX = ROOT / "examples"
 sys.path.insert(0, str(ROOT / "backend"))
 
@@ -85,14 +85,14 @@ def facts(collect: bool) -> tuple[dict, dict]:
     first = min(stamps)
     per_day = Counter(s.date() for s in stamps)
     raw["commits_per_day"] = sorted(per_day.items())
-    app = (ROOT / "backend" / "qcanvas" / "api" / "app.py").read_text(encoding="utf-8")
+    app = (ROOT / "backend" / "inkubit" / "api" / "app.py").read_text(encoding="utf-8")
     raw["routes"] = re.findall(r'@app\.(get|post|put|delete)\("([^"]+)"', app)
     raw["decisions"] = re.findall(r"^## (D\d+)\. (.+)$", (ROOT / "DECISIONS.md").read_text(encoding="utf-8"), re.M)
     f.update(
         commit=git("rev-parse", "--short", "HEAD"), n_commits=len(stamps),
         first_commit=f"{first:%d %B %Y} at {first:%H:%M} ET".lstrip("0"),
         build_date=f"{datetime.now():%d %B %Y}".lstrip("0"), active_days=len(per_day),
-        py_lines=f"{lines('*.py', ROOT / 'backend' / 'qcanvas'):,}",
+        py_lines=f"{lines('*.py', ROOT / 'backend' / 'inkubit'):,}",
         ts_lines=f"{lines('*.ts', ROOT / 'frontend' / 'src') + lines('*.tsx', ROOT / 'frontend' / 'src'):,}",
         test_lines=f"{lines('*.py', ROOT / 'backend' / 'tests') + lines('*.py', ROOT / 'e2e'):,}",
         components=len(list((ROOT / "frontend" / "src" / "components").glob("*.tsx"))),
@@ -254,7 +254,7 @@ def facts(collect: bool) -> tuple[dict, dict]:
              ix_devices=len(list((DATA / "devices").glob("*.json"))))
 
     # the algorithm library and the proof sheet
-    from qcanvas.api.app import CATEGORIES
+    from inkubit.api.app import CATEGORIES
 
     raw["categories"] = CATEGORIES
     algos = [n for c, ns in CATEGORIES.items() if c != "Basics" for n in ns]
@@ -267,7 +267,7 @@ def facts(collect: bool) -> tuple[dict, dict]:
              ps_median=f"{statistics.median(r['seconds'] for r in ps['rows']):.0f}")
 
     # RSA-2048
-    from qcanvas.estimator import HARDWARE, factoring_algorithm, surface_code
+    from inkubit.estimator import HARDWARE, factoring_algorithm, surface_code
 
     rsa = surface_code(factoring_algorithm(2048), HARDWARE["superconducting"])
     f.update(rsa_qubits=f"{rsa.physical_qubits / 1e6:.1f}", rsa_hours=f"{rsa.runtime_s / 3600:.1f}",
@@ -758,7 +758,7 @@ def toc(heads, pages: dict[str, int] | None) -> str:
 
 FOOTER = """<div style="width:100%;font-family:'Segoe UI',Arial,sans-serif;font-size:7px;color:#7a808c;
 padding:0 22mm;display:flex;justify-content:space-between;-webkit-print-color-adjust:exact">
-<span>Q-Canvas · Technical report · {commit}</span><span class="pageNumber"></span></div>"""
+<span>Inkubit · Technical report · {commit}</span><span class="pageNumber"></span></div>"""
 
 
 def render(page, url: str, out: Path, footer: str | None) -> None:
@@ -804,7 +804,7 @@ def outline_pages(pdf: Path, heads) -> dict[str, int]:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=str(ROOT / "docs" / "Q-Canvas-Technical-Report.pdf"))
+    ap.add_argument("--out", default=str(ROOT / "docs" / "Inkubit-Technical-Report.pdf"))
     ap.add_argument("--no-collect", action="store_true", help="take the backend test count from the README")
     ap.add_argument("--channel", default=os.environ.get("REPORT_BROWSER_CHANNEL", "msedge"))
     args = ap.parse_args()
@@ -820,7 +820,7 @@ def main() -> None:
 
     from playwright.sync_api import sync_playwright
 
-    tmp = Path(tempfile.mkdtemp(prefix="qcanvas-report-"))  # removed at the end
+    tmp = Path(tempfile.mkdtemp(prefix="inkubit-report-"))  # removed at the end
     (tmp / "cover.html").write_text(cover, encoding="utf-8")
     footer = FOOTER.format(commit=f["commit"])
     with sync_playwright() as p:
@@ -840,7 +840,7 @@ def main() -> None:
     n = len(w.pages)
     w.set_page_label(0, 0, prefix="Cover")
     w.set_page_label(1, n - 1, style="/D", start=1)
-    w.add_metadata({"/Title": "Q-Canvas: Technical report", "/Author": "DHRUV",
+    w.add_metadata({"/Title": "Inkubit: Technical report", "/Author": "DHRUV",
                     "/Subject": "Meta Global AI Developer Hackathon 2026, Push the Frontier",
                     "/Keywords": "quantum computing, verification, Muse Spark, Muse Wonder, SAM 3.1, Qiskit"})
     w.page_mode = "/UseOutlines"

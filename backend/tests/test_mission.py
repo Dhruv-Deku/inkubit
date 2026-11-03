@@ -7,10 +7,10 @@ import time
 
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.base import ModelCall
-from qcanvas.api.app import app
-from qcanvas.copilot import ToolRun
-from qcanvas.mission import Ctx, Mission, clean_plan, offline_plan, run_mission, verify
+from inkubit.adapters.base import ModelCall
+from inkubit.api.app import app
+from inkubit.copilot import ToolRun
+from inkubit.mission import Ctx, Mission, clean_plan, offline_plan, run_mission, verify
 
 BELL = {"kind": "circuit", "version": "1.0", "num_qubits": 2, "num_clbits": 2,
         "operations": [{"gate": "H", "targets": [0]}, {"gate": "H", "targets": [0]}, {"gate": "H", "targets": [0]},
@@ -111,7 +111,7 @@ def test_endpoint_runs_a_mission_and_streams_it():
 
 
 def test_an_ml_miss_is_a_note_not_a_flag():
-    from qcanvas.mission import run_step
+    from inkubit.mission import run_step
 
     run = run_step("run_algorithm", {"name": "grover3"})
     checks = verify(run)
@@ -121,7 +121,7 @@ def test_an_ml_miss_is_a_note_not_a_flag():
 
 
 def test_a_finished_mission_downloads_as_one_page_with_its_numbers_marked():
-    from qcanvas.mission_report import marked, render
+    from inkubit.mission_report import marked, render
 
     m = Mission("Teleport a qubit and check how it survives noise")
     run_mission(m, Ctx(live=False), photo=BELL)

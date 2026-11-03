@@ -70,16 +70,16 @@ export function Hero({ onMission, onTour }: { onMission: () => void; onTour: () 
   ]
 
   return (
-    <section className={`hero3d ${failed ? 'flat' : ''}`} aria-label="Q-Canvas">
+    <section className={`hero3d ${failed ? 'flat' : ''}`} aria-label="Inkubit">
       <div className="hero3d-stage" ref={host} aria-hidden="true">
         {failed && sc && <img className="hero3d-still" src={sc.image} alt="" />}
       </div>
       <div className="hero3d-copy">
         <p className="eyebrow">Photo&nbsp;→ spec&nbsp;→ Qiskit&nbsp;→ noisy run&nbsp;→ proof</p>
-        <h1>From a pencil sketch to <span>verified</span> quantum code.</h1>
+        <h1>An AI quantum engineer that <span>proves</span> its work.</h1>
         <p className="lede">
-          Meta's models read your drawing, plan the work and write the code. Every answer is checked against an
-          independent exact simulation, and any circuit can go from the editor to a real IBM chip.
+          Give Inkubit a pencil sketch, a sentence or your voice. Meta's models plan the work and write the code;
+          every number is checked against an independent exact simulation, and circuits run on real IBM chips.
         </p>
         <div className="hero3d-cta">
           <button className="btn primary big" onClick={onMission}>Launch a mission</button>

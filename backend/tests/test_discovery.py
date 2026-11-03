@@ -10,9 +10,9 @@ from fastapi.testclient import TestClient
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector
 
-from qcanvas.adapters.base import ModelCall
-from qcanvas.api.app import app
-from qcanvas.discovery import (
+from inkubit.adapters.base import ModelCall
+from inkubit.api.app import app
+from inkubit.discovery import (
     GOALS,
     Discovery,
     _ghz,
@@ -25,9 +25,9 @@ from qcanvas.discovery import (
     to_ops,
     tree_layouts,
 )
-from qcanvas.insights.circuit import FALCON_7Q
-from qcanvas.spec import parse_spec
-from qcanvas.verify.expected import append_operation
+from inkubit.insights.circuit import FALCON_7Q
+from inkubit.spec import parse_spec
+from inkubit.verify.expected import append_operation
 
 
 def _qiskit_state(raw: dict) -> np.ndarray:

@@ -202,7 +202,7 @@ export function IbmRunButton({ spec, valid }: { spec: CircuitSpec; valid: boolea
           {r?.error && <span className="badge fail">{r.error}</span>}
           {r?.measured && (
             <span> Measured distance to the ideal odds <b>{r.tvd_ideal?.toFixed(3)}</b>
-              {r.tvd_calibrated != null && <>, to Q-Canvas's calibrated preset <b>{r.tvd_calibrated.toFixed(3)}</b></>}; shot noise alone would leave about {r.shot_noise?.toFixed(3)}.
+              {r.tvd_calibrated != null && <>, to Inkubit's calibrated preset <b>{r.tvd_calibrated.toFixed(3)}</b></>}; shot noise alone would leave about {r.shot_noise?.toFixed(3)}.
               Top outcomes: {Object.entries(r.measured).slice(0, 4).map(([k, v]) => `${k} ${(v * 100).toFixed(1)}%`).join(', ')}.</span>
           )}
         </div>

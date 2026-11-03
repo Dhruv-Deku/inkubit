@@ -8,8 +8,8 @@ import pytest
 from fastapi.testclient import TestClient
 from qiskit.quantum_info import DensityMatrix
 
-from qcanvas.api.app import app
-from qcanvas.observatory import (
+from inkubit.api.app import app
+from inkubit.observatory import (
     _evolve,
     _grover_parts,
     _read_marked,

@@ -10,14 +10,14 @@ import pytest
 from fastapi.testclient import TestClient
 from qiskit.quantum_info import Statevector
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.api.app import app
-from qcanvas.shor import (COPRIME, WORK, continued_fraction, finish, match_shor, multiply_ops, order, shor_lab,
+from inkubit import EXAMPLES_DIR
+from inkubit.api.app import app
+from inkubit.shor import (COPRIME, WORK, continued_fraction, finish, match_shor, multiply_ops, order, shor_lab,
                           shor_readout, shor_spec)
-from qcanvas.spec import parse_spec
-from qcanvas.textspec import parse_description
-from qcanvas.verify import ideal_distribution
-from qcanvas.verify.expected import build_reference_circuit
+from inkubit.spec import parse_spec
+from inkubit.textspec import parse_description
+from inkubit.verify import ideal_distribution
+from inkubit.verify.expected import build_reference_circuit
 
 
 def _work_value(a: int, x: int) -> tuple[int, float]:

@@ -1,0 +1,519 @@
+{
+  "$defs": {
+    "CircuitSpec": {
+      "additionalProperties": false,
+      "description": "A gate-model quantum circuit.",
+      "properties": {
+        "kind": {
+          "const": "circuit",
+          "default": "circuit",
+          "title": "Kind",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "num_qubits": {
+          "description": "Number of qubits (1-12).",
+          "maximum": 12,
+          "minimum": 1,
+          "title": "Num Qubits",
+          "type": "integer"
+        },
+        "num_clbits": {
+          "description": "Number of classical bits.",
+          "maximum": 12,
+          "minimum": 0,
+          "title": "Num Clbits",
+          "type": "integer"
+        },
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/Operation"
+          },
+          "title": "Operations",
+          "type": "array"
+        },
+        "measurements": {
+          "items": {
+            "$ref": "#/$defs/Measurement"
+          },
+          "title": "Measurements",
+          "type": "array"
+        },
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        }
+      },
+      "required": [
+        "num_qubits",
+        "num_clbits"
+      ],
+      "title": "CircuitSpec",
+      "type": "object"
+    },
+    "Link": {
+      "additionalProperties": false,
+      "description": "A quantum channel between two nodes.",
+      "properties": {
+        "from": {
+          "title": "From",
+          "type": "string"
+        },
+        "to": {
+          "title": "To",
+          "type": "string"
+        },
+        "medium": {
+          "enum": [
+            "fiber",
+            "free_space"
+          ],
+          "title": "Medium",
+          "type": "string"
+        },
+        "length_km": {
+          "exclusiveMinimum": 0,
+          "maximum": 40000,
+          "title": "Length Km",
+          "type": "number"
+        },
+        "loss_db": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Override total channel loss (dB).",
+          "title": "Loss Db"
+        },
+        "depolarizing": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Override channel depolarizing probability.",
+          "title": "Depolarizing"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "medium",
+        "length_km"
+      ],
+      "title": "Link",
+      "type": "object"
+    },
+    "Measurement": {
+      "additionalProperties": false,
+      "description": "A terminal measurement of one qubit into one classical bit.",
+      "properties": {
+        "qubit": {
+          "minimum": 0,
+          "title": "Qubit",
+          "type": "integer"
+        },
+        "clbit": {
+          "minimum": 0,
+          "title": "Clbit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "qubit",
+        "clbit"
+      ],
+      "title": "Measurement",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "description": "Optional descriptive metadata.",
+      "properties": {
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "origin": {
+          "default": "manual",
+          "enum": [
+            "image",
+            "text",
+            "manual"
+          ],
+          "title": "Origin",
+          "type": "string"
+        }
+      },
+      "title": "Metadata",
+      "type": "object"
+    },
+    "NetworkSpec": {
+      "additionalProperties": false,
+      "description": "An entanglement-distribution network between a source and a destination node.",
+      "properties": {
+        "kind": {
+          "const": "network",
+          "default": "network",
+          "title": "Kind",
+          "type": "string"
+        },
+        "version": {
+          "default": "1.0",
+          "title": "Version",
+          "type": "string"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/Node"
+          },
+          "minItems": 2,
+          "title": "Nodes",
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/Link"
+          },
+          "minItems": 1,
+          "title": "Links",
+          "type": "array"
+        },
+        "source": {
+          "description": "Id of the node where the end-to-end pair starts.",
+          "title": "Source",
+          "type": "string"
+        },
+        "destination": {
+          "description": "Id of the node where the end-to-end pair ends.",
+          "title": "Destination",
+          "type": "string"
+        },
+        "purification_rounds": {
+          "default": 0,
+          "description": "Rounds of entanglement purification (BBPSSW) on every segment before swapping.",
+          "maximum": 3,
+          "minimum": 0,
+          "title": "Purification Rounds",
+          "type": "integer"
+        },
+        "metadata": {
+          "$ref": "#/$defs/Metadata"
+        }
+      },
+      "required": [
+        "nodes",
+        "links",
+        "source",
+        "destination"
+      ],
+      "title": "NetworkSpec",
+      "type": "object"
+    },
+    "Node": {
+      "additionalProperties": false,
+      "description": "A network node.",
+      "properties": {
+        "id": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "ground_station",
+            "satellite",
+            "repeater"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Position"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "memory_t2_ms": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Quantum-memory coherence time (ms) for swapping nodes.",
+          "title": "Memory T2 Ms"
+        },
+        "aperture_m": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 10,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Receiving telescope diameter (m) for ground stations.",
+          "title": "Aperture M"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "Node",
+      "type": "object"
+    },
+    "Operation": {
+      "additionalProperties": false,
+      "description": "One step of a circuit, applied in list order.",
+      "properties": {
+        "gate": {
+          "enum": [
+            "H",
+            "X",
+            "Y",
+            "Z",
+            "S",
+            "T",
+            "SDG",
+            "TDG",
+            "SX",
+            "RX",
+            "RY",
+            "RZ",
+            "CX",
+            "CZ",
+            "CP",
+            "SWAP",
+            "CCX",
+            "MEASURE",
+            "BARRIER"
+          ],
+          "title": "Gate",
+          "type": "string"
+        },
+        "targets": {
+          "description": "Target qubit indices.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Targets",
+          "type": "array"
+        },
+        "controls": {
+          "description": "Control qubit indices.",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Controls",
+          "type": "array"
+        },
+        "params": {
+          "description": "Angles in radians (RX/RY/RZ/CP).",
+          "items": {
+            "type": "number"
+          },
+          "title": "Params",
+          "type": "array"
+        },
+        "clbits": {
+          "description": "Classical bits (MEASURE only).",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Clbits",
+          "type": "array"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "gate"
+      ],
+      "title": "Operation",
+      "type": "object"
+    },
+    "Position": {
+      "additionalProperties": false,
+      "description": "Diagram position (unitless canvas coordinates).",
+      "properties": {
+        "x": {
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "Position",
+      "type": "object"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "Where an element came from in the uploaded image (for the overlay).",
+      "properties": {
+        "bbox": {
+          "description": "Box in source-image pixels: x1, y1, x2, y2 (top-left, bottom-right).",
+          "maxItems": 4,
+          "minItems": 4,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Bbox",
+          "type": "array"
+        },
+        "confidence": {
+          "description": "Detection confidence, 0 to 1.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "segment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id of the SAM segment, if any.",
+          "title": "Segment Id"
+        }
+      },
+      "required": [
+        "bbox",
+        "confidence"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "circuit": "#/$defs/CircuitSpec",
+      "network": "#/$defs/NetworkSpec"
+    },
+    "propertyName": "kind"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/CircuitSpec"
+    },
+    {
+      "$ref": "#/$defs/NetworkSpec"
+    }
+  ],
+  "$id": "https://inkubit.local/spec/1.0/schema.json",
+  "title": "Inkubit spec v1.0"
+}

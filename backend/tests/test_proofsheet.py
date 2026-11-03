@@ -7,10 +7,10 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas import EXAMPLES_DIR
-from qcanvas.proofsheet import _padded_with_identities, _permuted, proof_sheet
-from qcanvas.spec import parse_spec
-from qcanvas.verify.expected import ideal_distribution
+from inkubit import EXAMPLES_DIR
+from inkubit.proofsheet import _padded_with_identities, _permuted, proof_sheet
+from inkubit.spec import parse_spec
+from inkubit.verify.expected import ideal_distribution
 
 
 def _spec(name: str):
@@ -66,8 +66,8 @@ def test_the_openqasm2_export_reads_in_a_strict_reader():
     from qiskit import qasm2
     from qiskit.quantum_info import Operator
 
-    from qcanvas.insights.circuit import exports
-    from qcanvas.verify.expected import build_reference_circuit
+    from inkubit.insights.circuit import exports
+    from inkubit.verify.expected import build_reference_circuit
 
     spec = parse_spec({"kind": "circuit", "num_qubits": 3, "num_clbits": 3, "operations": [
         {"gate": "SX", "targets": [0]}, {"gate": "CP", "controls": [0], "targets": [1], "params": [0.7]},
@@ -78,7 +78,7 @@ def test_the_openqasm2_export_reads_in_a_strict_reader():
 
 
 def test_the_endpoint_runs_the_sheet_and_rejects_networks():
-    from qcanvas.api.app import app
+    from inkubit.api.app import app
 
     client = TestClient(app)
     ok = client.post("/api/proofsheet", json={"spec": json.loads((EXAMPLES_DIR / "specs" / "bell.json").read_text())})

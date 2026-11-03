@@ -15,12 +15,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
+os.environ.setdefault("INKUBIT_MODEL_PROVIDER", "meta")
 
 from PIL import Image  # noqa: E402
 
-from qcanvas.adapters.config import load_settings  # noqa: E402
-from qcanvas.adapters.meta_client import MetaClient  # noqa: E402
+from inkubit.adapters.config import load_settings  # noqa: E402
+from inkubit.adapters.meta_client import MetaClient  # noqa: E402
 
 # Same look as the pipeline's Muse Image diagrams (adapters/meta_vision.diagram_prompt), without labels.
 STYLE = ("Flat, precise technical illustration on a dark charcoal background (#16171b), crisp off-white line work, "

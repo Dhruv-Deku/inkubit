@@ -1,6 +1,6 @@
 # The proof sheet over the gallery
 
-`scripts/proofsheet_bench.py` ran the proof sheet (11 checks of 9 kinds, `backend/qcanvas/proofsheet.py`) on all 28 gallery circuits in 9 categories, 2026-11-02: **299 passed, 0 failed**, 1 skipped with the reason, 8 notes (the ML verifier's interval missing the exact value: a note about the model, not the circuit).
+`scripts/proofsheet_bench.py` ran the proof sheet (11 checks of 9 kinds, `backend/inkubit/proofsheet.py`) on all 28 gallery circuits in 9 categories, 2026-11-02: **299 passed, 0 failed**, 1 skipped with the reason, 8 notes (the ML verifier's interval missing the exact value: a note about the model, not the circuit).
 
 | Check | Kind | Guards against | Passed | Failed | Skipped | Notes |
 | --- | --- | --- | --- | --- | --- | --- |

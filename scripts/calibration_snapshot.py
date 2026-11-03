@@ -1,10 +1,10 @@
-"""Take a calibration snapshot of a real IBM quantum computer for Q-Canvas's calibrated noise preset.
+"""Take a calibration snapshot of a real IBM quantum computer for Inkubit's calibrated noise preset.
 
     .venv/Scripts/python scripts/calibration_snapshot.py [device]      # default: the device of the last hardware run
 
 Reads the device's reported calibration (IBM Quantum Platform, needs IBM_QUANTUM_TOKEN in .env) and keeps the median
 over its working qubits and couplers: one-qubit (sx) and two-qubit gate error and duration, readout error each way,
-T1 and T2. Writes backend/qcanvas/data/calibration.json; qcanvas.sim.noise turns it into the "calibrated" preset.
+T1 and T2. Writes backend/inkubit/data/calibration.json; inkubit.sim.noise turns it into the "calibrated" preset.
 Medians describe a typical qubit, not the best patch a compiler would pick, which the file says.
 """
 
@@ -55,7 +55,7 @@ def main() -> None:
         "t1_us": med(t1) * 1e6, "t2_us": med(t2) * 1e6,
         "note": "Medians over the device's qubits and couplers: a typical qubit, not the best patch a compiler picks.",
     }
-    path = ROOT / "backend" / "qcanvas" / "data" / "calibration.json"
+    path = ROOT / "backend" / "inkubit" / "data" / "calibration.json"
     path.write_text(json.dumps(snap, indent=1) + "\n", encoding="utf-8")
     print(json.dumps(snap, indent=1))
     print(f"wrote {path}")

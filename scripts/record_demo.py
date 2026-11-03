@@ -1,6 +1,6 @@
 """Record the demo video: a captioned screen recording of the real app.
 
-    .venv/Scripts/python scripts/record_demo.py [base_url] [--out docs/video/q-canvas-demo.mp4]
+    .venv/Scripts/python scripts/record_demo.py [base_url] [--out docs/video/inkubit-demo.mp4]
 
 Needs the backend serving the built frontend (scripts/dev.sh, or uvicorn on :8000).
 The script only drives the UI and lays captions over it; every number on screen
@@ -308,6 +308,15 @@ async def show(d: Director, title: str, pause: float = 0.9) -> Locator:
     return p
 
 
+async def hero_story(d: Director) -> None:
+    """The opening scene replays the pipeline in 3D on the bundled GHZ sketch; its own step bar narrates."""
+    page = d.page
+    await page.locator(".hero3d-stage canvas").wait_for(timeout=60_000)
+    await page.evaluate("document.querySelector('.hero3d-legend .linkish').click()")  # replay from the start
+    await d.wait(10.4)
+    await d.scroll_to(panel(page, "Mission control"), block="start", pause=0.9)
+
+
 async def mission_story(d: Director) -> None:
     page, live = d.page, d.live
     mc = panel(page, "Mission control")
@@ -445,8 +454,8 @@ async def hardware_story(d: Director) -> None:
 
 
 async def evidence_story(d: Director) -> None:
-    await section(d, "Evidence")
-    await show(d, "AI alone vs Q-Canvas")
+    await section(d, "Proof")
+    await show(d, "AI alone vs Inkubit")
     await d.caption("Why verify at all? Asked alone, the same model was exact on small circuits but on only 3 of 6 bigger ones, "
                     "once 43% off with full confidence.", hold=4.6)
     r = F["ref"]
@@ -479,26 +488,26 @@ async def record(base: str, out: Path) -> None:
         await page.wait_for_selector(".mission-goal")
         await page.evaluate("document.fonts.ready")
         d = Director(page, live)
-        await page.evaluate("a => window.__demo.card(...a)", ["Q-Canvas", "", [], "", False])
+        await page.evaluate("a => window.__demo.card(...a)", ["Inkubit", "", [], "", False])
         await d.wait(0.8)
 
         with tempfile.TemporaryDirectory() as tmp:
             rec = Recorder(page, Path(tmp))
             d.rec = rec
             await rec.start()
-            await d.card("Q-Canvas", "Meta's models turn a quantum idea into a plan. Exact physics checks every number before you see it.",
-                         chips, note, hold=4.6)
+            await d.card("Inkubit", "An AI quantum engineer that proves its work. Meta's models plan it; exact physics checks every number.",
+                         chips, note, hold=4.2)
             await page.screenshot(path=str(out.with_suffix(".png")))
             await d.hide_card()
             F.update(facts())
-            for name, story in (("mission", mission_story), ("sketch", sketch_story), ("discovery", discovery_story),
+            for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("discovery", discovery_story),
                                 ("learning", learning_story), ("estimator", estimator_story), ("paper", paper_story),
                                 ("hardware", hardware_story), ("evidence", evidence_story)):
                 print(name, f"{rec._video_time(time.monotonic()):.1f} s", flush=True)
                 await story(d)
             await d.caption(None)
-            await d.card("Q-Canvas", "Sketch it, say it or photograph it. The AI proposes; exact physics has the last word.",
-                         chips, "github.com/Dhruv-Deku/q-canvas · built during the Meta Global AI Developer Hackathon 2026", hold=5.0)
+            await d.card("Inkubit", "Sketch it, say it or photograph it. The AI proposes; exact physics has the last word.",
+                         chips, "github.com/Dhruv-Deku/inkubit · built during the Meta Global AI Developer Hackathon 2026", hold=5.0)
             await rec.stop()
             print(f"captured {len(rec.frames)} frames over {rec.t_end - rec.frames[0][0]:.1f} s "
                   f"({rec._video_time(rec.t_end):.1f} s after speed-ups); encoding…")
@@ -512,7 +521,7 @@ async def record(base: str, out: Path) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("base", nargs="?", default="http://127.0.0.1:8000")
-    ap.add_argument("--out", type=Path, default=ROOT / "docs" / "video" / "q-canvas-demo.mp4")
+    ap.add_argument("--out", type=Path, default=ROOT / "docs" / "video" / "inkubit-demo.mp4")
     args = ap.parse_args()
     asyncio.run(record(args.base.rstrip("/"), args.out.resolve()))
 

@@ -18,4 +18,4 @@ if [ -x .venv/bin/python ]; then PY=.venv/bin/python; else PY=.venv/Scripts/pyth
 "$PY" -m pip install -r backend/requirements.txt
 (cd frontend && npm ci && npm run build)
 [ -f .env ] || cp .env.example .env
-echo "Done. Start with: scripts/dev.sh   (or one port: cd backend && ../$PY -m uvicorn qcanvas.api.app:app)"
+echo "Done. Start with: scripts/dev.sh   (or one port: cd backend && ../$PY -m uvicorn inkubit.api.app:app)"

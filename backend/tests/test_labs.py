@@ -9,13 +9,13 @@ import pytest
 from fastapi.testclient import TestClient
 from qiskit.quantum_info import DensityMatrix, Statevector, random_density_matrix, random_statevector
 
-from qcanvas.api.app import app
-from qcanvas.insights.bell import TSIRELSON, _tensor, chsh_settings, chsh_value
-from qcanvas.insights.circuit import analyze_circuit
-from qcanvas.insights.tomography import _physical, tomography
-from qcanvas.qec import _logical_error, _logical_errors, repetition_lab
-from qcanvas.sim.noise import get_preset
-from qcanvas.spec import parse_spec
+from inkubit.api.app import app
+from inkubit.insights.bell import TSIRELSON, _tensor, chsh_settings, chsh_value
+from inkubit.insights.circuit import analyze_circuit
+from inkubit.insights.tomography import _physical, tomography
+from inkubit.qec import _logical_error, _logical_errors, repetition_lab
+from inkubit.sim.noise import get_preset
+from inkubit.spec import parse_spec
 
 client = TestClient(app)
 

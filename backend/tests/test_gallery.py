@@ -6,12 +6,12 @@ import math
 
 import pytest
 
-from qcanvas.adapters.mock_code import MockCodeModel
-from qcanvas.agent.loop import AgentOptions, run_agent
-from qcanvas.codegen.template import generate_code
-from qcanvas.sim.runner import run_code
-from qcanvas.spec import SpecError, parse_spec
-from qcanvas.verify import ideal_distribution, verify_counts
+from inkubit.adapters.mock_code import MockCodeModel
+from inkubit.agent.loop import AgentOptions, run_agent
+from inkubit.codegen.template import generate_code
+from inkubit.sim.runner import run_code
+from inkubit.spec import SpecError, parse_spec
+from inkubit.verify import ideal_distribution, verify_counts
 
 GALLERY = {
     "grover2": {"11": 1.0},
@@ -58,8 +58,8 @@ def test_the_ghz_game_is_won_every_time(example):
 
 
 def test_every_gallery_algorithm_has_a_category_and_a_spec():
-    from qcanvas import EXAMPLES_DIR
-    from qcanvas.api.app import CATEGORIES
+    from inkubit import EXAMPLES_DIR
+    from inkubit.api.app import CATEGORIES
 
     names = [n for ns in CATEGORIES.values() for n in ns]
     assert len(names) == len(set(names))
@@ -116,7 +116,7 @@ def test_planted_fault_is_repaired_in_a_controlled_phase_circuit(example):
 
 
 def test_toffoli_noise_is_six_cnots_worth():
-    from qcanvas.sim.noise import get_preset, toffoli_error
+    from inkubit.sim.noise import get_preset, toffoli_error
 
     p2 = get_preset("realistic").p2
     assert toffoli_error(get_preset("realistic")) == pytest.approx(1 - (1 - p2) ** 6)
@@ -128,7 +128,7 @@ def test_trotter_circuit_is_the_product_formula(example):
     import numpy as np
     from scipy.linalg import expm
 
-    from qcanvas.verify.expected import build_reference_circuit
+    from inkubit.verify.expected import build_reference_circuit
     from qiskit.quantum_info import Statevector
 
     i2, x, z = np.eye(2), np.array([[0, 1], [1, 0]]), np.diag([1, -1])

@@ -7,8 +7,8 @@ import math
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.chem import (BOHR, _expect, _simulate, best_theta, chem_lab, energy_exact, energy_hf, integrals,
+from inkubit.api.app import app
+from inkubit.chem import (BOHR, _expect, _simulate, best_theta, chem_lab, energy_exact, energy_hf, integrals,
                           vqe_energy)
 
 

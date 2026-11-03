@@ -19,10 +19,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-os.environ.setdefault("QCANVAS_MODEL_PROVIDER", "meta")
+os.environ.setdefault("INKUBIT_MODEL_PROVIDER", "meta")
 
-from qcanvas.adapters.registry import get_models  # noqa: E402
-from qcanvas.mission import Ctx, Mission, run_mission  # noqa: E402
+from inkubit.adapters.registry import get_models  # noqa: E402
+from inkubit.mission import Ctx, Mission, run_mission  # noqa: E402
 
 MISSIONS = [
     "Compare the hydrogen molecule at 0.6, 1.0 and 2.0 angstrom and say where the classical shortcut fails.",

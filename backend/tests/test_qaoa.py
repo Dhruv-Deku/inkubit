@@ -9,10 +9,10 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.qaoa import _canonical_p1, _expected, check_graph, cut_values, qaoa_lab, qaoa_spec, qaoa_state
-from qcanvas.spec import parse_spec
-from qcanvas.verify.expected import ideal_distribution
+from inkubit.api.app import app
+from inkubit.qaoa import _canonical_p1, _expected, check_graph, cut_values, qaoa_lab, qaoa_spec, qaoa_state
+from inkubit.spec import parse_spec
+from inkubit.verify.expected import ideal_distribution
 
 RING6 = [(i, (i + 1) % 6) for i in range(6)]
 RING5 = [(i, (i + 1) % 5) for i in range(5)]

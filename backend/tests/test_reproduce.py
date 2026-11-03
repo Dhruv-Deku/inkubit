@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.reproduce import claims_from_text, extract_qasm, reproduce, shots_from_text
+from inkubit.api.app import app
+from inkubit.reproduce import claims_from_text, extract_qasm, reproduce, shots_from_text
 
 GHZ = 'OPENQASM 2.0; include "qelib1.inc"; qreg q[3]; creg c[3]; h q[0]; cx q[0],q[1]; cx q[1],q[2]; measure q -> c;'
 

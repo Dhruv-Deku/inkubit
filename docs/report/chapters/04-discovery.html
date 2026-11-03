@@ -88,7 +88,7 @@ errors). For such hardware, what matters is <i>d</i><sub>Z</sub>, the smallest n
 the code, as long as the code still corrects any single error of any kind.</p>
 
 <h2>An exact checker</h2>
-<p><code>qcanvas/codes.py</code> checks any stabilizer code exactly, in the symplectic picture where each Pauli string
+<p><code>inkubit/codes.py</code> checks any stabilizer code exactly, in the symplectic picture where each Pauli string
 is a binary vector:</p>
 <ul>
 <li>the generators must <b>commute</b> (symplectic inner product zero for every pair) and be <b>independent</b> (full
@@ -116,7 +116,7 @@ error of any kind is still corrected. Later rounds found more codes with the sam
 <h2>Reading the result honestly</h2>
 <p>The checker proves the distances; they are facts about the generators, not estimates. Distances are not the whole
 story, though. How well a code performs under realistic biased noise also depends on the decoder, the circuits that
-measure the generators and the error rates. Q-Canvas does not yet simulate a decoder for the new code, so the claim is
+measure the generators and the error rates. Inkubit does not yet simulate a decoder for the new code, so the claim is
 limited to what the checker proves. Muse Spark's own explanation of its design, "adjacent-pair X parts form a
 repetition code giving Z distance 9 while step-pattern Z parts keep X and Y checks distinct", is shown as the model's
 idea, next to the checker's verdict. The page lets anyone enter their own generators and get the same exact
@@ -135,7 +135,7 @@ sketch pipeline as a fallback. It also transcribes the claimed outcome probabili
 the bit order. The circuit is re-run exactly and every claim is judged against an error bar:</p>
 <ul>
 <li>with a known shot count, three standard deviations of shot noise (at least 0.01);</li>
-<li>without one, 0.03 for hardware results and 0.005 for ideal ones; a hardware claim may also sit between Q-Canvas's
+<li>without one, 0.03 for hardware results and 0.005 for ideal ones; a hardware claim may also sit between Inkubit's
 ideal and realistic predictions;</li>
 <li>if the bit order is not stated, both orders are tried, and the better fit is used and labelled as inferred.</li>
 </ul>
@@ -143,7 +143,7 @@ ideal and realistic predictions;</li>
 in 8 seconds, and every claim was judged within its error bar.</p>
 
 <h2>Reproduce a whole paper</h2>
-<p>A figure is one experiment; a paper is many. Give Q-Canvas an arXiv id or a PDF. One pass over a hundred-page paper,
+<p>A figure is one experiment; a paper is many. Give Inkubit an arXiv id or a PDF. One pass over a hundred-page paper,
 with Muse Wonder reading the whole PDF, proved fragile: it listed repeated runs of one Bell circuit, dropped numbers
 into its notes, and once returned truncated JSON. Two passes work:</p>
 <ol>
@@ -163,7 +163,7 @@ guessed.</p>
 
 <h2>What "not reproduced" means</h2>
 <p>The two experiments not reproduced are Shor's algorithm for 15 and a quantum walk. Their stated numbers are
-measurements from 2018-era hardware, whose noise Q-Canvas's realistic preset does not reach. That is a statement about
+measurements from 2018-era hardware, whose noise Inkubit's realistic preset does not reach. That is a statement about
 the preset and the old devices, not an accusation against the paper. The lab reports what it can check, with what
 error bars, and leaves the interpretation visible.</p>
 

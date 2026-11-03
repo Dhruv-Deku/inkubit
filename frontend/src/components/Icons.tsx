@@ -37,9 +37,9 @@ export function StatusIcon({ status, live }: { status: Status; live?: boolean })
 export const Logo = () => (
   <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden>
     <rect width="32" height="32" rx="8" fill="#1f2025" />
-    <path d="M6 11h20M6 21h20" stroke="#ecebe8" strokeWidth="2" strokeLinecap="round" />
-    <path d="M16 11v10" stroke="#d9a441" strokeWidth="2" />
-    <circle cx="16" cy="11" r="3" fill="#d9a441" />
-    <circle cx="16" cy="21" r="4" fill="none" stroke="#d9a441" strokeWidth="2" />
+    <path d="M16 4.5C16 4.5 7.5 13.6 7.5 19a8.5 8.5 0 0 0 17 0C24.5 13.6 16 4.5 16 4.5Z" fill="#3987e5" />
+    <circle cx="16" cy="19.2" r="4.6" fill="none" stroke="#f4f3f0" strokeWidth="1.5" />
+    <path d="M16 19.2l2.9-3.3" stroke="#f4f3f0" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="18.9" cy="15.9" r="1.2" fill="#f4f3f0" />
   </svg>
 )

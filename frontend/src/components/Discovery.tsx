@@ -86,8 +86,8 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
       setGoal(d.goal)
       void start(false, d.goal)
     }
-    window.addEventListener('qcanvas:tour', onTour)
-    return () => window.removeEventListener('qcanvas:tour', onTour)
+    window.addEventListener('inkubit:tour', onTour)
+    return () => window.removeEventListener('inkubit:tour', onTour)
   })
   const g = goals.find((x) => x.id === goal)
   const found = result?.entries.filter((e) => e.source !== 'textbook' && e.source !== 'compiler') ?? []

@@ -1,11 +1,11 @@
 <section class="chapter">
 <h1>Evidence</h1>
 <p class="lede">Claims about AI and quantum hardware are easy to make and hard to check. This chapter collects the
-measurements behind Q-Canvas's design: how far a model alone can be trusted, what happens when two models debate, how
+measurements behind Inkubit's design: how far a model alone can be trusted, what happens when two models debate, how
 good a learned shortcut is, and how the predictions held up on a real quantum computer.</p>
 
-<h2>AI alone vs Q-Canvas</h2>
-<p>The pitch that "a chatbot hallucinates and Q-Canvas does not" was tested, not asserted. The same model
+<h2>AI alone vs Inkubit</h2>
+<p>The pitch that "a chatbot hallucinates and Inkubit does not" was tested, not asserted. The same model
 ({{ar_model}}, medium reasoning effort) was given each circuit as data, with no title, no notes and no simulator. It
 predicted every outcome's probability under a JSON schema, the way a chat assistant would answer. Exact simulation
 scored each answer by total variation distance, the share of probability in the wrong place: <i>exact</i> below 1%,
@@ -40,11 +40,11 @@ new ones, {{ref_n}} answers in all.</p>
 Muse Wonder raised {{ref_false}} false alarms against right answers and talked Muse Spark out of {{ref_talked}} of
 them, and it let {{ref_missed}} of the {{ref_wrong}} wrong answers through. Twice the two models agreed that a
 pair of qubits was entangled when its negativity was exactly zero (docs/REFEREE.md). A
-debate between models cannot tell which challenge was right; only the simulator can. That is why Q-Canvas checks
+debate between models cannot tell which challenge was right; only the simulator can. That is why Inkubit checks
 instead of debating.</p>
 
 <h2>The ML verifier</h2>
-<p>Exact density-matrix simulation is the referee everywhere in Q-Canvas, but it costs time that grows exponentially.
+<p>Exact density-matrix simulation is the referee everywhere in Inkubit, but it costs time that grows exponentially.
 The ML verifier is a fast first opinion: it predicts how much of a circuit's answer survives realistic noise (the
 Hellinger fidelity against the ideal distribution, at a noise scale from 0.05× to 5×), with a calibrated error bar.</p>
 <ul>
@@ -80,9 +80,9 @@ device on the IBM Quantum Platform's Open plan (job <code>{{hw_job}}</code>, {{h
 gates each. The measured counts were compared, by total variation distance, with four predictions:</p>
 <ul>
 <li>the <b>noiseless</b> odds;</li>
-<li>Q-Canvas's <b>generic realistic preset</b>, the default noise model of the whole app;</li>
+<li>Inkubit's <b>generic realistic preset</b>, the default noise model of the whole app;</li>
 <li>a <b>digital twin</b>: Qiskit Aer with <code>NoiseModel.from_backend</code>, built from the device's own calibration data and run on the same transpiled circuit;</li>
-<li>Q-Canvas's <b>calibrated preset</b>, added after this run: its own noise model with the median of a calibration snapshot of the same device (below).</li>
+<li>Inkubit's <b>calibrated preset</b>, added after this run: its own noise model with the median of a calibration snapshot of the same device (below).</li>
 </ul>
 <figure>{{chart:hardware}}
 <figcaption>Distance between what {{hw_device}} measured and each prediction (lower is closer). The twin beat the noiseless odds and the generic preset on {{hw_best}} of {{hw_n}} circuits; the calibrated preset was closer than the twin on {{hw_cal_beats}} of {{hw_n}}.</figcaption></figure>
@@ -103,7 +103,7 @@ every analysis. Rescored on the stored counts, it came within <b>{{hw_cal}}</b>,
 chip's behaviour is unmodelled. Two cautions are stated in the app: the snapshot was taken a few hours after the run,
 and medians describe a typical qubit rather than the best patch a compiler picks.</p>
 <div class="callout warn"><span class="k">What this does and does not show</span>
-<p>Four small circuits, with one or two two-qubit gates each, on one device on one day. They show that Q-Canvas's
+<p>Four small circuits, with one or two two-qubit gates each, on one device on one day. They show that Inkubit's
 pipeline reaches real hardware, and that a calibrated twin predicts it well at this scale. They are not a benchmark of
 the device. An offline rehearsal (<code>--fake</code>, on a simulated backend) checks the pipeline in CI and is never
 shown as hardware data. A test refuses to quote hardware numbers from a rehearsal.</p></div>
@@ -150,7 +150,7 @@ fidelity equals the average over all states: <b>{{ix_tele}} ± {{ix_tele_se}}</b
 scheme, and {{ix_tele_none}} without the corrections, as theory says.</p>
 
 <h2>The proof sheet: every check on every circuit</h2>
-<p>A run is verified by one comparison (Chapter 5). The proof sheet asks more, of the circuit and of Q-Canvas itself:
+<p>A run is verified by one comparison (Chapter 5). The proof sheet asks more, of the circuit and of Inkubit itself:
 {{ps_checks}} independent checks of {{ps_kinds}} kinds, each guarding against a different mistake. Two ideal simulators
 (Qiskit's quantum_info and Aer's C++) and two noisy ones (closed-form channels and Aer's density matrix) must agree. The
 noisy state must be a physical density matrix. The circuits Qiskit compiles for three chip wirings must be the same
@@ -161,7 +161,7 @@ tests). It runs on any circuit from the editor in about eight seconds.</p>
 <p>Over the whole gallery ({{ps_circuits}} circuits) it recorded <b>{{ps_passed}} passes and {{ps_failed}} failures</b>,
 {{ps_skipped}} check skipped with its reason and {{ps_notes}} notes, where the ML verifier's interval missed the exact
 value, consistent with its coverage on textbook circuits. A test breaks Qiskit's compiler on purpose (dropping one CNOT)
-and requires the compilation check to fail. Its first run also found a real defect: Q-Canvas's OpenQASM 2 export used
+and requires the compilation check to fail. Its first run also found a real defect: Inkubit's OpenQASM 2 export used
 <code>sx</code>, <code>cp</code> and <code>swap</code>, which the standard <code>qelib1.inc</code> does not define, so
 strict readers rejected it. The app's own read-back had used Qiskit's lenient mode and hidden this. The export now
 defines those gates in the file from standard ones.</p>

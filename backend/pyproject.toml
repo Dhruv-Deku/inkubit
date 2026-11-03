@@ -1,5 +1,5 @@
 [project]
-name = "qcanvas"
+name = "inkubit"
 version = "0.1.0"
 description = "Hand-drawn quantum circuits and networks to verified, running simulations."
 requires-python = ">=3.11"

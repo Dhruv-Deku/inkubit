@@ -35,7 +35,7 @@ export function ProofSheetView({ sheet }: { sheet: ProofSheet }) {
         }))}</tbody>
       </table>
       <p className="sub obs-method">Each check is independent of the others and of the code that produced the result. Thresholds are floating-point tolerances (1e-9 exact, 1e-6 between the two noisy
-        engines); the ML verifier's miss is a note about the model, never about the circuit. qcanvas/proofsheet.py.</p>
+        engines); the ML verifier's miss is a note about the model, never about the circuit. inkubit/proofsheet.py.</p>
     </div>
   )
 }

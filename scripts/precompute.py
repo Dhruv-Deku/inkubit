@@ -1,4 +1,4 @@
-"""Rebuild the results stored with the app (backend/qcanvas/data/precomputed): the simulation observatory, the pulse
+"""Rebuild the results stored with the app (backend/inkubit/data/precomputed): the simulation observatory, the pulse
 lab's duration sweep and its DRAG calibrations. Run after changing observatory.py or pulse.py; a test fails until
 you do.
 
@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-from qcanvas import observatory, precomputed, pulse  # noqa: E402
+from inkubit import observatory, precomputed, pulse  # noqa: E402
 
 
 def main() -> None:

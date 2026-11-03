@@ -10,9 +10,9 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas import satellites as S
-from qcanvas.api.app import app
-from qcanvas.orbits import CITIES, azimuth, elevation, station, up_vector
+from inkubit import satellites as S
+from inkubit.api.app import app
+from inkubit.orbits import CITIES, azimuth, elevation, station, up_vector
 
 NOW = datetime(2026, 11, 2, 9, 37, tzinfo=timezone.utc)
 

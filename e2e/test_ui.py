@@ -42,10 +42,10 @@ def server():
     if not (ROOT / "frontend" / "dist" / "index.html").exists():
         pytest.skip("build the frontend first: cd frontend && npm run build")
     port = _free_port()
-    env = {k: v for k, v in os.environ.items() if k not in ("META_API_KEY", "QCANVAS_PUBLIC")}
-    env |= {"QCANVAS_MODEL_PROVIDER": "mock", "PYTHONUNBUFFERED": "1"}
+    env = {k: v for k, v in os.environ.items() if k not in ("META_API_KEY", "INKUBIT_PUBLIC")}
+    env |= {"INKUBIT_MODEL_PROVIDER": "mock", "PYTHONUNBUFFERED": "1"}
     log = open(ROOT / "e2e" / "server.log", "w", encoding="utf-8")  # noqa: SIM115 - closed below
-    proc = subprocess.Popen([sys.executable, "-m", "uvicorn", "qcanvas.api.app:app", "--host", "127.0.0.1", "--port", str(port)],
+    proc = subprocess.Popen([sys.executable, "-m", "uvicorn", "inkubit.api.app:app", "--host", "127.0.0.1", "--port", str(port)],
                             cwd=ROOT / "backend", env=env, stdout=log, stderr=subprocess.STDOUT)
     url = f"http://127.0.0.1:{port}"
     for _ in range(120):

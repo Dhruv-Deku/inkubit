@@ -6,13 +6,13 @@ import pytest
 from qiskit import ClassicalRegister, transpile
 from qiskit_aer import AerSimulator
 
-from qcanvas.codegen.template import generate_code
-from qcanvas.sim.noise import build_noise_model, get_preset
-from qcanvas.sim.runner import run_code
-from qcanvas.spec import parse_spec
-from qcanvas.verify import ideal_distribution, noisy_distribution, verify_counts
-from qcanvas.verify.expected import apply_readout_error, build_reference_circuit
-from qcanvas.verify.metrics import hellinger_fidelity, shot_noise_tvd_bound, total_variation_distance
+from inkubit.codegen.template import generate_code
+from inkubit.sim.noise import build_noise_model, get_preset
+from inkubit.sim.runner import run_code
+from inkubit.spec import parse_spec
+from inkubit.verify import ideal_distribution, noisy_distribution, verify_counts
+from inkubit.verify.expected import apply_readout_error, build_reference_circuit
+from inkubit.verify.metrics import hellinger_fidelity, shot_noise_tvd_bound, total_variation_distance
 
 
 def sample_counts(spec, noise: str, shots: int = 4096, seed: int = 99) -> dict[str, int]:

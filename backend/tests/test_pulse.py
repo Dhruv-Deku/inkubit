@@ -7,7 +7,7 @@ import math
 import numpy as np
 import pytest
 
-from qcanvas.pulse import envelope, propagate, qubit_metrics, run
+from inkubit.pulse import envelope, propagate, qubit_metrics, run
 
 
 def test_pulse_area_is_pi():

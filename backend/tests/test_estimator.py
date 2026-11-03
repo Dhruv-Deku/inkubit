@@ -7,8 +7,8 @@ import math
 import pytest
 from fastapi.testclient import TestClient
 
-from qcanvas.api.app import app
-from qcanvas.estimator import (
+from inkubit.api.app import app
+from inkubit.estimator import (
     HARDWARE,
     Algorithm,
     estimate,

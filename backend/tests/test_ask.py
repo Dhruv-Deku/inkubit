@@ -1,4 +1,4 @@
-"""Ask Q-Canvas: questions answered only from a finished run's facts."""
+"""Ask Inkubit: questions answered only from a finished run's facts."""
 
 from __future__ import annotations
 
@@ -7,12 +7,12 @@ import time
 
 from fastapi.testclient import TestClient
 
-from qcanvas.adapters.config import load_settings
-from qcanvas.adapters.meta_vision import MetaReasoningModel
-from qcanvas.api.app import app
-from qcanvas.ask import ask_context, offline_answer
-from qcanvas.network.agent import run_network_agent
-from qcanvas.spec import parse_spec
+from inkubit.adapters.config import load_settings
+from inkubit.adapters.meta_vision import MetaReasoningModel
+from inkubit.api.app import app
+from inkubit.ask import ask_context, offline_answer
+from inkubit.network.agent import run_network_agent
+from inkubit.spec import parse_spec
 
 client = TestClient(app)
 
