@@ -35,6 +35,6 @@ the key absent from git history, CI on the latest commit, the deadline) and prin
 
 ## What judges will see first
 
-1. The video (2:56) and its thumbnail.
+1. The video (2:58) and its thumbnail.
 2. The README: the GIF, then "Results you can check in the app", each linked to its evidence.
 3. The app: the **Guided tour** button (under two minutes) shows the best of it; every number on screen comes from a run.
