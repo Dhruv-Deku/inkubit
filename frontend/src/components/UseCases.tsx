@@ -73,7 +73,7 @@ export function UseCases({ examples, onImage, onSpec, busy }: {
       <div className="uc-grid">
         {CASES.map((c) => (
           <button key={c.id} className="uc-card" onClick={() => { void run(c.action) }} disabled={busy && c.action.kind !== 'panel'}>
-            <img className="uc-img" src={`/usecases/${c.id}.webp`} alt="" loading="lazy" width={720} height={360}
+            <img className="uc-img" src={`/usecases/${c.id}.webp?v=pen`} alt="" loading="lazy" width={720} height={360}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
             <span className="uc-title">{c.title}</span>
             <span className="uc-text">{c.text}</span>
