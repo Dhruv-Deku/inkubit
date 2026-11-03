@@ -346,7 +346,7 @@ export default function App() {
           <button className={`step ${stage === 'run' ? 'active' : job?.result ? 'done' : ''}`} disabled={!job} onClick={() => setStage('run')}><span className="n">3</span>Run &amp; verify</button>
         </nav>
         <span className="spacer" />
-        <button className="btn small primary" onClick={() => { setStage('start'); setTouring(true) }} title="Under two minutes: the best of Inkubit, step by step">Guided tour</button>
+        <button className="btn small" onClick={() => { setStage('start'); setTouring(true) }} title="Under two minutes: the best of Inkubit, step by step">Guided tour</button>
         <label className={`toggle ${options.demo_mode ? 'on' : ''}`} title="Break the first attempt on purpose so the repair loop is visible">
           <input type="checkbox" hidden checked={options.demo_mode} onChange={(e) => setOptions({ ...options, demo_mode: e.target.checked })} />
           <span className="track" />Demo mode

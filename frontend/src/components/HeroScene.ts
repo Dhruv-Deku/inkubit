@@ -202,7 +202,7 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
 
   const hTex = track(labelTexture((g, s) => {
     g.fillStyle = '#fff'
-    g.font = `600 ${s * 0.62}px Inter, "Segoe UI", system-ui, sans-serif`
+    g.font = `600 ${s * 0.62}px "IBM Plex Sans", "Segoe UI", system-ui, sans-serif`
     g.textAlign = 'center'; g.textBaseline = 'middle'
     g.fillText('H', s / 2, s / 2 + s * 0.03)
   }))
@@ -320,7 +320,7 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
   })
   const keyLabel = (txt: string) => track(labelTexture((g, s) => {
     g.fillStyle = '#a9abb2'
-    g.font = `500 ${s * 0.32}px "JetBrains Mono", Consolas, monospace`
+    g.font = `500 ${s * 0.32}px "IBM Plex Mono", Consolas, monospace`
     g.textAlign = 'center'; g.textBaseline = 'middle'
     g.fillText(txt, s / 2, s / 2)
   }))

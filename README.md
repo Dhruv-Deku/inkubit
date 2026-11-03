@@ -128,7 +128,7 @@ Inkubit closes that gap and refuses to fake success:
 | Challenges | 11 puzzles in three levels (warm-up, entanglement, gate golf): build a target state or gate, scored exactly with par like golf, stars saved in the browser, a lesson on success. Solve them with the palette, a photo of your paper answer, or words | **Muse Spark 1.3** gives hints that never spell out the answer |
 | Error-correction lab | The three-qubit bit-flip code against a bare qubit on log-log axes, perfect vs realistic gates; drag the gate quality and watch the break-even point move (the threshold idea); switch to phase flips to see the same code make things worse. One click opens the code, with an error, in the editor | exact simulation, no model |
 | Quantum Rosetta | The language of quantum computing, translated both ways. Type, paste, say or photograph a state or a program: Dirac notation (`(|01⟩−|10⟩)/√2`, `cos(π/8)|0⟩ + e^(iπ/4) sin(π/8)|1⟩`, `|GHZ⟩`, LaTeX pasted from a paper), OpenQASM 2 or 3, Quil, Qiskit calls, other code (Cirq, PennyLane, Q#, Braket) or plain words. Out come the state in Dirac notation (independent qubits factored out, surds and phases recognised, LaTeX to copy) with which qubits are entangled, **a circuit proven to prepare it** (shortest textbook-gate circuit by exhaustive search, GHZ fan-out, or compiled state preparation; fidelity checked by exact simulation), what every gate does in words with the state after it, and the same program in **eight languages**: Qiskit, OpenQASM 2 and 3 and Cirq are run here and must reproduce the same state. A 28-word dictionary gives each term an example state computed exactly. The gate-by-gate inspector now shows the state in Dirac notation at every step | exact parsers and simulation; **Muse Spark** only for code it cannot parse exactly and for photos (transcribed, never solved), labelled |
-| What it can do | Nine cards on the start page (sketch to code, debugging, chemistry, quantum security, optimization, satellite networks, cryptography, real hardware, trust), each illustrated by **Muse Image 1.0** in the same flat technical style as the pipeline's diagrams (`scripts/make_usecase_art.py`) and each one click into the part of the app that does it | **Muse Image 1.0** |
+| What it can do | Nine cards on the start page (sketch to code, debugging, chemistry, quantum security, optimization, satellite networks, cryptography, real hardware, trust), each a pen sketch on paper in the hand of the sample sketches (`scripts/make_card_sketches.py`) and each one click into the part of the app that does it | none |
 | Simulation observatory | Five exact simulations of where quantum technology stands, each with its key number written out: **satellites vs fiber** (secret key between two cities from 25 to 3,000 km, the network planner's own model, satellite geometry from the Earth's curvature, Micius's 1,203 km marked); **Grover vs noise** (2 to 5 qubits compiled to CNOTs and evolved as exact density matrices under the realistic preset: at 5 qubits the noise erases the speedup); **quantum walk** vs a random walk (play it step by step; spread grows with t, not √t); **entanglement growth** in random circuits up to Page's limit; **the exponential wall** (memory for an exact state, laptop to supercomputer) | exact simulation, no model |
 | Molecule lab (H₂) | The hydrogen molecule from first principles: STO-3G integrals computed in closed form (checked against Szabo and Ostlund), Hartree-Fock against the exact energy as the bond stretches, and VQE on one qubit with realistic noise, raw and with the calibrated noise undone (within shot noise of exact at every bond length). Shows why the classical shortcut fails when the electrons become correlated | exact simulation, no model |
 | Catch the spy (BB84) | Quantum key distribution: random bits and bases, an intercept-resend eavesdropper on a share of photons you choose, sifting, the error-rate check and the 11% abort, privacy amplification. Eve on a share f adds f/4 to the error rate, so she is caught; each photon also opens as a circuit | exact simulation, no model |
@@ -183,7 +183,7 @@ Inkubit closes that gap and refuses to fake success:
 <td><img src="docs/screenshots/25-catch-the-spy.png" alt="Catch the spy: an eavesdropper on 60% of photons pushes the error rate past 11%"></td>
 </tr>
 <tr>
-<td colspan="2"><img src="docs/screenshots/26-use-cases.png" alt="What it can do: nine cards illustrated by Muse Image, one click each"></td>
+<td colspan="2"><img src="docs/screenshots/26-use-cases.png" alt="What it can do: nine cards with pen sketches, one click each"></td>
 </tr>
 <tr>
 <td><img src="docs/screenshots/27-observatory-satellites.png" alt="Simulation observatory: fiber gives no key beyond 500 km, the satellite still works at 2,400 km"></td>
@@ -616,10 +616,11 @@ was renamed because an unrelated QCanvas already exists (decision D82).
   (Apache-2.0). Playwright (Apache-2.0) and imageio-ffmpeg (BSD) are used only
   by the screenshot and video scripts; Cirq (Apache-2.0) only by the tests and the Rosetta's check of its Cirq
   output, when installed.
-- **Fonts:** Inter and JetBrains Mono from Google Fonts (SIL Open Font License).
-- **Images:** the use-case photos were generated for this project with Muse
-  Image 1.0 (`scripts/make_usecase_art.py`); the sample sketches are drawn by
-  `scripts/make_sketches.py`; the screenshots and the video are of this app.
+- **Fonts:** IBM Plex Sans and IBM Plex Mono from Google Fonts (SIL Open Font License).
+- **Images:** the sample sketches, the section tabs' doodles and the use-case cards' sketches are drawn by
+  `scripts/make_sketches.py`, `scripts/make_tab_sketches.py` and `scripts/make_card_sketches.py`; the screenshots
+  and the video are of this app. (`scripts/make_usecase_art.py` made the earlier Muse Image card art, kept for the
+  record.)
 - **Science:** physical constants and textbook values (STO-3G basis parameters,
   the H₂ reference energies, the Micius satellite geometry, the BB84 abort
   threshold) are facts from the cited literature, implemented from scratch.

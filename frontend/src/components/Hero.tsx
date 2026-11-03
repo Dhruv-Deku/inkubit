@@ -3,29 +3,6 @@ import { api } from '../api'
 import type { Headline } from '../types'
 import type { Phase, SceneHandle } from './HeroScene'
 
-/** Counts a figure up from zero once, keeping its format ("0.924", "30/30", "299/299", "5"). */
-function CountUp({ value }: { value: string }) {
-  const m = /^(\d+(?:\.\d+)?)(.*)$/.exec(value)
-  const [shown, setShown] = useState(m ? value.replace(m[1], (0).toFixed((m[1].split('.')[1] ?? '').length)) : value)
-  useEffect(() => {
-    if (!m || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setShown(value); return }
-    const end = parseFloat(m[1])
-    const dec = (m[1].split('.')[1] ?? '').length
-    const t0 = performance.now()
-    let raf = 0
-    const tick = (now: number) => {
-      const k = Math.min(1, (now - t0) / 1300)
-      const e = 1 - (1 - k) ** 3
-      setShown((end * e).toFixed(dec) + m[2])
-      if (k < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
-  return <>{shown}</>
-}
-
 function webglOk(): boolean {
   try {
     const c = document.createElement('canvas')
@@ -82,13 +59,13 @@ export function Hero({ onMission, onTour }: { onMission: () => void; onTour: () 
         </p>
         <div className="hero3d-cta">
           <button className="btn primary big" onClick={onMission}>Launch a mission</button>
-          <button className="btn big ghost" onClick={onTour}>Take the guided tour</button>
+          <button className="linkish" onClick={onTour}>or take the 95-second tour</button>
         </div>
         {data && (
-          <dl className="hero3d-stats">
+          <dl className="hero3d-record">
             {data.stats.map((s) => (
               <div key={s.source} title={`${s.note} (${s.source})`}>
-                <dt><CountUp value={s.value} /></dt>
+                <dt>{s.value}</dt>
                 <dd>{s.label}</dd>
               </div>
             ))}

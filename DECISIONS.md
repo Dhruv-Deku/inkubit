@@ -1039,3 +1039,20 @@ D83 left four limits; three are lifted and the fourth (sketches) is left on purp
   the first try (`pytest -m live`).
 - **Sketches** would need a drawn double-line convention, a new sample and new segmentation phrases, and would change
   the sketch prompt that every cached reading depends on; left for after the hackathon.
+
+## D85. A second pass against the generated look (2026-11-03)
+The first pass (db26601) only cut words. The page still read as generated: AI-drawn card art with a gold
+accent, a template hero (heavy headline, two buttons, four big counting numbers), Inter everywhere, dashboard tiles,
+a wall of bordered buttons and panels fading in on scroll.
+
+- **Cards** now carry pen sketches on paper, drawn by `scripts/make_card_sketches.py` with the same pen as the sample
+  sketches and the tab doodles, each saying something true about its feature (7^x mod 15 repeating every 4, the H2
+  energy well, a 25% error rate under a full intercept, the heavy-hex patch with three qubits picked). The eyebrow tags
+  and question titles are gone. Muse Image still draws the pipeline's diagram; it no longer decorates the start page.
+- **Type**: IBM Plex Sans and Plex Mono in place of Inter and JetBrains Mono; headings at weight 500.
+- **Hero**: one button, the tour as a text link, the four figures as a plain record (mono value, label) with no count-up.
+- **Figures** in every lab (`.tile`) are a hairline and a mono number, not filled boxes.
+- **Gallery** is a three-column index of plain links; pasting JSON is folded under it.
+- **Motion** that only decorates is gone (panels fading in on scroll, cards lifting on hover); motion that carries
+  meaning stays (data flowing into a running step, a check passing).
+

@@ -131,7 +131,7 @@ function draw(ctx: CanvasRenderingContext2D, S: number, plan: OrbitPlan, rings: 
   const sat = view([c[0] * rs, c[1] * rs, c[2] * rs])
   const cities = [{ c: plan.city_a, el: plan.el_a[k], night: plan.night_a[k] }, { c: plan.city_b, el: plan.el_b[k], night: plan.night_b[k] }]
   const both = plan.satellite.dual && cities.every((s) => s.el >= MIN_EL && s.night)
-  ctx.font = `${Math.round(S / 46)}px Inter, system-ui, sans-serif`
+  ctx.font = `${Math.round(S / 46)}px 'IBM Plex Sans', system-ui, sans-serif`
   const placed: [number, number, number, number][] = []  // label boxes already drawn, to keep labels apart
   for (const s of cities) {
     const p = view(toV(s.c.lat, s.c.lon))
@@ -155,7 +155,7 @@ function draw(ctx: CanvasRenderingContext2D, S: number, plan: OrbitPlan, rings: 
     ctx.fillRect(x - 9, y - 2, 6, 4); ctx.fillRect(x + 3, y - 2, 6, 4)
     ctx.strokeRect(x - 9, y - 2, 6, 4); ctx.strokeRect(x + 3, y - 2, 6, 4)
     ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 2 * Math.PI); ctx.fillStyle = '#ecebe8'; ctx.fill()
-    ctx.font = `${Math.round(S / 50)}px Inter, system-ui, sans-serif`
+    ctx.font = `${Math.round(S / 50)}px 'IBM Plex Sans', system-ui, sans-serif`
     ctx.fillStyle = '#a9abb2'; ctx.fillText(plan.satellite.name, x + 12, y + 4)
   }
 }

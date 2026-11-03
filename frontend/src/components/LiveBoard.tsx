@@ -43,7 +43,7 @@ function Annotated({ url, read }: { url: string; read: LiveRead }) {
             <g key={w.qubit}>
               <line x1={w.x_end} x2={x} y1={w.y} y2={w.y} stroke="#d9a441" strokeWidth={Math.max(1, a.width / 900)} strokeDasharray="4 4" />
               <rect x={x} y={w.y - fs * 0.95} width={tw} height={fs * 1.9} rx={fs * 0.4} fill="#1b1c20" fillOpacity={0.94} stroke="#d9a441" strokeWidth={Math.max(1.5, a.width / 600)} />
-              <text x={x + fs * 0.5} y={w.y + fs * 0.35} fontSize={fs} fill="#ecebe8" fontFamily="JetBrains Mono, monospace">
+              <text x={x + fs * 0.5} y={w.y + fs * 0.35} fontSize={fs} fill="#ecebe8" fontFamily="IBM Plex Mono, monospace">
                 q{w.qubit} 1: {(p1 * 100).toFixed(0)}%{pn !== undefined ? ` · ${(pn * 100).toFixed(0)}%` : ''}
               </text>
             </g>

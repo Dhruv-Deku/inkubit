@@ -2,16 +2,16 @@ import type { Examples, Spec } from '../types'
 
 type Action = { kind: 'panel'; title: string } | { kind: 'sample'; match: string } | { kind: 'spec'; id: string }
 
-const CASES: { id: string; tag: string; title: string; text: string; action: Action; cta: string }[] = [
-  { id: 'sketch', tag: 'Sketch to code', title: 'A photo becomes a verified result', text: 'Draw a circuit on paper or a board and take a photo: code, a noisy run and an independent check in seconds.', action: { kind: 'sample', match: 'ghz' }, cta: 'Read a sample sketch' },
-  { id: 'hardware', tag: 'Real hardware', title: 'Will it run on a real chip?', text: 'Phase estimation under realistic noise: error budget, chip layouts, a shorter proven-equal circuit.', action: { kind: 'spec', id: 'phase_estimation' }, cta: 'Open it in the editor' },
-  { id: 'evidence', tag: 'Trust', title: 'Can the AI be trusted?', text: 'We measured where the model alone goes wrong. Here, nothing reaches you unchecked.', action: { kind: 'panel', title: 'AI alone vs Inkubit' }, cta: 'See the evidence' },
-  { id: 'network', tag: 'Satellite networks', title: 'A satellite link, fixed', text: 'Ground stations and a satellite: find the weakest link and the fix that helps most.', action: { kind: 'spec', id: 'network_satellite' }, cta: 'Plan the link' },
-  { id: 'shor', tag: 'Cryptography', title: 'How Shor breaks RSA', text: 'Factor 15 from a measured period, and see why noise makes it hard today.', action: { kind: 'panel', title: "Shor's algorithm lab" }, cta: 'Factor 15' },
-  { id: 'molecule', tag: 'Chemistry', title: 'The energy of a molecule', text: 'H₂ from first principles: where the classical shortcut fails and VQE does not.', action: { kind: 'panel', title: 'Molecule lab' }, cta: 'Open the molecule lab' },
-  { id: 'qkd', tag: 'Quantum security', title: 'Keys a spy cannot copy', text: 'BB84: slide an eavesdropper in and watch the error rate give her away.', action: { kind: 'panel', title: 'Catch the spy' }, cta: 'Catch the spy' },
-  { id: 'qaoa', tag: 'Optimization', title: 'Seat, schedule, route', text: 'Max-Cut with QAOA: the shape of scheduling and routing problems, on a graph you draw.', action: { kind: 'panel', title: 'Split the party' }, cta: 'Split the party' },
-  { id: 'bughunt', tag: 'Debugging', title: 'Find the one wrong gate', text: 'Spot the planted bug from the histogram alone, against the clock and against Muse Spark.', action: { kind: 'panel', title: 'Bug hunt' }, cta: 'Play bug hunt' },
+const CASES: { id: string; title: string; text: string; action: Action; cta: string }[] = [
+  { id: 'sketch', title: 'Photo to verified code', text: 'Draw a circuit on paper or a whiteboard and photograph it. You get Qiskit code, a noisy run and an independent check.', action: { kind: 'sample', match: 'ghz' }, cta: 'Read a sample sketch' },
+  { id: 'hardware', title: 'Ready for a real chip', text: 'Phase estimation under realistic noise: the error budget, the qubits to use and a shorter circuit proven equal.', action: { kind: 'spec', id: 'phase_estimation' }, cta: 'Open it in the editor' },
+  { id: 'evidence', title: 'Every answer checked', text: 'We measured where Muse Spark alone goes wrong. Here no answer reaches you before it is checked.', action: { kind: 'panel', title: 'AI alone vs Inkubit' }, cta: 'See the evidence' },
+  { id: 'network', title: 'Fix a satellite link', text: 'Two ground stations and a satellite: find the weakest link and the change that helps most.', action: { kind: 'spec', id: 'network_satellite' }, cta: 'Plan the link' },
+  { id: 'shor', title: 'Factor 15 with Shor', text: 'Find the period of 7 mod 15 on a simulated chip, and see why noise makes it hard today.', action: { kind: 'panel', title: "Shor's algorithm lab" }, cta: 'Factor 15' },
+  { id: 'molecule', title: 'The energy of H₂', text: 'The hydrogen molecule from first principles, where the classical shortcut fails and VQE does not.', action: { kind: 'panel', title: 'Molecule lab' }, cta: 'Open the molecule lab' },
+  { id: 'qkd', title: 'Catch an eavesdropper', text: 'BB84 key exchange: put a spy on the line and watch the error rate climb towards 25%.', action: { kind: 'panel', title: 'Catch the spy' }, cta: 'Catch the spy' },
+  { id: 'qaoa', title: 'Split a graph with QAOA', text: 'Max-Cut, the shape of many scheduling and routing problems, on a graph you draw.', action: { kind: 'panel', title: 'Split the party' }, cta: 'Split the party' },
+  { id: 'bughunt', title: 'Find the wrong gate', text: 'Spot a planted bug from the histogram alone, against the clock and against Muse Spark.', action: { kind: 'panel', title: 'Bug hunt' }, cta: 'Play bug hunt' },
 ]
 
 export function scrollToPanel(title: string, retried = false) {
@@ -69,14 +69,12 @@ export function UseCases({ examples, onImage, onSpec, busy }: {
   }
   return (
     <div className="panel">
-      <div className="panel-head"><h2>What it can do</h2><span className="spacer" />
-        <span className="sub">drawn by Muse Image</span></div>
+      <div className="panel-head"><h2>What it can do</h2></div>
       <div className="uc-grid">
         {CASES.map((c) => (
           <button key={c.id} className="uc-card" onClick={() => { void run(c.action) }} disabled={busy && c.action.kind !== 'panel'}>
-            <img className="uc-img" src={`/usecases/${c.id}.webp`} alt="" loading="lazy" width={720} height={405}
+            <img className="uc-img" src={`/usecases/${c.id}.webp`} alt="" loading="lazy" width={720} height={360}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-            <span className="uc-who">{c.tag}</span>
             <span className="uc-title">{c.title}</span>
             <span className="uc-text">{c.text}</span>
             <span className="uc-cta">{c.cta}</span>

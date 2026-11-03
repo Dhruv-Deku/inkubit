@@ -133,19 +133,19 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
       </div>
 
       {extra}
-      <div className="hero">
-        <div className="panel">
-          <div className="panel-head"><h2>Start from a spec</h2><span className="spacer" />
-            <button className="btn small primary" onClick={() => onSpec(BLANK)} title="An empty two-qubit circuit: pick gates from the palette and click wires">
-              Blank circuit
-            </button>
-          </div>
+      <div className="panel">
+        <div className="panel-head"><h2>Start from a spec</h2><span className="spacer" />
+          <button className="btn small primary" onClick={() => onSpec(BLANK)} title="An empty two-qubit circuit: pick gates from the palette and click wires">
+            Blank circuit
+          </button>
+        </div>
+        <div className="spec-index">
           {[...new Set(examples?.specs.map((s) => s.group) ?? [])].map((g) => (
-            <div key={g} style={{ marginBottom: 12 }}>
-              <div className="label" style={{ marginBottom: 6 }}>{g}</div>
+            <div key={g} className="spec-group">
+              <div className="label">{g}</div>
               <div className="spec-list">
                 {examples?.specs.filter((s) => s.group === g).map((s) => (
-                  <button key={s.id} className="btn" onClick={() => onSpec(s.spec)} title={s.notes}>
+                  <button key={s.id} className="spec-link" onClick={() => onSpec(s.spec)} title={s.notes}>
                     {s.title}{!s.valid && <span className="badge warn">invalid on purpose</span>}
                   </button>
                 ))}
@@ -153,14 +153,13 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
             </div>
           ))}
         </div>
-        <div className="panel">
-          <div className="panel-head"><h2>Paste JSON</h2><span className="spacer" />
-            <button className="btn small" disabled={!paste.trim()} onClick={usePaste}>Use this spec</button>
-          </div>
+        <details className="paste-json">
+          <summary>Paste a JSON spec</summary>
           <textarea rows={5} value={paste} onChange={(e) => setPaste(e.target.value)}
             placeholder='{"kind": "circuit", "num_qubits": 2, ...}' />
+          <button className="btn small" disabled={!paste.trim()} onClick={usePaste}>Use this spec</button>
           {pasteError && <div className="notice error" style={{ marginTop: 8 }}>{pasteError}</div>}
-        </div>
+        </details>
       </div>
     </div>
   )

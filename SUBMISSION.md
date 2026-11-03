@@ -209,8 +209,8 @@ Its first run found a real bug: the OpenQASM 2 export used gates the standard li
 
 **What it can do.** Nine cards on the start page (sketch to code, debugging,
 chemistry, quantum security, optimization, satellite networks, cryptography,
-real hardware, trust), each illustrated by Muse Image in the same flat technical
-style as the pipeline's diagrams, and each one click into the real feature.
+real hardware, trust), each with a pen sketch on paper in the hand of the sample
+sketches, and each one click into the real feature.
 
 **Simulation observatory.** Five exact simulations of where quantum technology
 stands, each with its key number written out. Satellites vs fiber: from the
@@ -292,7 +292,7 @@ repeatable and cheap.
 | **SAM 3.1** (`/v1/responses`) | Concept-prompted segmentation of every drawn part, with confidences, scaled onto the photo; the same for each new frame of the live whiteboard camera |
 | **Muse Spark 1.3** (`/v1/chat/completions`, JSON-schema output) | Chooses what SAM should look for; reads photo plus numbered boxes into the spec (re-prompted with validation errors if invalid); turns a plain-language description into a spec; writes and repairs the Qiskit code; explains the result in 12 languages; answers questions about a run from its facts; gives challenge hints; proposes shorter circuits that exact simulation must prove; drives Ask Inkubit with tool calling over nine exact tools; plans, repairs and reports Mission control's tool graphs under JSON schemas; proposes circuit layouts in the discovery lab; maps a problem in words to an algorithm and hardware for the resource estimator; transcribes a paper's figure, circuit and claims for the reproducibility checker; reads the whiteboard; reads Cirq, PennyLane, Q# and Braket code and photos of notation for the Quantum Rosetta (transcribed, never solved); plays the bug hunt; predicts circuits alone for the AI-alone comparison |
 | **Muse Wonder 1.0** (`/v1/chat/completions`, tools, `reasoning_effort: medium`) | Deep mode of Ask Inkubit: plans longer chains of tool calls (up to six rounds) for questions that take several steps; same tools, same number tracing |
-| **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing; the nine use-case photos |
+| **Muse Image 1.0** (`/v1/images/generations`) | Clean illustration of the final circuit or network, always shown next to the exact drawing |
 | **Muse Voice Transcribe 1.0** (`/v1/asr/transcribe`) | Voice input for the assistant and for describing a design: a 16 kHz WAV recorded in the browser, with quantum keywords (qubit, Hadamard, CNOT, GHZ, Shor) to bias the recogniser |
 | **Muse Code** (opt-in, experimental) | Alternative repair backend: the verifier, not the agent's exit code, decides if a fix worked |
 
