@@ -1055,4 +1055,9 @@ a wall of bordered buttons and panels fading in on scroll.
 - **Gallery** is a three-column index of plain links; pasting JSON is folded under it.
 - **Motion** that only decorates is gone (panels fading in on scroll, cards lifting on hover); motion that carries
   meaning stays (data flowing into a running step, a check passing).
+- **The opening's figures** each sit over a small chart of the data they are computed from (`/api/headline` now
+  returns it, `tests/test_headline.py` checks the chart against the figure): teleportation fidelity per input state on
+  ibm_fez with and without feed-forward against the classical limit, the 30 benchmark missions' durations, the proof
+  matrix (28 gallery circuits by 11 checks), and the five models by name. "Proves" is underlined by a pen stroke drawn
+  once on load; nothing else moves.
 

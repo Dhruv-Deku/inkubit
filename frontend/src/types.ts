@@ -888,7 +888,12 @@ export interface IbmExperiments { device: string; job_id: string; date_utc: stri
     feed_forward: { average: number; se: number; twin_average: number; rows: { state: string; fidelity: number; se: number; twin_fidelity: number }[] }
     no_corrections: { average: number; se: number; twin_average: number; rows: { state: string; fidelity: number; se: number; twin_fidelity: number }[] } } }
 
-export interface HeadlineStat { value: string; label: string; note: string; source: string }
+export type HeadlineChart =
+  | { kind: 'teleport'; limit: number; states: string[]; with: number[]; without: number[] }
+  | { kind: 'missions'; seconds: number[]; done: boolean[] }
+  | { kind: 'proof'; checks: string[]; circuits: { title: string; cells: string[] }[] }
+  | { kind: 'models'; names: string[] }
+export interface HeadlineStat { value: string; label: string; note: string; source: string; chart?: HeadlineChart }
 export interface HeadlineScene {
   image: string
   width: number

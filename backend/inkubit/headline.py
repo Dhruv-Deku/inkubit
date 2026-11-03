@@ -30,9 +30,9 @@ def _load(name: str) -> Any:
     return json.loads((EXAMPLES_DIR / name).read_text(encoding="utf-8"))
 
 
-def stats() -> list[dict[str, str]]:
-    """The four figures above the scene, each with where it comes from."""
-    out: list[dict[str, str]] = []
+def stats() -> list[dict[str, Any]]:
+    """The four figures above the scene, each with where it comes from and the data its small chart draws."""
+    out: list[dict[str, Any]] = []
     ibm = EXAMPLES_DIR / "ibm_experiments.json"
     if ibm.exists():
         data = json.loads(ibm.read_text(encoding="utf-8"))
@@ -40,20 +40,30 @@ def stats() -> list[dict[str, str]]:
             t = data["teleport"]
             out.append({"value": f"{t['feed_forward']['average']:.3f}", "label": f"teleportation fidelity on IBM {data['device']}",
                         "note": f"classical limit {t['classical_limit']:.3f}; real mid-circuit feed-forward",
-                        "source": "examples/ibm_experiments.json"})
+                        "source": "examples/ibm_experiments.json",
+                        "chart": {"kind": "teleport", "limit": t["classical_limit"],
+                                  "states": [r["state"] for r in t["feed_forward"]["rows"]],
+                                  "with": [r["fidelity"] for r in t["feed_forward"]["rows"]],
+                                  "without": [r["fidelity"] for r in t["no_corrections"]["rows"]]}})
     missions = _load("mission_benchmark.json")
     done = sum(1 for m in missions if m["status"] == "done")
     steps = sum(m["steps"] for m in missions)
     verified = sum(m["verified"] for m in missions)
     out.append({"value": f"{done}/{len(missions)}", "label": "missions finished live",
-                "note": f"{verified} of {steps} steps verified", "source": "examples/mission_benchmark.json"})
+                "note": f"{verified} of {steps} steps verified", "source": "examples/mission_benchmark.json",
+                "chart": {"kind": "missions", "seconds": [m["seconds"] for m in missions],
+                          "done": [m["status"] == "done" for m in missions]}})
     proof = _load("proofsheet_benchmark.json")
     tot = proof["totals"]
     checked = tot["passed"] + tot["failed"]
     out.append({"value": f"{tot['passed']}/{checked}", "label": "proof checks passed",
                 "note": f"{proof['circuits']} gallery circuits, {proof['checks_per_circuit']} checks each",
-                "source": "examples/proofsheet_benchmark.json"})
-    out.append({"value": str(len(MODELS)), "label": "Meta models in the loop", "note": ", ".join(MODELS), "source": "health"})
+                "source": "examples/proofsheet_benchmark.json",
+                "chart": {"kind": "proof", "checks": [c["title"] for c in proof["per_check"].values()],
+                          "circuits": [{"title": r["title"], "cells": [r["checks"].get(k, "skipped") for k in proof["per_check"]]}
+                                       for r in proof["rows"]]}})
+    out.append({"value": str(len(MODELS)), "label": "Meta models in the loop", "note": ", ".join(MODELS), "source": "health",
+                "chart": {"kind": "models", "names": MODELS}})
     return out
 
 

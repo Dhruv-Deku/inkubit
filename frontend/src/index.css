@@ -964,3 +964,42 @@ details summary { cursor: pointer; }
   .topbar .steps .step { white-space: nowrap; }
   .topbar .steps .step:not(.active) { font-size: 0; gap: 0; padding: 7px; }
 }
+
+/* the opening's evidence: each figure over a small chart of the data it is computed from; "proves" underlined in ink */
+.hero3d { height: auto; min-height: 624px; }
+.hero3d-copy { padding-bottom: 40px; max-width: 660px; }
+.hero3d h1 .ink { position: relative; display: inline-block; }
+.hero3d h1 .ink svg { position: absolute; left: -3%; width: 106%; bottom: -0.16em; height: 0.3em; overflow: visible; pointer-events: none; }
+.hero3d h1 .ink path { fill: none; stroke: #5b9cf0; stroke-width: 3.2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.hero3d h1 .ink path + path { stroke-width: 2.2; opacity: .75; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero3d h1 .ink path { stroke-dasharray: 400; stroke-dashoffset: 400; animation: ink-draw .9s cubic-bezier(.3, .6, .2, 1) .5s forwards; }
+  .hero3d h1 .ink path + path { animation-delay: 1.05s; animation-duration: .7s; }
+}
+@keyframes ink-draw { to { stroke-dashoffset: 0; } }
+.hero3d-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 28px; max-width: 580px;
+  padding-top: 18px; border-top: 1px solid var(--line); }
+.hero3d-figs figure { margin: 0; display: grid; gap: 8px; align-content: start; }
+.hero3d-figs .mini { display: block; width: 100%; max-width: 260px; height: 44px; }
+.hero3d-figs figcaption { display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: var(--text-2); line-height: 1.35; }
+.hero3d-figs figcaption b { font-family: var(--mono); font-size: 17px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; flex: none; }
+.mini .m-with { fill: var(--measured); }
+.mini .m-without { fill: #4a4d55; }
+.mini .m-limit { stroke: var(--text-2); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.mini .m-pass { fill: var(--pass); }
+.mini .m-fail { fill: var(--fail); }
+.mini .m-note { fill: #6f7b74; }
+.mini .m-skip { fill: none; stroke: var(--line-2); stroke-width: .6; }
+.mini-models { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-content: center; gap: 5px 6px; }
+.mini-models li { font-family: var(--mono); font-size: 11px; color: var(--text-2); padding: 2px 7px; border: 1px solid var(--line-2); border-radius: 4px; }
+@media (max-width: 560px) { .hero3d-figs { grid-template-columns: minmax(0, 1fr); } }
+
+.hero3d h1 .ink { color: inherit; }
+.hero3d-figs { max-width: 470px; gap: 20px 26px; }
+.hero3d-figs .mini { max-width: 220px; height: 40px; }
+.hero3d-figs .mini-models { display: flex; height: 40px; max-width: 220px; gap: 3px 0; align-content: center; }
+.hero3d-figs .mini-models li { border: 0; padding: 0; font-size: 11px; line-height: 1.35; }
+.hero3d-figs .mini-models li + li::before { content: '·'; margin: 0 6px; color: var(--muted); }
+.hero3d-figs figcaption { flex-wrap: wrap; gap: 2px 9px; }
+.hero3d-figs .mini-models { display: grid; grid-template-columns: repeat(2, max-content); gap: 1px 16px; align-content: center; }
+.hero3d-figs .mini-models li + li::before { content: none; }

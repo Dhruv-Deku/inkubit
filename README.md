@@ -55,7 +55,7 @@ cd backend && python -m uvicorn inkubit.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 591 backend tests, all offline except one opt-in live check (`cd backend && python -m pytest -q`), and browser tests drive the built app
+live. 592 backend tests, all offline except one opt-in live check (`cd backend && python -m pytest -q`), and browser tests drive the built app
 (`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D81); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
@@ -356,7 +356,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (591 tests, one opt-in live,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (592 tests, one opt-in live,
 about 6 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per

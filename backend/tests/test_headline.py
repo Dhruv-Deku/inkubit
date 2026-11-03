@@ -48,3 +48,19 @@ def test_endpoint():
     r = TestClient(app).get("/api/headline")
     assert r.status_code == 200
     assert len(r.json()["stats"]) >= 3
+
+
+def test_charts_draw_the_same_data_as_the_figures():
+    stats = {s["source"]: s for s in headline()["stats"]}
+    missions = stats["examples/mission_benchmark.json"]["chart"]
+    assert f"{sum(missions['done'])}/{len(missions['done'])}" == stats["examples/mission_benchmark.json"]["value"]
+    proof = stats["examples/proofsheet_benchmark.json"]["chart"]
+    cells = [c for row in proof["circuits"] for c in row["cells"]]
+    assert all(len(row["cells"]) == len(proof["checks"]) for row in proof["circuits"])
+    assert f"{cells.count('pass')}/{cells.count('pass') + cells.count('fail')}" == stats["examples/proofsheet_benchmark.json"]["value"]
+    ibm = _load("ibm_experiments.json")
+    if not ibm["rehearsal"]:
+        tele = stats["examples/ibm_experiments.json"]["chart"]
+        assert round(sum(tele["with"]) / len(tele["with"]), 3) == float(stats["examples/ibm_experiments.json"]["value"])
+        assert min(tele["with"]) > tele["limit"] > max(tele["without"])
+    assert stats["health"]["chart"]["names"] == MODELS

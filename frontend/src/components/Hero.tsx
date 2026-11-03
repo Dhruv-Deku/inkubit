@@ -1,7 +1,64 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api'
-import type { Headline } from '../types'
+import type { Headline, HeadlineChart } from '../types'
 import type { Phase, SceneHandle } from './HeroScene'
+
+const CW = 240
+const CH = 44
+
+/** The small chart drawn under each opening figure, from the same stored data the figure is computed from. */
+function MiniChart({ c }: { c: HeadlineChart }) {
+  if (c.kind === 'teleport') {
+    const n = c.states.length
+    const slot = CW / n
+    const y = (v: number) => CH - v * CH
+    return (
+      <svg className="mini" viewBox={`0 0 ${CW} ${CH}`} role="img" aria-label="Teleportation fidelity per input state, with and without feed-forward">
+        {c.states.map((st, i) => (
+          <g key={st}>
+            <rect className="m-with" x={i * slot + slot * 0.18} y={y(c.with[i])} width={slot * 0.3} height={c.with[i] * CH}>
+              <title>{`${st}: ${c.with[i].toFixed(3)} with feed-forward`}</title></rect>
+            <rect className="m-without" x={i * slot + slot * 0.52} y={y(c.without[i])} width={slot * 0.3} height={c.without[i] * CH}>
+              <title>{`${st}: ${c.without[i].toFixed(3)} without corrections`}</title></rect>
+          </g>
+        ))}
+        <line className="m-limit" x1={0} x2={CW} y1={y(c.limit)} y2={y(c.limit)} />
+      </svg>
+    )
+  }
+  if (c.kind === 'missions') {
+    const top = Math.max(...c.seconds, 1)
+    const slot = CW / c.seconds.length
+    return (
+      <svg className="mini" viewBox={`0 0 ${CW} ${CH}`} role="img" aria-label="Seconds each benchmark mission took">
+        {c.seconds.map((s, i) => (
+          <rect key={i} className={c.done[i] ? 'm-pass' : 'm-fail'} x={i * slot + 1} y={CH - (s / top) * CH} width={slot - 2} height={(s / top) * CH}>
+            <title>{`mission ${i + 1}: ${s.toFixed(1)} s, ${c.done[i] ? 'finished' : 'did not finish'}`}</title></rect>
+        ))}
+      </svg>
+    )
+  }
+  if (c.kind === 'proof') {
+    const cols = c.circuits.length
+    const rows = c.checks.length
+    const cw = CW / cols
+    const rh = CH / rows
+    return (
+      <svg className="mini" viewBox={`0 0 ${CW} ${CH}`} role="img" aria-label="Every proof check on every gallery circuit">
+        {c.circuits.map((circ, x) => circ.cells.map((cell, yy) => (
+          <rect key={`${x}-${yy}`} className={cell === 'pass' ? 'm-pass' : cell === 'fail' ? 'm-fail' : cell === 'note' ? 'm-note' : 'm-skip'}
+            x={x * cw + 0.6} y={yy * rh + 0.6} width={cw - 1.2} height={rh - 1.2}>
+            <title>{`${circ.title}: ${c.checks[yy]} (${cell})`}</title></rect>
+        )))}
+      </svg>
+    )
+  }
+  return (
+    <ul className="mini mini-models" aria-label="Meta models">
+      {c.names.map((n) => <li key={n}>{n}</li>)}
+    </ul>
+  )
+}
 
 function webglOk(): boolean {
   try {
@@ -52,7 +109,8 @@ export function Hero({ onMission, onTour }: { onMission: () => void; onTour: () 
         {failed && sc && <img className="hero3d-still" src={sc.image} alt="" />}
       </div>
       <div className="hero3d-copy">
-        <h1>Draw a quantum circuit. Inkubit proves what it does.</h1>
+        <h1>Draw a quantum circuit. Inkubit <span className="ink">proves<svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M3 9 C 42 4, 96 12, 146 6 S 186 7, 197 5" /><path d="M14 13 C 64 9, 122 14, 188 9" /></svg></span> what it does.</h1>
         <p className="lede">
           Photograph a sketch, type it or say it. Meta's models write the Qiskit code, an exact simulation checks
           every number, and real IBM chips run it.
@@ -62,14 +120,14 @@ export function Hero({ onMission, onTour }: { onMission: () => void; onTour: () 
           <button className="linkish" onClick={onTour}>or take the 95-second tour</button>
         </div>
         {data && (
-          <dl className="hero3d-record">
+          <div className="hero3d-figs">
             {data.stats.map((s) => (
-              <div key={s.source} title={`${s.note} (${s.source})`}>
-                <dt>{s.value}</dt>
-                <dd>{s.label}</dd>
-              </div>
+              <figure key={s.source} title={`${s.note} (${s.source})`}>
+                {s.chart && <MiniChart c={s.chart} />}
+                <figcaption><b>{s.value}</b><span>{s.label}</span></figcaption>
+              </figure>
             ))}
-          </dl>
+          </div>
         )}
       </div>
       {!failed && sc && (
