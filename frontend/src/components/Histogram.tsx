@@ -75,9 +75,9 @@ export function Histogram({ predicted, measured = {}, ideal, shots = 0, predicte
                 onMouseMove={(e) => setTip({ k, x: e.clientX, y: e.clientY })}
                 onMouseLeave={() => setTip(null)}>
                 <rect x={gx - groupW / 2} y={PAD.t} width={groupW} height={H - PAD.t - PAD.b} fill="transparent" />
-                {p > 0 && <path d={bar(sampled ? gx - bw - 1 : gx - bw / 2, p)} fill="rgba(217,89,38,0.16)" stroke="var(--predicted)"
-                  strokeWidth={1.6} style={{ transition: 'd .22s ease' }} />}
-                {m > 0 && <path d={bar(gx + 1, m)} fill="var(--measured)" />}
+                {p > 0 && <path className="hbar" d={bar(sampled ? gx - bw - 1 : gx - bw / 2, p)} fill="rgba(217,89,38,0.16)" stroke="var(--predicted)"
+                  strokeWidth={1.6} style={{ transition: 'd .22s ease', ['--i' as string]: i }} />}
+                {m > 0 && <path className="hbar measured" d={bar(gx + 1, m)} fill="var(--measured)" style={{ ['--i' as string]: i }} />}
                 {showIdeal && id > 0 && (
                   <line x1={gx - (sampled ? bw : bw / 2) - 4} x2={gx + (sampled ? bw : bw / 2) + 4} y1={yv(id)} y2={yv(id)}
                     stroke="var(--text)" strokeWidth={1.6} strokeDasharray="4 3" />

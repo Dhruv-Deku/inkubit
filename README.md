@@ -575,7 +575,7 @@ commit (`a892217`, the spec format) is from Oct 27, 2026 at 14:57 ET.
   Qiskit and Qiskit Aer (Apache-2.0), NumPy (BSD), Matplotlib (PSF-based),
   pylatexenc (MIT), Pillow (MIT-CMU), pydantic (MIT), FastAPI (MIT), Uvicorn
   (BSD), sse-starlette (BSD), python-multipart (Apache-2.0), python-dotenv
-  (BSD), httpx (BSD), qiskit-qasm3-import (Apache-2.0), pytest (MIT); React (MIT), Vite (MIT), TypeScript
+  (BSD), httpx (BSD), qiskit-qasm3-import (Apache-2.0), pytest (MIT); React (MIT), three.js (MIT), Vite (MIT), TypeScript
   (Apache-2.0). Playwright (Apache-2.0) and imageio-ffmpeg (BSD) are used only
   by the screenshot and video scripts; Cirq (Apache-2.0) only by the tests and the Rosetta's check of its Cirq
   output, when installed.

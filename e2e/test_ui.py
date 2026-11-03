@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = (ROOT / "frontend" / "src" / "App.tsx").read_text(encoding="utf-8")
 TOUR = (ROOT / "frontend" / "src" / "components" / "Tour.tsx").read_text(encoding="utf-8")
 SECTIONS = [(m[0], m[1], re.findall(r"'([^']+)'|\"([^\"]+)\"", m[2]))
-            for m in re.findall(r"\{ id: '(\w+)', label: '([^']+)', hint: '[^']*', panels: \[([^\]]*)\] \}", APP)]
+            for m in re.findall(r"\{ id: '(\w+)', label: '([^']+)', hint: '[^']*',(?: art: '[^']*',)? panels: \[([^\]]*)\] \}", APP)]
 SECTIONS = [(sid, label, [a or b for a, b in panels]) for sid, label, panels in SECTIONS]
 TOUR_PANELS = re.findall(r"panel: '([^']+)'", TOUR)
 CONDITIONAL = {"Recent runs"}  # shown only once something has run

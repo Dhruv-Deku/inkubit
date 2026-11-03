@@ -36,6 +36,7 @@ import { StartPanel } from './components/StartPanel'
 import { ProofBenchPanel, ProofSheetView } from './components/ProofSheet'
 import { IbmPanel, IbmRunButton } from './components/Ibm'
 import { Tour, type TourSection } from './components/Tour'
+import { Hero } from './components/Hero'
 import type {
   ProofSheet,
   AgentEvent, ChallengeInfo, CircuitInsights, CircuitResult, CircuitSpec, Examples, Health, JobSummary, ModelCall,
@@ -44,12 +45,12 @@ import type {
 import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 
 type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
-const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
-  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
-  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
-  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, decoders, satellites', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
-  { id: 'labs', label: 'Labs & games', hint: 'challenges, bug hunt, Shor, QAOA, H₂, BB84', panels: ['Challenges', 'Bug hunt', "Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy'] },
-  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Q-Canvas', 'The AI referee'] },
+const SECTIONS: { id: SectionId; label: string; hint: string; art: string; panels: string[] }[] = [
+  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', art: 'sketch', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
+  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', art: 'bughunt', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
+  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, decoders, satellites', art: 'hardware', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
+  { id: 'labs', label: 'Labs & games', hint: 'challenges, bug hunt, Shor, QAOA, H₂, BB84', art: 'molecule', panels: ['Challenges', 'Bug hunt', "Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy'] },
+  { id: 'evidence', label: 'Evidence', hint: 'observatory, ML verifier, AI alone', art: 'evidence', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Q-Canvas', 'The AI referee'] },
 ]
 
 type Stage = 'start' | 'edit' | 'run'
@@ -369,6 +370,12 @@ export default function App() {
               <button className="btn small" onClick={() => setStage('edit')} disabled={!spec}>Back to the challenge</button>
             </div>
           )}
+          <Hero onTour={() => setTouring(true)} onMission={() => {
+            setAssistant('mission')
+            const panel = document.querySelector<HTMLElement>('.panel.mission')
+            panel?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            window.setTimeout(() => panel?.querySelector<HTMLTextAreaElement>('.mission-goal')?.focus({ preventScroll: true }), 450)
+          }} />
           <div className="hero-switch" role="tablist" aria-label="Assistant">
             <button role="tab" aria-selected={assistant === 'mission'} className={assistant === 'mission' ? 'on' : ''} onClick={() => setAssistant('mission')}>
               <b>Mission control</b><span>a whole problem: planned, run in parallel, verified</span></button>
@@ -384,7 +391,8 @@ export default function App() {
           <nav className="section-tabs" role="tablist" aria-label="Sections">
             {SECTIONS.map((t) => (
               <button key={t.id} role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={() => goTab(t.id)}>
-                {t.label}<span>{t.hint}</span>
+                <img src={`/usecases/${t.art}.webp`} alt="" width={48} height={48} />
+                <span className="tab-text">{t.label}<span>{t.hint}</span></span>
               </button>
             ))}
           </nav>

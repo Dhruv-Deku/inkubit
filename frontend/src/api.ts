@@ -4,7 +4,7 @@ import type { PResult } from './components/Paper'
 import type { CodesLab } from './components/Codes'
 import type {
   AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitMeta, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, DiscoveryHardware, ProofSheet, ProofBench, IbmStatus, IbmSnapshot, IbmAdvice, IbmRun, IbmExperiments, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
-  SketchAnalysis, Spec, SpecIssue, TextDraft,
+  SketchAnalysis, Spec, SpecIssue, TextDraft, Headline,
 } from './types'
 
 export class ApiError extends Error {
@@ -46,6 +46,7 @@ const json = (body: unknown): RequestInit => ({
 
 export const api = {
   health: () => call<Health>('/api/health'),
+  headline: () => call<Headline>('/api/headline'),
   examples: () => call<Examples>('/api/examples'),
   validate: (spec: unknown) =>
     call<{ valid: boolean; issues: SpecIssue[]; spec?: Spec }>('/api/spec/validate', json({ spec })),

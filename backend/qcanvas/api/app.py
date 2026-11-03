@@ -97,6 +97,14 @@ def _budget_left(cap: int) -> int | None:
     return BUDGET.left(cap)
 
 
+@app.get("/api/headline")
+def headline() -> dict[str, Any]:
+    """The start page's opening scene: the GHZ sketch replayed through the pipeline and four stored headline figures."""
+    from qcanvas.headline import headline as build
+
+    return build()
+
+
 CATEGORIES: dict[str, list[str]] = {  # the gallery, by what each algorithm does (every answer is pinned in a test)
     "Basics": ["superposition", "bell", "ghz3"],
     "Entanglement & communication": ["w_state", "superdense", "teleportation", "entanglement_swapping", "swap_test"],

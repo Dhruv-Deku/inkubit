@@ -884,3 +884,20 @@ export interface IbmExperiments { device: string; job_id: string; date_utc: stri
   teleport: { qubits: number[]; shots: number; classical_limit: number
     feed_forward: { average: number; se: number; twin_average: number; rows: { state: string; fidelity: number; se: number; twin_fidelity: number }[] }
     no_corrections: { average: number; se: number; twin_average: number; rows: { state: string; fidelity: number; se: number; twin_fidelity: number }[] } } }
+
+export interface HeadlineStat { value: string; label: string; note: string; source: string }
+export interface HeadlineScene {
+  image: string
+  width: number
+  height: number
+  segments: { concept: string; bbox: [number, number, number, number]; confidence: number }[]
+  operations: { gate: string; targets: number[]; controls?: number[] }[]
+  num_qubits: number
+  outcomes: { key: string; measured: number; predicted: number }[]
+  shots: number
+  preset: string
+  verified: boolean
+  fidelity: number
+  tvd: number
+}
+export interface Headline { stats: HeadlineStat[]; scene: HeadlineScene }

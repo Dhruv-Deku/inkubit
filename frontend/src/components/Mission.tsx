@@ -62,7 +62,7 @@ function Graph({ nodes, selected, onSelect }: { nodes: MissionNode[]; selected: 
             const from = byId.get(a)
             return <path key={`${a}-${n.id}`} d={`M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`} fill="none"
               stroke={live ? 'var(--primary)' : from && ['done', 'repaired'].includes(from.status) ? 'var(--text-2)' : 'var(--line-2)'}
-              strokeWidth={live ? 2 : 1.5} strokeDasharray={n.status === 'waiting' ? '4 4' : undefined} />
+              strokeWidth={live ? 2 : 1.5} strokeDasharray={n.status === 'waiting' ? '4 4' : undefined} className={live ? 'medge-flow' : undefined} />
           }))}
         </svg>
         {nodes.map((n) => {
