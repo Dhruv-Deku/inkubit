@@ -11,7 +11,7 @@ Muse Voice read sketches, photos, papers and speech, plan multi-step experiments
 simulation, independent re-runs and physics invariants verify every result, and every number in every AI answer is
 traced back to a tool that computed it.
 
-![Mission control, live: one request becomes a plan of exact tools that runs in parallel, every step verified and every number in the report traced](docs/screenshots/mission-control.gif)
+![The opening scene replays the pipeline in 3D on a real pencil sketch; then Mission control, live: one request becomes a plan of exact tools that runs in parallel, every step verified and every number in the report traced](docs/screenshots/mission-control.gif)
 
 ### Results you can check in the app
 

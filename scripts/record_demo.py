@@ -293,7 +293,7 @@ def panel(page: Page, title: str) -> Locator:
 async def section(d: Director, label: str) -> None:
     """Open one of the five sections from the sticky tab bar."""
     await d.caption(None)  # a caption never outlives the panel it describes
-    await d.scroll_top()
+    await d.scroll_to(d.page.locator("nav.section-tabs"), block="start", pause=0.7)  # below the opening scene
     await d.click(d.page.get_by_role("tab", name=re.compile("^" + re.escape(label))))
     await d.wait(0.8)
 

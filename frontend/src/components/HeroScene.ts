@@ -336,7 +336,7 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
     renderer.domElement.style.width = '100%'
     renderer.domElement.style.height = '100%'
     camera.aspect = width / height
-    const shift = width > 900 ? width * 0.19 : 0
+    const shift = width > 900 ? width * (width < 1400 ? 0.225 : 0.19) : 0
     if (shift) camera.setViewOffset(width + 2 * shift, height, 0, 0, width, height)
     else camera.clearViewOffset()
     camera.updateProjectionMatrix()
@@ -352,7 +352,9 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
   const placeCamera = (t: number) => {
     const intro = outCubic(seg(t, 0, 2.0))
     const narrow = width <= 900
-    const dist = (narrow ? 33 : 27) + (1 - intro) * 4
+    const fit = 2.37 / camera.aspect // the layout was framed at 2.37:1; narrower stages pull the camera back to fit
+    const dist = (narrow ? Math.max(17, 19 * fit) : 27 * Math.max(1, fit) ** 2) + (1 - intro) * 4
+    target.x = narrow ? 0.2 : 1.6 // without the lens shift the scene is centred on the stage
     const elev = THREE.MathUtils.degToRad(40 + (1 - intro) * 9 - pointer.sy * 2.5)
     const azim = THREE.MathUtils.degToRad(-10 + Math.sin(t * 0.21) * 1.6 + pointer.sx * 4)
     camera.position.set(

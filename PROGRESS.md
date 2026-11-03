@@ -3,7 +3,7 @@
 Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 `DECISIONS.md` and `git log` first after a restart.
 
-## Done (495 backend tests and 6 browser tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-01)
+## Done (546 backend tests and 6 browser tests pass offline; frontend builds; live smoke tests pass; last checked 2026-11-03)
 - **P1 Spec**: versioned pydantic models, readable validation (all issues, with paths), `schema.json`, 6 examples, round trips.
 - **P2 Codegen + sim**: deterministic readable Qiskit template, noise presets (ideal / low / realistic), AST safety check, sandboxed subprocess runner (timeout, scrubbed env).
 - **P3 Verification**: independent exact noise-aware expectation (density matrix + exact readout), TVD + Hellinger, shot-noise-based thresholds (D8), structured verdicts.
@@ -49,7 +49,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 ## Needs human
 1. Put the Meta key in `.env`: `META_API_KEY=LLM_...` and `INKUBIT_MODEL_PROVIDER=meta`. Then run `cd backend && ../.venv/Scripts/python -m pytest -m live -q` (three tiny calls, < $0.02).
 2. Try one real phone photo of a hand-drawn circuit in live mode; check SAM finds the parts (concept phrases are chosen by Muse Spark).
-3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/inkubit-demo.mp4`; optionally add a voice-over.
+3. Run `scripts/record_demo.py` in live mode (twice: the first warms the cache), then upload `docs/video/inkubit-demo-v4.mp4`; optionally add a voice-over.
 4. Repo is pushed to https://github.com/Dhruv-Deku/inkubit (**private**): make it public before submitting (`gh repo edit Dhruv-Deku/inkubit --visibility public --accept-visibility-change-consequences`), then fill the Cerebral Valley submission form (check its required fields: video length, repo link, description).
 5. Git identity is `DHRUV <alwaysworking.7077@gmail.com>`; change with `git config user.email` if needed.
 
@@ -64,6 +64,7 @@ Deadline: **Nov 4, 2026, 9:00 PM ET** (Cerebral Valley portal). Read this,
 - Nov 1 (evening): four new labs, each live-benchmarked and judged exactly (D71-D74): an AI scientist that learns under proof (feedback 6 to 5, 6 to 5, 8 to 7 CNOTs; without feedback never improves), whole-paper reproduction from a PDF (two passes; arXiv:1804.03719: 3 of 5 experiments, 11 of 19 numbers), the code lab (a 9-qubit code with dZ = 9, three times the surface code), the AI referee (17 to 19 of 24 right after debate, 5 false alarms); hosting on a free container with stored results (D70); a QASM extractor that silently dropped unknown gates now refuses them.
 - Nov 2: focus pass (D59): Mission control leads, five sections below, cards jump across sections.
 - Nov 2: guided tour and CI (D60), public mode + Dockerfile + Space deploy script (D61), 30-mission benchmark and the IBM hardware check script (D62). Waiting on: repo public, Hugging Face login, IBM key.
+- Nov 3: an opening scene in 3D (the GHZ sketch replayed through the pipeline, figures from /api/headline); renamed from Q-Canvas to Inkubit and led with proof and real hardware (D82); video v4 (2:35, `docs/video/inkubit-demo-v4.mp4`), new thumbnail, screenshots, GIF and report.
 
 ## Top 5 next steps
 1. Live smoke test with the key; fix any response-shape differences in `adapters/meta_*.py` (now also `spec_from_text`, `answer`, `hint`, `optimize`, and explanations in other languages).

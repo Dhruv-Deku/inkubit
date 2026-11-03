@@ -8,6 +8,7 @@ Writes docs/screenshots/*.png.
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -41,15 +42,21 @@ def main() -> None:
         errors: list[str] = []
         page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
         page.goto(BASE)
+        # full-page captures see past the viewport, where the scroll-in fade would leave panels dim
+        page.add_style_tag(content=".panel { animation: none !important; }")
+        tab = lambda label: page.get_by_role("tab", name=re.compile("^" + re.escape(label))).click()  # noqa: E731
         page.wait_for_selector(".sample img")
         page.wait_for_timeout(600)
+        page.wait_for_timeout(10500)  # the opening scene reaches its verified state
         page.screenshot(path=str(OUT / "1-start.png"))
+        tab("Hardware")
         lab = page.locator(".panel", has=page.locator("h2", has_text="Error-correction lab"))
         page.wait_for_selector(".panel:has(h2:has-text('Error-correction lab')) svg path")
         lab.scroll_into_view_if_needed()
         page.wait_for_timeout(300)
         lab.screenshot(path=str(OUT / "19-qec-lab.png"))
         page.evaluate("window.scrollTo(0, 0)")
+        tab("Sketch to code")
 
         # circuit: sample sketch -> overlay -> demo run
         page.click(".sample >> nth=0")
@@ -139,6 +146,7 @@ def main() -> None:
 
         # a challenge solved with the click-to-compose palette
         page.click("nav.steps button >> nth=0")
+        tab("Labs")
         page.click(".challenge-card:has-text('Bell pair')")
         page.wait_for_selector(".check-msg")
         page.click(".gate-btn:text-is('H')")
@@ -157,6 +165,7 @@ def main() -> None:
 
         # network: preset A from the spec list
         page.click("nav.steps button >> nth=0")
+        tab("Sketch to code")
         page.click("text=Preset A: satellite link")
         page.wait_for_selector(".ops")
         page.click("button.btn.primary.big")
