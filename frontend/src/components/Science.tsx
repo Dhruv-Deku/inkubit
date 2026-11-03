@@ -116,7 +116,7 @@ export function ChemLabPanel({ onOpen }: { onOpen?: (spec: CircuitSpec) => void 
     <div className="panel" id="uc-chem">
       <div className="panel-head">
         <h2>Molecule lab: H₂</h2>
-        <span className="sub">the energy of a molecule from first principles, with VQE</span>
+        <span className="sub">first principles, with VQE</span>
         <span className="spacer" />
         {onOpen && lab && <button className="btn small" onClick={() => onOpen(lab.spec as CircuitSpec)}>Open the VQE circuit</button>}
       </div>
@@ -196,7 +196,7 @@ export function QkdLabPanel({ onOpen }: { onOpen?: (spec: CircuitSpec) => void }
     <div className="panel" id="uc-qkd">
       <div className="panel-head">
         <h2>Catch the spy</h2>
-        <span className="sub">BB84 quantum key distribution: physics, not maths, keeps the key secret</span>
+        <span className="sub">BB84 key distribution</span>
         <span className="spacer" />
         {onOpen && lab && <button className="btn small" onClick={() => onOpen(lab.spec as CircuitSpec)}>Open photon 1 as a circuit</button>}
       </div>

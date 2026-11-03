@@ -55,18 +55,9 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
         <div className="panel hero-copy">
           <h2>Start from a photo of your drawing.</h2>
           <p>
-            Photograph a hand-drawn circuit or a satellite network. Inkubit reads it, writes the Qiskit code,
-            runs it under realistic noise, and checks the answer against an independent simulation. When the
-            code is wrong, you watch the agent find the bug and fix it.
+            A circuit or a satellite network, drawn by hand. Inkubit reads it, writes the code, runs it with
+            realistic noise and checks the answer. If the code is wrong, you watch it get fixed.
           </p>
-          <div className="pipeline">
-            <span>SAM 3.1 finds the drawn parts</span>
-            <span>Muse Spark reads the sketch</span>
-            <span>You correct the spec</span>
-            <span>Agent writes, runs, verifies, repairs</span>
-            <span>Muse Spark explains</span>
-            <span>Muse Image draws it clean</span>
-          </div>
         </div>
         <div
           className={`drop ${over ? 'over' : ''}`}
@@ -98,7 +89,7 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
 
       {recent.length > 0 && (
         <div className="panel">
-          <div className="panel-head"><h2>Recent runs</h2><span className="sub">this session; click to reopen the log and results</span></div>
+          <div className="panel-head"><h2>Recent runs</h2><span className="sub">this session</span></div>
           <div className="spec-list">
             {recent.map((r) => (
               <button key={r.id} className="btn" onClick={() => onOpen(r.id)}>
@@ -115,7 +106,7 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
 
       <div className="panel">
         <div className="panel-head"><h2>Or describe it in words</h2>
-          <span className="sub">{live ? 'Muse Spark turns any description into a spec' : 'offline: named algorithms, gate lists and simple networks'}</span>
+          <span className="sub">{live ? 'Muse Spark writes the spec' : 'offline: named algorithms and gate lists'}</span>
         </div>
         <form className="row wrap" style={{ gap: 10, alignItems: 'stretch' }}
           onSubmit={(e) => { e.preventDefault(); if (words.trim()) onText(words) }}>
@@ -130,7 +121,7 @@ export function StartPanel({ examples, busy, error, onImage, onSpec, onText, liv
       </div>
 
       <div className="panel">
-        <div className="panel-head"><h2>Sample sketches</h2><span className="sub">photos of pen drawings, bundled for offline demos</span></div>
+        <div className="panel-head"><h2>Sample sketches</h2></div>
         <div className="samples">
           {examples?.images.map((img) => (
             <button key={img.id} className="sample" disabled={busy} onClick={() => pickSample(img.url, img.id)}>

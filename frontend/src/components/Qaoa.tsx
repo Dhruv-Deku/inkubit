@@ -261,7 +261,7 @@ export function QaoaLabPanel({ onOpen }: { onOpen?: (spec: CircuitSpec) => void 
     <div className="panel">
       <div className="panel-head">
         <h2>Split the party</h2>
-        <span className="sub">QAOA seats feuding guests at two tables · Max-Cut</span>
+        <span className="sub">QAOA Max-Cut</span>
         <span className="spacer" />
         {onOpen && openSpec && <button className="btn small" onClick={() => onOpen(openSpec)}>Open the circuit in the editor</button>}
       </div>

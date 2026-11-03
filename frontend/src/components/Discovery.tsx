@@ -96,8 +96,7 @@ export function DiscoveryPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
     <div className="panel discovery">
       <div className="panel-head">
         <h2>Discovery lab</h2>
-        <span className="sub">{live ? 'Muse Spark proposes circuits, an exact optimiser fits them, Qiskit proves them, the ML verifier screens and noise decides'
-          : 'offline: spanning-tree and random layouts stand in for the model; the fitting, proofs and scoring are the same'}</span>
+        <span className="sub">{live ? 'Muse Spark proposes circuits, physics proves them' : 'offline layouts, the same proofs'}</span>
       </div>
       <div className="row wrap" style={{ gap: 6 }}>
         <span className="label">Goal</span>

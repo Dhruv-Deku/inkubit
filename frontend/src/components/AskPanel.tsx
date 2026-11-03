@@ -29,7 +29,7 @@ export function AskPanel({ jobId, kind }: { jobId: string; kind: 'circuit' | 'ne
   }
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Ask about this result</h2><span className="sub">answered only from this run's numbers</span></div>
+      <div className="panel-head"><h2>Ask about this result</h2><span className="sub">answered from this run's numbers</span></div>
       {thread.length > 0 && (
         <div className="thread">
           {thread.map((x, i) => (

@@ -47,7 +47,7 @@ export function ChallengeList({ list, progress, onStart }: {
     <div className="panel">
       <div className="panel-head">
         <h2>Challenges</h2>
-        <span className="sub">build the target state or gate; scored exactly, with par like golf</span>
+        <span className="sub">scored exactly, with par</span>
         <span className="spacer" />
         <span className="sub mono">{earned} / {list.length * 3}</span><Stars n={1} of={1} />
       </div>

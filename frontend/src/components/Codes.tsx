@@ -32,7 +32,7 @@ export function CodesPanel() {
     <div className="panel codes">
       <div className="panel-head">
         <h2>Code lab</h2>
-        <span className="sub">Muse Spark designs quantum error-correcting codes; an exact checker proves what each one can correct</span>
+        <span className="sub">codes designed by Muse Spark, proven exactly</span>
       </div>
       {t && (
         <>

@@ -72,7 +72,7 @@ export function RefereePanel({ live }: { live: boolean }) {
     <div className="panel referee">
       <div className="panel-head">
         <h2>The AI referee</h2>
-        <span className="sub">Muse Spark answers, Muse Wonder challenges, exact simulation decides who was right</span>
+        <span className="sub">two models argue, simulation decides</span>
       </div>
       <p className="obs-head" style={{ margin: '0 0 10px', fontSize: 14, lineHeight: 1.5, color: 'var(--text)', maxWidth: '90ch' }}>
         On {bench.debates} circuits no textbook contains, Muse Spark answered {bench.claims} questions and was right on <b>{s.spark_first}</b> as first stated.

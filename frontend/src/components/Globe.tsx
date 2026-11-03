@@ -249,7 +249,7 @@ export function GlobePanel() {
     <div className="panel globe">
       <div className="panel-head">
         <h2>Satellite planner</h2>
-        <span className="sub">quantum satellites in orbit today on their real orbits, live, under the cloud forecast; or Micius's 2017 experiments</span>
+        <span className="sub">real satellites, today's orbits, tonight's clouds</span>
       </div>
       <div className="row wrap" style={{ gap: 6 }}>
         {meta?.satellites.map((s) => (

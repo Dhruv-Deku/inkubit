@@ -75,11 +75,10 @@ export function Hero({ onMission, onTour }: { onMission: () => void; onTour: () 
         {failed && sc && <img className="hero3d-still" src={sc.image} alt="" />}
       </div>
       <div className="hero3d-copy">
-        <p className="eyebrow">Photo&nbsp;→ spec&nbsp;→ Qiskit&nbsp;→ noisy run&nbsp;→ proof</p>
-        <h1>An AI quantum engineer that <span>proves</span> its work.</h1>
+        <h1>Draw a quantum circuit. Inkubit proves what it does.</h1>
         <p className="lede">
-          Give Inkubit a pencil sketch, a sentence or your voice. Meta's models plan the work and write the code;
-          every number is checked against an independent exact simulation, and circuits run on real IBM chips.
+          Photograph a sketch, type it or say it. Meta's models write the Qiskit code, an exact simulation checks
+          every number, and real IBM chips run it.
         </p>
         <div className="hero3d-cta">
           <button className="btn primary big" onClick={onMission}>Launch a mission</button>
@@ -90,7 +89,7 @@ export function Hero({ onMission, onTour }: { onMission: () => void; onTour: () 
             {data.stats.map((s) => (
               <div key={s.source} title={`${s.note} (${s.source})`}>
                 <dt><CountUp value={s.value} /></dt>
-                <dd>{s.label}<small>{s.note}</small></dd>
+                <dd>{s.label}</dd>
               </div>
             ))}
           </dl>

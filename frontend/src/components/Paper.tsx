@@ -44,7 +44,7 @@ export function PaperPanel({ live }: { live: boolean }) {
     <div className="panel paper">
       <div className="panel-head">
         <h2>Reproduce a whole paper</h2>
-        <span className="sub">a PDF or an arXiv id: Muse Wonder finds the experiments, Muse Spark transcribes each, exact simulation judges every number</span>
+        <span className="sub">a PDF or an arXiv id, every number checked</span>
       </div>
       <div className="row wrap" style={{ gap: 8 }}>
         {examples.map((x) => <button key={x.source} className={`chip-btn${result?.source === x.source ? ' on' : ''}`} onClick={() => setResult(x)} disabled={busy}>{x.title || x.source}</button>)}

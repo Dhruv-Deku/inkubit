@@ -94,7 +94,7 @@ export function CircuitResults({ result, sketchCalls, spec, jobId }: {
         // an offline "illustration" is the same Qiskit drawing; only show a real Muse Image one next to it
         result.diagram?.call?.provider === 'meta' || !result.exact_diagram ? result.diagram : undefined]} />
       <div className="panel">
-        <div className="panel-head"><h2>Models used</h2><span className="sub">every result says where it came from</span></div>
+        <div className="panel-head"><h2>Models used</h2></div>
         <CallsTable calls={calls} />
       </div>
     </div>
@@ -161,7 +161,7 @@ export function NetworkResults({ result, sketchCalls, jobId, spec }: {
       </div>
       {result.candidates.length > 0 && (
         <div className="panel">
-          <div className="panel-head"><h2>Fixes the agent tried</h2><span className="sub">each one re-simulated; the best one per round is applied</span></div>
+          <div className="panel-head"><h2>Fixes the agent tried</h2><span className="sub">each one re-simulated</span></div>
           <table className="data">
             <thead><tr><th>Round</th><th>Fix</th><th className="num">Pairs/s</th><th className="num">Fidelity</th><th className="num">Key rate</th></tr></thead>
             <tbody>

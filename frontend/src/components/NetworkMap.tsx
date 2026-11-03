@@ -79,7 +79,7 @@ export function NetworkMap({ spec, specAfter, before, after }: {
     <div className="panel">
       <div className="panel-head">
         <h2>Network map</h2>
-        <span className="sub">pairs in flight; thicker links deliver more pairs per second</span>
+        <span className="sub">thicker links deliver more pairs</span>
         <span className="spacer" />
         {after && (
           <div className="seg">

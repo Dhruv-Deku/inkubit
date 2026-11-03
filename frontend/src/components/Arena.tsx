@@ -35,7 +35,7 @@ export function ArenaPanel() {
     <div className="panel">
       <div className="panel-head">
         <h2>AI alone vs Inkubit</h2>
-        <span className="sub">why no answer here reaches you unchecked</span>
+        <span className="sub">why every answer is checked</span>
         <span className="spacer" />
         <span className="sub mono">{bench.model} · {bench.date}</span>
       </div>

@@ -69,8 +69,8 @@ export function UseCases({ examples, onImage, onSpec, busy }: {
   }
   return (
     <div className="panel">
-      <div className="panel-head"><h2>What it can do</h2><span className="sub">one click into each</span><span className="spacer" />
-        <span className="sub">illustrations: Muse Image 1.0</span></div>
+      <div className="panel-head"><h2>What it can do</h2><span className="spacer" />
+        <span className="sub">drawn by Muse Image</span></div>
       <div className="uc-grid">
         {CASES.map((c) => (
           <button key={c.id} className="uc-card" onClick={() => { void run(c.action) }} disabled={busy && c.action.kind !== 'panel'}>
@@ -79,7 +79,7 @@ export function UseCases({ examples, onImage, onSpec, busy }: {
             <span className="uc-who">{c.tag}</span>
             <span className="uc-title">{c.title}</span>
             <span className="uc-text">{c.text}</span>
-            <span className="uc-cta">{c.cta} →</span>
+            <span className="uc-cta">{c.cta}</span>
           </button>
         ))}
       </div>

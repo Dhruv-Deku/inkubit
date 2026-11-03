@@ -45,12 +45,12 @@ import type {
 import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 
 type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
-const SECTIONS: { id: SectionId; label: string; hint: string; art: string; panels: string[] }[] = [
-  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, live board', art: 'sketch', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
-  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, decoders, satellites', art: 'hardware', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
-  { id: 'evidence', label: 'Proof', hint: 'proof sheet, real chip runs, AI alone', art: 'evidence', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Inkubit', 'The AI referee'] },
-  { id: 'discover', label: 'Discover', hint: 'AI scientist, when quantum wins, papers', art: 'bughunt', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
-  { id: 'labs', label: 'Labs', hint: 'Shor, QAOA, H₂, BB84, bug hunt, puzzles', art: 'molecule', panels: ["Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy', 'Bug hunt', 'Challenges'] },
+const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
+  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, whiteboard', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
+  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, satellites', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
+  { id: 'evidence', label: 'Proof', hint: 'every check, every chip run', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Inkubit', 'The AI referee'] },
+  { id: 'discover', label: 'Discover', hint: 'AI scientist, papers, estimates', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
+  { id: 'labs', label: 'Labs', hint: 'Shor, QAOA, H₂, BB84, games', panels: ["Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy', 'Bug hunt', 'Challenges'] },
 ]
 
 type Stage = 'start' | 'edit' | 'run'
@@ -100,6 +100,15 @@ export default function App() {
   const [backendError, setBackendError] = useState<string | null>(null)
   const [stage, setStage] = useState<Stage>('start')
   const [assistant, setAssistant] = useState<'mission' | 'ask'>('mission')
+  const tabSentinel = useRef<HTMLDivElement>(null)
+  const [tabsStuck, setTabsStuck] = useState(false)
+  useEffect(() => {  // once the tab bar sticks to the top, its sketches fold away so it takes one line
+    const el = tabSentinel.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setTabsStuck(!e.isIntersecting && e.boundingClientRect.top < 0))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [stage])
   const [tab, setTab] = useState<SectionId>(() => {
     const h = new URLSearchParams(window.location.hash.slice(1)).get('tab')
     return (SECTIONS.find((t) => t.id === h)?.id ?? 'build') as SectionId
@@ -329,7 +338,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <Logo />
-          <div><h1>Inkubit</h1><p>sketch → proven quantum results</p></div>
+          <div><h1>Inkubit</h1><p>from pencil to proof</p></div>
         </div>
         <nav className="steps" aria-label="Steps">
           <button className={`step ${stage === 'start' ? 'active' : 'done'}`} onClick={() => setStage('start')}><span className="n">1</span>Sketch</button>
@@ -378,9 +387,9 @@ export default function App() {
           }} />
           <div className="hero-switch" role="tablist" aria-label="Assistant">
             <button role="tab" aria-selected={assistant === 'mission'} className={assistant === 'mission' ? 'on' : ''} onClick={() => setAssistant('mission')}>
-              <b>Mission control</b><span>a whole problem: planned, run in parallel, verified</span></button>
+              <b>Mission control</b></button>
             <button role="tab" aria-selected={assistant === 'ask'} className={assistant === 'ask' ? 'on' : ''} onClick={() => setAssistant('ask')}>
-              <b>Quick question</b><span>one answer from the exact tools</span></button>
+              <b>Quick question</b></button>
           </div>
           <div style={{ display: assistant === 'mission' ? 'block' : 'none' }}>
             <MissionPanel live={health?.mode === 'meta'} examples={examples} onOpen={(s) => onSpec(clone(s))} />
@@ -388,10 +397,11 @@ export default function App() {
           <div style={{ display: assistant === 'ask' ? 'block' : 'none' }}>
             <CopilotPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
           </div>
-          <nav className="section-tabs" role="tablist" aria-label="Sections">
+          <div ref={tabSentinel} aria-hidden="true" />
+          <nav className={`section-tabs ${tabsStuck ? 'stuck' : ''}`} role="tablist" aria-label="Sections">
             {SECTIONS.map((t) => (
               <button key={t.id} role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={() => goTab(t.id)}>
-                <img src={`/usecases/${t.art}.webp`} alt="" width={48} height={48} />
+                <img src={`/tabs/${t.id}.webp`} alt="" width={56} height={56} />
                 <span className="tab-text">{t.label}<span>{t.hint}</span></span>
               </button>
             ))}

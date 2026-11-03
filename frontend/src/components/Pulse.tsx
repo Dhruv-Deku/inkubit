@@ -27,7 +27,7 @@ export function PulsePanel() {
     <div className="panel pulse">
       <div className="panel-head">
         <h2>Pulse lab</h2>
-        <span className="sub">from the sketch down to the microwave pulse: an X gate on a superconducting qubit, with the third level it can leak into</span>
+        <span className="sub">an X gate as a microwave pulse</span>
       </div>
       <div className="row wrap" style={{ gap: 10 }}>
         <div className="seg">

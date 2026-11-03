@@ -58,7 +58,7 @@ export function EstimatorPanel({ live }: { live: boolean }) {
     <div className="panel estimator">
       <div className="panel-head">
         <h2>When does quantum win?</h2>
-        <span className="sub">describe a real problem: {live ? 'Muse Spark maps it to an algorithm, ' : ''}an error-corrected estimate meets the best classical route, every assumption and source shown</span>
+        <span className="sub">quantum cost against the best classical route</span>
       </div>
       <form className="row wrap" style={{ gap: 8 }} onSubmit={(e) => { e.preventDefault(); if (text.trim()) setLast({ text: text.trim() }) }}>
         <input type="text" className="copilot-input" style={{ flex: '1 1 280px', minWidth: 0 }} value={text} onChange={(e) => setText(e.target.value)}

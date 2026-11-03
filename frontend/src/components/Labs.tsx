@@ -43,7 +43,7 @@ const vec = (v: number[]) => `(${v.map((c) => (Math.abs(c) < 5e-4 ? '0' : c.toFi
 export function BellPanel({ bell }: { bell: BellTest }) {
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Bell test</h2><span className="sub">could any classical explanation fake these correlations?</span></div>
+      <div className="panel-head"><h2>Bell test</h2><span className="sub">could a classical model fake this?</span></div>
       <p className="lead">{bell.summary}</p>
       {bell.tests.map((t) => (
         <div key={`${t.kind}-${t.qubits.join('')}`} className="bell-row">
@@ -211,7 +211,7 @@ export function RepetitionLabPanel({ onTry }: { onTry?: () => void }) {
     <div className="panel">
       <div className="panel-head">
         <h2>Error-correction lab</h2>
-        <span className="sub">protect one qubit with two copies: when does it pay off?</span>
+        <span className="sub">when do two copies pay off?</span>
         <span className="spacer" />
         <div className="seg">
           <button className={kind === 'bit' ? 'on' : ''} onClick={() => setKind('bit')}>Bit flips</button>

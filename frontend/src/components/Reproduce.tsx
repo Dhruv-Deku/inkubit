@@ -28,7 +28,7 @@ export function ReproducePanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
     <div className="panel reproduce">
       <div className="panel-head">
         <h2>Reproduce a paper</h2>
-        <span className="sub">a figure from a quantum paper, or its caption and code: {live ? 'Muse Spark transcribes it, ' : ''}the circuit is re-run exactly and every claimed number is judged against its error bar</span>
+        <span className="sub">one figure, re-run exactly</span>
       </div>
       <textarea className="mission-goal" rows={3} value={text} onChange={(e) => setText(e.target.value)} disabled={busy}
         placeholder="Paste a caption with the claimed numbers (P(00) = 0.48 …) and, if you have it, the OpenQASM; or add the figure" aria-label="Caption and code" />

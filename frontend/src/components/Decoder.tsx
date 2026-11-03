@@ -75,7 +75,7 @@ export function DecoderPanel() {
     <div className="panel decoder">
       <div className="panel-head">
         <h2>ML error-correction decoder</h2>
-        <span className="sub">the surface code at distance 3 and 5: minimum-weight matching against neural networks that see both kinds of checks</span>
+        <span className="sub">surface code, distance 3 and 5</span>
       </div>
       {error && <div className="notice error">{error}</div>}
       {r && at && (

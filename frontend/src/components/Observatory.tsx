@@ -322,7 +322,7 @@ export function ObservatoryPanel() {
   useEffect(() => { api.observatory().then(setData).catch((e: Error) => setError(e.message)) }, [])
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Simulation observatory</h2><span className="sub">five exact simulations of where quantum technology stands today, and the ML verifier</span></div>
+      <div className="panel-head"><h2>Simulation observatory</h2><span className="sub">where the technology stands</span></div>
       <div className="obs-tabs" role="tablist">
         {TABS.map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id} className={`chip-btn${tab === t.id ? ' on' : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>

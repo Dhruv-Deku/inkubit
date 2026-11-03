@@ -103,7 +103,7 @@ export function BugHuntPanel({ live, onOpen }: { live: boolean; onOpen?: (spec: 
     <div className="panel">
       <div className="panel-head">
         <h2>Bug hunt</h2>
-        <span className="sub">{live ? 'one gate is wrong: find it before Muse Spark does' : 'one gate is wrong: find it from the histogram'}</span>
+        <span className="sub">{live ? 'find the wrong gate before Muse Spark does' : 'find the wrong gate'}</span>
         <span className="spacer" />
         <div className="seg">
           {LEVELS.map((l) => <button key={l.id} className={level === l.id ? 'on' : ''} onClick={() => { setLevel(l.id); setSeed(newSeed()) }}>{l.label}</button>)}

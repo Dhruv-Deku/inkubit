@@ -196,8 +196,7 @@ export function MissionPanel({ live, examples, onOpen }: { live: boolean; exampl
     <div className="panel mission">
       <div className="panel-head">
         <h2>Mission control</h2>
-        <span className="sub">{live ? 'a whole problem in words, a photo or your voice: Muse Spark plans a graph of exact tools, it runs live in parallel, every result is verified twice'
-          : 'offline: a keyword planner builds the graph; with a key Muse Spark plans it and writes the report'}</span>
+        <span className="sub">{live ? 'a whole problem, planned and checked' : 'offline: keyword planner'}</span>
       </div>
       <textarea className="mission-goal" rows={3} value={goal} onChange={(e) => setGoal(e.target.value)} disabled={busy}
         placeholder="Describe a whole problem: two cities to secure, a molecule to map, a circuit photo to make hardware-ready…" aria-label="Mission" />

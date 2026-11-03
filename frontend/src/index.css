@@ -906,3 +906,37 @@ details summary { cursor: pointer; }
 .ops .ff { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 12.5px; color: var(--text-2); }
 .ops .ff select { padding: 2px 4px; }
 .ops .ff input[type=text] { width: 54px; }
+
+/* ---------- plainer surface: one headline colour, quiet figures, paper sketches on the tabs ---------- */
+.hero3d h1 { font-size: 42px; max-width: 600px; }
+.hero3d .lede { max-width: 500px; }
+.hero3d-stats { grid-template-columns: repeat(4, minmax(0, auto)); gap: 0; max-width: 620px; justify-content: start; }
+.hero3d-stats > div { border-top: 0; border-left: 1px solid var(--line-2); padding: 2px 18px 2px 14px; }
+.hero3d-stats > div:first-child { border-left: 0; padding-left: 0; }
+.hero3d-stats dt { font-size: 22px; }
+.hero3d-stats dd { font-size: 12px; color: var(--muted); max-width: 130px; }
+@media (max-width: 900px) {
+  .hero3d-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+  .hero3d-stats > div:nth-child(3) { border-left: 0; padding-left: 0; }
+}
+
+.hero-switch { display: inline-grid; grid-template-columns: repeat(2, auto); gap: 4px; padding: 4px; margin-bottom: 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.hero-switch button { border: 0; background: transparent; padding: 7px 14px; border-radius: 9px; }
+.hero-switch button b { font-size: 13.5px; font-weight: 600; color: var(--text-2); }
+.hero-switch button.on { background: var(--panel-3); border: 0; }
+.hero-switch button.on b { color: var(--text); }
+
+.section-tabs button { gap: 12px; padding: 10px 14px 10px 10px; }
+.section-tabs button img { width: 56px; height: 56px; border-radius: 3px; opacity: .82; filter: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 4px 10px rgba(0, 0, 0, .25); transform: rotate(-2deg);
+  transition: transform .2s, opacity .2s, width .2s, height .2s, margin .2s; }
+.section-tabs button:nth-child(even) img { transform: rotate(1.6deg); }
+.section-tabs button:hover img, .section-tabs button.on img { opacity: 1; transform: rotate(0deg); }
+.section-tabs.stuck button img { width: 0; height: 0; margin-right: -12px; opacity: 0; box-shadow: none; }
+.section-tabs.stuck button { padding-top: 7px; padding-bottom: 7px; }
+.section-tabs.stuck .tab-text > span { display: none; }
+
+.uc-who { text-transform: none; letter-spacing: 0; font-size: 12px; }
+.uc-cta { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+.uc-card:hover .uc-cta { color: var(--text); }

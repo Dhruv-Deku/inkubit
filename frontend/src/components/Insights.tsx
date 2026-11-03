@@ -122,7 +122,7 @@ export function ErrorBudgetPanel({ budget }: { budget: ErrorBudget }) {
   const max = Math.max(1e-4, ...budget.items.map((i) => i.fidelity_loss))
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Error budget</h2><span className="sub">match lost to each noise source on its own</span></div>
+      <div className="panel-head"><h2>Error budget</h2><span className="sub">match lost to each noise source</span></div>
       <p className="lead">{budget.summary}</p>
       <div className="budget">
         {budget.items.map((it) => (
@@ -262,7 +262,7 @@ export function LayoutsPanel({ ins }: { ins: CircuitInsights }) {
   if (!ins.layouts.length) return null
   return (
     <div className="panel">
-      <div className="panel-head"><h2>On real chip layouts</h2><span className="sub">compiled to rz, sx, x, cx with Qiskit's router</span></div>
+      <div className="panel-head"><h2>On real chip layouts</h2><span className="sub">routed by Qiskit</span></div>
       <p className="lead">{ins.layout_summary}</p>
       <table className="data">
         <thead><tr><th>Wiring</th><th className="num">Depth</th><th className="num">CNOTs</th><th className="num">Extra SWAPs</th><th className="num">Rough success</th></tr></thead>
@@ -341,7 +341,7 @@ function ZneChart({ z }: { z: ZeroNoise }) {
 export function ZnePanel({ z }: { z: ZeroNoise }) {
   return (
     <div className="panel">
-      <div className="panel-head"><h2>Zero-noise extrapolation</h2><span className="sub">run it noisier on purpose, then extrapolate back to no noise</span></div>
+      <div className="panel-head"><h2>Zero-noise extrapolation</h2><span className="sub">noisier on purpose, then back to zero</span></div>
       <div className="tiles zne-tiles">
         <div className="tile"><div className="k">As measured</div><div className="v">{z.fidelity_raw.toFixed(3)}</div><div className="s">match to the ideal</div></div>
         <div className="tile"><div className="k">Readout corrected</div><div className="v">{z.fidelity_readout.toFixed(3)}</div></div>
@@ -372,7 +372,7 @@ export function InsightsSection({ spec, ins, wide = false }: { spec: CircuitSpec
   return (
     <div className="stack">
       <div className="panel">
-        <div className="panel-head"><h2>Inside the circuit, gate by gate</h2><span className="sub">exact ideal state after every step</span></div>
+        <div className="panel-head"><h2>Inside the circuit, gate by gate</h2><span className="sub">exact state after each gate</span></div>
         <StepInspector spec={spec} steps={ins.steps} />
       </div>
       <div className={wide ? 'two-col' : 'stack'}>

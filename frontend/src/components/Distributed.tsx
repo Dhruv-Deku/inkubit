@@ -71,7 +71,7 @@ export function DistributedPanel({ examples, onOpen }: { examples: Examples | nu
     <div className="panel distributed">
       <div className="panel-head">
         <h2>Distributed quantum computer</h2>
-        <span className="sub">one circuit on two small chips joined by a quantum link from the network planner: where to cut it, and what every remote CNOT costs</span>
+        <span className="sub">one circuit across two linked chips</span>
       </div>
       <div className="row wrap" style={{ gap: 6 }}>
         <span className="label">Circuit</span>

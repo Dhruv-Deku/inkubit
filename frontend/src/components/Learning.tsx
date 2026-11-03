@@ -70,7 +70,7 @@ export function LearningPanel({ live }: { live: boolean }) {
     <div className="panel learning">
       <div className="panel-head">
         <h2>An AI scientist that learns</h2>
-        <span className="sub">Muse Spark designs circuits in rounds and sees what exact physics said about each one; does it get better?</span>
+        <span className="sub">does feedback make it better?</span>
       </div>
       <div className="row wrap" style={{ gap: 6 }}>
         {bench.targets.map((x, i) => <button key={x.goal.id} className={`chip-btn${gi === i ? ' on' : ''}`} onClick={() => setGi(i)} disabled={busy}>{x.goal.title}</button>)}

@@ -219,8 +219,7 @@ export function CopilotPanel({ live, onOpen }: { live: boolean; onOpen?: (s: Cir
     <div className="panel copilot">
       <div className="panel-head">
         <h2>Ask Inkubit</h2>
-        <span className="sub">{live ? 'one assistant for the whole lab: Muse Spark, or Muse Wonder for harder questions, calls exact tools, and every number it says is traced'
-          : 'offline: a keyword router reaches the same exact tools; the live model answers anything'}</span>
+        <span className="sub">{live ? 'every number from an exact tool' : 'offline: keyword router'}</span>
       </div>
       <form className="row wrap" style={{ gap: 10, alignItems: 'stretch' }} onSubmit={(e) => { e.preventDefault(); void ask(text) }}>
         <input type="text" value={text} onChange={(e) => setText(e.target.value)} style={{ flex: '1 1 260px', minWidth: 0 }} className="copilot-input"

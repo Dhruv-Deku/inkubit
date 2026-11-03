@@ -33,7 +33,7 @@ function Dictionary({ onTry }: { onTry: (text: string) => void }) {
   return (
     <div className="ros-dict">
       <button className="btn" onClick={() => setOpen(!open)} aria-expanded={open}>
-        {open ? 'Hide the dictionary' : 'Quantum dictionary: the words of the field, each with a state computed exactly'}
+        {open ? 'Hide the dictionary' : 'Quantum dictionary'}
       </button>
       {open && (
         <>
@@ -185,7 +185,7 @@ export function RosettaPanel({ live, onOpen }: { live: boolean; onOpen?: (s: Cir
     <div className="panel rosetta" ref={topRef}>
       <div className="panel-head">
         <h2>Quantum Rosetta</h2>
-        <span className="sub">the language of quantum computing, translated both ways: math, circuits, plain words and eight programming languages, every translation checked by exact simulation</span>
+        <span className="sub">maths, circuits, words and code, both ways</span>
       </div>
       <form onSubmit={(e) => { e.preventDefault(); void run(text) }}>
         <textarea className="ros-input mono" rows={3} value={text} onChange={(e) => setText(e.target.value)} disabled={busy}

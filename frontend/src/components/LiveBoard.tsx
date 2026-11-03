@@ -151,7 +151,7 @@ export function LiveBoardPanel({ live, onOpen }: { live: boolean; onOpen?: (s: C
     <div className="panel liveboard">
       <div className="panel-head">
         <h2>Live board</h2>
-        <span className="sub">point a camera at a whiteboard: when the drawing changes and holds still it is read, simulated and the odds appear on the wires</span>
+        <span className="sub">a camera on a whiteboard</span>
       </div>
       <div className="row wrap" style={{ gap: 8 }}>
         {phase === 'off'
