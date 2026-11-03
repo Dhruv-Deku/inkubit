@@ -85,6 +85,12 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
   renderer.shadowMap.type = THREE.PCFShadowMap
   renderer.setClearColor(BG)
   host.appendChild(renderer.domElement)
+  // Without a GPU (software WebGL, as on CI runners and some locked-down laptops) or with reduced motion, the scene is
+  // one still frame of its finished state: an animation there would hold the main thread and stall the whole page.
+  const gl = renderer.getContext()
+  const gpuInfo = gl.getExtension('WEBGL_debug_renderer_info')
+  const gpu = gpuInfo ? String(gl.getParameter(gpuInfo.UNMASKED_RENDERER_WEBGL)) : ''
+  let still = reduced || /swiftshader|llvmpipe|softpipe|software|basic render/i.test(gpu)
 
   const scene = new THREE.Scene()
   scene.background = new THREE.Color(BG)
@@ -409,23 +415,37 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
   }
 
   // ---- loop: runs only while the hero is on screen and the tab is visible
-  let t = reduced ? T.verify + 1 : 0
+  const FINAL = T.verify + 1
+  let t = still ? FINAL : 0
   let raf = 0
   let last = 0
   let onScreen = true
+  let slow = 0 // running share of frames that took too long; a machine that cannot keep up gets the still frame
+  let sampled = 0
   const frame = (now: number) => {
     raf = 0
-    const dt = last ? Math.min(0.1, (now - last) / 1000) : 0
+    const gap = last ? (now - last) / 1000 : 0
+    const dt = Math.min(0.1, gap)
     last = now
-    if (!reduced) {
+    if (!still) {
       t += dt
       if (t >= T.loop) t = 0.6
     }
     pointer.sx += (pointer.x - pointer.sx) * Math.min(1, dt * 3)
     pointer.sy += (pointer.y - pointer.sy) * Math.min(1, dt * 3)
     apply(t)
+    const r0 = performance.now()
     renderer.render(scene, camera)
-    if (onScreen && !document.hidden && !reduced) raf = requestAnimationFrame(frame)
+    if (!still && gap) {
+      slow = slow * 0.9 + (gap > 0.055 || performance.now() - r0 > 30 ? 0.1 : 0)
+      if (++sampled > 45 && slow > 0.6) {
+        still = true
+        t = FINAL
+        apply(t)
+        renderer.render(scene, camera)
+      }
+    }
+    if (onScreen && !document.hidden && !still) raf = requestAnimationFrame(frame)
   }
   const kick = () => { if (!raf) { last = 0; raf = requestAnimationFrame(frame) } }
   const io = new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; if (onScreen) kick() }, { threshold: 0.05 })
@@ -438,7 +458,7 @@ export function mountHeroScene(host: HTMLElement, data: HeadlineScene, onPhase: 
   kick()
 
   return {
-    replay() { t = reduced ? T.verify + 1 : 0; kick() },
+    replay() { t = still ? FINAL : 0; kick() },
     dispose() {
       cancelAnimationFrame(raf)
       io.disconnect(); ro.disconnect()
