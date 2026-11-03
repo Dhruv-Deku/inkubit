@@ -18,6 +18,7 @@ import { RosettaPanel } from './components/Rosetta'
 import { ObservatoryPanel } from './components/Observatory'
 import { MissionPanel } from './components/Mission'
 import { RefereePanel } from './components/Referee'
+import { FigureProofPanel } from './components/FigureProof'
 import { PaperPanel } from './components/Paper'
 import { CodesPanel } from './components/Codes'
 import { LearningPanel } from './components/Learning'
@@ -25,6 +26,7 @@ import { DiscoveryPanel } from './components/Discovery'
 import { DistributedPanel } from './components/Distributed'
 import { EstimatorPanel } from './components/Estimator'
 import { LiveBoardPanel } from './components/LiveBoard'
+import { LecturePanel } from './components/Lecture'
 import { GlobePanel } from './components/Globe'
 import { ReproducePanel } from './components/Reproduce'
 import { DecoderPanel } from './components/Decoder'
@@ -46,9 +48,9 @@ import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 
 type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
 const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
-  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, whiteboard', panels: ['Live board', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
+  { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, whiteboard', panels: ['Live board', 'Lecture checker', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
   { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, satellites', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
-  { id: 'evidence', label: 'Proof', hint: 'every check, every chip run', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Inkubit', 'The AI referee'] },
+  { id: 'evidence', label: 'Proof', hint: 'every check, every chip run', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Inkubit', 'The AI referee', 'Proven illustrations'] },
   { id: 'discover', label: 'Discover', hint: 'AI scientist, papers, estimates', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
   { id: 'labs', label: 'Labs', hint: 'Shor, QAOA, H₂, BB84, games', panels: ["Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy', 'Bug hunt', 'Challenges'] },
 ]
@@ -412,6 +414,7 @@ export default function App() {
               live={health?.mode === 'meta'} recent={recent} onOpen={openJob}
               extra={<>
                 <LiveBoardPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
+                <LecturePanel live={health?.mode === 'meta'} />
                 <RosettaPanel live={health?.mode === 'meta'} onOpen={(s) => onSpec(clone(s))} />
                 <UseCases examples={examples} onImage={onImage} onSpec={onSpec} busy={busy} />
               </>} />
@@ -461,6 +464,7 @@ export default function App() {
               <ObservatoryPanel />
               <ArenaPanel />
               <RefereePanel live={health?.mode === 'meta'} />
+              <FigureProofPanel />
             </div>
             </div>
           )}

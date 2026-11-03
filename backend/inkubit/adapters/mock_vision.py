@@ -23,6 +23,8 @@ from inkubit.adapters.base import (
     SegmentationModel,
     SegmentationResult,
     SpecDraft,
+    Track,
+    TrackResult,
 )
 from inkubit.adapters.imaging import sha256
 from inkubit.explain.diagrams import circuit_png, network_png
@@ -65,6 +67,18 @@ class MockSegmentationModel(SegmentationModel):
                                   concepts=list(concepts or fx["concepts"]),
                                   call=ModelCall(provider="mock", model="sample-sketch fixtures", role="segment"))
 
+    def track_video(self, video: bytes, concepts: list[str], fps: float, source: str = "") -> TrackResult:
+        """Offline, only the bundled sample lecture can be tracked: its script recorded when each part was drawn."""
+        from inkubit.lecture import sample_record
+
+        rec = sample_record(source)
+        tracks = [Track(id=f"{e['id']}{k}", concept=seg["concept"], first_s=e["appears"], last_s=rec["duration"],
+                        bbox=tuple(seg["bbox"]))
+                  for e in rec["elements"] for k, seg in enumerate(e["segments"])]
+        return TrackResult(width=rec["width"], height=rec["height"], frames=int(rec["duration"] * fps), fps=fps,
+                           tracks=tracks, concepts=concepts,
+                           call=ModelCall(provider="mock", model="the sample's own script", role="track"))
+
 
 class MockReasoningModel(ReasoningModel):
     """Recorded readings for bundled sketches and template explanations."""
@@ -74,7 +88,8 @@ class MockReasoningModel(ReasoningModel):
         return fx["kind"], list(fx["concepts"]), ModelCall(provider="mock", model="sample-sketch fixtures",
                                                            role="choose concepts")
 
-    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str) -> SpecDraft:
+    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str,
+                   context: str = "") -> SpecDraft:
         fx = _fixture(image)
         call = ModelCall(provider="mock", model="sample-sketch fixtures", role="read sketch")
         try:

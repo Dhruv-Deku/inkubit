@@ -252,7 +252,11 @@ using only endpoints and fields documented in Meta's docs (list of pages in
 - **SAM 3.1** (`sam-3.1`, `POST /v1/responses`, streamed): one concept prompt per
   noun phrase with the photo as a data URL and `metadata.include_confidence: "true"`.
   The special-token output (`<0f>0<|box;x1=..;c=..|><|mask;...|>`) is parsed into
-  boxes and confidences, scaled to the uploaded image.
+  boxes and confidences, scaled to the uploaded image. **On video** (the lecture
+  checker) a 2-frames-a-second H.264 clip goes as an `input_video` data URL; SAM
+  answers one line per frame and keeps each object's id across frames, so an
+  object's first frame is when it was drawn ("square" and "circle" track pen
+  sketches reliably).
 - **Muse Spark 1.3** (`muse-spark-1.3`, `POST /v1/chat/completions`):
   1. looks at the photo and names what SAM should look for (`response_format`
      JSON schema, `reasoning_effort: low`), the pairing Meta's docs recommend;
@@ -299,10 +303,16 @@ using only endpoints and fields documented in Meta's docs (list of pages in
   CNOT, GHZ, Shor, ...) that biases the recogniser toward quantum words. The
   transcript then takes the describe-in-words path. Offline there is no speech
   model, so the browser's own recogniser is used and the server refuses to guess.
+  The lecture checker uses **`DIARIZATION`** mode: the buffered answer lists each
+  turn with its start, end and a speaker label.
 - **Muse Image 1.0** (`muse-image-1.0`, `POST /v1/images/generations`,
   `response_format: b64_json`): a clean, annotated illustration of the final
   design. It is always shown next to the exact Qiskit drawing, so an imperfect
-  illustration can never mislead.
+  illustration can never mislead. A figure that is shown on its own (the lecture
+  checker's) is **proven first**: drawn without captions, read back by SAM 3.1 and
+  Muse Spark, compared exactly with the circuit, and corrected with
+  **`POST /v1/images/edits`** (the figure as a data URL plus the exact difference)
+  when it is wrong; if it never matches, the exact drawing is shown instead.
 - **Muse Code** (opt-in, `INKUBIT_CODE_BACKEND=muse-cli`): repairs are handed to
   the Muse Code agent headlessly (`muse exec --prompt-file task.txt
   --disable-approval --max-model-steps 12`) in a scratch workspace; Inkubit's

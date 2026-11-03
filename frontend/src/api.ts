@@ -2,9 +2,10 @@ import type { LBench } from './components/Learning'
 import type { RBench } from './components/Referee'
 import type { PResult } from './components/Paper'
 import type { CodesLab } from './components/Codes'
+import type { FigureBench } from './components/FigureProof'
 import type {
   AgentEvent, ArenaBenchmark, ChemLab, DiscoveryGoal, DistributedResult, EstimateResult, LiveRead, OrbitMeta, OrbitPlan, Reproduction, DecoderReport, PulseReport, HardwareRuns, DiscoveryHardware, ProofSheet, ProofBench, IbmStatus, IbmSnapshot, IbmAdvice, IbmRun, IbmExperiments, MlReport, Observatory, CopilotReply, NotationRead, RosettaEntry, RosettaResult, QkdLab, ArenaResult, BugGuess, BugRound, BugVerdict, ChallengeCheck, ChallengeInfo, CircuitInsights, Examples, Explanation, Health, JobSummary, LiveState, OptimizeResult, QaoaLab, RepetitionLab, ShorLab, RunOptions, Transcript,
-  SketchAnalysis, Spec, SpecIssue, TextDraft, Headline,
+  SketchAnalysis, Spec, SpecIssue, TextDraft, Headline, LectureView,
 } from './types'
 
 export class ApiError extends Error {
@@ -136,6 +137,14 @@ export const api = {
     return call<{ paper_id: string }>('/api/paper', { method: 'POST', body: form })
   },
   paper: (id: string) => call<{ status: string; error: string | null; result: unknown }>(`/api/paper/${id}`),
+  lectureSample: () => call<{ title: string; made_by: string; duration: number; video: string; turns: number }>('/api/lecture/sample'),
+  startLecture: (video: File | null) => {
+    const form = new FormData()
+    if (video) form.append('video', video, video.name)
+    return call<{ lecture_id: string }>('/api/lecture', { method: 'POST', body: form })
+  },
+  lecture: (id: string) => call<LectureView>(`/api/lecture/${id}`),
+  figureBenchmark: () => call<FigureBench>('/api/figures/benchmark'),
   codesLab: () => call<CodesLab>('/api/codes'),
   analyseCode: (generators: string[]) => call<{ generators: string[]; valid: boolean; note: string; n: number; k: number; d: number | null; dx: number | null; dz: number | null; css: boolean; logical: string | null }>('/api/codes/analyse', json({ generators })),
   startLearning: (goal: string) => call<{ learning_id: string; events_url: string }>('/api/learning', json({ goal })),

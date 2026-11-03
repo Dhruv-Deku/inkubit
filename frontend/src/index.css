@@ -1003,3 +1003,85 @@ details summary { cursor: pointer; }
 .hero3d-figs figcaption { flex-wrap: wrap; gap: 2px 9px; }
 .hero3d-figs .mini-models { display: grid; grid-template-columns: repeat(2, max-content); gap: 1px 16px; align-content: center; }
 .hero3d-figs .mini-models li + li::before { content: none; }
+
+/* ---------- lecture checker ---------- */
+.lec-top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.lec-media video { display: block; width: 100%; border-radius: var(--radius-sm); background: #000; aspect-ratio: 16 / 9; }
+.lec-timeline { display: block; width: 100%; height: auto; margin-top: 10px; }
+.lec-lane { font-size: 12px; fill: var(--muted); font-family: var(--mono); }
+.lec-tick { font-size: 11px; fill: var(--muted); font-family: var(--mono); text-anchor: middle; }
+.lec-op { stroke: var(--text-2); stroke-width: 1.5; }
+.lec-op-label { font-size: 12px; fill: var(--text-2); font-family: var(--mono); }
+.lec-dot { stroke: var(--panel); stroke-width: 1.5; }
+.lec-dot.v-true { fill: var(--pass); }
+.lec-dot.v-false { fill: var(--fail); }
+.lec-dot.v-unclear { fill: var(--muted); }
+.lec-now { stroke: var(--text); stroke-width: 1; stroke-dasharray: 2 3; }
+.lec-hit { cursor: pointer; }
+.lec-side .lead { margin-top: 0; }
+.lec-headline { margin: 0 0 10px; font-size: 15px; color: var(--text); line-height: 1.45; }
+.lec-claims { display: grid; gap: 8px; max-height: 470px; overflow-y: auto; padding-right: 4px; }
+.lec-turn { border-left: 2px solid var(--line); padding: 2px 0 2px 12px; }
+.lec-turn.on { border-left-color: var(--text-2); }
+.lec-turn-head { display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 0; cursor: pointer;
+  font-size: 12.5px; color: var(--text-2); }
+.lec-turn-head i { width: 9px; height: 9px; border-radius: 50%; }
+.lec-turn-head span { font-family: var(--mono); color: var(--muted); }
+.lec-claim { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; margin-top: 6px; }
+.lec-claim q { font-size: 14px; color: var(--text); }
+.lec-claim p { margin: 2px 0; font-size: 13px; color: var(--text-2); }
+.lec-verdict { font-weight: 600; line-height: 1.5; }
+.lec-claim.v-true .lec-verdict { color: var(--pass); }
+.lec-claim.v-false .lec-verdict { color: var(--fail); }
+.lec-claim.v-false q { text-decoration: line-through; text-decoration-color: rgba(229, 72, 77, .6); }
+.lec-claim.v-unclear .lec-verdict { color: var(--muted); }
+.lec-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+.lec-steps li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 6px; font-size: 13px; color: var(--muted); }
+.lec-step-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.lec-step-text b { color: var(--text-2); font-weight: 500; }
+.lec-step-text span { font-size: 12px; }
+.lec-step-text .lec-detail { color: var(--text-2); }
+.lec-mark { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; background: var(--panel-3); }
+.lec-steps .s-done .lec-mark { background: var(--pass); color: #0d1f16; }
+.lec-steps .s-offline .lec-mark { background: var(--panel-3); color: var(--pass); }
+.lec-steps .s-failed .lec-mark { background: var(--fail); color: #fff; }
+.lec-steps .s-running .lec-mark { border: 2px solid var(--primary); border-top-color: transparent; background: none; }
+@media (prefers-reduced-motion: no-preference) { .lec-steps .s-running .lec-mark { animation: lec-spin .8s linear infinite; } }
+@keyframes lec-spin { to { transform: rotate(360deg); } }
+.lec-steps .s-running b, .lec-steps .s-done b { color: var(--text); }
+.lec-how { margin-top: 14px; }
+.lec-how summary { cursor: pointer; font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+.lec-lower { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--line); }
+.lec-lower h3 { margin: 0 0 8px; color: var(--text); font-size: 14px; font-weight: 600; }
+.lec-frame { position: relative; border-radius: var(--radius-sm); overflow: hidden; }
+.lec-frame img { display: block; width: 100%; }
+.lec-frame svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lec-notes h4 { margin: 0 0 4px; font-size: 14px; }
+.lec-notes p { margin: 0 0 8px; font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.lec-correction { border-left: 2px solid var(--fail); padding-left: 10px; margin-bottom: 10px; }
+.lec-correction q { font-size: 13px; color: var(--text); }
+.lec-section b { font-size: 13px; }
+.lec-figure { display: block; width: 100%; border-radius: var(--radius-sm); }
+.lec-proof { margin: 8px 0 4px; font-size: 13px; }
+.lec-proof.p-proven, .lec-proof.p-repaired { color: var(--pass); }
+.lec-proof.p-mismatch, .lec-proof.p-unread { color: var(--warn); }
+.lec-calls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 14px; }
+@media (max-width: 1000px) {
+  .lec-top, .lec-lower { grid-template-columns: minmax(0, 1fr); }
+  .lec-steps { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* proven illustrations */
+.fig-rows { display: grid; gap: 12px; margin: 12px 0 8px; }
+.fig-row { display: grid; grid-template-columns: 200px 200px minmax(0, 1fr); gap: 14px; align-items: start; padding-bottom: 12px;
+  border-bottom: 1px solid var(--line); }
+.fig-row img { display: block; width: 100%; border-radius: 6px; background: #16171b; }
+.fig-row p { margin: 4px 0 0; font-size: 13px; color: var(--text-2); line-height: 1.45; }
+.fig-same { display: grid; place-items: center; height: 100%; min-height: 60px; font-size: 12px; color: var(--muted);
+  border: 1px dashed var(--line-2); border-radius: 6px; }
+.fig-verdict { font-weight: 600; }
+.fig-verdict.f-proven, .fig-verdict.f-repaired { color: var(--pass); }
+.fig-verdict.f-mismatch, .fig-verdict.f-unread { color: var(--warn); }
+@media (max-width: 760px) { .fig-row { grid-template-columns: 1fr 1fr; } .fig-row > div { grid-column: 1 / -1; } }
+.lec-filter { margin-bottom: 10px; }

@@ -16,3 +16,5 @@ pytest==9.1.1
 sgp4==2.27
 pymatching==2.4.0
 pypdf==6.21.4
+# the lecture checker cuts audio, a tracking clip and frames out of an upload (bundles a static ffmpeg)
+imageio-ffmpeg==0.7.0

@@ -33,6 +33,8 @@ from inkubit.adapters.base import (
     SegmentationModel,
     SegmentationResult,
     SpecDraft,
+    Track,
+    TrackResult,
 )
 from inkubit.adapters.config import Settings
 from inkubit.adapters.imaging import annotate, data_url
@@ -101,6 +103,34 @@ class MetaSegmentationModel(SegmentationModel):
                          latency_s=time.perf_counter() - start)
         return SegmentationResult(width=width, height=height, segments=segments, concepts=concepts, call=call)
 
+    def track_video(self, video: bytes, concepts: list[str], fps: float, source: str = "") -> TrackResult:
+        """One request per concept with the clip as an ``input_video`` data URL (docs/meta-api/sam_segmenting.md):
+        SAM 3.1 answers one line per frame and keeps each object's id across frames, so an object's first frame is
+        when it appeared."""
+        url = "data:video/mp4;base64," + base64.b64encode(video).decode("ascii")
+        tracks: list[Track] = []
+        width = height = frames = 0
+        cached_all, start = True, time.perf_counter()
+        for concept in concepts[:MAX_CONCEPTS]:
+            payload = {"model": self.model, "input": [{"type": "message", "role": "user", "content": [
+                {"type": "input_text", "text": concept}, {"type": "input_video", "video_url": url}]}],
+                "metadata": {"include_confidence": "true"}}
+            text, cached = self.client.post_stream_text("/responses", payload)
+            cached_all = cached_all and cached
+            seen: dict[int, list[Any]] = {}
+            for box in parse_sam_output(text):
+                seen.setdefault(box.object_id, []).append(box)
+                width, height, frames = box.width, box.height, max(frames, box.frame + 1)
+            for oid, boxes in sorted(seen.items()):
+                last = boxes[-1]
+                tracks.append(Track(id=f"{concept[:3]}{oid}", concept=concept, first_s=round(boxes[0].frame / fps, 2),
+                                    last_s=round(last.frame / fps, 2), bbox=(last.x1, last.y1, last.x2, last.y2),
+                                    confidence=last.confidence if last.confidence is not None else 1.0))
+        call = ModelCall(provider="meta", model=self.model, role="track", cached=cached_all,
+                         latency_s=time.perf_counter() - start)
+        return TrackResult(width=width, height=height, frames=frames, fps=fps, tracks=tracks, concepts=concepts,
+                           call=call)
+
 
 class MetaReasoningModel(ReasoningModel):
     """Muse Spark reads sketches into specs and explains results."""
@@ -138,7 +168,8 @@ class MetaReasoningModel(ReasoningModel):
                          latency_s=time.perf_counter() - start)
         return kind, concepts or ["box", "circle"], call
 
-    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str) -> SpecDraft:
+    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str,
+                   context: str = "") -> SpecDraft:
         start = time.perf_counter()
         seg_dicts = [s.model_dump() for s in segments.segments]
         listing = "\n".join(
@@ -152,7 +183,8 @@ class MetaReasoningModel(ReasoningModel):
                     f"This is a hand-drawn quantum {kind}. The image is {segments.width}x{segments.height} pixels. "
                     f"Segments found by SAM 3.1 (pixel boxes):\n{listing}\n\n"
                     "The first image is the photo; the second shows the same segments as numbered red boxes. "
-                    "Fill the JSON for the drawing. Use segment ids exactly as listed (empty string if none).")},
+                    "Fill the JSON for the drawing. Use segment ids exactly as listed (empty string if none)."
+                    + (f" {context}" if context else ""))},
                 _image_part(image, mime),
                 _image_part(marked, "image/jpeg"),
             ]},
@@ -404,6 +436,22 @@ class MetaImageModel(ImageModel):
         return DiagramResult(image_b64=b64, mime="image/png", call=call,
                              caption="Illustration by Muse Image. The exact circuit is the Qiskit drawing.")
 
+    def edit(self, image_b64: str, mime: str, prompt: str) -> DiagramResult:
+        """``POST /images/edits`` with the figure as a data URL (docs/meta-api/api-reference_images_edit-image.md)."""
+        start = time.perf_counter()
+        data, cached = self.client.post("/images/edits", {
+            "model": self.model, "prompt": prompt, "images": [{"image_url": f"data:{mime};base64,{image_b64}"}],
+            "n": 1, "size": "1536x1024", "response_format": "b64_json", "output_format": "png",
+            "reasoning_strength": "high",
+        })
+        try:
+            b64 = data["data"][0]["b64_json"]
+        except (KeyError, IndexError, TypeError):
+            raise MetaAPIError("image edit returned no image") from None
+        return DiagramResult(image_b64=b64, mime="image/png", caption="Corrected by Muse Image.",
+                             call=ModelCall(provider="meta", model=self.model, role="correct figure", cached=cached,
+                                            latency_s=time.perf_counter() - start))
+
 
 def diagram_prompt(spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> str:
     """A precise description of the design for Muse Image."""
@@ -443,7 +491,8 @@ def diagram_prompt(spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> s
         return (f"An annotated quantum circuit diagram titled '{spec.metadata.title or 'Quantum circuit'}'. "
                 f"{spec.num_qubits} horizontal wires labelled q0 to q{spec.num_qubits - 1} from top to bottom. "
                 f"Left to right: {'; '.join(steps)}; then a measurement meter at the end of every wire. "
-                f"Add one short caption under each step explaining it for a student. "
+                + ("No captions, step labels or other text besides the title, the wire labels and the gate letters. "
+                   if result.get("plain") else "Add one short caption under each step explaining it for a student. ")
                 + (f"To the right, a small bar chart of the measured results ({top}). " if top else "")
                 + style)
     nodes = "; ".join(f"{n.label or n.id} ({n.type.replace('_', ' ')})" for n in spec.nodes)

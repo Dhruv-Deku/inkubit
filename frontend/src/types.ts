@@ -909,3 +909,22 @@ export interface HeadlineScene {
   tvd: number
 }
 export interface Headline { stats: HeadlineStat[]; scene: HeadlineScene }
+
+export interface LectureStep { id: string; label: string; by: string; status: 'waiting' | 'running' | 'done' | 'offline' | 'failed'; detail: string; seconds: number | null }
+export interface LectureTurn { index: number; speaker: string; start: number; end: number; text: string }
+export interface LectureClaim {
+  turn: number; quote: string; kind: string; qubits: number[]; speaker: string; time: number; board: number; board_ops: string[]
+  verdict: 'true' | 'false' | 'unclear'; detail: string
+}
+export interface LectureResult {
+  source: 'sample' | 'upload'; title: string; made_by: string; duration: number; width: number; height: number; frame: string
+  turns: LectureTurn[]; tracks: { id: string; concept: string; first_s: number; last_s: number; bbox: [number, number, number, number] }[]
+  ops: { op: number; appears: number; how: string; tracks: string[]; label: string }[]
+  versions: { index: number; time: number; ops: number[] }[]
+  claims: LectureClaim[]; tally: { true: number; false: number; unclear: number }; headline: string
+  notes: { title: string; summary: string; sections: { heading: string; text: string }[]; corrections: { quote: string; speaker: string; correction: string }[] }
+  figure: { image: string; caption: string; proof?: FigureProof }
+  calls: ModelCall[]; offline: boolean; seconds: number
+}
+export interface FigureProof { verdict: 'proven' | 'repaired' | 'mismatch' | 'unread'; detail: string; read_ops: string[]; attempts: number }
+export interface LectureView { id: string; status: 'running' | 'done' | 'failed'; error: string | null; steps: LectureStep[]; result: LectureResult | null }

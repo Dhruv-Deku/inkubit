@@ -168,18 +168,62 @@ class BugGuess(BaseModel):
     call: ModelCall
 
 
+class Track(BaseModel):
+    """One object SAM 3.1 followed through a video: when it is first and last seen, and where it is at the end."""
+
+    id: str
+    concept: str
+    first_s: float
+    last_s: float
+    bbox: tuple[float, float, float, float]  # on the last frame it was seen, in the clip's pixels
+    confidence: float = 1.0
+
+
+class TrackResult(BaseModel):
+    width: int
+    height: int
+    frames: int
+    fps: float
+    tracks: list[Track]
+    concepts: list[str]
+    call: ModelCall
+
+
+class Turn(BaseModel):
+    """One speech turn: who (a label the model makes up per recording), when, and what was said."""
+
+    speaker: str
+    start: float
+    end: float
+    text: str
+
+
+class TurnTranscript(BaseModel):
+    turns: list[Turn]
+    text: str
+    duration_ms: int = 0
+    call: ModelCall
+
+
 class SegmentationModel(ABC):
-    """SAM 3.1: image -> segments."""
+    """SAM 3.1: image -> segments; video -> tracked objects."""
 
     @abstractmethod
     def segment(self, image: bytes, mime: str, concepts: list[str] | None = None) -> SegmentationResult: ...
+
+    def track_video(self, video: bytes, concepts: list[str], fps: float, source: str = "") -> TrackResult:
+        """Follow every object matching each concept through an MP4 clip sampled at ``fps``. ``source`` is the
+        SHA-256 of the original upload; only the offline stand-in uses it, to find a recorded sample."""
+        raise NotImplementedError("tracking objects through a video needs the live SAM 3.1")
 
 
 class ReasoningModel(ABC):
     """Muse Spark: sketch -> spec draft, and results -> explanation."""
 
     @abstractmethod
-    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str) -> SpecDraft: ...
+    def draft_spec(self, image: bytes, mime: str, segments: SegmentationResult, kind: str,
+                   context: str = "") -> SpecDraft:
+        """``context``: an extra instruction for this reading (e.g. that the image is a figure being checked)."""
 
     @abstractmethod
     def choose_concepts(self, image: bytes, mime: str) -> tuple[str, list[str], ModelCall]:
@@ -248,9 +292,17 @@ class SpeechModel(ABC):
     @abstractmethod
     def transcribe(self, wav: bytes, keywords: list[str] | None = None) -> Transcript: ...
 
+    def transcribe_turns(self, wav: bytes, keywords: list[str] | None = None, source: str = "") -> TurnTranscript:
+        """Who said what and when (diarization). ``source`` as in :meth:`SegmentationModel.track_video`."""
+        raise NotImplementedError("telling speakers apart needs the live Muse Voice Transcribe")
+
 
 class ImageModel(ABC):
     """Muse Image: final design -> clean annotated diagram."""
 
     @abstractmethod
     def diagram(self, spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> DiagramResult: ...
+
+    def edit(self, image_b64: str, mime: str, prompt: str) -> DiagramResult:
+        """Change an existing figure as the prompt says (used to correct a figure that was read back wrong)."""
+        raise NotImplementedError("editing a figure needs the live Muse Image")

@@ -13,7 +13,7 @@ import io
 import time
 import wave
 
-from inkubit.adapters.base import ModelCall, SpeechModel, Transcript
+from inkubit.adapters.base import ModelCall, SpeechModel, Transcript, Turn, TurnTranscript
 from inkubit.adapters.config import Settings
 
 MAX_SECONDS = 60
@@ -59,9 +59,37 @@ class MetaSpeechModel(SpeechModel):
                           call=ModelCall(provider="meta", model=self.model, role="transcribe", cached=cached,
                                          latency_s=time.perf_counter() - start))
 
+    def transcribe_turns(self, wav: bytes, keywords: list[str] | None = None, source: str = "") -> TurnTranscript:
+        """``DIARIZATION`` mode: the buffered answer lists turns with ``startMs``, ``endMs`` and a ``speaker`` label
+        (docs/meta-api/api-reference_voice_schemas.md). Turns with no words are dropped."""
+        check_wav(wav)
+        start = time.perf_counter()
+        request = {"model": self.model, "audioEncoding": "WAV", "mode": "DIARIZATION",
+                   "keywords": list(keywords if keywords is not None else KEYWORDS)}
+        data, cached = self.client.post_multipart("/asr/transcribe", request, wav, "lecture.wav", "audio/wav")
+        turns = [Turn(speaker=str(t.get("speaker") or "?"), start=round(int(t.get("startMs") or 0) / 1000, 2),
+                      end=round(int(t.get("endMs") or 0) / 1000, 2), text=str(t.get("transcript", "")).strip())
+                 for t in data.get("turns") or []]
+        turns = [t for t in turns if t.text]
+        return TurnTranscript(turns=turns, text=str(data.get("transcript", "")).strip(),
+                              duration_ms=int(data.get("audioDurationMs") or 0),
+                              call=ModelCall(provider="meta", model=self.model, role="diarize", cached=cached,
+                                             latency_s=time.perf_counter() - start))
+
 
 class MockSpeechModel(SpeechModel):
     """Offline there is no speech model, and making up a transcript would be dishonest."""
 
     def transcribe(self, wav: bytes, keywords: list[str] | None = None) -> Transcript:
         raise RuntimeError("offline mode cannot transcribe audio; the browser's own speech recognition is used instead")
+
+    def transcribe_turns(self, wav: bytes, keywords: list[str] | None = None, source: str = "") -> TurnTranscript:
+        """Offline, only the bundled sample lecture has turns: the script that made it recorded who said what."""
+        from inkubit.lecture import sample_record
+
+        rec = sample_record(source)
+        speakers = {"Teacher": "A", "Student": "B"}
+        turns = [Turn(speaker=speakers.get(t["speaker"], "?"), start=t["start"], end=t["end"], text=t["text"])
+                 for t in rec["turns"]]
+        return TurnTranscript(turns=turns, text=" ".join(t.text for t in turns), duration_ms=int(rec["duration"] * 1000),
+                              call=ModelCall(provider="mock", model="the sample's own script", role="diarize"))

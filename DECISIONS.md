@@ -1061,3 +1061,39 @@ a wall of bordered buttons and panels fading in on scroll.
   matrix (28 gallery circuits by 11 checks), and the five models by name. "Proves" is underlined by a pen stroke drawn
   once on load; nothing else moves.
 
+## D86. The lecture checker: a filmed explanation in, every spoken claim checked (2026-11-04)
+Three Meta capabilities the app had not used yet, each on what it is built for, and exact physics as the judge:
+
+- **Muse Voice Transcribe in `DIARIZATION` mode** returns turns with start, end and a speaker label (the buffered
+  `turns` array). A WAV written to a pipe has no length in its header, so the audio is cut to a file first.
+- **SAM 3.1 on video** (`input_video`, a data URL of a 2-frames-a-second H.264 clip): one line per frame, each object
+  keeping its id, so an object's first frame is when it was drawn. On pen sketches "square" and "circle" track
+  reliably; "gate box" found nothing on video, and "dot" found the control dots late. Measured on the sample: the H at
+  7.0 s, the CNOTs at 13.5 s and 30.0 s (drawn at 6.6, 13.6 and 30.1 s).
+- **Muse Spark** reads the last frame with SAM's tracks as its segments, and writes each claim out formally: kind
+  (probability, outcomes, entangled, not entangled, named state, other), qubits, bits, and the board version it is
+  about. It never judges. The version it names is only accepted if that version was on the board during the turn (or
+  appeared within a second after it); otherwise the board at the turn's start is used.
+- **Exact simulation** judges every claim against the circuit as drawn at that moment: marginal probabilities to
+  0.02, outcome sets exactly, entanglement as a mixed single-qubit reduced state (purity below 0.999), named states as
+  fidelity 0.99 or more with GHZ, W, Bell, all-zero or uniform.
+- **Muse Wonder** writes corrected notes from the verdicts only; **Muse Image** draws the final board (D87).
+
+The sample (`scripts/make_lecture.py`) is a pen sketch drawn in five stages while Windows' David and Zira voices talk;
+two statements are wrong on purpose, one per speaker. Live, the whole run takes about a minute and finds the same
+three wrong claims the script planted (the student's "the third qubit is entangled too" before it was wired in, and the
+teacher's "this is the W state" and "exactly one reads one"); `examples/lecture/lecture_run.json` records it. Offline,
+only the sample can be checked: its script's own record stands in for the models, labelled. Uploads (MP4 or MOV with
+sound, at most 60 s and 40 MB) need the live models. `imageio-ffmpeg` moved into the runtime requirements.
+
+## D87. Proven illustrations: a generated figure is read back before it is shown (2026-11-04)
+Muse Image's first figure of the lecture circuit drew the CNOTs on the wrong wires, and its "corrected" figure was
+still wrong, yet a reader passed it: the figure's captions said "CNOT (q0→q1)". So a figure to be proven is drawn with
+no captions (`diagram_prompt(..., {"plain": True})`), and read back with an instruction to read only the symbols
+(a CNOT is a dot and a circled plus joined by a line; titles and captions are ignored), through the same pipeline as a
+photographed sketch (Muse Spark picks concepts, SAM 3.1 segments, Muse Spark reads). The circuit read back must have
+the same qubit count and the same unitary up to a global phase (overlap at least 0.999, since a figure prints angles to
+two decimals). A wrong figure goes to Muse Image's edit endpoint (`/images/edits`, the figure as a data URL) with the
+exact difference, at most twice; if it never matches, the exact Qiskit drawing is shown and the page says why.
+`scripts/figure_bench.py` measures it over the small gallery circuits (`examples/figure_benchmark.json`).
+

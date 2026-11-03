@@ -188,8 +188,9 @@ class Recorder:
 class Director:
     """Moves a visible cursor, clicks, scrolls smoothly and shows captions."""
 
-    def __init__(self, page: Page, live: bool, rec: Recorder | None = None):
-        self.page, self.live, self.rec = page, live, rec
+    def __init__(self, page: Page, live: bool, rec: Recorder | None = None, captions: bool = True):
+        self.page, self.live, self.rec, self.captions = page, live, rec, captions
+        self.cues: list[tuple[float, str]] = []  # (video time, caption): the voice-over script of the take
         self.x, self.y = VIEW_W / 2, VIEW_H / 2
 
     async def fast(self, factor: float, label: str) -> None:
@@ -208,7 +209,9 @@ class Director:
         await self.page.wait_for_timeout(seconds * 1000)
 
     async def caption(self, text: str | None, hold: float = 0) -> None:
-        await self.page.evaluate("t => window.__demo.caption(t)", text or "")
+        if text and self.rec:
+            self.cues.append((self.rec._video_time(time.monotonic()), text.replace("**", "")))
+        await self.page.evaluate("t => window.__demo.caption(t)", (text or "") if self.captions else "")
         if hold:
             await self.wait(hold)
 
@@ -400,6 +403,24 @@ async def feedforward_story(d: Director) -> None:
     await d.wait(0.8)
 
 
+async def lecture_story(d: Director) -> None:
+    """The lecture checker: a filmed explanation, every spoken claim checked against the board as it was."""
+    page = d.page
+    await section(d, "Sketch to code")
+    lec = await show(d, "Lecture checker")
+    await d.click(lec.get_by_role("button", name="Check the sample lecture"))
+    await d.caption("**Lecture checker**: a filmed explanation. Muse Voice tells the speakers apart; SAM 3.1 tracks each drawn "
+                    "part through the video.", hold=3.6)
+    await lec.locator(".lec-headline").wait_for(timeout=240_000)
+    await d.click(lec.locator(".lec-filter button", has_text="Wrong"))
+    await d.caption("Muse Spark writes every claim out; exact physics judges each against the board as it was when it was "
+                    "said. Both speakers' mistakes are caught.", hold=4.4)
+    await d.caption(None)
+    await d.scroll_to(lec.locator(".lec-lower"), block="center", pause=0.5)
+    await d.caption("Muse Wonder writes corrected notes, and Muse Image's figure is read back and proven before it is shown.",
+                    hold=3.6)
+
+
 async def discovery_story(d: Director) -> None:
     page, live = d.page, d.live
     await section(d, "Discover")
@@ -460,11 +481,6 @@ async def hardware_story(d: Director) -> None:
     dec = await show(d, "ML error-correction decoder")
     await dec.locator(".obs-head").first.wait_for(timeout=60_000)
     await d.caption("A learned surface-code decoder that reads both kinds of checks beats minimum-weight matching, beyond its error bars.", hold=3.6)
-    d5 = dec.locator(".d5")
-    if await d5.count():
-        await d.caption(None)
-        await d.scroll_to(d5, block="start", pause=0.6)
-        await d.caption("And at distance 5, below threshold, the bigger code suppresses errors, as Google's Willow chip showed.", hold=3.6)
     await show(d, "Code lab")
     await d.caption(f"**Codes designed by AI, proven exactly**: for chips where phase flips dominate, Muse Spark found a 9-qubit code that "
                     f"needs {F['dz']} phase flips to fail, against {F['surface_dz']} for the surface code.", hold=5.2)
@@ -490,7 +506,7 @@ async def evidence_story(d: Director) -> None:
                         f"predicted what it measured best on {F['hw_best']} of {F['hw_n']} circuits.", hold=5.4)
 
 
-async def record(base: str, out: Path) -> None:
+async def record(base: str, out: Path, captions: bool = True) -> None:
     with urllib.request.urlopen(f"{base}/api/health", timeout=10) as r:
         health = json.load(r)
     live = health.get("mode") == "meta"
@@ -509,7 +525,7 @@ async def record(base: str, out: Path) -> None:
         await page.goto(base)
         await page.wait_for_selector(".mission-goal")
         await page.evaluate("document.fonts.ready")
-        d = Director(page, live)
+        d = Director(page, live, captions=captions)
         await page.evaluate("a => window.__demo.card(...a)", ["Inkubit", "", [], "", False])
         await d.wait(0.8)
 
@@ -522,10 +538,11 @@ async def record(base: str, out: Path) -> None:
             await page.screenshot(path=str(out.with_suffix(".png")))
             await d.hide_card()
             F.update(facts())
-            for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("feedforward", feedforward_story), ("discovery", discovery_story),
-                                ("learning", learning_story), ("estimator", estimator_story), ("paper", paper_story),
+            for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("feedforward", feedforward_story), ("lecture", lecture_story),
+                                ("discovery", discovery_story), ("estimator", estimator_story),
                                 ("hardware", hardware_story), ("evidence", evidence_story)):
                 print(name, f"{rec._video_time(time.monotonic()):.1f} s", flush=True)
+                d.cues.append((rec._video_time(time.monotonic()), f"[scene: {name}]"))
                 await story(d)
             await d.caption(None)
             await d.card("Inkubit", "Sketch it, say it or photograph it. The AI proposes; exact physics has the last word.",
@@ -534,6 +551,11 @@ async def record(base: str, out: Path) -> None:
             print(f"captured {len(rec.frames)} frames over {rec.t_end - rec.frames[0][0]:.1f} s "
                   f"({rec._video_time(rec.t_end):.1f} s after speed-ups); encoding…")
             rec.encode(out)
+            cue_file = out.with_suffix(".cues.txt")
+            cue_file.write_text("
+".join(f"{int(t // 60)}:{t % 60:04.1f}  {c}" for t, c in d.cues) + "
+", encoding="utf-8")
+            print(f"cues: {cue_file}")
         await browser.close()
     if errors:
         print("console errors:", *errors, sep="\n  ")
@@ -544,8 +566,10 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("base", nargs="?", default="http://127.0.0.1:8000")
     ap.add_argument("--out", type=Path, default=ROOT / "docs" / "video" / "inkubit-demo.mp4")
+    ap.add_argument("--no-captions", action="store_true",
+                    help="keep the pacing but show no captions (for a voice-over); the cues file still lists them")
     args = ap.parse_args()
-    asyncio.run(record(args.base.rstrip("/"), args.out.resolve()))
+    asyncio.run(record(args.base.rstrip("/"), args.out.resolve(), captions=not args.no_captions))
 
 
 if __name__ == "__main__":

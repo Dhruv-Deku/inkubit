@@ -514,6 +514,27 @@ class RefereeRequest(BaseModel):
     spec: dict[str, Any] | None = None
 
 
+@app.get("/api/figures/benchmark")
+def figure_benchmark() -> dict[str, Any]:
+    """Proven illustrations, measured (scripts/figure_bench.py): how often Muse Image's figure of a gallery circuit was
+    right first time, corrected after the read-back, or replaced by the exact drawing."""
+    data = _recorded("figure_benchmark.json")
+    for r in data["circuits"]:
+        for key in ("first_image", "final_image"):
+            if r.get(key):
+                r[key] = "/api/examples/" + r[key]
+        r.pop("calls", None)
+    return data
+
+
+@app.get("/api/examples/figures/{name}")
+def example_figure(name: str) -> FileResponse:
+    path = (EXAMPLES_DIR / "figures" / name).resolve()
+    if path.parent != (EXAMPLES_DIR / "figures").resolve() or path.suffix != ".webp" or not path.exists():
+        raise HTTPException(404, "no such figure")
+    return FileResponse(path, media_type="image/webp")
+
+
 @app.get("/api/referee/benchmark")
 def referee_benchmark() -> dict[str, Any]:
     """The recorded AI referee benchmark (scripts/referee_bench.py)."""
@@ -594,6 +615,47 @@ def paper_status(paper_id: str) -> dict[str, Any]:
     if s is None:
         raise HTTPException(404, "no such paper run")
     return {"id": s.id, "status": s.status, "error": s.error, "source": s.source, "result": s.result}
+
+
+@app.get("/api/lecture/sample")
+def lecture_sample() -> dict[str, Any]:
+    """The bundled sample lecture: a pen sketch drawn in stages while two voices explain it, two of them wrongly."""
+    from inkubit import lecture
+
+    rec = lecture._sample()
+    return {"title": rec["title"], "made_by": rec["made_by"], "duration": rec["duration"], "sha256": rec["sha256"],
+            "video": "/api/lecture/sample.mp4", "turns": len(rec["turns"])}
+
+
+@app.get("/api/lecture/sample.mp4")
+def lecture_sample_video() -> FileResponse:
+    from inkubit.lecture import LECTURE_DIR
+
+    return FileResponse(LECTURE_DIR / "lecture.mp4", media_type="video/mp4")
+
+
+@app.post("/api/lecture")
+async def start_lecture(video: UploadFile | None = File(None)) -> dict[str, Any]:
+    """Check a filmed explanation: Muse Voice tells the speakers apart, SAM 3.1 tracks what was drawn through the
+    video, Muse Spark reads the board and writes each claim out, exact simulation judges each claim against the board
+    as it was, Muse Wonder writes corrected notes and Muse Image a clean figure. No upload: the bundled sample."""
+    from inkubit import lecture
+
+    raw = await video.read() if video is not None else b""
+    if len(raw) > lecture.MAX_BYTES:
+        raise HTTPException(413, f"keep the video under {lecture.MAX_BYTES // 1_000_000} MB")
+    s = lecture.launch(raw or lecture.sample_video(), get_models(), sample=not raw)
+    return {"lecture_id": s.id}
+
+
+@app.get("/api/lecture/{lecture_id}")
+def lecture_status(lecture_id: str) -> dict[str, Any]:
+    from inkubit import lecture
+
+    s = lecture.get(lecture_id)
+    if s is None:
+        raise HTTPException(404, "no such lecture run")
+    return s.view()
 
 
 class CodeRequest(BaseModel):

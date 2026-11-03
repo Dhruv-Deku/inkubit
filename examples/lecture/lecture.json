@@ -1,0 +1,339 @@
+{
+  "title": "Entanglement, three qubits",
+  "made_by": "scripts/make_lecture.py (pen sketch drawn in stages; Windows speech voices David and Zira)",
+  "video": "lecture.mp4",
+  "sha256": "32d834423f9df02a5ebf036a81ed7e6d00780af4528fe9fc3b04b5f622e3561d",
+  "duration": 50.81,
+  "width": 1280,
+  "height": 720,
+  "turns": [
+    {
+      "index": 0,
+      "speaker": "Teacher",
+      "voice": "Microsoft David Desktop",
+      "start": 0.8,
+      "end": 6.24,
+      "text": "Today we build an entangled state on three qubits. Three wires, all starting at zero."
+    },
+    {
+      "index": 1,
+      "speaker": "Teacher",
+      "voice": "Microsoft David Desktop",
+      "start": 8.14,
+      "end": 13.22,
+      "text": "A Hadamard on the first qubit. Now it reads zero or one, each half of the time."
+    },
+    {
+      "index": 2,
+      "speaker": "Teacher",
+      "voice": "Microsoft David Desktop",
+      "start": 15.12,
+      "end": 22.46,
+      "text": "A CNOT from the first qubit to the second. Now these two are entangled: we only ever see zero zero, or one one."
+    },
+    {
+      "index": 3,
+      "speaker": "Student",
+      "voice": "Microsoft Zira Desktop",
+      "start": 22.96,
+      "end": 25.95,
+      "text": "And the third qubit is entangled with them too, right?"
+    },
+    {
+      "index": 4,
+      "speaker": "Teacher",
+      "voice": "Microsoft David Desktop",
+      "start": 26.45,
+      "end": 29.72,
+      "text": "Not yet. The third qubit is still just zero."
+    },
+    {
+      "index": 5,
+      "speaker": "Teacher",
+      "voice": "Microsoft David Desktop",
+      "start": 31.62,
+      "end": 40.82,
+      "text": "One more CNOT, from the second qubit to the third. Now all three are entangled. This is the W state: exactly one of the three qubits reads one."
+    },
+    {
+      "index": 6,
+      "speaker": "Teacher",
+      "voice": "Microsoft David Desktop",
+      "start": 42.72,
+      "end": 48.31,
+      "text": "When we measure, we get zero zero zero, or one one one, each with probability one half."
+    }
+  ],
+  "elements": [
+    {
+      "id": "wires",
+      "appears": 0.3,
+      "segments": []
+    },
+    {
+      "id": "h",
+      "appears": 6.64,
+      "segments": [
+        {
+          "concept": "gate box",
+          "bbox": [
+            250,
+            180,
+            350,
+            280
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cx01",
+      "appears": 13.62,
+      "segments": [
+        {
+          "concept": "dot",
+          "bbox": [
+            505,
+            215,
+            535,
+            245
+          ]
+        },
+        {
+          "concept": "circle",
+          "bbox": [
+            481,
+            341,
+            559,
+            419
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cx12",
+      "appears": 30.12,
+      "segments": [
+        {
+          "concept": "dot",
+          "bbox": [
+            725,
+            365,
+            755,
+            395
+          ]
+        },
+        {
+          "concept": "circle",
+          "bbox": [
+            701,
+            491,
+            779,
+            569
+          ]
+        }
+      ]
+    },
+    {
+      "id": "meters",
+      "appears": 41.22,
+      "segments": [
+        {
+          "concept": "meter",
+          "bbox": [
+            960,
+            186,
+            1068,
+            274
+          ]
+        },
+        {
+          "concept": "meter",
+          "bbox": [
+            960,
+            336,
+            1068,
+            424
+          ]
+        },
+        {
+          "concept": "meter",
+          "bbox": [
+            960,
+            486,
+            1068,
+            574
+          ]
+        }
+      ]
+    }
+  ],
+  "spec": {
+    "kind": "circuit",
+    "version": "1.0",
+    "num_qubits": 3,
+    "num_clbits": 3,
+    "operations": [
+      {
+        "gate": "H",
+        "targets": [
+          0
+        ]
+      },
+      {
+        "gate": "CX",
+        "controls": [
+          0
+        ],
+        "targets": [
+          1
+        ]
+      },
+      {
+        "gate": "CX",
+        "controls": [
+          1
+        ],
+        "targets": [
+          2
+        ]
+      }
+    ],
+    "measurements": [
+      {
+        "qubit": 0,
+        "clbit": 0
+      },
+      {
+        "qubit": 1,
+        "clbit": 1
+      },
+      {
+        "qubit": 2,
+        "clbit": 2
+      }
+    ],
+    "metadata": {
+      "title": "Entanglement, three qubits",
+      "origin": "image"
+    }
+  },
+  "op_elements": [
+    "h",
+    "cx01",
+    "cx12"
+  ],
+  "claims": [
+    {
+      "turn": 1,
+      "quote": "Now it reads zero or one, each half of the time.",
+      "kind": "probability",
+      "qubits": [
+        0
+      ],
+      "outcome": "1",
+      "value": 0.5
+    },
+    {
+      "turn": 2,
+      "quote": "Now these two are entangled",
+      "kind": "entangled",
+      "qubits": [
+        0,
+        1
+      ]
+    },
+    {
+      "turn": 2,
+      "quote": "we only ever see zero zero, or one one",
+      "kind": "outcomes",
+      "qubits": [
+        0,
+        1
+      ],
+      "outcomes": [
+        "00",
+        "11"
+      ]
+    },
+    {
+      "turn": 3,
+      "quote": "And the third qubit is entangled with them too, right?",
+      "kind": "entangled",
+      "qubits": [
+        2
+      ]
+    },
+    {
+      "turn": 4,
+      "quote": "The third qubit is still just zero.",
+      "kind": "probability",
+      "qubits": [
+        2
+      ],
+      "outcome": "0",
+      "value": 1.0
+    },
+    {
+      "turn": 5,
+      "quote": "Now all three are entangled.",
+      "kind": "entangled",
+      "qubits": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "turn": 5,
+      "quote": "This is the W state",
+      "kind": "state",
+      "qubits": [
+        0,
+        1,
+        2
+      ],
+      "state": "W"
+    },
+    {
+      "turn": 5,
+      "quote": "exactly one of the three qubits reads one",
+      "kind": "outcomes",
+      "qubits": [
+        0,
+        1,
+        2
+      ],
+      "outcomes": [
+        "100",
+        "010",
+        "001"
+      ]
+    },
+    {
+      "turn": 6,
+      "quote": "we get zero zero zero, or one one one, each with probability one half",
+      "kind": "outcomes",
+      "qubits": [
+        0,
+        1,
+        2
+      ],
+      "outcomes": [
+        "000",
+        "111"
+      ]
+    },
+    {
+      "turn": 6,
+      "quote": "each with probability one half",
+      "kind": "probability",
+      "qubits": [
+        0,
+        1,
+        2
+      ],
+      "outcome": "000",
+      "value": 0.5
+    }
+  ]
+}
