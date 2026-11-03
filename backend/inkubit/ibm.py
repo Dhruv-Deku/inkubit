@@ -125,18 +125,20 @@ def runs_today() -> int:
 
 
 def submit(spec: CircuitSpec, shots: int = 2048, device: str | None = None) -> dict[str, Any]:
-    from qiskit import transpile
-    from qiskit_ibm_runtime import SamplerV2
-
-    from inkubit.chip import advise, device_names
-    from inkubit.proofsheet import _measured
-
+    # refuse first (public mode, no token, no library, daily cap), so a host without IBM access never imports it
     ok, why = available()
     if not ok:
         raise PermissionError(why)
     cap = int(os.environ.get("INKUBIT_IBM_DAILY_RUNS", "10"))
     if runs_today() >= cap:
         raise PermissionError(f"today's cap of {cap} IBM runs is reached (INKUBIT_IBM_DAILY_RUNS)")
+
+    from qiskit import transpile
+    from qiskit_ibm_runtime import SamplerV2
+
+    from inkubit.chip import advise, device_names
+    from inkubit.proofsheet import _measured
+
     shots = max(100, min(int(shots), MAX_SHOTS))
     svc = _service()
     if device is None:
