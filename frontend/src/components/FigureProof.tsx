@@ -10,6 +10,18 @@ export interface FigureBench {
   totals: { circuits: number; first_try: number; repaired: number; mismatch: number; unread: number }; circuits: FigureRow[]
 }
 
+/** The corrected figures first, then caught and proven ones alternating, so the first rows show every outcome. */
+function interleave(all: FigureRow[]): FigureRow[] {
+  const by = (v: FigureRow['verdict'][]) => all.filter((r) => v.includes(r.verdict)).sort((a, b) => a.gates - b.gates)
+  const caught = by(['mismatch', 'unread']), proven = by(['proven'])
+  const mixed: FigureRow[] = []
+  for (let i = 0; i < Math.max(caught.length, proven.length); i++) {
+    if (caught[i]) mixed.push(caught[i])
+    if (proven[i]) mixed.push(proven[i])
+  }
+  return [...by(['repaired']), ...mixed]
+}
+
 const LABEL = { proven: 'right first time', repaired: 'corrected, then proven', mismatch: 'never matched', unread: 'could not be read' } as const
 
 /** Every figure Muse Image drew of a gallery circuit, read back by SAM 3.1 and Muse Spark and compared exactly. */
@@ -20,7 +32,7 @@ export function FigureProofPanel() {
   useEffect(() => { api.figureBenchmark().then(setData).catch(() => setMissing(true)) }, [])
   if (missing) return null
   const t = data?.totals
-  const rows = data ? [...data.circuits].sort((a, b) => Number(a.first_try) - Number(b.first_try) || a.title.localeCompare(b.title)) : []
+  const rows = data ? interleave(data.circuits) : []
   const shown = open ? rows : rows.slice(0, 6)
   return (
     <div className="panel">

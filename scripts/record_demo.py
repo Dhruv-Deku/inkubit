@@ -17,7 +17,9 @@ import argparse
 import asyncio
 import base64
 import json
+import os
 import re
+import shutil
 import subprocess
 import tempfile
 import time
@@ -113,6 +115,9 @@ OVERLAY_JS = r"""
 """
 
 
+JPEG_QUALITY = int(os.environ.get("RECORD_JPEG_QUALITY", "95"))  # screencast frames; 85 needs about half the disk
+MIN_FREE = 0.3e9  # bytes left on the disk below which capture stops
+
 class Recorder:
     """Collects screencast frames with arrival times and encodes them at a fixed rate."""
 
@@ -122,6 +127,7 @@ class Recorder:
         self.speeds: list[tuple[float, float]] = []  # (real time, playback factor from then on)
         self.cdp = None
         self.t_end = 0.0
+        self.disk_full = False
 
     def speed(self, factor: float) -> None:
         """Play everything from now on ``factor`` times faster (1 = real time)."""
@@ -142,13 +148,16 @@ class Recorder:
         self.cdp = await self.page.context.new_cdp_session(self.page)
 
         def on_frame(params: dict) -> None:
-            path = self.dir / f"f{len(self.frames):06d}.jpg"
-            path.write_bytes(base64.b64decode(params["data"]))
-            self.frames.append((time.monotonic(), path))
+            if len(self.frames) % 200 == 0 and shutil.disk_usage(self.dir).free < MIN_FREE:
+                self.disk_full = True  # stop writing before the disk fills; the take is abandoned
+            if not self.disk_full:
+                path = self.dir / f"f{len(self.frames):06d}.jpg"
+                path.write_bytes(base64.b64decode(params["data"]))
+                self.frames.append((time.monotonic(), path))
             asyncio.ensure_future(self.cdp.send("Page.screencastFrameAck", {"sessionId": params["sessionId"]}))
 
         self.cdp.on("Page.screencastFrame", on_frame)
-        await self.cdp.send("Page.startScreencast", {"format": "jpeg", "quality": 95,
+        await self.cdp.send("Page.startScreencast", {"format": "jpeg", "quality": JPEG_QUALITY,
                                                      "maxWidth": 1920, "maxHeight": 1080, "everyNthFrame": 1})
 
     async def stop(self) -> None:
@@ -156,6 +165,8 @@ class Recorder:
         await self.cdp.send("Page.stopScreencast")
 
     def encode(self, out: Path) -> None:
+        if self.disk_full:
+            raise RuntimeError(f"stopped capturing: less than {MIN_FREE / 1e9:.1f} GB left on the disk")
         if not self.frames:
             raise RuntimeError("no frames were captured")
         # resample to a fixed rate: each output frame shows the newest captured frame at that moment
@@ -412,6 +423,9 @@ async def lecture_story(d: Director) -> None:
     await d.caption("**Lecture checker**: a filmed explanation. Muse Voice tells the speakers apart; SAM 3.1 tracks each drawn "
                     "part through the video.", hold=3.6)
     await lec.locator(".lec-headline").wait_for(timeout=240_000)
+    # play the lecture itself (muted) from just before the second CNOT is drawn and the "W state" claim is made
+    await page.evaluate("() => { const v = document.querySelector('.panel.lecture video'); v.muted = true; "
+                        "v.currentTime = 24; v.play().catch(() => {}); }")
     await d.click(lec.locator(".lec-filter button", has_text="Wrong"))
     await d.caption("Muse Spark writes every claim out; exact physics judges each against the board as it was when it was "
                     "said. Both speakers' mistakes are caught.", hold=4.4)
@@ -552,9 +566,7 @@ async def record(base: str, out: Path, captions: bool = True) -> None:
                   f"({rec._video_time(rec.t_end):.1f} s after speed-ups); encoding…")
             rec.encode(out)
             cue_file = out.with_suffix(".cues.txt")
-            cue_file.write_text("
-".join(f"{int(t // 60)}:{t % 60:04.1f}  {c}" for t, c in d.cues) + "
-", encoding="utf-8")
+            cue_file.write_text("".join(f"{int(t // 60)}:{t % 60:04.1f}  {c}\n" for t, c in d.cues), encoding="utf-8")
             print(f"cues: {cue_file}")
         await browser.close()
     if errors:

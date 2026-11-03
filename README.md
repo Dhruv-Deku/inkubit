@@ -190,6 +190,12 @@ Inkubit closes that gap and refuses to fake success:
 <td colspan="2"><img src="docs/screenshots/26-use-cases.png" alt="What it can do: nine cards with pen sketches, one click each"></td>
 </tr>
 <tr>
+<td colspan="2"><img src="docs/screenshots/41-lecture-checker.png" alt="Lecture checker: the wrong claims from a filmed lecture, the timeline of speech, drawing and verdicts, the tracked board, corrected notes and a proven figure"></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/screenshots/42-proven-illustrations.png" alt="Proven illustrations: each Muse Image figure read back and compared exactly; a corrected Toffoli, figures right first time, and the ones replaced by the exact drawing"></td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/27-observatory-satellites.png" alt="Simulation observatory: fiber gives no key beyond 500 km, the satellite still works at 2,400 km"></td>
 <td><img src="docs/screenshots/28-observatory-grover.png" alt="Grover vs noise: at 5 qubits today's noise erases the speedup"></td>
 </tr>
