@@ -70,6 +70,13 @@ class Metadata(_Strict):
     origin: Literal["image", "text", "manual"] = "manual"
 
 
+class Conditional(_Strict):
+    """Feed-forward: the gate runs only when an earlier mid-circuit measurement read this value."""
+
+    classical_register: int = Field(ge=0, description="Index of the classical bit the gate depends on.")
+    value: Literal[0, 1] = Field(description="The gate runs only when that bit reads this value.")
+
+
 class Operation(_Strict):
     """One step of a circuit, applied in list order."""
 
@@ -78,6 +85,8 @@ class Operation(_Strict):
     controls: list[int] = Field(default_factory=list, description="Control qubit indices.")
     params: list[float] = Field(default_factory=list, description="Angles in radians (RX/RY/RZ/CP).")
     clbits: list[int] = Field(default_factory=list, description="Classical bits (MEASURE only).")
+    conditional: Conditional | None = Field(
+        default=None, description="Run this gate only when a classical bit written by an earlier MEASURE reads a value.")
     source: SourceRef | None = None
 
     @field_validator("gate", mode="before")
@@ -113,6 +122,10 @@ class CircuitSpec(_Strict):
 
         raise_if_issues(circuit_issues(self))
         return self
+
+    def is_dynamic(self) -> bool:
+        """True when a gate depends on a mid-circuit measurement (feed-forward)."""
+        return any(op.conditional is not None for op in self.operations)
 
     def measured_pairs(self) -> list[tuple[int, int]]:
         """All (qubit, clbit) measurement pairs, from MEASURE ops and the measurement list."""

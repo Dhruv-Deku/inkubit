@@ -29,6 +29,9 @@ BENCH_FILE = EXAMPLES_DIR / "arena_benchmark.json"
 
 def facts(spec: CircuitSpec) -> dict[str, Any]:
     """The circuit as the model sees it: no title or notes, which could name the answer."""
+    from inkubit.verify.expected import require_static
+
+    require_static(spec)
     ops = []
     for op in spec.operations:
         o: dict[str, Any] = {"gate": op.gate, "targets": op.targets}

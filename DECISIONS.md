@@ -995,3 +995,22 @@ cached responses no longer match and the first live run of each makes a fresh ca
 The overlap was more than the name, so the start page now leads with what QCanvas does not do: an assistant that
 plans and runs whole missions, proves every number against an independent exact simulation, and runs circuits on real
 IBM chips. Sections are ordered sketch, hardware, proof, discovery, labs, and the games and puzzles sit last.
+
+## D83. Feed-forward in the format, the verifier, the editor and IBM runs (2026-11-03)
+The teleportation run on ibm_fez (D81) used mid-circuit measurement and feed-forward from a script; the app's own format
+allowed terminal measurements only. Now any gate may carry `"conditional": {"classical_register": c, "value": v}` and a
+`MEASURE` may sit mid-circuit. Choices:
+
+- **Qiskit `if_test`, not `c_if`.** `c_if` was removed in Qiskit 2.0; `if_test` is what IBM's dynamic circuits run, so
+  the generated code, the drawing and **Run on IBM Quantum** share one construct (`verify.expected.physical_circuit`).
+- **Exact prediction by deferred measurement** (`verify/dynamic.py`): one record qubit per mid-circuit measurement, a
+  conditioned gate controlled by its record, readout flips on the record, and a conditioned gate's error channel only in
+  the branch where it fires (a Kraus channel blocked by the record's projectors). Against 200,000-shot Aer runs of the
+  generated code it agrees at the shot-noise floor for every preset and for a stress preset (p1 6%, p2 12%, readout
+  7%/10%) with conditional CX/CZ and value-0 conditions, where the noiseless prediction is 0.15 away.
+- **Refuse, never guess.** `append_operation` raises on a conditional operation, so every tool that reads gates into one
+  unitary or state (step-through, live state, optimizer, proof sheet, Rosetta exports, ML verifier, arena, distributed)
+  answers 422 in words instead of applying the gate unconditionally; the first version of the live state did exactly
+  that, which is why the guard sits at the lowest level.
+- **Scope.** No qubit reuse after measurement, one bit per condition, at most 10 qubits including records. Model prompts
+  change only for feed-forward circuits, so every cached response for other circuits still matches.

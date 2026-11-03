@@ -75,8 +75,10 @@ def _padded(qc: Any, n: int) -> Any:
 def _measured(spec: CircuitSpec) -> Any:
     from qiskit import QuantumCircuit
 
-    from inkubit.verify.expected import build_reference_circuit
+    from inkubit.verify.expected import build_reference_circuit, physical_circuit
 
+    if spec.is_dynamic():  # mid-circuit measurements and if_test blocks, as the chip runs them
+        return physical_circuit(spec)
     qc = QuantumCircuit(spec.num_qubits, spec.num_clbits)
     qc.compose(build_reference_circuit(spec), inplace=True)
     for q, c in spec.measured_pairs():

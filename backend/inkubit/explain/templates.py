@@ -16,6 +16,14 @@ def _angle(theta: float) -> str:
 
 
 def _op_phrase(op: Operation) -> str:
+    phrase = _gate_phrase(op)
+    if op.conditional is not None:
+        c, v = op.conditional.classical_register, op.conditional.value
+        phrase = f"only if classical bit c{c} reads {v}, {phrase}"
+    return phrase
+
+
+def _gate_phrase(op: Operation) -> str:
     qs = ", ".join(f"q{q}" for q in op.targets)
     g = op.gate
     if g == "H":

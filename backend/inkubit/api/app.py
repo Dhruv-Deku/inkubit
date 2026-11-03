@@ -13,7 +13,7 @@ from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
@@ -27,6 +27,7 @@ from inkubit.api.jobs import JobStore, RunOptions
 from inkubit.sim.noise import PRESETS, get_preset
 from inkubit.sketch import analyze_image
 from inkubit.spec.validation import SpecError, parse_spec
+from inkubit.verify.expected import DynamicCircuitError
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logging.getLogger("qiskit").setLevel(logging.WARNING)  # the transpiler logs every pass at INFO
@@ -34,6 +35,13 @@ log = logging.getLogger("inkubit.api")
 MAX_UPLOAD = 15 * 1024 * 1024
 
 app = FastAPI(title="Inkubit", version=__version__)
+
+
+@app.exception_handler(DynamicCircuitError)
+def _dynamic_circuit(_request: Any, err: DynamicCircuitError) -> JSONResponse:
+    """Tools built on one state (step-through, optimizer, proof sheet...) refuse feed-forward circuits in words."""
+    return JSONResponse(status_code=422, content={"detail": f"{err}. The run itself, its exact verification and "
+                                                            "IBM hardware runs do support feed-forward."})
 
 
 @app.on_event("startup")
@@ -107,7 +115,8 @@ def headline() -> dict[str, Any]:
 
 CATEGORIES: dict[str, list[str]] = {  # the gallery, by what each algorithm does (every answer is pinned in a test)
     "Basics": ["superposition", "bell", "ghz3"],
-    "Entanglement & communication": ["w_state", "superdense", "teleportation", "entanglement_swapping", "swap_test"],
+    "Entanglement & communication": ["w_state", "superdense", "teleportation", "teleportation_feedforward",
+                                     "entanglement_swapping", "swap_test"],
     "Nonlocal games": ["chsh_game", "mermin_game"],
     "Oracles & hidden structure": ["deutsch_jozsa", "bernstein_vazirani", "simon", "hidden_shift"],
     "Search & counting": ["grover2", "grover3", "grover_two_marked", "quantum_counting"],

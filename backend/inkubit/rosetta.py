@@ -464,6 +464,8 @@ def _gallery() -> list[tuple[str, int, list[dict[str, Any]], np.ndarray]]:
             spec = parse_spec(data)
         except Exception:  # noqa: BLE001 - an invalid example is skipped (one is invalid on purpose)
             continue
+        if spec.is_dynamic():  # feed-forward branches on measurements, so it prepares no single state
+            continue
         ops = [o.model_dump(exclude={"source", "clbits"}) for o in spec.operations if o.gate not in ("MEASURE", "BARRIER")]
         out.append((spec.metadata.title or path.stem, spec.num_qubits, ops, statevector(spec)))  # type: ignore[arg-type]
     return out
@@ -578,6 +580,9 @@ def _effect(op: Operation, before: np.ndarray, after: np.ndarray, fb: DiracForm,
 
 
 def narrate(spec: CircuitSpec) -> list[Step]:
+    from inkubit.verify.expected import require_static
+
+    require_static(spec)
     from qiskit import QuantumCircuit
     from qiskit.quantum_info import Statevector
 
@@ -622,6 +627,9 @@ def _uses_angles(spec: CircuitSpec) -> bool:
 
 
 def to_qiskit(spec: CircuitSpec) -> str:
+    from inkubit.verify.expected import require_static
+
+    require_static(spec)
     one = {"H": "h", "X": "x", "Y": "y", "Z": "z", "S": "s", "T": "t", "SDG": "sdg", "TDG": "tdg", "SX": "sx"}
     lines = ["from qiskit import QuantumCircuit"] + (["import numpy as np"] if _uses_angles(spec) else []) + [
         "", f"qc = QuantumCircuit({spec.num_qubits}, {spec.num_clbits})" if spec.num_clbits else f"qc = QuantumCircuit({spec.num_qubits})"]
@@ -646,6 +654,9 @@ def to_qiskit(spec: CircuitSpec) -> str:
 
 
 def to_cirq(spec: CircuitSpec) -> str:
+    from inkubit.verify.expected import require_static
+
+    require_static(spec)
     one = {"H": "cirq.H", "X": "cirq.X", "Y": "cirq.Y", "Z": "cirq.Z", "S": "cirq.S", "T": "cirq.T",
            "SDG": "(cirq.S**-1)", "TDG": "(cirq.T**-1)", "SX": "(cirq.X**0.5)"}
     body = []

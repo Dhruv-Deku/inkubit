@@ -143,7 +143,7 @@ minutes earlier. The best, median and worst ran on exactly those qubits: GHZ fid
 {{ix_med}} and {{ix_worst}}, in the advisor's order (its scores: {{ix_best_score}}, {{ix_med_score}},
 {{ix_worst_score}}). The best and the worst placement were {{ix_z}} standard errors apart, and on the worst qubits the
 state no longer certifies entanglement. Same circuit, same chip, same hour; only the qubits differed.</p>
-<p><b>Teleportation with real feed-forward.</b> The simulator has no mid-circuit measurement, but the chip does. A qubit
+<p><b>Teleportation with real feed-forward.</b> This run came first, from a script; feed-forward is now part of the app's format and verifier as well (decision D83), and the gallery's feed-forward teleportation sends the same if_test circuit to the chip from the editor. A qubit
 was teleported with the Bell measurement in the middle of the circuit and X and Z applied by the chip in real time,
 only when the measured bits said so (qubits {{ix_tele_qubits}}). The six axis states form a 2-design, so their average
 fidelity equals the average over all states: <b>{{ix_tele}} ± {{ix_tele_se}}</b>, against 2/3 for the best classical

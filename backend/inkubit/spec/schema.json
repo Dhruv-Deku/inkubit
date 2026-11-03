@@ -54,6 +54,33 @@
       "title": "CircuitSpec",
       "type": "object"
     },
+    "Conditional": {
+      "additionalProperties": false,
+      "description": "Feed-forward: the gate runs only when an earlier mid-circuit measurement read this value.",
+      "properties": {
+        "classical_register": {
+          "description": "Index of the classical bit the gate depends on.",
+          "minimum": 0,
+          "title": "Classical Register",
+          "type": "integer"
+        },
+        "value": {
+          "description": "The gate runs only when that bit reads this value.",
+          "enum": [
+            0,
+            1
+          ],
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "classical_register",
+        "value"
+      ],
+      "title": "Conditional",
+      "type": "object"
+    },
     "Link": {
       "additionalProperties": false,
       "description": "A quantum channel between two nodes.",
@@ -406,6 +433,18 @@
           },
           "title": "Clbits",
           "type": "array"
+        },
+        "conditional": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Conditional"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Run this gate only when a classical bit written by an earlier MEASURE reads a value."
         },
         "source": {
           "anyOf": [

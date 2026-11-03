@@ -22,7 +22,13 @@ _EPS = 1e-12
 
 
 def append_operation(qc: QuantumCircuit, op: Operation) -> None:
-    """Append the unitary action of one spec operation (BARRIER and MEASURE add nothing)."""
+    """Append the unitary action of one spec operation (BARRIER and MEASURE add nothing).
+
+    A conditional operation raises: a caller building one unitary or one state cannot honour it, and applying the
+    gate unconditionally would be silently wrong. ``physical_circuit`` and ``verify.dynamic`` handle conditions.
+    """
+    if op.conditional is not None:
+        raise DynamicCircuitError(NO_FEED_FORWARD)
     g = op.gate
     if g in _ONE_Q:
         for q in op.targets:
@@ -42,8 +48,23 @@ def append_operation(qc: QuantumCircuit, op: Operation) -> None:
         qc.swap(op.targets[0], op.targets[1])
 
 
+class DynamicCircuitError(ValueError):
+    """A tool that needs a circuit without feed-forward was given one with gates conditioned on measurements."""
+
+
+NO_FEED_FORWARD = "this tool works on circuits without feed-forward; this circuit has gates that depend on mid-circuit measurements"
+
+
+def require_static(spec: CircuitSpec) -> None:
+    """Refuse a feed-forward circuit in a tool that reads gates one by one into a single circuit or state."""
+    if spec.is_dynamic():
+        raise DynamicCircuitError(NO_FEED_FORWARD)
+
+
 def build_reference_circuit(spec: CircuitSpec) -> QuantumCircuit:
     """The unitary part of the spec (no measurements) as a QuantumCircuit."""
+    if spec.is_dynamic():
+        raise DynamicCircuitError(NO_FEED_FORWARD)
     qc = QuantumCircuit(spec.num_qubits)
     for op in spec.operations:
         append_operation(qc, op)
@@ -65,18 +86,42 @@ def _to_clbit_keys(probs: dict[str, float], spec: CircuitSpec, pairs: list[tuple
     return out
 
 
+def physical_circuit(spec: CircuitSpec) -> QuantumCircuit:
+    """The circuit as it runs: gates, mid-circuit measurements, ``if_test`` feed-forward, terminal measurements."""
+    qc = QuantumCircuit(spec.num_qubits, spec.num_clbits)
+    for op in spec.operations:
+        if op.gate == "MEASURE":
+            for q, c in zip(op.targets, op.clbits):
+                qc.measure(q, c)
+        elif op.gate == "BARRIER":
+            qc.barrier(*op.targets)
+        elif op.conditional is not None:
+            with qc.if_test((qc.clbits[op.conditional.classical_register], op.conditional.value)):
+                append_operation(qc, op.model_copy(update={"conditional": None}))
+        else:
+            append_operation(qc, op)
+    for m in spec.measurements:
+        qc.measure(m.qubit, m.clbit)
+    return qc
+
+
 def ideal_distribution(spec: CircuitSpec) -> Distribution:
     """Exact noiseless outcome probabilities, keyed like Qiskit counts."""
+    if spec.is_dynamic():
+        from inkubit.verify.dynamic import distribution
+
+        return distribution(spec, None)
     pairs = spec.measured_pairs()
     sv = Statevector.from_instruction(build_reference_circuit(spec))
     return _to_clbit_keys(sv.probabilities_dict(qargs=[q for q, _ in pairs]), spec, pairs)
 
 
-def apply_readout_error(dist: Distribution, spec: CircuitSpec, p01: float, p10: float) -> Distribution:
-    """Exactly apply independent per-bit readout flips to measured classical bits."""
+def apply_readout_error(dist: Distribution, spec: CircuitSpec, p01: float, p10: float,
+                        clbits: list[int] | None = None) -> Distribution:
+    """Exactly apply independent per-bit readout flips to measured classical bits (all of them, or ``clbits``)."""
     nc = spec.num_clbits
     out = dict(dist)
-    for _, c in spec.measured_pairs():
+    for c in (clbits if clbits is not None else [c for _, c in spec.measured_pairs()]):
         idx = nc - 1 - c
         nxt: Distribution = {}
         for key, p in out.items():
@@ -107,6 +152,10 @@ def noisy_distribution(spec: CircuitSpec, preset: NoisePreset | str) -> Distribu
     preset = get_preset(preset) if isinstance(preset, str) else preset
     if preset.is_ideal:
         return ideal_distribution(spec)
+    if spec.is_dynamic():
+        from inkubit.verify.dynamic import distribution
+
+        return distribution(spec, preset)
     pairs = spec.measured_pairs()
     if build_gate_noise_model(preset) is None:
         dist = ideal_distribution(spec)

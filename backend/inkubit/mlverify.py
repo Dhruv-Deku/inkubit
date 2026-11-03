@@ -48,6 +48,9 @@ FEATURES = ["qubits", "measured", "gates_1q", "gates_2q", "gates_3q", "depth", "
 
 
 def _circuit(spec: CircuitSpec) -> QuantumCircuit:
+    from inkubit.verify.expected import require_static
+
+    require_static(spec)
     qc = QuantumCircuit(spec.num_qubits)
     for op in spec.operations:
         if op.gate != "MEASURE":

@@ -23,6 +23,10 @@ WARN = "#e0715a"
 
 def circuit_png(spec: CircuitSpec) -> bytes:
     """Clean circuit drawing (Qiskit matplotlib drawer, dark style) as PNG bytes."""
+    if spec.is_dynamic():
+        from inkubit.verify.expected import physical_circuit
+
+        return _png(physical_circuit(spec))
     qc = build_reference_circuit(spec)
     qc.add_register(ClassicalRegister(spec.num_clbits, "c"))
     for op in spec.operations:
@@ -31,6 +35,10 @@ def circuit_png(spec: CircuitSpec) -> bytes:
     qc.barrier()
     for q, c in spec.measured_pairs():
         qc.measure(q, c)
+    return _png(qc)
+
+
+def _png(qc) -> bytes:
     fig = qc.draw(output="mpl", style="iqp-dark", fold=-1)
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=160, bbox_inches="tight", facecolor=fig.get_facecolor())

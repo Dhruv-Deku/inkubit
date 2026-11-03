@@ -133,7 +133,12 @@ def generate_code(
         f"    qc = QuantumCircuit({spec.num_qubits}, {spec.num_clbits})",
     ]
     for i, op in enumerate(spec.operations):
-        body += operation_lines(i, op)
+        if op.conditional is not None:  # feed-forward: the chip decides from the bit it just measured
+            c, v = op.conditional.classical_register, op.conditional.value
+            body.append(f"    with qc.if_test((qc.clbits[{c}], {v})):  # op {i}: only when c{c} reads {v}")
+            body += ["    " + line for line in operation_lines(i, op)]
+        else:
+            body += operation_lines(i, op)
     for m in spec.measurements:
         body.append(f"    qc.measure({m.qubit}, {m.clbit})  # measure q{m.qubit} -> c{m.clbit}")
     body.append("    return qc")

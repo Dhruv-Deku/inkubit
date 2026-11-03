@@ -155,6 +155,16 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
   const changeGate = (i: number, g: Gate) => {
     const op = spec.operations[i]
     const next: Operation = { ...op, gate: g }
+    if (g === 'MEASURE' || g === 'BARRIER') next.conditional = null
+    if (g === 'MEASURE') {
+      const c = freeClbit(spec)
+      update((s) => {
+        s.operations[i] = { ...next, targets: [op.targets[0] ?? 0], controls: [], params: [], clbits: [c] }
+        s.num_clbits = Math.max(s.num_clbits, c + 1)
+      })
+      return
+    }
+    next.clbits = []
     if (g === 'CCX') {
       const t = op.targets[0] ?? Math.min(2, spec.num_qubits - 1)
       const pool = [...(op.controls ?? []), ...Array.from({ length: spec.num_qubits }, (_, q) => q)]
@@ -200,7 +210,9 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
       {optimizer && <AskAlone spec={spec} valid={valid} />}
       <table className="ops" style={{ marginTop: 12 }} onMouseLeave={() => onPick(null)}>
         <thead>
-          <tr><th>#</th><th>Gate</th><th>Target</th><th>Control</th><th>Angle</th><th>From sketch</th><th /></tr>
+          <tr><th>#</th><th>Gate</th><th>Target</th><th>Control</th><th>Angle</th>
+            <th title="Mid-circuit measurements write a classical bit; a gate can run only when an earlier bit reads 0 or 1">Feed-forward</th>
+            <th>From sketch</th><th /></tr>
         </thead>
         <tbody>
           {spec.operations.map((op, i) => {
@@ -216,6 +228,14 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
                 <td><IntList value={op.targets} onChange={(v) => setOp(i, { targets: v })} /></td>
                 <td>{needsControl(op.gate) ? <IntList value={op.controls ?? []} onChange={(v) => setOp(i, { controls: v })} /> : <span className="muted">—</span>}</td>
                 <td>{needsAngle(op.gate) ? <AngleInput value={op.params?.[0] ?? 0} onChange={(v) => setOp(i, { params: [v] })} /> : <span className="muted">—</span>}</td>
+                <td>{op.gate === 'MEASURE' ? (
+                  <span className="ff">into c <IntList value={op.clbits ?? []} onChange={(v) => update((s) => {
+                    s.operations[i] = { ...s.operations[i], clbits: v }
+                    s.num_clbits = Math.max(s.num_clbits, ...v.map((c) => c + 1))
+                  })} /></span>
+                ) : op.gate === 'BARRIER' ? <span className="muted">—</span> : (
+                  <Condition op={op} bits={bitsBefore(spec, i)} onChange={(c) => setOp(i, { conditional: c })} />
+                )}</td>
                 <td>{op.source ? <span className="chip-src">{Math.round(op.source.confidence * 100)}% sure</span> : <span className="muted">added</span>}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   <button className="icon-btn" title="Move up" disabled={i === 0} onClick={() => move(i, -1)}><Up /></button>
@@ -230,8 +250,14 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
       <div className="row wrap" style={{ marginTop: 10 }}>
         <button className="btn small" onClick={() => update((s) => { s.operations.push({ gate: 'H', targets: [0], controls: [], params: [] }) })}>+ Gate</button>
         <button className="btn small" disabled={spec.num_qubits < 2} onClick={() => update((s) => { s.operations.push({ gate: 'CX', controls: [0], targets: [1], params: [] }) })}>+ CNOT</button>
+        <button className="btn small" title="Measure a qubit halfway through; later gates can depend on the result (feed-forward)"
+          onClick={() => update((s) => {
+            const c = freeClbit(s)
+            s.operations.push({ gate: 'MEASURE', targets: [freeQubit(s)], clbits: [c], controls: [], params: [] })
+            s.num_clbits = Math.max(s.num_clbits, c + 1)
+          })}>+ Mid-circuit measure</button>
         <span className="spacer grow" />
-        <span className="sub">Measure:</span>
+        <span className="sub">Measure at the end:</span>
         <div className="meas">
           {Array.from({ length: spec.num_qubits }, (_, q) => (
             <label key={q}>
@@ -246,6 +272,49 @@ function CircuitForm({ spec, highlight, onPick, onChange, allowed, valid, optimi
         </div>
       </div>
     </div>
+  )
+}
+
+/** The smallest classical bit nothing writes yet. */
+function freeClbit(s: CircuitSpec): number {
+  const used = new Set([...s.measurements.map((m) => m.clbit), ...s.operations.flatMap((o) => (o.gate === 'MEASURE' ? o.clbits ?? [] : []))])
+  let c = 0
+  while (used.has(c)) c++
+  return c
+}
+
+/** A qubit nothing measures yet (else q0), for a new mid-circuit measurement. */
+function freeQubit(s: CircuitSpec): number {
+  const used = new Set([...s.measurements.map((m) => m.qubit), ...s.operations.flatMap((o) => (o.gate === 'MEASURE' ? o.targets : []))])
+  return Array.from({ length: s.num_qubits }, (_, q) => q).find((q) => !used.has(q)) ?? 0
+}
+
+/** Classical bits written by mid-circuit measurements before operation ``i``: the bits it may depend on. */
+function bitsBefore(s: CircuitSpec, i: number): number[] {
+  return [...new Set(s.operations.slice(0, i).flatMap((o) => (o.gate === 'MEASURE' ? o.clbits ?? [] : [])))].sort((a, b) => a - b)
+}
+
+/** "Make conditional on classical bit X": a checkbox, the bit and the value it must read. */
+function Condition({ op, bits, onChange }: { op: Operation; bits: number[]; onChange: (c: Operation['conditional']) => void }) {
+  const cond = op.conditional
+  const options = cond && !bits.includes(cond.classical_register) ? [...bits, cond.classical_register] : bits
+  return (
+    <span className="ff" title={bits.length || cond ? 'Run this gate only when an earlier mid-circuit measurement read this value'
+      : 'Add a mid-circuit measurement above this gate first: a gate can only depend on a bit measured before it'}>
+      <input type="checkbox" aria-label="Make conditional on a classical bit" checked={!!cond} disabled={!cond && !bits.length}
+        onChange={(e) => onChange(e.target.checked ? { classical_register: bits[bits.length - 1], value: 1 } : null)} />
+      {cond ? (
+        <>
+          if c<select aria-label="Classical bit" value={cond.classical_register}
+            onChange={(e) => onChange({ ...cond, classical_register: Number(e.target.value) })}>
+            {options.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          =<select aria-label="Value" value={cond.value} onChange={(e) => onChange({ ...cond, value: Number(e.target.value) as 0 | 1 })}>
+            <option value={1}>1</option><option value={0}>0</option>
+          </select>
+        </>
+      ) : <span className="muted">{bits.length ? 'conditional' : 'measure first'}</span>}
+    </span>
   )
 }
 

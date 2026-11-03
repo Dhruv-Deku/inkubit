@@ -44,6 +44,9 @@ def raise_if_issues(issues: list[SpecIssue]) -> None:
         )
 
 
+MAX_DYNAMIC_QUBITS = 10  # qubits plus one record per mid-circuit measurement (verify/dynamic.py)
+
+
 def _qubit_range(n: int) -> str:
     return "qubit 0" if n == 1 else f"qubits 0-{n - 1}"
 
@@ -55,6 +58,7 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
     issues: list[SpecIssue] = []
     nq, nc = spec.num_qubits, spec.num_clbits
     measured_at: dict[int, int] = {}
+    written_at: dict[int, int] = {}  # classical bit -> the MEASURE operation that writes it
 
     def add(path: str, msg: str) -> None:
         issues.append(SpecIssue(path=path, message=msg))
@@ -117,11 +121,32 @@ def circuit_issues(spec: "CircuitSpec") -> list[SpecIssue]:
         if g not in ("MEASURE", "BARRIER"):
             for q in [*op.targets, *op.controls]:
                 if q in measured_at:
-                    add(where, f"acts on qubit {q} after it was measured in operations[{measured_at[q]}]; "
-                               "Inkubit supports terminal measurements only.")
+                    add(where, f"acts on qubit {q} after it was measured in operations[{measured_at[q]}]; a measured "
+                               "qubit cannot be used again, but later gates on other qubits can depend on its "
+                               "result through a conditional.")
+        cond = op.conditional
+        if cond is not None:
+            c = cond.classical_register
+            if g in ("MEASURE", "BARRIER"):
+                add(where, f"{g} cannot be conditional; only gates can depend on a measured bit.")
+            elif not 0 <= c < nc:
+                add(where, f"is conditional on classical bit {c}, which is out of range; this circuit has {nc} "
+                           f"classical bit{'s' if nc != 1 else ''}.")
+            elif c not in written_at:
+                add(where, f"is conditional on classical bit {c}, but no earlier MEASURE writes it; add a "
+                           f"mid-circuit MEASURE into c{c} before this gate.")
         if g == "MEASURE":
             for q in op.targets:
                 measured_at.setdefault(q, i)
+            for c in op.clbits:
+                written_at.setdefault(c, i)
+
+    if spec.is_dynamic():
+        records = sum(len(op.targets) for op in spec.operations if op.gate == "MEASURE")
+        if nq + records > MAX_DYNAMIC_QUBITS:
+            add("operations", f"feed-forward circuits are verified exactly with one record qubit per mid-circuit "
+                              f"measurement; this one needs {nq + records} qubits, above the limit of "
+                              f"{MAX_DYNAMIC_QUBITS}. Use fewer qubits or mid-circuit measurements.")
 
     for j, m in enumerate(spec.measurements):
         where = f"measurements[{j}]"

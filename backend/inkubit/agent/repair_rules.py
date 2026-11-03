@@ -7,6 +7,7 @@ wrong qubit, reversed control/target). Anything else it honestly cannot fix.
 
 from __future__ import annotations
 
+import ast
 import re
 from difflib import SequenceMatcher
 
@@ -71,6 +72,8 @@ def align_with_spec(code: str, spec: CircuitSpec, noise: str) -> tuple[str, list
         new_block.extend(ref_block)
     if not changes:
         return code, []
+    if spec.is_dynamic():  # gates sit inside if_test blocks, so rebuilding the call list flat would break them
+        return _restore_function(code, reference), changes
 
     remove = {n for c in calls for n in range(c.lineno, c.end_lineno + 1)}
     if calls:
@@ -84,6 +87,26 @@ def align_with_spec(code: str, spec: CircuitSpec, noise: str) -> tuple[str, list
         if i + 1 not in remove:
             out.append(line)
     return "\n".join(out), changes
+
+
+def _function_span(code: str, name: str) -> tuple[int, int] | None:
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == name:
+            return node.lineno, node.end_lineno or node.lineno
+    return None
+
+
+def _restore_function(code: str, reference: str, name: str = "build_circuit") -> str:
+    """Replace the script's ``name`` function with the reference's, keeping everything else."""
+    ours, theirs = _function_span(code, name), _function_span(reference, name)
+    if ours is None or theirs is None:
+        return reference
+    lines, ref = code.split("\n"), reference.split("\n")
+    return "\n".join(lines[:ours[0] - 1] + ref[theirs[0] - 1:theirs[1]] + lines[ours[1]:])
 
 
 def _circuit_var(code: str) -> str:

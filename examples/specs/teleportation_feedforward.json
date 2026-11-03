@@ -1,0 +1,24 @@
+{
+  "kind": "circuit",
+  "version": "1.0",
+  "num_qubits": 3,
+  "num_clbits": 3,
+  "operations": [
+    {"gate": "RY", "targets": [0], "params": [2.0943951023931953]},
+    {"gate": "H", "targets": [1]},
+    {"gate": "CX", "targets": [2], "controls": [1]},
+    {"gate": "CX", "targets": [1], "controls": [0]},
+    {"gate": "H", "targets": [0]},
+    {"gate": "MEASURE", "targets": [0, 1], "clbits": [0, 1]},
+    {"gate": "X", "targets": [2], "conditional": {"classical_register": 1, "value": 1}},
+    {"gate": "Z", "targets": [2], "conditional": {"classical_register": 0, "value": 1}}
+  ],
+  "measurements": [
+    {"qubit": 2, "clbit": 2}
+  ],
+  "metadata": {
+    "title": "Teleportation (feed-forward)",
+    "notes": "The same teleportation with real mid-circuit measurement: q0 and q1 are measured halfway, and X and Z fix q2 only when the measured bits say so (if_test on the chip). The four measured pairs come out evenly, and q2 reads 1 with 75% after every one of them.",
+    "origin": "manual"
+  }
+}

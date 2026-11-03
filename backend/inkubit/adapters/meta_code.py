@@ -8,7 +8,7 @@ import time
 from inkubit.adapters.base import CodeModel, CodeResult, ModelCall, RepairRequest, RepairResult
 from inkubit.adapters.config import Settings
 from inkubit.adapters.meta_client import MetaAPIError, MetaClient
-from inkubit.adapters.prompts import CODE_CONTRACT, GENERATE_SYSTEM, REPAIR_SYSTEM
+from inkubit.adapters.prompts import CODE_CONTRACT, FEED_FORWARD_NOTE, GENERATE_SYSTEM, REPAIR_SYSTEM
 from inkubit.sim.noise import get_preset
 from inkubit.spec.models import CircuitSpec
 
@@ -46,6 +46,8 @@ def _spec_block(spec: CircuitSpec, noise: str, shots: int | None = None, seed: i
              f"Noise preset '{noise}' parameters (times in microseconds):\n{json.dumps(preset)}"]
     if shots is not None:
         parts.append(f"SHOTS = {shots}, SEED = {seed}")
+    if spec.is_dynamic():  # only feed-forward circuits get the note, so every other prompt stays as it was
+        parts.append(FEED_FORWARD_NOTE)
     return "\n\n".join(parts)
 
 

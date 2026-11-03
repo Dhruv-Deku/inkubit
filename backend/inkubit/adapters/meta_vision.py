@@ -413,6 +413,12 @@ def diagram_prompt(spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> s
     if isinstance(spec, CircuitSpec):
         steps = []
         for op in spec.operations:
+            if spec.is_dynamic() and op.gate == "MEASURE":
+                steps.append("a measurement meter in the middle of " + ", ".join(f"q{q}" for q in op.targets)
+                             + ", its result sent down a double line to classical bit "
+                             + ", ".join(f"c{c}" for c in op.clbits))
+                continue
+            before = len(steps)
             if op.gate in ("CX", "CZ"):
                 steps.append(f"{op.gate} with control on wire q{op.controls[0]} (solid dot) and target on wire "
                              f"q{op.targets[0]} ({'circled plus' if op.gate == 'CX' else 'solid dot'})")
@@ -427,6 +433,9 @@ def diagram_prompt(spec: CircuitSpec | NetworkSpec, result: dict[str, Any]) -> s
             elif op.gate not in ("BARRIER", "MEASURE"):
                 angle = f"({op.params[0]:.2f} rad)" if op.params else ""
                 steps.append(f"a box labelled {op.gate}{angle} on " + ", ".join(f"q{q}" for q in op.targets))
+            if op.conditional is not None and len(steps) > before:
+                c, v = op.conditional.classical_register, op.conditional.value
+                steps[-1] += f", applied only when c{c} reads {v} (a dashed line from the gate down to c{c}, labelled ={v})"
         measured = (result.get("verdict") or {}).get("measured", {})
         top = ", ".join(f"{k}: {v * 100:.0f}%" for k, v in sorted(measured.items(), key=lambda kv: -kv[1])[:4])
         return (f"An annotated quantum circuit diagram titled '{spec.metadata.title or 'Quantum circuit'}'. "

@@ -30,7 +30,9 @@ def _lines(code: str) -> list[str]:
 
 
 def _first_call(code: str, names: set[str]):
-    return next((c for c in extract_calls(code) if c.name in names), None)
+    """The first such call at the top level of build_circuit (never a gate inside a feed-forward if_test block)."""
+    lines = _lines(code)
+    return next((c for c in extract_calls(code) if c.name in names and not lines[c.lineno - 1].startswith(" " * 8)), None)
 
 
 def _drop_lines(code: str, start: int, end: int) -> str:

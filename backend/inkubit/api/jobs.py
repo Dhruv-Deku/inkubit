@@ -127,6 +127,11 @@ def _insights(job: Job, result: dict[str, Any]) -> dict[str, Any] | None:
     if not isinstance(job.spec, CircuitSpec):
         return None
     bus = job.bus
+    if job.spec.is_dynamic():
+        bus.emit("insights", "ok", "Step-by-step states are skipped: this circuit branches on its mid-circuit "
+                                   "measurements, so there is no single state to show. The result above is verified "
+                                   "exactly over every branch.")
+        return None
     bus.emit("insights", "running", "Analysing the state step by step, the entanglement and the noise budget…")
     try:
         verdict = result.get("verdict") or {}

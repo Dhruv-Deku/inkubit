@@ -15,8 +15,8 @@ anyone sees it. Press **Guided tour** in the app for the best of it in under two
 | Criterion | What to look at |
 | --- | --- |
 | **Creativity** | An **AI scientist that learns under proof**: Muse Spark designs circuits in rounds, sees what exact physics said, and its best proven circuit improves on every target, where the same model without feedback never does. **AI-designed error-correcting codes**: a 9-qubit code that needs 9 phase-flip errors to fail, three times the surface code. **Mission control** turns one request (typed, spoken or photographed) into a live graph of exact tools that runs in parallel and verifies itself. A **discovery lab** where Muse Spark proposes circuits and Qiskit proves them (a GHZ state on 7 qubits of an IBM chip in 6 CNOTs; the textbook circuit needs 10). The quantum-key **satellites in orbit today** flown live on their real orbits under tonight's cloud forecast. A camera on a **whiteboard**; a **whole paper** from its PDF re-run claim by claim; an **AI referee** where Muse Wonder challenges Muse Spark and exact simulation decides |
-| **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
-| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **546 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
+| **Technical ambition** | Exact density-matrix simulation, checked against Qiskit Aer. **Feed-forward** (mid-circuit measurement, gates that run only when a measured bit says so) is in the format and the editor, predicted exactly by deferred measurement and sent to IBM chips unchanged. A **distance-5 surface code**: the bigger code suppresses errors 5.9x per round (Λ; Google's Willow measured 2.14), and a network on top of matching makes 10% fewer logical errors (paired test z = 7.8). A three-level transmon with **DRAG** pulses. **SGP4** orbits matching Skyfield to 0.003°. Surface-code **resource estimates** within 1.3x (qubits) and 2.3x (time) of the published RSA-2048 figure |
+| **Does it work** | **On a real IBM quantum computer** (ibm_fez): Muse Spark's discovered GHZ circuit beat the textbook circuit on the same seven qubits, GHZ fidelity 0.814 against 0.795 (3.2 standard errors), both certifying genuine 7-qubit entanglement; a noise preset calibrated from the chip predicted its counts closer than a digital twin on 4 of 4 circuits. A 30-mission **live benchmark**: 30 of 30 finished, 68 of 68 steps verified, 204 of 209 report numbers traced to a tool, median 15 s. **571 backend tests and 6 browser tests** run in CI on every push; a fresh clone runs from the README alone. The hosted copy above |
 | **Use of Meta models** | **Five Meta models**, each where it is strongest: Muse Spark plans, reads photos, writes and repairs code, calls tools and writes traced reports; Muse Wonder takes the long multi-step questions; SAM 3.1 segments sketches and whiteboards; Muse Image illustrates; Muse Voice Transcribe takes speech (Muse Glimmer, Meta's open-weight model, also runs on a laptop through the same client, but at about 1.6 tokens a second it is too slow to drive the app). And the measured reason none of their answers reaches you unchecked: alone, Muse Spark was exact on small circuits but on only 3 of 6 bigger ones, once 43% off with full confidence |
 
 ## Built during the hackathon
@@ -198,7 +198,7 @@ exact simulation predicts in about 151 µs how much of an answer survives
 today's noise: on 900 held-out circuits its average error is 0.010, 9 times smaller than the product-of-gate-fidelities rule of thumb (0.087) and below a global-depolarizing physics model (0.013); its 90% interval held for 90% of them and for 78% of 60 textbook cases it never saw (error 0.020). Every prediction up to 10 qubits is checked exactly, and a
 miss is shown as a note about the model, never a change to the result.
 
-**25 algorithms in 8 categories.** From the QFT finding a period and Simon's algorithm to quantum counting, an HHL
+**26 algorithms in 8 categories.** From the QFT finding a period and Simon's algorithm to quantum counting, an HHL
 solver (A⁻¹b in the ratio 9 : 1), a Fourier-space adder, hidden shift, Shor's nine-qubit code correcting a Y error and
 two nonlocal games (CHSH won cos²(π/8) of the time; the GHZ game won every time), each checked against its known answer.
 
@@ -307,7 +307,7 @@ level-3 transpiler stopped at 7 gates.
 ## How it's built
 
 Python 3.13, FastAPI, Qiskit 2.6 + Aer, PyMatching, SGP4, pydantic v2, server-sent events for the
-live agent log; React 19 + TypeScript + Vite. 546 offline backend tests (spec
+live agent log; React 19 + TypeScript + Vite. 571 offline backend tests (spec
 validation, codegen, verification statistics, the repair loop with every planted
 fault, exact insights checked against Aer, network physics, orbits against Skyfield, the live adapters
 against recorded request shapes, API) and 6 end-to-end browser tests of the built app, all in CI on every
@@ -328,5 +328,5 @@ script publish the public mode to a Hugging Face Space.
 ## What's next
 
 Calibrated twins per device and per qubit patch (the median-calibrated preset already beats the generic one), circuit-level
-noise for the decoders, mid-circuit measurement (teleportation, error-correction codes), and multi-page lab-notebook
-sketches.
+noise for the decoders, measured-qubit reuse (reset) for error-correction cycles, sketches read with classical
+control, and multi-page lab-notebook sketches.

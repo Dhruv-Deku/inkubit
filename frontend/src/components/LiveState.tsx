@@ -52,8 +52,9 @@ export function AmplitudeTable({ amps, hidden = 0, max = 16 }: { amps: Amplitude
 export function LiveStrip({ spec, valid }: { spec: CircuitSpec; valid: boolean }) {
   const [live, setLive] = useState<LiveState | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const branching = spec.operations.some((op) => op.conditional)
   useEffect(() => {
-    if (!valid) return
+    if (!valid || branching) return
     const ctl = new AbortController()
     const t = setTimeout(() => {
       api.state(spec, 'realistic', undefined, ctl.signal)
@@ -61,7 +62,15 @@ export function LiveStrip({ spec, valid }: { spec: CircuitSpec; valid: boolean }
         .catch((e: Error) => { if (!ctl.signal.aborted) setError(e.message) })
     }, 90)
     return () => { clearTimeout(t); ctl.abort() }
-  }, [spec, valid])
+  }, [spec, valid, branching])
+  if (branching) {
+    return (
+      <div className="notice" style={{ marginTop: 12 }}>
+        Feed-forward: this circuit branches on its mid-circuit measurements, so there is no single live state to draw.
+        Run it: the result is verified exactly over every branch, and it can run on a real IBM chip as it is.
+      </div>
+    )
+  }
   if (!live) return error ? <div className="notice error" style={{ marginTop: 12 }}>{error}</div> : null
   const last = live.steps[live.steps.length - 1]
   const n = last.bloch.length

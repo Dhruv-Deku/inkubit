@@ -21,6 +21,8 @@ GALLERY = {
     "superdense": {"11": 1.0},
     "toffoli_and": {"000": 0.25, "001": 0.25, "010": 0.25, "111": 0.25},
     "teleportation": {"0": 0.25, "1": 0.75},
+    # the same teleportation with mid-circuit measurement: c0 c1 even, q2 (c2) reads 1 with 75% after each pair
+    "teleportation_feedforward": {**{f"0{k}": 0.0625 for k in ("00", "01", "10", "11")}, **{f"1{k}": 0.1875 for k in ("00", "01", "10", "11")}},
     "w_state": {"001": 1 / 3, "010": 1 / 3, "100": 1 / 3},
     "bit_flip_code": {"0": 0.25, "1": 0.75},  # the error on q1 is corrected
     "qft_period": {"000": 0.5, "100": 0.5},

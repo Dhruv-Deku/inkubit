@@ -17,6 +17,13 @@ Output contract for the script (the runner depends on it):
 - Never invent, edit or post-process the counts.
 """
 
+FEED_FORWARD_NOTE = """\
+This circuit uses feed-forward (Qiskit 2.x has no c_if; use if_test):
+- A MEASURE operation in the middle of the list is a mid-circuit measurement: emit qc.measure(q, c) right there.
+- An operation with "conditional": {"classical_register": c, "value": v} runs only when classical bit c reads v.
+  Write it as `with qc.if_test((qc.clbits[c], v)):` with the gate call indented inside, in list order.
+"""
+
 GENERATE_SYSTEM = (
     "You are a careful quantum software engineer. You turn a JSON circuit spec into a clean, "
     "readable Qiskit 2.x script that a student can read. Follow the output contract exactly."

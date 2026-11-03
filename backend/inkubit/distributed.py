@@ -82,6 +82,9 @@ class DistributedResult(BaseModel):
 
 
 def compile_ops(spec: CircuitSpec) -> tuple[QuantumCircuit, list[dict[str, Any]]]:
+    from inkubit.verify.expected import require_static
+
+    require_static(spec)
     qc = QuantumCircuit(spec.num_qubits)
     for op in spec.operations:
         if op.gate not in ("MEASURE", "BARRIER"):

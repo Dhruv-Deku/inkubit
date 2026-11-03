@@ -26,20 +26,34 @@ function lane(gate: Gate, qs: number[], n: number): number[] {
     ? Array.from({ length: span[1] - span[0] + 1 }, (_, i) => span[0] + i) : qs
 }
 
-/** Assign each operation a column, packing gates that touch different qubits; also the next free column per wire. */
-function layout(ops: Operation[], n: number): { cols: number[]; free: number[] } {
-  const free = new Array(n).fill(0)
+/** Classical bits a feed-forward drawing shows as wires: those mid-circuit measurements write or gates read. */
+function classicalBits(ops: Operation[]): number {
+  const used = ops.flatMap((op) => [...(op.gate === 'MEASURE' ? op.clbits ?? [] : []),
+    ...(op.conditional ? [op.conditional.classical_register] : [])])
+  return used.length ? Math.max(...used) + 1 : 0
+}
+
+/** Assign each operation a column, packing gates that touch different qubits; also the next free column per wire.
+ * Classical bits are lanes after the qubits: a measurement or a conditional gate occupies every wire its vertical line
+ * crosses, so a gate that reads a bit is always drawn after the measurement that writes it. */
+function layout(ops: Operation[], n: number, nc: number): { cols: number[]; free: number[] } {
+  const free = new Array(n + nc).fill(0)
   const cols = ops.map((op) => {
     const qs = [...op.targets, ...(op.controls ?? [])].filter((q) => q >= 0 && q < n)
     const span = qs.length ? [Math.min(...qs), Math.max(...qs)] : [0, n - 1]
     const range = op.gate === 'BARRIER' && !op.targets.length ? [0, n - 1] : span
-    const lane = MULTI.has(op.gate) || op.gate === 'SWAP' || op.gate === 'BARRIER'
+    let lane = MULTI.has(op.gate) || op.gate === 'SWAP' || op.gate === 'BARRIER'
       ? Array.from({ length: range[1] - range[0] + 1 }, (_, i) => range[0] + i) : qs
+    const bits = op.gate === 'MEASURE' && nc ? op.clbits ?? [] : op.conditional ? [op.conditional.classical_register] : []
+    if (bits.length && qs.length) {
+      const deepest = Math.max(...bits.filter((c) => c < nc), 0)
+      lane = Array.from({ length: n + deepest + 1 - Math.min(...qs) }, (_, i) => Math.min(...qs) + i)
+    }
     const col = Math.max(0, ...lane.map((q) => free[q]))
     lane.forEach((q) => { free[q] = col + 1 })
     return col
   })
-  return { cols, free }
+  return { cols, free: free.slice(0, n) }
 }
 
 /** Live drawing of the spec as it is edited (entangling gates in gold); with ``compose``, click wires to add gates. */
@@ -49,25 +63,80 @@ export function CircuitPreview({ spec, highlight, onPick, compose }: {
   const [hoverQ, setHoverQ] = useState<number | null>(null)
   const n = Math.max(1, Math.min(spec.num_qubits, 12))
   const ops = spec.operations
-  const { cols, free } = layout(ops, n)
+  const nc = Math.min(classicalBits(ops), 12)
+  const { cols, free } = layout(ops, n, nc)
   const nCols = Math.max(1, ...cols.map((c) => c + 1))
   const adding = compose && compose.tool && compose.tool !== 'ERASE' ? compose.tool : null
   const erasing = compose?.tool === 'ERASE'
   const pickedQs = [...(compose?.pending ?? []), ...(hoverQ !== null && !compose?.pending.includes(hoverQ) ? [hoverQ] : [])]
   const ghostCol = adding && pickedQs.length ? Math.max(0, ...lane(adding, pickedQs, n).map((q) => free[q])) : nCols
   const width = LEFT + (Math.max(nCols, ghostCol + 1) + 1 + (adding ? 1 : 0)) * COL + 40
-  const height = n * ROW + 16
+  const CROW = 30
+  const height = n * ROW + 16 + (nc ? nc * CROW + 6 : 0)
   const y = (q: number) => 24 + q * ROW
+  const yc = (c: number) => y(n - 1) + ROW * 0.85 + c * CROW // classical bit wires sit under the qubits
   const x = (c: number) => LEFT + 30 + c * COL
   const mx = x(adding ? Math.max(nCols, ghostCol + 1) : nCols) + 8
-  const measured = new Set(spec.measurements.map((m) => m.qubit))
-  ops.forEach((op) => op.gate === 'MEASURE' && op.targets.forEach((q) => measured.add(q)))
+  const measured = new Set(spec.measurements.map((m) => m.qubit)) // terminal meters; MEASURE ops draw in place
   const valid = (q: number) => q >= 0 && q < n
 
+  const meter = (mx: number, my: number, hl = false) => (
+    <g>
+      <rect x={mx - 16} y={my - 14} width={32} height={28} rx={6} fill={hl ? '#3a3d45' : '#2d3036'} stroke={hl ? '#fff' : '#5c6068'} />
+      <path d={`M${mx - 9} ${my + 6}a9 9 0 0118 0`} stroke="#ecebe8" fill="none" strokeWidth={1.4} />
+      <path d={`M${mx} ${my + 6}l6 -10`} stroke="#ecebe8" strokeWidth={1.4} />
+    </g>
+  )
+
+  /** Feed-forward: a dashed line from the gate down to the bit it reads, a dot there (filled 1, hollow 0) and "=v". */
+  const condition = (op: Operation, cx: number, from: number): ReactElement | null => {
+    const cond = op.conditional
+    if (!cond || cond.classical_register >= nc) return null
+    const cy = yc(cond.classical_register)
+    return (
+      <g pointerEvents="none">
+        <line x1={cx} x2={cx} y1={from} y2={cy} stroke="var(--primary)" strokeWidth={1.6} strokeDasharray="4 3" />
+        <circle cx={cx} cy={cy} r={4.5} fill={cond.value ? 'var(--primary)' : 'var(--bg)'} stroke="var(--primary)" strokeWidth={1.6} />
+        <text x={cx + 8} y={cy - 6} fontSize={10.5} fill="var(--primary)" fontFamily="var(--mono)">={cond.value}</text>
+      </g>
+    )
+  }
+
   const drawOp = (op: Operation, i: number): ReactElement | null => {
+    const el = drawGate(op, i)
+    if (!el || !op.conditional) return el
+    const qs = [...op.targets, ...(op.controls ?? [])].filter(valid)
+    if (!qs.length) return el
+    const bottom = Math.max(...qs.map(y)) + (op.gate === 'CX' || op.gate === 'CCX' ? 11 : 15)
+    return <>{el}{condition(op, x(cols[i]), bottom)}</>
+  }
+
+  const drawGate = (op: Operation, i: number): ReactElement | null => {
     const cx = x(cols[i])
     const hl = highlight === `operations[${i}]`
     const ink = hl ? '#ffffff' : '#ecebe8'
+    if (op.gate === 'MEASURE') {
+      const ys = op.targets.filter(valid).map(y)
+      if (!ys.length) return null
+      return (
+        <>
+          {op.targets.map((q, k) => {
+            const c = op.clbits?.[k]
+            if (!valid(q)) return null
+            return (
+              <g key={q}>
+                {c !== undefined && c < nc && (
+                  <path d={`M${cx - 2} ${y(q) + 14}V${yc(c) - 5}M${cx + 2} ${y(q) + 14}V${yc(c) - 5}`} stroke="#8b8f98" strokeWidth={1.2} />
+                )}
+                {c !== undefined && c < nc && <path d={`M${cx - 5} ${yc(c) - 7}l5 6l5 -6z`} fill="#8b8f98" />}
+                {meter(cx, y(q), hl)}
+              </g>
+            )
+          })}
+          <rect x={cx - 17} y={Math.min(...ys) - 15} width={34} height={Math.max(...ys) - Math.min(...ys) + 30} fill="transparent" />
+        </>
+      )
+    }
     if (MULTI.has(op.gate) && op.controls?.length && op.targets.length) {
       const cs = op.controls, t = op.targets[0]
       if (!cs.every(valid) || !valid(t)) return null
@@ -170,6 +239,12 @@ export function CircuitPreview({ spec, highlight, onPick, compose }: {
             <line x1={LEFT} x2={width - 10} y1={y(q)} y2={y(q)} stroke={hoverQ === q && adding ? '#7a7e87' : '#55585f'} strokeWidth={1.5} />
           </g>
         ))}
+        {Array.from({ length: nc }, (_, c) => (
+          <g key={`c${c}`} pointerEvents="none">
+            <text x={8} y={yc(c) + 4} fontSize={12} fill="var(--muted)" fontFamily="var(--mono)">c{c}</text>
+            <path d={`M${LEFT} ${yc(c) - 1.5}H${width - 10}M${LEFT} ${yc(c) + 1.5}H${width - 10}`} stroke="#45484f" strokeWidth={1} />
+          </g>
+        ))}
         {adding && compose && Array.from({ length: n }, (_, q) => (
           <rect key={`hit${q}`} x={0} y={y(q) - ROW / 2} width={width} height={ROW} fill="transparent" style={{ cursor: 'crosshair' }}
             onMouseEnter={() => setHoverQ(q)} onMouseLeave={() => setHoverQ(null)} onClick={() => compose.onWire(q)}
@@ -187,11 +262,7 @@ export function CircuitPreview({ spec, highlight, onPick, compose }: {
         })}
         {ghost()}
         {Array.from({ length: n }, (_, q) => measured.has(q) && (
-          <g key={`m${q}`} pointerEvents="none">
-            <rect x={mx - 16} y={y(q) - 14} width={32} height={28} rx={6} fill="#2d3036" stroke="#5c6068" />
-            <path d={`M${mx - 9} ${y(q) + 6}a9 9 0 0118 0`} stroke="#ecebe8" fill="none" strokeWidth={1.4} />
-            <path d={`M${mx} ${y(q) + 6}l6 -10`} stroke="#ecebe8" strokeWidth={1.4} />
-          </g>
+          <g key={`m${q}`} pointerEvents="none">{meter(mx, y(q))}</g>
         ))}
       </svg>
     </div>
