@@ -18,6 +18,10 @@ AI answer is traced back to a tool that computed it.
 <sub>Above: the quantum internet on a 3D Earth, recorded live on Meta's models. The real Sun's day and night,
 SpeQtre and QUBE-II on today's orbits, gold pairs of entangled photons on every route.</sub>
 
+**▶ Watch the demo (2:40):** [youtube.com/watch?v=_a1YO8vMkPY](https://www.youtube.com/watch?v=_a1YO8vMkPY)
+
+[![Inkubit demo video: from a pencil sketch to a quantum internet](docs/thumbnail.png)](https://www.youtube.com/watch?v=_a1YO8vMkPY)
+
 ### See it work
 
 Every clip is recorded from the running app, live on Meta's models (sped-up stretches are labelled on screen).

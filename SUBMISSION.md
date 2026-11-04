@@ -5,7 +5,7 @@ Every number below comes from a run of this repo.
 
 **Track:** Indie developer · **Problem statement:** Push the Frontier (accelerate a scientific experiment; understand and control a physical system)
 
-**Demo video:** `<YouTube / Loom link>` · **Code:** https://github.com/Dhruv-Deku/inkubit (public, MIT) · **Try it:** `<hosted app link>` (public mode: model-written code is never executed, live calls capped per day)
+**Demo video:** https://www.youtube.com/watch?v=_a1YO8vMkPY · **Code:** https://github.com/Dhruv-Deku/inkubit (public, MIT) · **Try it:** `<hosted app link>` (public mode: model-written code is never executed, live calls capped per day)
 
 ## At a glance (for judges)
 
