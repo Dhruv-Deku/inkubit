@@ -58,7 +58,7 @@ cd backend && python -m uvicorn inkubit.api.app:app --port 8000   # then open ht
 
 Press **Guided tour** in the header (or open `/#tour`) for a walk through the highlights in under two minutes. Without a key
 everything runs offline on labelled mock models; with `META_API_KEY` in `.env` the Meta models are
-live. 615 backend tests, all offline except two opt-in live checks (`cd backend && python -m pytest -q`), and browser tests drive the built app
+live. 626 backend tests, all offline except two opt-in live checks (`cd backend && python -m pytest -q`), and browser tests drive the built app
 (`python -m pytest e2e`); CI runs both on every push. Every design decision is in [DECISIONS.md](DECISIONS.md) (D1 to D81); what was built on which day is in
 [Built during the hackathon](#built-during-the-hackathon).
 
@@ -190,6 +190,9 @@ Inkubit closes that gap and refuses to fake success:
 </tr>
 <tr>
 <td colspan="2"><img src="docs/screenshots/26-use-cases.png" alt="What it can do: nine cards with pen sketches, one click each"></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/screenshots/43-quantum-internet.png" alt="Quantum internet on a 3D Earth: Muse Spark designed Delhi, Mumbai and London, Muse Wonder improved it in its second round, physics and an exhaustive search agree; live satellites overhead"></td>
 </tr>
 <tr>
 <td colspan="2"><img src="docs/screenshots/41-lecture-checker.png" alt="Lecture checker: the wrong claims from a filmed lecture, the timeline of speech, drawing and verdicts, the tracked board, corrected notes and a proven figure"></td>
@@ -378,7 +381,7 @@ The badge at the top right shows **Meta live**, **Mock**, or **Meta (no key: moc
 a planted bug and prints the live log. `scripts/demo.sh examples/specs/network_fiber_chain.json`
 runs the network agent.
 
-**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (615 tests, two opt-in live,
+**Tests:** `cd backend && ../.venv/Scripts/python -m pytest -q` (626 tests, two opt-in live,
 about 10 minutes, all offline). `python -m pytest e2e` (after `npm run build`) starts the server on the offline models
 and drives the built app in Chromium: every section, a sketch to verified code, the guided tour, the satellite
 planner, phone width (`E2E_BROWSER_CHANNEL=msedge` uses the system Edge). `pytest -m live` makes one cheap real call per
