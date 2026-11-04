@@ -1101,3 +1101,26 @@ Muse Image was right first time on 5 (Bell pair, Deutsch-Jozsa (balanced), GHZ-3
 wires, a Toffoli drawn for two CNOTs, controls joined to nothing, boxes spanning several wires. So the benchmark
 measures Muse Image, and the rule (never show an unproven figure on its own) is what makes it safe to use.
 
+## D88. The quantum internet on a 3D Earth (2026-11-04)
+A key network between real cities, designed by the models and decided by physics, on a globe you can grab.
+
+- **The globe** (`frontend/src/components/EarthScene.ts`, three.js): Natural Earth land drawn into a texture, lit by the
+  Sun's real position for the moment shown (the Astronomical Almanac's low-precision solar coordinates), so day and
+  night are right; routes coloured by the key they deliver; entangled photon pairs in gold (the colour kept for
+  entanglement) leaving each source in opposite directions, fading out on the way where no key survives; SpeQtre and
+  QUBE-II on their real orbits (SGP4 from today's CelesTrak elements, three hours ahead), with a gold beam to a city
+  whenever the satellite is more than 15 degrees above its horizon; time at 1x, 60x or 600x. A frame is only ever
+  scheduled once (OrbitControls' change event inside the frame would otherwise double the frames each frame).
+- **Routes** (`backend/inkubit/qnet.py`) are one of three things that exist: fiber over the great-circle distance (the
+  best case), fiber cut by quantum-memory repeaters (the network model's heralded segments), or a real satellite as a
+  trusted node, scored by its clear-sky key from the real night passes of the next 24 hours, with tonight's cloud
+  forecast shown beside it. A design is scored by its weakest pair.
+- **The collaboration**: Muse Spark designs from words (city ids only, route types, no numbers); exact physics scores
+  every route; Muse Wonder challenges with the physics in hand, and gets a second round with its first attempt as
+  physics scored it; an exhaustive search over the same options shows the best possible. In the first live runs Spark
+  chose QUBE-II for Delhi–Mumbai (586 bits a day), Wonder's first try did worse, and its second round switched to
+  SpeQtre (8,070 bits a day), which the search confirmed as the best of the options. The numbers move with the orbits.
+- **Honest physics, not a sales pitch**: with today's memories (10 ms) the model's repeaters never beat direct fiber;
+  a slider lets anyone see where they start to win (three repeaters with 10 s memories give London–Paris about six
+  times fiber's key). Offline, a rule of thumb stands in for the designer and nobody challenges it.
+

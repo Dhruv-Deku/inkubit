@@ -617,6 +617,57 @@ def paper_status(paper_id: str) -> dict[str, Any]:
     return {"id": s.id, "status": s.status, "error": s.error, "source": s.source, "result": s.result}
 
 
+class QnetPlanRequest(BaseModel):
+    request: str = Field(min_length=3, max_length=400)
+
+
+@app.get("/api/qnet/cities")
+def qnet_cities() -> dict[str, Any]:
+    from inkubit.qnet import CITIES
+
+    return {"cities": [{"id": k, "name": v[0], "lat": v[1], "lon": v[2]} for k, v in CITIES.items()]}
+
+
+@app.get("/api/qnet/sky")
+def qnet_sky() -> dict[str, Any]:
+    """The operating quantum-key satellites now and over the next three hours, from today's CelesTrak elements."""
+    from inkubit.qnet import sky
+
+    return sky()
+
+
+@app.post("/api/qnet/evaluate")
+def qnet_evaluate(body: dict[str, Any]) -> dict[str, Any]:
+    """Exact physics for any design (the globe's own edits): every route's key rate and what limits it."""
+    from inkubit.qnet import Design, evaluate
+
+    try:
+        design = Design.model_validate({"by": "you", **body})
+        return evaluate(design)
+    except (ValueError, TypeError) as err:
+        raise HTTPException(422, str(err)[:300]) from None
+
+
+@app.post("/api/qnet/plan")
+def qnet_plan(body: QnetPlanRequest) -> dict[str, Any]:
+    """Muse Spark designs a key network from words, Muse Wonder challenges it, exact physics and an exhaustive search
+    decide."""
+    from inkubit import qnet
+
+    s = qnet.launch(body.request, get_models())
+    return {"plan_id": s.id}
+
+
+@app.get("/api/qnet/plan/{plan_id}")
+def qnet_plan_status(plan_id: str) -> dict[str, Any]:
+    from inkubit import qnet
+
+    s = qnet.get(plan_id)
+    if s is None:
+        raise HTTPException(404, "no such plan")
+    return s.view()
+
+
 @app.get("/api/lecture/sample")
 def lecture_sample() -> dict[str, Any]:
     """The bundled sample lecture: a pen sketch drawn in stages while two voices explain it, two of them wrongly."""

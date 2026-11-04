@@ -435,6 +435,42 @@ async def lecture_story(d: Director) -> None:
                     hold=3.6)
 
 
+async def earth_story(d: Director) -> None:
+    """The quantum internet on a 3D Earth: Muse Spark designs, Muse Wonder challenges, physics decides; then an edit."""
+    page = d.page
+    await section(d, "Hardware & networks")
+    earth = await show(d, "Quantum internet")
+    await earth.locator(".qe-list button").first.wait_for(timeout=120_000)
+    await d.click(earth.locator(".qe-samples .linkish", has_text="Connect Delhi, Mumbai and London"))
+    await d.caption("**A quantum internet on the real Earth**: Muse Spark designs a key network between the cities you name.", hold=2.3)
+    await d.fast(4, "physics scoring every route")
+    await page.wait_for_function("() => [...document.querySelectorAll('.qe-steps li')].some(li => "
+                                 "li.textContent.includes('Verdict') && li.className.includes('s-done'))", timeout=300_000)
+    await d.normal()
+    await d.caption("Muse Wonder challenges it, learns from how physics scored its first try, and wins; an exhaustive "
+                    "search confirms nothing better exists.", hold=3.6)
+    await d.caption(None)
+    globe = earth.locator(".qe-globe canvas")
+    await d.move(globe, 0.42, 0.55, steps=12)
+    await page.mouse.down()
+    for k in range(1, 19):
+        await page.mouse.move(d.x + k * 9, d.y - k * 2)
+        await d.wait(0.03)
+    await page.mouse.up()
+    await d.click(earth.locator(".qe-time .seg button", has_text="600"))
+    await d.caption("SpeQtre and QUBE-II fly their real orbits from today's CelesTrak data; gold is entangled light, "
+                    "beamed to a city on each night pass.", hold=3.1)
+    await d.click(earth.locator(".qe-designs button", has_text="Yours"))
+    await d.click(earth.locator(".qe-list button", has_text="London"))
+    await d.click(earth.locator(".qe-route .seg button", has_text="repeaters"))
+    await d.wait(1.0)
+    slider = earth.locator(".qe-slider input").nth(1)
+    await d.move(slider, 0.5, 0.5, steps=10)
+    await slider.fill("4")
+    await d.caption("Edit any route and physics answers at once: with ten-second memories, three repeaters beat direct fiber.",
+                    hold=3.6)
+
+
 async def discovery_story(d: Director) -> None:
     page, live = d.page, d.live
     await section(d, "Discover")
@@ -489,20 +525,9 @@ async def estimator_story(d: Director) -> None:
 async def hardware_story(d: Director) -> None:
     page = d.page
     await section(d, "Hardware & networks")
-    pulse = await show(d, "Pulse lab")
-    await pulse.locator(".obs-head").first.wait_for(timeout=120_000)
-    await d.caption("Down to the microwave pulse: a three-level transmon, where DRAG keeps a fast X gate near 1e-4 error.", hold=3.2)
     dec = await show(d, "ML error-correction decoder")
     await dec.locator(".obs-head").first.wait_for(timeout=60_000)
     await d.caption("A learned surface-code decoder that reads both kinds of checks beats minimum-weight matching, beyond its error bars.", hold=3.6)
-    await show(d, "Code lab")
-    await d.caption(f"**Codes designed by AI, proven exactly**: for chips where phase flips dominate, Muse Spark found a 9-qubit code that "
-                    f"needs {F['dz']} phase flips to fail, against {F['surface_dz']} for the surface code.", hold=5.2)
-    sat = await show(d, "Satellite planner")
-    await sat.locator(".sat-card").wait_for(timeout=120_000)
-    await d.caption("Out to orbit, live: SpeQtre on today's real orbit from CelesTrak, every night pass over its ground stations…", hold=3.2)
-    await d.scroll_to(sat.locator(".outlook"), block="center", pause=0.3)
-    await d.caption("…weighed by the cloud forecast at each station.", hold=2.6)
 
 
 async def evidence_story(d: Director) -> None:
@@ -554,7 +579,7 @@ async def record(base: str, out: Path, captions: bool = True) -> None:
             F.update(facts())
             for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("feedforward", feedforward_story), ("lecture", lecture_story),
                                 ("discovery", discovery_story), ("estimator", estimator_story),
-                                ("hardware", hardware_story), ("evidence", evidence_story)):
+                                ("hardware", hardware_story), ("earth", earth_story), ("evidence", evidence_story)):
                 print(name, f"{rec._video_time(time.monotonic()):.1f} s", flush=True)
                 d.cues.append((rec._video_time(time.monotonic()), f"[scene: {name}]"))
                 await story(d)

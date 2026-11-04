@@ -27,6 +27,7 @@ import { DistributedPanel } from './components/Distributed'
 import { EstimatorPanel } from './components/Estimator'
 import { LiveBoardPanel } from './components/LiveBoard'
 import { LecturePanel } from './components/Lecture'
+import { QuantumEarthPanel } from './components/QuantumEarth'
 import { GlobePanel } from './components/Globe'
 import { ReproducePanel } from './components/Reproduce'
 import { DecoderPanel } from './components/Decoder'
@@ -49,7 +50,7 @@ import { clone, decodeSpec, encodeSpec, specTitle } from './util'
 type SectionId = 'build' | 'discover' | 'hardware' | 'labs' | 'evidence'
 const SECTIONS: { id: SectionId; label: string; hint: string; panels: string[] }[] = [
   { id: 'build', label: 'Sketch to code', hint: 'photo, words, voice, whiteboard', panels: ['Live board', 'Lecture checker', 'Quantum Rosetta', 'What it can do', 'Recent runs', 'Sample sketches'] },
-  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, satellites', panels: ['IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
+  { id: 'hardware', label: 'Hardware & networks', hint: 'IBM chips, pulses, satellites', panels: ['Quantum internet', 'IBM Quantum', 'Pulse lab', 'ML error-correction decoder', 'Code lab', 'Error-correction lab', 'Distributed quantum computer', 'Satellite planner'] },
   { id: 'evidence', label: 'Proof', hint: 'every check, every chip run', panels: ['Proof sheet over the gallery', 'Simulation observatory', 'AI alone vs Inkubit', 'The AI referee', 'Proven illustrations'] },
   { id: 'discover', label: 'Discover', hint: 'AI scientist, papers, estimates', panels: ['Discovery lab', 'An AI scientist that learns', 'When does quantum win?', 'Reproduce a paper', 'Reproduce a whole paper'] },
   { id: 'labs', label: 'Labs', hint: 'Shor, QAOA, H₂, BB84, games', panels: ["Shor's algorithm lab", 'Split the party', 'Molecule lab', 'Catch the spy', 'Bug hunt', 'Challenges'] },
@@ -434,6 +435,7 @@ export default function App() {
           {seen.has('hardware') && (
             <div hidden={tab !== 'hardware'}>
             <div className="stack section-body">
+              <QuantumEarthPanel live={health?.mode === 'meta'} />
               <IbmPanel spec={spec && spec.kind === 'circuit' ? spec : null} />
               <PulsePanel />
               <DecoderPanel />

@@ -9,7 +9,7 @@ const R_E = 6378.137
 const MIN_EL = 15
 
 /** Natural Earth land (TopoJSON, quantised and delta-encoded arcs) to rings of [lon, lat]. */
-function landRings(): [number, number][][] {
+export function landRings(): [number, number][][] {
   const topo = land as unknown as { transform: { scale: [number, number]; translate: [number, number] }; arcs: [number, number][][]; objects: { land: { geometries: { type: string; arcs: number[][][] | number[][] }[] } } }
   const [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate
   const arcs = topo.arcs.map((arc) => { let x = 0, y = 0; return arc.map(([dx, dy]) => { x += dx; y += dy; return [x * sx + tx, y * sy + ty] as [number, number] }) })
