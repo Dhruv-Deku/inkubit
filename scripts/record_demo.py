@@ -224,7 +224,7 @@ class Director:
             self.cues.append((self.rec._video_time(time.monotonic()), text.replace("**", "")))
         await self.page.evaluate("t => window.__demo.caption(t)", (text or "") if self.captions else "")
         if hold:
-            await self.wait(hold)
+            await self.wait(hold * HOLD)
 
     async def card(self, title: str, sub: str = "", chips: list[str] | None = None, note: str = "",
                    small: bool = False, hold: float = 4) -> None:
@@ -298,6 +298,7 @@ def facts() -> dict:
 
 
 F: dict = {}
+HOLD = 1.0  # the long cut (--long) holds every caption longer, for a voice-over at an easy pace
 
 
 def panel(page: Page, title: str) -> Locator:
@@ -312,11 +313,23 @@ async def section(d: Director, label: str) -> None:
     await d.wait(0.8)
 
 
+async def until(d: Director, target: Locator, label: str = "loading", factor: float = 8, timeout: float = 300_000) -> None:
+    """Wait for something to appear; if it takes more than a moment, the wait is sped up and labelled on screen."""
+    try:
+        await target.wait_for(timeout=700)
+        return
+    except Exception:
+        pass
+    await d.fast(factor, label)
+    await target.wait_for(timeout=timeout)
+    await d.normal()
+
+
 async def show(d: Director, title: str, pause: float = 0.9) -> Locator:
     """Scroll a panel to the top of the view (under the sticky tabs) and return it."""
     await d.caption(None)
     p = panel(d.page, title)
-    await p.first.wait_for(timeout=60_000)
+    await until(d, p.first)
     await p.first.evaluate("el => el.scrollIntoView({behavior: 'smooth', block: 'start'})")
     await d.wait(pause)
     return p
@@ -325,34 +338,34 @@ async def show(d: Director, title: str, pause: float = 0.9) -> Locator:
 async def hero_story(d: Director) -> None:
     """The opening scene replays the pipeline in 3D on the bundled GHZ sketch; its own step bar narrates."""
     page = d.page
-    await page.locator(".hero3d-stage canvas").wait_for(timeout=60_000)
+    await until(d, page.locator(".hero3d-stage canvas"))
     await page.evaluate("document.querySelector('.hero3d-legend .linkish').click()")  # replay from the start
-    await d.wait(10.4)
+    await d.wait(9.8)
     await d.scroll_to(panel(page, "Mission control"), block="start", pause=0.9)
 
 
 async def mission_story(d: Director) -> None:
     page, live = d.page, d.live
     mc = panel(page, "Mission control")
-    await d.caption("**Mission control**: one request, in words, a photo or speech.", hold=2.4)
+    await d.caption("**Mission control**: one request, in words, a photo or speech.", hold=1.9)
     await d.click(mc.locator(".chip-btn", has_text="Secure two cities"))
-    await d.wait(1.6)
+    await d.wait(1.1)
     await d.caption(models_or(live, "**Muse Spark** turns it into a plan: a graph of exact tools. Independent steps run in parallel.",
                               "The planner turns it into a graph of exact tools. Independent steps run in parallel."))
     await d.click(mc.locator("button.btn.primary", has_text="Launch mission"))
-    await page.wait_for_selector(".mnode", timeout=120_000)
+    await until(d, page.locator(".mnode").first, "planning", factor=5)
     await d.scroll_to(page.locator(".mission-graph-scroll"), block="center", pause=0.3)
-    await d.fast(3, "tools and model calls")
+    await d.fast(5, "tools and model calls")
     await page.locator(".mission-report").wait_for(timeout=300_000)
     await d.normal()
     await d.caption("Every step passed physics checks and a second, independent simulator before anything was reported.", hold=0.4)
     nodes = page.locator(".mnode.s-done, .mnode.s-repaired")
     if await nodes.count() > 1:
         await d.click(nodes.nth(1))
-    await d.wait(3.2)
+    await d.wait(2.5)
     await d.scroll_to(page.locator(".mission-report"), block="center", pause=0.4)
     await d.caption(models_or(live, "**Muse Spark** writes the report, and every number in it is traced to the tool that computed it.",
-                              "The report's numbers are each traced to the tool that computed them."), hold=4.4)
+                              "The report's numbers are each traced to the tool that computed them."), hold=3.6)
 
 
 async def sketch_story(d: Director) -> None:
@@ -360,32 +373,32 @@ async def sketch_story(d: Director) -> None:
     await section(d, "Sketch to code")
     sample = page.locator(".sample", has_text="Bell pair")
     await d.scroll_to(sample, block="center", pause=0.5)
-    await d.caption("Where it started: a photo of a pen sketch becomes verified code.", hold=1.6)
+    await d.caption("Where it started: a photo of a pen sketch becomes verified code.", hold=1.2)
     await d.click(sample)
     await d.caption(models_or(live, "**SAM 3.1** finds every drawn part; **Muse Spark** reads the photo into a spec…",
                               "The sketch is segmented and read into a spec…"))
     if live:
-        await d.fast(4, "model calls")
+        await d.fast(6, "model calls")
     await page.wait_for_selector(".overlay-wrap svg rect", timeout=180_000)
     await d.normal()
-    await d.caption("…with every gate linked to the box it was read from.", hold=2.2)
+    await d.caption("…with every gate linked to the box it was read from.", hold=1.7)
     await d.scroll_top()
     await d.caption("**Demo mode** plants a real bug in the first attempt, so you can watch it get caught.")
     await d.click(page.locator("header label.toggle"))
     await d.wait(0.8)
     await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.4)
     await d.click(page.locator("button.btn.primary.big"))
-    await d.fast(4, "sandbox run")
+    await d.fast(8, "sandbox run")
     await page.wait_for_selector(".ev.fail", timeout=180_000)
     await d.normal()
-    await d.caption("The verifier predicts the answer from the spec, never from the code. This run disagrees, so it **fails**.", hold=3.4)
+    await d.caption("The verifier predicts the answer from the spec, never from the code. This run disagrees, so it **fails**.", hold=2.9)
     await d.caption(models_or(live, "**Muse Spark** gets the evidence and repairs the code…",
                               "The repairer gets the evidence and fixes the code…"))
-    await d.fast(4, "repair and re-run")
+    await d.fast(8, "repair and re-run")
     await page.wait_for_selector(".verdict-badge", timeout=240_000)
     await d.normal()
     await d.wait(0.4)
-    await d.caption("…attempt 2 matches the prediction within shot noise: **verified**.", hold=3.4)
+    await d.caption("…attempt 2 matches the prediction within shot noise: **verified**.", hold=2.7)
     await d.click(page.locator("header label.toggle"))  # demo mode off again
     await d.scroll_top()
     await d.click(page.locator("nav.steps button >> nth=0"))
@@ -401,14 +414,14 @@ async def feedforward_story(d: Director) -> None:
     await page.wait_for_selector(".preview svg", timeout=60_000)
     await d.scroll_to(page.locator(".preview").first, block="center", pause=0.6)
     await d.caption("**Feed-forward**: a helper qubit measures the error syndrome mid-circuit, is reset and reused, "
-                    "and only the qubit the two bits point to is fixed, on the chip.", hold=4.6)
+                    "and only the qubit the two bits point to is fixed, on the chip.", hold=3.9)
     await d.caption(None)
     await d.scroll_to(page.locator(".run-bar"), block="center", pause=0.3)
     await d.click(page.locator("button.btn.primary.big"))
-    await d.fast(4, "sandbox run")
+    await d.fast(8, "sandbox run")
     await page.wait_for_selector(".verdict-badge", timeout=240_000)
     await d.normal()
-    await d.caption("Predicted exactly over every branch, verified, and it compiles for IBM's ibm_fez as it is.", hold=3.4)
+    await d.caption("Predicted exactly over every branch, verified, and it compiles for IBM's ibm_fez as it is.", hold=2.7)
     await d.scroll_top()
     await d.click(page.locator("nav.steps button >> nth=0"))
     await d.wait(0.8)
@@ -421,18 +434,20 @@ async def lecture_story(d: Director) -> None:
     lec = await show(d, "Lecture checker")
     await d.click(lec.get_by_role("button", name="Check the sample lecture"))
     await d.caption("**Lecture checker**: a filmed explanation. Muse Voice tells the speakers apart; SAM 3.1 tracks each drawn "
-                    "part through the video.", hold=3.6)
+                    "part through the video.", hold=3.1)
+    await d.fast(4, "checking the lecture")
     await lec.locator(".lec-headline").wait_for(timeout=240_000)
+    await d.normal()
     # play the lecture itself (muted) from just before the second CNOT is drawn and the "W state" claim is made
     await page.evaluate("() => { const v = document.querySelector('.panel.lecture video'); v.muted = true; "
                         "v.currentTime = 24; v.play().catch(() => {}); }")
     await d.click(lec.locator(".lec-filter button", has_text="Wrong"))
     await d.caption("Muse Spark writes every claim out; exact physics judges each against the board as it was when it was "
-                    "said. Both speakers' mistakes are caught.", hold=4.4)
+                    "said. Both speakers' mistakes are caught.", hold=3.9)
     await d.caption(None)
     await d.scroll_to(lec.locator(".lec-lower"), block="center", pause=0.5)
     await d.caption("Muse Wonder writes corrected notes, and Muse Image's figure is read back and proven before it is shown.",
-                    hold=3.6)
+                    hold=3.0)
 
 
 async def earth_story(d: Director) -> None:
@@ -440,15 +455,15 @@ async def earth_story(d: Director) -> None:
     page = d.page
     await section(d, "Hardware & networks")
     earth = await show(d, "Quantum internet")
-    await earth.locator(".qe-list button").first.wait_for(timeout=120_000)
+    await until(d, earth.locator(".qe-list button").first)
     await d.click(earth.locator(".qe-samples .linkish", has_text="Connect Delhi, Mumbai and London"))
-    await d.caption("**A quantum internet on the real Earth**: Muse Spark designs a key network between the cities you name.", hold=2.3)
-    await d.fast(4, "physics scoring every route")
+    await d.caption("**A quantum internet on the real Earth**: Muse Spark designs a key network between the cities you name.", hold=2.0)
+    await d.fast(8, "physics scoring every route")
     await page.wait_for_function("() => [...document.querySelectorAll('.qe-steps li')].some(li => "
                                  "li.textContent.includes('Verdict') && li.className.includes('s-done'))", timeout=300_000)
     await d.normal()
     await d.caption("Muse Wonder challenges it, learns from how physics scored its first try, and wins; an exhaustive "
-                    "search confirms nothing better exists.", hold=3.6)
+                    "search confirms nothing better exists.", hold=3.1)
     await d.caption(None)
     globe = earth.locator(".qe-globe canvas")
     await d.move(globe, 0.42, 0.55, steps=12)
@@ -459,7 +474,7 @@ async def earth_story(d: Director) -> None:
     await page.mouse.up()
     await d.click(earth.locator(".qe-time .seg button", has_text="600"))
     await d.caption("SpeQtre and QUBE-II fly their real orbits from today's CelesTrak data; gold is entangled light, "
-                    "beamed to a city on each night pass.", hold=3.1)
+                    "beamed to a city on each night pass.", hold=2.8)
     await d.click(earth.locator(".qe-designs button", has_text="Yours"))
     await d.click(earth.locator(".qe-list button", has_text="London"))
     await d.click(earth.locator(".qe-route .seg button", has_text="repeaters"))
@@ -468,19 +483,19 @@ async def earth_story(d: Director) -> None:
     await d.move(slider, 0.5, 0.5, steps=10)
     await slider.fill("4")
     await d.caption("Edit any route and physics answers at once: with ten-second memories, three repeaters beat direct fiber.",
-                    hold=3.6)
+                    hold=3.0)
 
 
 async def discovery_story(d: Director) -> None:
     page, live = d.page, d.live
     await section(d, "Discover")
     disc = await show(d, "Discovery lab")
-    await d.caption("**Discovery lab**: AI proposes, physics proves.", hold=1.8)
+    await d.caption("**Discovery lab**: AI proposes, physics proves.", hold=1.3)
     await d.click(disc.locator(".chip-btn", has_text="GHZ on all 7"))
     await d.caption(models_or(live, "**Muse Spark** proposes circuit layouts for all 7 qubits of an IBM chip; an exact optimiser fits each one.",
                               "Circuit layouts for all 7 qubits of an IBM chip; an exact optimiser fits each one."))
     await d.click(disc.locator("button.btn.primary", has_text="Start discovery"))
-    await d.fast(6, "the search")
+    await d.fast(12, "the search")
     await page.wait_for_function(
         "() => [...document.querySelectorAll('.panel button.btn.primary')].some(b => b.textContent === 'Start discovery')",
         timeout=400_000)
@@ -490,7 +505,7 @@ async def discovery_story(d: Director) -> None:
     await d.scroll_to(disc.locator(".disc-bars"), block="center", pause=0.3)
     if "Discovered" in cx and "Textbook" in cx:
         await d.caption(f"Qiskit proves the winner exact: **{cx['Discovered']} CNOTs**, where the textbook circuit compiled "
-                        f"onto the chip needs {cx['Textbook']}, and more of the state survives noise.", hold=4.6)
+                        f"onto the chip needs {cx['Textbook']}, and more of the state survives noise.", hold=3.9)
     else:
         await d.caption("Qiskit proves every winner exact, and exact noisy simulation decides which survives best.", hold=4.0)
 
@@ -507,7 +522,7 @@ async def paper_story(d: Director) -> None:
     pp = F["paper"]
     await show(d, "Reproduce a whole paper")
     await d.caption(f"**A whole paper** from its PDF: Muse Wonder found {len(pp['experiments'])} experiments in 100 pages, Muse Spark transcribed each, "
-                    f"exact simulation checked {pp['claims_total']} stated numbers.", hold=5.0)
+                    f"exact simulation checked {pp['claims_total']} stated numbers.", hold=4.4)
 
 
 async def estimator_story(d: Director) -> None:
@@ -515,37 +530,109 @@ async def estimator_story(d: Director) -> None:
     est = await show(d, "When does quantum win?")
     await d.caption("**When does quantum win?** Surface-code estimates against the best classical route.")
     await d.click(est.locator(".chip-btn", has_text="Break RSA-2048"))
-    await est.locator(".est-verdict").first.wait_for(timeout=120_000)
-    await d.wait(3.0)
+    await until(d, est.locator(".est-verdict").first, "estimating")
+    await d.wait(2.3)
     await d.click(est.locator(".chip-btn", has_text="Crack a 64-bit key"))
     await d.wait(1.0)
-    await d.caption("Checked against Gidney and Ekerå's RSA-2048 figure, and when classical wins, it says so.", hold=3.8)
+    await d.caption("Checked against Gidney and Ekerå's RSA-2048 figure, and when classical wins, it says so.", hold=3.1)
+
+
+
+async def shor_story(d: Director) -> None:
+    """Shor's algorithm on 15: each reading turned into a period, step by step, with and without noise."""
+    page = d.page
+    await section(d, "Labs")
+    lab = await show(d, "Shor's algorithm lab")
+    await until(d, lab.locator(".shor-grid"))
+    await d.caption("**Shor's algorithm lab**: factor 15 by finding the period of 7ˣ mod 15, on noisy qubits.", hold=1.4)
+    bars = lab.locator(".shor-grid svg g[style*='cursor']")
+    for i in (4, 6, 2):  # a reading that fails, then two that give the factors
+        if await bars.count() > i:
+            await d.move(bars.nth(i), 0.5, 0.6, steps=14)
+            await d.wait(0.7)
+    await d.caption("Each reading becomes a period step by step; exact noisy simulation says how many runs it really takes "
+                    "to get 15 = 3 × 5.", hold=2.8)
 
 
 async def hardware_story(d: Director) -> None:
     page = d.page
     await section(d, "Hardware & networks")
     dec = await show(d, "ML error-correction decoder")
-    await dec.locator(".obs-head").first.wait_for(timeout=60_000)
-    await d.caption("A learned surface-code decoder that reads both kinds of checks beats minimum-weight matching, beyond its error bars.", hold=3.6)
+    await until(d, dec.locator(".obs-head").first)
+    await d.caption("A learned surface-code decoder that reads both kinds of checks beats minimum-weight matching, beyond its error bars.", hold=3.1)
 
 
 async def evidence_story(d: Director) -> None:
     await section(d, "Proof")
     await show(d, "AI alone vs Inkubit")
     await d.caption("Why verify at all? Asked alone, the same model was exact on small circuits but on only 3 of 6 bigger ones, "
-                    "once 43% off with full confidence.", hold=4.6)
+                    "once 43% off with full confidence.", hold=3.9)
     r = F["ref"]
     await show(d, "The AI referee")
     await d.caption(f"**The AI referee**: Muse Wonder challenges Muse Spark. Debate took it from {r['spark_first']} to {r['final_right']} of {F['ref_n']} right, "
-                    f"but also raised {r['false_alarms']} false alarms; only exact simulation knew which.", hold=5.4)
+                    f"but also raised {r['false_alarms']} false alarms; only exact simulation knew which.", hold=4.6)
     if not F["hw_rehearsal"]:
         await show(d, "Real hardware")
         await d.caption(f"And on a **real IBM quantum computer** ({F['hw_device']}): a digital twin built from the chip's own calibration "
-                        f"predicted what it measured best on {F['hw_best']} of {F['hw_n']} circuits.", hold=5.4)
+                        f"predicted what it measured best on {F['hw_best']} of {F['hw_n']} circuits.", hold=4.7)
 
 
-async def record(base: str, out: Path, captions: bool = True) -> None:
+
+async def glance(d: Director, title: str, text: str, hold: float = 4.2, section_label: str | None = None, down: int = 0) -> None:
+    """The long cut's extra panels: open the section if asked, bring the panel up, say what it is."""
+    if section_label:
+        await section(d, section_label)
+    await show(d, title)
+    if down:
+        await d.page.mouse.wheel(0, down)
+        await d.wait(0.6)
+    await d.caption(text, hold=hold)
+
+
+async def rosetta_story(d: Director) -> None:
+    await glance(d, "Quantum Rosetta", "**The Quantum Rosetta**: the same circuit as Dirac notation, OpenQASM, Quil, Qiskit, Cirq "
+                 "and more, translated both ways and checked.")
+
+
+async def labs_more_story(d: Director) -> None:
+    await glance(d, "Split the party", "**Split the party**: QAOA seats feuding guests at two tables; brute force gives the true "
+                 "best, and the landscape shows every angle the optimiser tried.")
+    await glance(d, "Molecule lab", "**H₂ from first principles**: Hartree–Fock fails as the bond is pulled apart; mitigated VQE "
+                 "follows the exact curve.")
+    await glance(d, "Catch the spy", "**Catch the spy**: BB84 with an eavesdropper on a share of the photons. She raises the error "
+                 "rate past the 11% abort line, so she is caught.")
+    await glance(d, "Bug hunt", "**Bug hunt**: one gate is wrong. Find it against the clock, while Muse Spark plays the same "
+                 "round from the same facts.")
+
+
+async def hardware_more_story(d: Director) -> None:
+    await glance(d, "IBM Quantum", "**IBM Quantum**: three Heron chips mapped from their own calibration. The advisor places a "
+                 "circuit on the qubits most likely to run it without a fault.", hold=4.6)
+    await glance(d, "Pulse lab", "**Pulse lab**: below the gates, DRAG pulses on a three-level transmon keep the qubit out of "
+                 "the level it should never reach.")
+    await glance(d, "Code lab", "**Code lab**: error-correcting codes Muse Spark designed for noise where phase flips dominate, "
+                 "each proven by an exact checker.")
+    await glance(d, "Distributed quantum computer", "**A distributed quantum computer**: two chips joined by entanglement, and "
+                 "how the fidelity falls with the distance between them.")
+
+
+async def proof_more_story(d: Director) -> None:
+    await glance(d, "Proof sheet over the gallery", "**The proof sheet**: two simulators of each kind, a physical density "
+                 "matrix, translation validation of Qiskit's compiler and metamorphic tests, on every gallery circuit.",
+                 section_label="Proof", hold=4.8)
+    await glance(d, "Simulation observatory", "**The simulation observatory**: fiber against satellites, Grover against "
+                 "noise, entanglement growth and the memory wall, each an exact sweep.")
+    await glance(d, "Proven illustrations", "**Proven illustrations**: each figure Muse Image draws is read back by SAM 3.1 "
+                 "and Muse Spark, and shown only if it is exactly the same circuit.")
+
+
+async def learning_short_story(d: Director) -> None:
+    a, b, c = F["learn_steps"]
+    await glance(d, "An AI scientist that learns", f"**An AI scientist that learns**: shown what exact physics said about each "
+                 f"round, Muse Spark's best proven circuit improved on every target ({a}, {b}, {c} CNOTs).", hold=4.6)
+
+
+async def record(base: str, out: Path, captions: bool = True, long: bool = False) -> None:
     with urllib.request.urlopen(f"{base}/api/health", timeout=10) as r:
         health = json.load(r)
     live = health.get("mode") == "meta"
@@ -573,19 +660,25 @@ async def record(base: str, out: Path, captions: bool = True) -> None:
             d.rec = rec
             await rec.start()
             await d.card("Inkubit", "An AI quantum engineer that proves its work. Meta's models plan it; exact physics checks every number.",
-                         chips, note, hold=4.2)
+                         chips, note, hold=3.4)
             await page.screenshot(path=str(out.with_suffix(".png")))
             await d.hide_card()
             F.update(facts())
-            for name, story in (("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("feedforward", feedforward_story), ("lecture", lecture_story),
-                                ("discovery", discovery_story), ("estimator", estimator_story),
-                                ("hardware", hardware_story), ("earth", earth_story), ("evidence", evidence_story)):
+            scenes = [("hero", hero_story), ("mission", mission_story), ("sketch", sketch_story), ("feedforward", feedforward_story),
+                      ("lecture", lecture_story), ("discovery", discovery_story), ("paper", paper_story), ("estimator", estimator_story),
+                      ("shor", shor_story), ("hardware", hardware_story), ("earth", earth_story), ("evidence", evidence_story)]
+            if long:  # the five-minute cut: the same story, with more of every section
+                extra = {"feedforward": ("rosetta", rosetta_story), "discovery": ("learning", learning_short_story),
+                         "shor": ("labs", labs_more_story), "hardware": ("hardware-more", hardware_more_story),
+                         "earth": ("proof", proof_more_story)}
+                scenes = [s for name, story in scenes for s in [(name, story)] + ([extra[name]] if name in extra else [])]
+            for name, story in scenes:
                 print(name, f"{rec._video_time(time.monotonic()):.1f} s", flush=True)
                 d.cues.append((rec._video_time(time.monotonic()), f"[scene: {name}]"))
                 await story(d)
             await d.caption(None)
             await d.card("Inkubit", "Sketch it, say it or photograph it. The AI proposes; exact physics has the last word.",
-                         chips, "github.com/Dhruv-Deku/inkubit · built during the Meta Global AI Developer Hackathon 2026", hold=5.0)
+                         chips, "github.com/Dhruv-Deku/inkubit · built during the Meta Global AI Developer Hackathon 2026", hold=4.4)
             await rec.stop()
             print(f"captured {len(rec.frames)} frames over {rec.t_end - rec.frames[0][0]:.1f} s "
                   f"({rec._video_time(rec.t_end):.1f} s after speed-ups); encoding…")
@@ -603,10 +696,14 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("base", nargs="?", default="http://127.0.0.1:8000")
     ap.add_argument("--out", type=Path, default=ROOT / "docs" / "video" / "inkubit-demo.mp4")
+    ap.add_argument("--long", action="store_true", help="the five-minute cut: more panels in every section and longer holds")
     ap.add_argument("--no-captions", action="store_true",
                     help="keep the pacing but show no captions (for a voice-over); the cues file still lists them")
     args = ap.parse_args()
-    asyncio.run(record(args.base.rstrip("/"), args.out.resolve(), captions=not args.no_captions))
+    global HOLD
+    if args.long:
+        HOLD = 1.35
+    asyncio.run(record(args.base.rstrip("/"), args.out.resolve(), captions=not args.no_captions, long=args.long))
 
 
 if __name__ == "__main__":

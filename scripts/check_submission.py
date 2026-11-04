@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEADLINE = datetime(2026, 11, 5, 2, 0, tzinfo=timezone.utc)  # Nov 4, 9:00 PM ET
-VIDEO = ROOT / "docs" / "video" / "inkubit-demo-v6.mp4"
+VIDEO = ROOT / "docs" / "video" / "inkubit-demo-3min-voiceover.mp4"
 PY = sys.executable
 rows: list[tuple[str, str, str]] = []
 
@@ -44,7 +44,7 @@ def main() -> None:
         "" if vis == "PUBLIC" else f"now {vis or 'unknown'}: gh repo edit Dhruv-Deku/inkubit --visibility public --accept-visibility-change-consequences")
 
     add("TODO" if "<YouTube / Loom link>" in sub else "OK", "Video link in SUBMISSION.md",
-        "upload your voiced cut of docs/video/inkubit-demo-v6-voiceover.mp4 (or docs/video/inkubit-demo-v6.mp4; unlisted is fine), thumbnail docs/thumbnail.png, paste the link" if "<YouTube" in sub else "")
+        "upload your voiced cut of docs/video/inkubit-demo-3min-voiceover.mp4 (unlisted is fine; the 5-minute cut is for YouTube), thumbnail docs/thumbnail.png, paste the link" if "<YouTube" in sub else "")
     add("TODO" if "<hosted app link>" in sub else "OK", "Hosted demo link in SUBMISSION.md",
         "deploy with the Koyeb button in the README (free), paste the URL; or delete the 'Try it' part" if "<hosted app" in sub else "")
     hw = ROOT / "examples" / "hardware_runs.json"

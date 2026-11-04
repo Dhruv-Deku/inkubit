@@ -9,7 +9,7 @@ the key absent from git history, CI on the latest commit, the deadline) and prin
 | Done | What | How |
 | --- | --- | --- |
 | [ ] | Make the repository public | `gh repo edit Dhruv-Deku/inkubit --visibility public --accept-visibility-change-consequences` |
-| [ ] | Record the voice-over | Clipchamp: import `docs/video/inkubit-demo-v6-voiceover.mp4` (no captions), read the blocks in `DEMO_SCRIPT.md` over their scenes |
+| [ ] | Record the voice-over | Clipchamp: import `docs/video/inkubit-demo-3min-voiceover.mp4` (no captions), read the blocks in `DEMO_SCRIPT.md` over their scenes |
 | [ ] | Film your hand drawing a circuit (optional, about 10 s) | Phone, top-down, pen on white paper; put it before the title card |
 | [ ] | Upload the video | YouTube, unlisted is fine; thumbnail `docs/thumbnail.png`; title "Inkubit: Meta's models propose, exact physics checks every number" |
 | [ ] | Paste the video link | `SUBMISSION.md`, line "Demo video" |
