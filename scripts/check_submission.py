@@ -70,9 +70,12 @@ def main() -> None:
         add("OK" if size == (1280, 720) else "FAIL", "YouTube thumbnail 1280x720", f"{size[0]}x{size[1]}")
     else:
         add("FAIL", "YouTube thumbnail", "docs/thumbnail.png is missing")
-    gif = ROOT / "docs" / "screenshots" / "mission-control.gif"
-    add("OK" if gif.exists() and gif.stat().st_size < 10e6 and "mission-control.gif" in readme else "FAIL",
-        "README opens with the mission-control GIF", f"{gif.stat().st_size / 1e6:.1f} MB" if gif.exists() else "missing")
+    gifs = sorted(set(re.findall(r"docs/screenshots/([\w-]+\.gif)", readme)))
+    bad = [g for g in gifs if not (ROOT / "docs" / "screenshots" / g).exists() or (ROOT / "docs" / "screenshots" / g).stat().st_size >= 10e6]
+    add("OK" if gifs and not bad and readme.index("quantum-internet.gif") < readme.index("### Results") else "FAIL",
+        "README opens with the globe GIF and a GIF of every core feature",
+        f"{len(gifs)} GIFs, {sum((ROOT / 'docs' / 'screenshots' / g).stat().st_size for g in gifs if g not in bad) / 1e6:.1f} MB"
+        + (f"; missing or over 10 MB: {', '.join(bad)}" if bad else ""))
 
     code, out = run([PY, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"], cwd=ROOT / "backend")
     m = re.search(r"(\d+) tests? collected", out)

@@ -7,11 +7,46 @@
 number before you see it.**
 
 Inkubit is a quantum lab where the AI never gets the last word. Muse Spark, Muse Wonder, SAM 3.1, Muse Image and
-Muse Voice read sketches, photos, papers and speech, plan multi-step experiments and propose circuits; exact
-simulation, independent re-runs and physics invariants verify every result, and every number in every AI answer is
-traced back to a tool that computed it.
+Muse Voice read sketches, photos, papers, lectures and speech, plan multi-step experiments and propose circuits and
+networks; exact simulation, independent re-runs and physics invariants verify every result, and every number in every
+AI answer is traced back to a tool that computed it.
 
-![The opening scene replays the pipeline in 3D on a real pencil sketch; then Mission control, live: one request becomes a plan of exact tools that runs in parallel, every step verified and every number in the report traced](docs/screenshots/mission-control.gif)
+![A quantum internet on a 3D Earth: Muse Spark designs a key network between Delhi, Mumbai and London, Muse Wonder challenges it and wins its second round, exact physics and an exhaustive search agree; the real satellites fly overhead and a route is edited by hand](docs/screenshots/quantum-internet.gif)
+
+<sub>Above: the quantum internet on a 3D Earth, recorded live on Meta's models. The real Sun's day and night,
+SpeQtre and QUBE-II on today's orbits, gold pairs of entangled photons on every route.</sub>
+
+### See it work
+
+Every clip is recorded from the running app, live on Meta's models (sped-up stretches are labelled on screen).
+
+<table>
+<tr>
+<td width="50%"><b>Mission control</b><br><sub>One request becomes a plan of exact tools that runs in parallel; every number in the report is traced.</sub><br><img src="docs/screenshots/mission-control.gif" alt="The opening scene replays the pipeline in 3D on a real pencil sketch; then Mission control: one request becomes a plan of exact tools that runs in parallel, every step verified and every number in the report traced"></td>
+<td width="50%"><b>Sketch to verified code</b><br><sub>SAM 3.1 finds every drawn part, Muse Spark reads it; a planted bug fails, is repaired and verified.</sub><br><img src="docs/screenshots/sketch-to-verified.gif" alt="A photo of a pen sketch is read into a circuit, demo mode plants a bug, the verifier fails it, Muse Spark repairs the code and attempt two is verified"></td>
+</tr>
+<tr>
+<td><b>Lecture checker</b><br><sub>All five Meta models in one run: every spoken claim judged against the board as it was.</sub><br><img src="docs/screenshots/lecture-checker.gif" alt="Lecture checker: the wrong claims from a filmed lecture, the tracked board, corrected notes and a proven figure"></td>
+<td><b>Feed-forward error correction</b><br><sub>A helper qubit is measured mid-circuit, reset and reused; only the flipped qubit is fixed.</sub><br><img src="docs/screenshots/feed-forward.gif" alt="The bit-flip code with a reused helper qubit and feed-forward, run and verified over every branch"></td>
+</tr>
+<tr>
+<td><b>Discovery lab</b><br><sub>Muse Spark proposes layouts, an exact optimiser fits them, Qiskit proves the winner: 6 CNOTs against 10.</sub><br><img src="docs/screenshots/discovery-lab.gif" alt="Discovery lab: GHZ on all 7 qubits of an IBM heavy-hex chip in 6 CNOTs, where the textbook circuit needs 10"></td>
+<td><b>When does quantum win?</b><br><sub>Surface-code estimates against the best classical route, checked against the published RSA-2048 figure.</sub><br><img src="docs/screenshots/when-quantum-wins.gif" alt="When does quantum win: RSA-2048, then a 64-bit key where classical wins"></td>
+</tr>
+<tr>
+<td colspan="2"><b>Why verify at all</b><br><sub>The model alone was exact on small circuits but on only 3 of 6 bigger ones; debate with Muse Wonder fixed some answers and broke others; on a real IBM quantum computer a twin from the chip's calibration predicted best.</sub><br><img src="docs/screenshots/why-verify.gif" alt="The proof sheet, AI alone vs Inkubit, the AI referee and the real IBM hardware runs"></td>
+</tr>
+</table>
+
+### Five Meta models, each with a job
+
+| Model | What it does in Inkubit | What checks it |
+| --- | --- | --- |
+| **Muse Spark** (`muse-spark-1.3`) | Reads sketches, photos and figures into circuits; plans missions; designs circuits, codes and quantum networks; repairs failing code; writes reports | Exact simulation, a second simulator, physics invariants; every report number traced to a tool |
+| **Muse Wonder** (`muse-wonder-1.0`) | Challenges Muse Spark (the AI referee, the network designs); finds the experiments in a whole paper; writes corrected lecture notes | The same exact physics decides who was right |
+| **SAM 3.1** (`sam-3.1`) | Finds every drawn gate in a photo; tracks each drawn part through a lecture video, frame by frame | Each gate is linked back to the box it was read from |
+| **Muse Image** (`muse-image-1.0`) | Draws figures, and corrects them when the read-back names a mistake | Read back by SAM 3.1 and Muse Spark; shown only if it is exactly the same circuit |
+| **Muse Voice** (`muse-voice-transcribe-1.0`) | Speech in everywhere; tells the speakers in a lecture apart | Each claim is tied to who said it and when |
 
 ### Results you can check in the app
 
@@ -211,6 +246,7 @@ Inkubit closes that gap and refuses to fake success:
 <tr><td><img src="docs/screenshots/31-discovery.png" alt="Discovery lab: GHZ-7 on heavy-hex in 6 CNOTs"></td><td><img src="docs/screenshots/32-distributed.png" alt="Distributed computer: two chips and the fidelity against distance"></td></tr>
 <tr><td><img src="docs/screenshots/33-when-quantum-wins.png" alt="When does quantum win: Grover search loses to a classical cluster at 64 bits"></td><td><img src="docs/screenshots/34-live-board.png" alt="Live board: odds pinned to the wires of a camera frame"></td></tr>
 <tr><td><img src="docs/screenshots/35-satellite-planner.png" alt="Satellite planner: SpeQtre live on its real orbit, every pass over Chilbolton and Singapore under the cloud forecast"></td><td><img src="docs/screenshots/36-reproduce-a-paper.png" alt="Reproduce a paper: every claim within its error bar"></td></tr>
+<tr><td><img src="docs/screenshots/39-ibm-chip-map.png" alt="IBM Quantum: three Heron chips mapped from their own calibration, every qubit and coupler coloured by its error"></td><td><img src="docs/screenshots/40-ibm-experiments.png" alt="Experiments on ibm_fez: the advisor's best, median and worst placements measured 0.894, 0.814 and 0.285; teleportation with real feed-forward 0.924"></td></tr>
 <tr><td><img src="docs/screenshots/37-ml-decoder.png" alt="ML decoder at distance 3 and 5: the bigger code suppresses errors 5.9x per round"></td><td><img src="docs/screenshots/38-pulse-lab.png" alt="Pulse lab: DRAG against Gaussian"></td></tr>
 </table>
 
