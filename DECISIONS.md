@@ -1041,7 +1041,7 @@ D83 left four limits; three are lifted and the fourth (sketches) is left on purp
   the sketch prompt that every cached reading depends on; left for after the hackathon.
 
 ## D85. A second pass against the generated look (2026-11-03)
-The first pass (db26601) only cut words. The page still read as generated: AI-drawn card art with a gold
+The first pass (650cac4) only cut words. The page still read as generated: AI-drawn card art with a gold
 accent, a template hero (heavy headline, two buttons, four big counting numbers), Inter everywhere, dashboard tiles,
 a wall of bordered buttons and panels fading in on scroll.
 
