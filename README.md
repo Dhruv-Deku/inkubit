@@ -1,3 +1,5 @@
+<img src="docs/brand/inkubit-mark.svg" width="72" alt="Inkubit logo: a drop of ink in a satellite's orbit, carrying an entangled photon">
+
 # Inkubit
 
 [![tests](https://github.com/Dhruv-Deku/inkubit/actions/workflows/ci.yml/badge.svg)](https://github.com/Dhruv-Deku/inkubit/actions/workflows/ci.yml)
